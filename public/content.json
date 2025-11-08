@@ -83,10 +83,10 @@
     },
     {
       "title": "AI Roadmap & Full Implementation",
-      "duration": "3–6 months",
+      "duration": "3-6 months",
       "description": "End-to-end implementation of AI agents, workflows, and integrations",
       "deliverables": [
-        "Custom AI agent development (lead qualification, AI voice agent, customer support, etc.)",
+        "Custom AI agents development",
         "Workflow automation and system integrations",
         "Team training and Playbook building",
         "Ongoing optimization and ROI tracking"
