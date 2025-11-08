@@ -75,10 +75,10 @@
       "price": "$4,000 fixed",
       "description": "Deep-dive discovery to identify your highest-ROI AI opportunities",
       "deliverables": [
-        "Current workflow analysis, bottlenecks and pain-point mapping",
-        "AI opportunity scorecard (impact vs. effort matrix)",
-        "Vendor/tool evaluation and recommendation",
-        "3-month quick-wins roadmap with ROI projections"
+        "Workflow analysis and pain point mapping",
+        "AI opportunity scorecard",
+        "Vendor/tool recommendations",
+        "3-month roadmap with ROI projections"
       ],
       "cta": "Book your audit"
     },
