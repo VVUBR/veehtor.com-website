@@ -1,12 +1,12 @@
 {
   "personal": {
-    "name": "Alex Morgan",
+    "name": "Vitor Ungari",
     "title": "AI Strategy Consultant",
-    "email": "alex@aiaudit.com",
-    "phone": "+1 (555) 123-4567",
-    "calendarLink": "https://calendly.com/aiaudit",
-    "linkedin": "https://linkedin.com/in/alexmorgan",
-    "twitter": "https://twitter.com/alexmorgan"
+    "email": "vitor@veehtor.com",
+    "phone": "+17816559279",
+    "calendarLink": "https://calendar.notion.so/meet/vitorvannucchiungari/free",
+    "linkedin": "https://www.linkedin.com/in/vitorungari/",
+    "twitter": "https://x.com/vitorungari"
   },
   "navigation": {
     "links": [
@@ -21,9 +21,9 @@
     "headline": "Ship AI that pays for itself in 90 days",
     "subheadline": "Stop overpaying for AI experiments. Get a custom roadmap that delivers 20-40% efficiency gains and ROI you can measure.",
     "proofPoints": [
-      "Reduce manual work by 20-40% in first quarter",
-      "Clear ROI tracking from day one",
-      "No vendor lock-in or unnecessary enterprise licenses"
+      "Reduce manual work by 20-40% in the first quarter",
+      "Apply AI where and how it actually makes sense",
+      "Clear ROI tracking from day one"
     ],
     "primaryCTA": "Get your AI Audit",
     "secondaryCTA": "See how it works",
@@ -34,16 +34,16 @@
       { "value": "<60s", "label": "Lead response time with AI agents" },
       { "value": "20-40%", "label": "Reduction in manual hours" },
       { "value": "90 days", "label": "Average time to positive ROI" },
-      { "value": "$4,000", "label": "Fixed price for 2-week audit" }
+      { "value": "$4,000", "label": "Fixed price for 2-week extensive audit" }
     ]
   },
   "problemSolution": {
     "problem": {
       "title": "The AI trap most companies fall into",
       "points": [
-        "Spending $50K+ on tools that sit unused",
+        "Spending $20-50K+ on tools that sit unused",
         "Teams overwhelmed by AI hype, unclear where to start",
-        "Consultants who pitch 6-month roadmaps with no guaranteed outcomes",
+        "Consultants who pitch 6-month roadmaps with no guaranteed outcomes (just a pretty PPT)",
         "Vendor lock-in with enterprise licenses you don't need"
       ]
     },
@@ -53,7 +53,7 @@
         {
           "number": "1",
           "title": "AI Audit (2 weeks, $4K)",
-          "description": "We map your actual workflows and identify high-ROI automation opportunities"
+          "description": "We map your actual workflows and identify high-ROI automation and AI agents opportunities"
         },
         {
           "number": "2",
@@ -63,7 +63,7 @@
         {
           "number": "3",
           "title": "Build & Scale",
-          "description": "We implement agents and workflows that integrate seamlessly with your existing stack"
+          "description": "We implement AI agents and workflows that integrate seamlessly with what your company already uses"
         }
       ]
     }
@@ -75,22 +75,22 @@
       "price": "$4,000 fixed",
       "description": "Deep-dive discovery to identify your highest-ROI AI opportunities",
       "deliverables": [
-        "Current workflow analysis and pain point mapping",
+        "Current workflow analysis, bottlenecks and pain-point mapping",
         "AI opportunity scorecard (impact vs. effort matrix)",
         "Vendor/tool evaluation and recommendation",
-        "3-month quick-win roadmap with ROI projections"
+        "3-month quick-wins roadmap with ROI projections"
       ],
       "cta": "Book your audit"
     },
     {
-      "title": "AI Roadmap & Implementation",
+      "title": "AI Roadmap & Full Implementation",
       "duration": "3-6 months",
       "price": "$15K - $50K",
       "description": "End-to-end implementation of AI agents, workflows, and integrations",
       "deliverables": [
-        "Custom AI agent development (lead qualification, customer support, etc.)",
+        "Custom AI agent development (lead qualification, AI voice agent, customer support, etc.)",
         "Workflow automation and system integrations",
-        "Team training and change management",
+        "Team training and Playbook building",
         "Ongoing optimization and ROI tracking"
       ],
       "cta": "Schedule a call"
@@ -98,19 +98,19 @@
   ],
   "outcomes": [
     {
-      "metric": "20% faster",
+      "metric": "+25% revenue",
+      "title": "Revenue Lift",
+      "description": "AI-qualified leads, project data analysis, and weekly business insights increased revenue and win rates"
+    },
+    {
+      "metric": "24h → 1 min",
       "title": "Lead Response Time",
-      "description": "Legal tech startup reduced response time from 5 minutes to under 60 seconds with AI-powered lead qualification"
+      "description": "Cut response from a full day to under 60 seconds with AI-Agents and instant proposal drafts"
     },
     {
-      "metric": "$180K saved",
-      "title": "Annual Labor Cost Reduction",
-      "description": "B2B SaaS company automated 30% of customer support tickets, saving 2 FTEs"
-    },
-    {
-      "metric": "3x pipeline",
+      "metric": "3x pipeline in 6 weeks",
       "title": "Sales Development Efficiency",
-      "description": "Professional services firm tripled qualified meetings by automating prospect research and personalization"
+      "description": "Home services firm tripled qualified meetings by automating prospect research and lead generation"
     }
   ],
   "howItWorks": {
@@ -141,7 +141,7 @@
   },
   "pricing": {
     "title": "Transparent, results-based pricing",
-    "note": "Third-party costs (OpenAI API, Make.com, etc.) billed separately at cost. Most clients spend $200-800/month on infrastructure.",
+    "note": "Third-party costs (e.g., OpenAI API) billed separately at cost. Most clients spend $100-700/month on infrastructure.",
     "tiers": [
       {
         "name": "AI Audit",
@@ -154,26 +154,15 @@
           "3-month roadmap with ROI projections"
         ]
       },
-      {
-        "name": "Roadmap Only",
-        "price": "$8,000 - $15,000",
-        "duration": "3-4 weeks",
-        "features": [
-          "Everything in Audit",
-          "Detailed implementation plan",
-          "Technical architecture",
-          "Vendor procurement support"
-        ]
-      },
-      {
-        "name": "Full Implementation",
+            {
+        "name": "AI Roadmap & Full Implementation",
         "price": "$15,000 - $50,000",
         "duration": "3-6 months",
         "features": [
+          "Everything in Audit",
           "Custom AI agent development",
           "Workflow automation & integrations",
-          "Team training & change management",
-          "Ongoing optimization & ROI tracking"
+          "Team training, Ongoing optimization & ROI tracking"
         ]
       }
     ]
@@ -201,15 +190,15 @@
   "faq": [
     {
       "question": "Why should I pay for an audit when I can just try AI tools myself?",
-      "answer": "Most companies waste $50K+ on AI tools that sit unused because they lack a strategic implementation plan. An audit gives you a clear roadmap with ROI projections, so you invest in the right solutions from day one. Think of it as insurance against expensive mistakes."
+      "answer": "You can do everything with AI, but not everything at the same time. As a business owner, you know the importance of prioritization and opportunity cost. Most companies waste $20K+ on AI tools that sit unused because they lack a strategic implementation plan. An audit gives you a clear roadmap with ROI projections, so you invest in the right solutions from day one. Think of it as insurance against expensive mistakes."
     },
     {
       "question": "What if the audit reveals no good AI opportunities for my business?",
-      "answer": "If we determine AI isn't a fit for your current workflows, we'll tell you upfront and refund 50% of the audit fee. However, in 3+ years of consulting, we've never had a client where we couldn't identify at least one high-ROI opportunity."
+      "answer": "If we determine AI isn't a fit for your current business and workflows, we'll tell you upfront and refund 50% of the audit fee. However, we've never had a client where we couldn't identify at least one high-ROI opportunity. (Link to Terms)"
     },
     {
       "question": "Do I need to have a technical team to implement your recommendations?",
-      "answer": "No. We handle all implementation if you choose the Full Implementation package. For Audit/Roadmap clients, we provide detailed documentation and vendor recommendations that any technical partner can execute. We can also refer implementation partners if needed."
+      "answer": "No. We handle all implementation if you choose the Full Implementation package. For Audit/Roadmap clients, we provide detailed documentation and vendor recommendations that any technical partner can execute. We can also refer to implementation partners if needed."
     },
     {
       "question": "How do you measure ROI on AI projects?",
@@ -223,28 +212,28 @@
       "title": "VP of Operations, B2B SaaS Company"
     },
     {
-      "quote": "Most consultants wanted 6 months and $100K to 'explore AI opportunities.' Alex delivered a detailed roadmap in 2 weeks for $4K. No comparison.",
-      "author": "Michael Torres",
-      "title": "CEO, Legal Tech Startup"
+      "quote": "Most consultants wanted 6 months and $80K to 'explore AI opportunities.' Vitor delivered a detailed roadmap in 2 weeks for $4K. No comparison.",
+      "author": "Gleison Torres",
+      "title": "CEO, Home Services Business"
     }
   ],
   "about": {
-    "title": "About Alex Morgan",
-    "bio": "I've spent 8+ years implementing AI and automation for startups and mid-market companies. I've seen teams waste hundreds of thousands on shiny AI tools that never get used, and I've helped dozens of companies cut through the hype to ship AI that actually pays for itself.\n\nMy approach is simple: audit your workflows, identify high-ROI opportunities, build a custom roadmap, and implement in sprints with measurable outcomes at every step.\n\nNo 6-month consulting engagements with vague deliverables. No vendor lock-in. Just results you can measure in 90 days.",
+    "title": "About Vitor Ungari",
+    "bio": "I bring practical operations experience with modern AI to turn pilots into production outcomes. Clear priorities, fast delivery, measurable ROI.",
     "credentials": [
-      "8+ years in AI and automation consulting",
-      "Former ML engineer at Fortune 500 tech company",
-      "Helped 50+ companies implement AI workflows",
-      "Certified in GPT-4, Claude, and major automation platforms"
+      "Entrepreneur with 8+ years of experience in business, technology, and social impact",
+      "Former Founder (climate tech)",
+      "Helped 20+ companies implement AI workflows",
+      "MBA, concentration in Machine Learning and Business Analytics"
     ]
   },
   "finalCTA": {
     "headline": "Ready to see ROI in 90 days?",
-    "subheadline": "Book a 2-week AI Audit for $4,000 and get a custom roadmap with clear ROI projections",
+    "subheadline": "Book a 2-week AI Audit for $4,000 and get the roadmap your business needs with clear ROI projections",
     "cta": "Get your AI Audit"
   },
   "footer": {
-    "copyright": "© 2025 AI Audit. All rights reserved.",
+    "copyright": "© 2025 Veehtor AI, LLC. All rights reserved.",
     "links": [
       { "label": "Privacy Policy", "href": "/privacy" },
       { "label": "Terms of Service", "href": "/terms" }
