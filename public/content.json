@@ -19,10 +19,10 @@
   },
   "hero": {
     "headline": "Turn AI into ROI in 90 days",
-    "subheadline": "Stop overpaying for AI experiments. Get a custom roadmap that delivers 20-40% efficiency gains and ROI you can measure.",
+    "subheadline": "Stop overpaying for AI experiments. Get a custom roadmap that delivers 20–40% efficiency gains and ROI you can measure.",
     "proofPoints": [
-      "Reduce manual work by 20-40% in the first quarter",
-      "Apply AI where and how it actually makes sense.",
+      "Reduce manual work by 20–40% in the first quarter",
+      "Apply AI where and how it actually makes sense",
       "Clear ROI tracking from day one"
     ],
     "primaryCTA": "Get your AI Audit",
@@ -32,16 +32,16 @@
   "socialProof": {
     "stats": [
       { "value": "<60s", "label": "Lead response time with AI agents" },
-      { "value": "20-40%", "label": "Reduction in manual hours" },
+      { "value": "20–40%", "label": "Reduction in manual hours" },
       { "value": "90 days", "label": "Average time to positive ROI" },
-      { "value": "$4,000", "label": "Fixed price for 2-week extensive audit" }
+      { "value": "2 weeks", "label": "Audit turnaround (fixed scope)" }
     ]
   },
   "problemSolution": {
     "problem": {
       "title": "The AI trap most companies fall into",
       "points": [
-        "Spending $20-50K+ on tools that sit unused",
+        "Spending $20–50K+ on tools that sit unused",
         "Teams overwhelmed by AI hype, unclear where to start",
         "Consultants who pitch 6-month roadmaps with no guaranteed outcomes (just a pretty PPT)",
         "Vendor lock-in with enterprise licenses you don't need"
@@ -52,7 +52,7 @@
       "moves": [
         {
           "number": "1",
-          "title": "AI Audit (2 weeks, $4K)",
+          "title": "AI Audit (2 weeks)",
           "description": "We map your actual workflows and identify high-ROI automation and AI agents opportunities"
         },
         {
@@ -72,11 +72,10 @@
     {
       "title": "AI Audit",
       "duration": "2 weeks",
-      "price": "$4,000 fixed",
       "description": "Deep-dive discovery to identify your highest-ROI AI opportunities",
       "deliverables": [
         "Workflow analysis and pain point mapping",
-        "AI opportunity scorecard",
+        "AI opportunity scorecard (impact vs. effort matrix)",
         "Vendor/tool recommendations",
         "3-month roadmap with ROI projections"
       ],
@@ -84,8 +83,7 @@
     },
     {
       "title": "AI Roadmap & Full Implementation",
-      "duration": "3-6 months",
-      "price": "$15K - $50K",
+      "duration": "3–6 months",
       "description": "End-to-end implementation of AI agents, workflows, and integrations",
       "deliverables": [
         "Custom AI agent development (lead qualification, AI voice agent, customer support, etc.)",
@@ -133,37 +131,9 @@
       {
         "number": "3",
         "title": "Build & Scale",
-        "duration": "8-12 weeks",
+        "duration": "8–12 weeks",
         "description": "We implement agents and workflows in sprints, measuring ROI at each milestone. You own all code and IP.",
         "icon": "rocket"
-      }
-    ]
-  },
-  "pricing": {
-    "title": "Transparent, results-based pricing",
-    "note": "Third-party costs (e.g., OpenAI API) billed separately at cost. Most clients spend $100-700/month on infrastructure.",
-    "tiers": [
-      {
-        "name": "AI Audit",
-        "price": "$4,000",
-        "duration": "2 weeks",
-        "features": [
-          "Workflow analysis and pain point mapping",
-          "AI opportunity scorecard",
-          "Vendor/tool recommendations",
-          "3-month roadmap with ROI projections"
-        ]
-      },
-            {
-        "name": "AI Roadmap & Full Implementation",
-        "price": "$15,000 - $50,000",
-        "duration": "3-6 months",
-        "features": [
-          "Everything in Audit",
-          "Custom AI agent development",
-          "Workflow automation & integrations",
-          "Team training, Ongoing optimization & ROI tracking"
-        ]
       }
     ]
   },
@@ -202,17 +172,17 @@
     },
     {
       "question": "How do you measure ROI on AI projects?",
-      "answer": "We establish baseline metrics during the audit (e.g., time spent on manual tasks, cost per customer interaction) and track improvements post-implementation. Most clients see measurable ROI within 60-90 days through reduced labor costs, faster response times, or increased conversion rates."
+      "answer": "We establish baseline metrics during the audit (e.g., time spent on manual tasks, cost per customer interaction) and track improvements post-implementation. Most clients see measurable ROI within 60–90 days through reduced labor costs, faster response times, or increased conversion rates."
     }
   ],
   "testimonials": [
     {
-      "quote": "We went from spending $40K on unused AI tools to having a clear roadmap that delivered $180K in annual savings. The audit paid for itself 45x over.",
+      "quote": "We went from spending $40K on unused AI tools to having a clear roadmap that delivered $180K in annual savings. The audit paid for itself many times over.",
       "author": "Sarah Chen",
       "title": "VP of Operations, B2B SaaS Company"
     },
     {
-      "quote": "Most consultants wanted 6 months and $80K to 'explore AI opportunities.' Vitor delivered a detailed roadmap in 2 weeks for $4K. No comparison.",
+      "quote": "Most consultants wanted 6 months and $80K to 'explore AI opportunities.' Vitor delivered a detailed roadmap in 2 weeks. No comparison.",
       "author": "Gleison Torres",
       "title": "CEO, Home Services Business"
     }
@@ -229,7 +199,7 @@
   },
   "finalCTA": {
     "headline": "Ready to see ROI in 90 days?",
-    "subheadline": "Book a 2-week AI Audit for $4,000 and get the roadmap your business needs with clear ROI projections",
+    "subheadline": "Book a 2-week AI Audit and get the roadmap your business needs with clear ROI projections",
     "cta": "Get your AI Audit"
   },
   "footer": {
