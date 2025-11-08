@@ -82,7 +82,7 @@
       "cta": "Book your audit"
     },
     {
-      "title": "AI Roadmap & Full Implementation",
+      "title": "AI Roadmap & Implementation",
       "duration": "3-6 months",
       "description": "End-to-end implementation of AI agents, workflows, and integrations",
       "deliverables": [
@@ -101,7 +101,7 @@
       "description": "AI-qualified leads, project data analysis, and weekly business insights increased revenue and win rates"
     },
     {
-      "metric": "24h → 1 min",
+      "metric": "24h → 1min",
       "title": "Lead Response Time",
       "description": "Cut response from a full day to under 60 seconds with AI-Agents and instant proposal drafts"
     },
