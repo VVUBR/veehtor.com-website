@@ -79,6 +79,8 @@
         "Vendor/tool recommendations",
         "3-month roadmap with ROI projections"
       ],
+      "price": "$4,000",
+      "priceDisplay": "**$4,000**",
       "cta": "Book your audit"
     },
     {
@@ -91,6 +93,8 @@
         "Team training and Playbook building",
         "Ongoing optimization and ROI tracking"
       ],
+      "price": "$15,000-40,000",
+      "priceDisplay": "**$15,000-40,000**",
       "cta": "Schedule a call"
     }
   ],
