@@ -1,6 +1,8 @@
-import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import ElectricBorder from "@/components/ui/ElectricBorder";
+import SpotlightCard from "./SpotlightCard";
+import GlareButton from "./GlareButton";
+import Reveal from "./Reveal";
 
 interface ServicesProps {
   content: any;
@@ -15,36 +17,35 @@ export const Services = ({ content }: ServicesProps) => {
   };
 
   return (
-    <section id="services" className="py-16 md:py-24 px-4 bg-secondary/20">
+    <section id="services" className="py-16 md:py-24 px-4 border-t border-slate-200">
       <div className="container mx-auto max-w-6xl">
-        <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold mb-4">
-            Two ways to work together
-          </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Start with an audit to get clarity, then implement what matters
-          </p>
-        </div>
+        <Reveal>
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">
+              Two ways to work together
+            </h2>
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+              Start with an audit to get clarity, then implement what matters
+            </p>
+          </div>
+        </Reveal>
 
         <div className="grid md:grid-cols-2 gap-8">
           {content.services.map((service: any, idx: number) => {
-            const isAudit = idx === 0; // First service is the AI Audit
-            const ServiceCard = (
-              <div
-                key={idx}
-                className="reveal bg-card rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow"
-                style={{ animationDelay: `${idx * 0.15}s` }}
-              >
+            const isAudit = idx === 0;
+            
+            const CardContent = (
+              <div className="p-8">
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-2xl md:text-3xl font-bold mb-2">{service.title}</h3>
-                    <div className="flex items-baseline gap-3 mb-2">
-                      <span className="text-3xl md:text-4xl font-bold text-primary">
+                    <div className="mb-2">
+                      <p className="text-muted-foreground mb-1">{service.duration}</p>
+                      <strong className="text-3xl md:text-4xl font-bold text-primary">
                         {service.price}
-                      </span>
-                      <span className="text-muted-foreground">• {service.duration}</span>
+                      </strong>
                     </div>
-                    <p className="text-muted-foreground">{service.description}</p>
+                    <p className="text-muted-foreground mt-4">{service.description}</p>
                   </div>
 
                   <div className="space-y-3">
@@ -59,26 +60,29 @@ export const Services = ({ content }: ServicesProps) => {
                     ))}
                   </div>
 
-                  <Button onClick={handleCTA} className="w-full glare-effect">
+                  <GlareButton onClick={handleCTA} className="w-full">
                     {service.cta}
-                  </Button>
+                  </GlareButton>
                 </div>
               </div>
             );
 
-            return isAudit ? (
-              <ElectricBorder
-                key={idx}
-                color="#7df9ff"
-                speed={1}
-                chaos={0.5}
-                thickness={2}
-                style={{ borderRadius: 16 }}
-              >
-                {ServiceCard}
-              </ElectricBorder>
-            ) : (
-              ServiceCard
+            return (
+              <Reveal key={idx} delay={idx * 0.15}>
+                {isAudit ? (
+                  <ElectricBorder
+                    color="#7df9ff"
+                    speed={1}
+                    chaos={0.5}
+                    thickness={2}
+                    style={{ borderRadius: 16 }}
+                  >
+                    {CardContent}
+                  </ElectricBorder>
+                ) : (
+                  <SpotlightCard>{CardContent}</SpotlightCard>
+                )}
+              </Reveal>
             );
           })}
         </div>
