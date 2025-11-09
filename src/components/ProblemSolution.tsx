@@ -1,6 +1,5 @@
-import { X } from "lucide-react";
-import GlareButton from "./GlareButton";
-import Reveal from "./Reveal";
+import { Button } from "@/components/ui/button";
+import { X, Check } from "lucide-react";
 
 interface ProblemSolutionProps {
   content: any;
@@ -15,12 +14,11 @@ export const ProblemSolution = ({ content }: ProblemSolutionProps) => {
   };
 
   return (
-    <section className="py-16 md:py-24 px-4 border-t border-slate-200">
+    <section className="py-16 md:py-24 px-4">
       <div className="container mx-auto max-w-6xl">
         <div className="grid md:grid-cols-2 gap-12 md:gap-16">
           {/* Problem */}
-          <Reveal>
-            <div className="space-y-6">
+          <div className="reveal space-y-6">
             <h2 className="text-3xl md:text-4xl font-bold text-destructive">
               {content.problemSolution.problem?.title || "The Problem"}
             </h2>
@@ -32,12 +30,10 @@ export const ProblemSolution = ({ content }: ProblemSolutionProps) => {
                 </div>
               ))}
             </div>
-            </div>
-          </Reveal>
+          </div>
 
           {/* Solution */}
-          <Reveal delay={0.2}>
-            <div className="space-y-6">
+          <div className="reveal space-y-6" style={{ animationDelay: "0.2s" }}>
             <h2 className="text-3xl md:text-4xl font-bold text-primary">
               {content.problemSolution.solution?.title || "The Solution"}
             </h2>
@@ -55,12 +51,11 @@ export const ProblemSolution = ({ content }: ProblemSolutionProps) => {
               ))}
             </div>
             <div className="pt-4">
-              <GlareButton onClick={handleCTA}>
+              <Button onClick={handleCTA} className="glare-effect">
                 Start with an AI Audit
-              </GlareButton>
+              </Button>
             </div>
-            </div>
-          </Reveal>
+          </div>
         </div>
       </div>
     </section>

@@ -1,16 +1,4 @@
 {
-  "ui": {
-    "sections": {
-      "hero": { "bg": "orb", "effects": ["reveal"] },
-      "socialProof": { "bg": "surface", "effects": ["count-up", "reveal"] },
-      "problemSolution": { "bg": "tint", "effects": ["reveal"] },
-      "services": { "bg": "surface", "effects": ["spotlight", "reveal"] },
-      "outcomes": { "bg": "tint", "effects": ["reveal"] },
-      "howItWorks": { "bg": "surface", "effects": ["reveal"] },
-      "caseStudies": { "bg": "tint", "effects": ["reveal"] },
-      "finalCTA": { "bg": "beams", "effects": [] }
-    }
-  },
   "personal": {
     "name": "Veehtor AI",
     "title": "AI Strategy for Businesses",
@@ -43,10 +31,10 @@
   },
   "socialProof": {
     "stats": [
-      { "value": 60, "suffix": "s", "label": "Lead response time with AI agents" },
-      { "value": 20, "suffix": "–40%", "label": "Reduction in manual hours" },
-      { "value": 90, "suffix": " days", "label": "Average time to positive ROI" },
-      { "value": 2, "suffix": " weeks", "label": "Audit turnaround (fixed scope)" }
+      { "value": "<60s", "label": "Lead response time with AI agents" },
+      { "value": "20–40%", "label": "Reduction in manual hours" },
+      { "value": "90 days", "label": "Average time to positive ROI" },
+      { "value": "2 weeks", "label": "Audit turnaround (fixed scope)" }
     ]
   },
   "problemSolution": {
@@ -92,11 +80,12 @@
         "3-month roadmap with ROI projections"
       ],
       "price": "$4,000",
+      "priceDisplay": "**$4,000**",
       "cta": "Book your audit"
     },
     {
       "title": "AI Roadmap & Implementation",
-      "duration": "3–6 months",
+      "duration": "3-6 months",
       "description": "End-to-end implementation of AI agents, workflows, and integrations",
       "deliverables": [
         "Custom AI agents development",
@@ -104,7 +93,8 @@
         "Team training and Playbook building",
         "Ongoing optimization and ROI tracking"
       ],
-      "price": "$15,000–40,000",
+      "price": "$15,000-40,000",
+      "priceDisplay": "**$15,000-40,000**",
       "cta": "Schedule a call"
     }
   ],
@@ -121,7 +111,7 @@
     },
     {
       "metric": "3x pipeline in 6 weeks",
-      "title": "Sales Development Efficiency",
+      "title": "Sales Increased Efficiency",
       "description": "Home services firm tripled qualified meetings by automating prospect research and lead generation"
     }
   ],
@@ -174,7 +164,7 @@
   "faq": [
     {
       "question": "Why should I pay for an audit when I can just try AI tools myself?",
-      "answer": "You can do everything with AI, but not everything at the same time. Most companies waste $20K+ on AI tools that sit unused because they lack a strategic implementation plan. An audit gives you a clear roadmap with ROI projections so you invest in the right solutions from day one."
+      "answer": "You can do everything with AI, but not everything at the same time. As a business owner, you know the importance of prioritization and opportunity cost. Most companies waste $20K+ on AI tools that sit unused because they lack a strategic implementation plan. An audit gives you a clear roadmap with ROI projections, so you invest in the right solutions from day one. Think of it as insurance against expensive mistakes."
     },
     {
       "question": "What if the audit reveals no good AI opportunities for my business?",
