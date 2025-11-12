@@ -8,7 +8,7 @@ interface ContactProps {
 }
 
 export const Contact = ({ content }: ContactProps) => {
-  const calendarLink = content?.personal?.calendarLink;
+  const calendarLink = "https://cal.com/veehtorai";
   const email = content?.personal?.email;
   const phone = content?.personal?.phone;
 
