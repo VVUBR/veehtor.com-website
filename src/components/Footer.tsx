@@ -30,9 +30,6 @@ export const Footer = ({ content }: FooterProps) => {
               <h3 className="text-xl font-bold mb-4">
                 {content?.personal?.name || "AI Consultant"}
               </h3>
-              <p className="text-muted-foreground mb-4">
-                {content?.about?.bio?.substring(0, 150) || "AI Strategy & Implementation"}...
-              </p>
             </div>
 
             <div>
