@@ -22,18 +22,28 @@ export const Hero = ({ content }: HeroProps) => {
     words.forEach((word, wordIndex) => {
       const wordSpan = document.createElement("span");
       wordSpan.style.display = "inline-block";
-      wordSpan.style.marginRight = "0.3em";
+      wordSpan.style.whiteSpace = "pre";
+      wordSpan.style.marginRight = "0.25em";
 
       word.split("").forEach((char, charIndex) => {
         const span = document.createElement("span");
         span.textContent = char;
         span.className = "split-char";
+        span.style.display = "inline-block";
         const delay = (wordIndex * 5 + charIndex) * 0.03;
         span.style.animationDelay = `${delay}s`;
         wordSpan.appendChild(span);
       });
 
       headline.appendChild(wordSpan);
+      
+      // Add space after word (except last word)
+      if (wordIndex < words.length - 1) {
+        const space = document.createElement("span");
+        space.textContent = " ";
+        space.style.display = "inline";
+        headline.appendChild(space);
+      }
     });
 
     // Add cursor
@@ -54,7 +64,7 @@ export const Hero = ({ content }: HeroProps) => {
   };
 
   return (
-    <section className="relative min-h-[620px] md:min-h-[700px] flex items-center justify-center pt-32 md:pt-40 pb-12 md:pb-16 px-4 overflow-hidden">
+    <section className="relative min-h-[620px] md:min-h-[700px] flex items-center justify-center pt-40 md:pt-48 pb-14 md:pb-20 px-4 overflow-hidden">
       {/* Orb background */}
       <div className="absolute inset-0 -z-10 min-h-[560px] md:min-h-[640px]">
         <Orb hue={-20} hoverIntensity={0.5} rotateOnHover={true} forceHoverState={false} capture="window" />
