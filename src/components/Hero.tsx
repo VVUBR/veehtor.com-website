@@ -78,7 +78,7 @@ export const Hero = ({ content }: HeroProps) => {
             {content?.hero?.headline || "Turn AI into ROI in 90 days"}
           </h1>
 
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed whitespace-pre-line">
             {content?.hero?.subheadline || "Stop overpaying for AI experiments."}
           </p>
 
