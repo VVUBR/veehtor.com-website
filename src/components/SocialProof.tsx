@@ -9,7 +9,7 @@ export const SocialProof = ({ content }: SocialProofProps) => {
   if (!content?.socialProof?.stats) return null;
 
   return (
-    <section className="relative py-16 md:py-20 px-4 bg-brandBlue text-white">
+    <section className="relative py-16 md:py-20 px-4 bg-primary text-white">
       <div className="container mx-auto max-w-6xl">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {content.socialProof.stats.map((stat: any, idx: number) => (
