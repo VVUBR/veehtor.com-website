@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import Orb from "./Orb";
+import GlareButton from "./GlareButton";
 
 interface HeroProps {
   content: any;
@@ -53,8 +54,11 @@ export const Hero = ({ content }: HeroProps) => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-20 pb-16 px-4 aurora-bg overflow-hidden">
-      <div className="aurora-orb" />
+    <section className="relative min-h-[620px] flex items-center justify-center pt-24 pb-24 px-4 overflow-hidden">
+      {/* Orb background */}
+      <div className="absolute inset-0 -z-10">
+        <Orb hue={-20} hoverIntensity={0.5} rotateOnHover={true} forceHoverState={false} capture="window" />
+      </div>
       
       <div className="container mx-auto max-w-5xl relative z-10">
         <div className="text-center space-y-8">
@@ -70,13 +74,13 @@ export const Hero = ({ content }: HeroProps) => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-            <Button size="lg" onClick={handlePrimaryCTA} className="glare-effect text-base px-8">
+            <GlareButton size="lg" onClick={handlePrimaryCTA} className="text-base px-8">
               {content?.hero?.primaryCTA || "Get your AI Audit"}
               <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button size="lg" variant="outline" onClick={handleSecondaryCTA} className="text-base px-8">
+            </GlareButton>
+            <GlareButton size="lg" variant="outline" onClick={handleSecondaryCTA} className="text-base px-8">
               {content?.hero?.secondaryCTA || "See how it works"}
-            </Button>
+            </GlareButton>
           </div>
 
           {content?.hero?.proofPoints && (

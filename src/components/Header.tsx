@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import GlareButton from "./GlareButton";
 
 interface HeaderProps {
   content: any;
@@ -62,9 +62,9 @@ export const Header = ({ content }: HeaderProps) => {
           </nav>
 
           <div className="hidden md:block">
-            <Button onClick={handleCTA} className="glare-effect">
+            <GlareButton onClick={handleCTA}>
               {content?.navigation?.cta || "Get Started"}
-            </Button>
+            </GlareButton>
           </div>
 
           {/* Mobile Menu Button */}
@@ -90,9 +90,9 @@ export const Header = ({ content }: HeaderProps) => {
                 </button>
               ))}
               <div className="px-4">
-                <Button onClick={handleCTA} className="w-full">
+                <GlareButton onClick={handleCTA} className="w-full">
                   {content?.navigation?.cta || "Get Started"}
-                </Button>
+                </GlareButton>
               </div>
             </nav>
           </div>
