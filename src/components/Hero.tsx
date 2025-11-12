@@ -14,6 +14,7 @@ export const Hero = ({ content }: HeroProps) => {
     if (!headlineRef.current) return;
 
     const headline = headlineRef.current;
+    headline.style.position = "relative"; // keep cursor from shifting layout
     const text = headline.textContent || "";
     headline.innerHTML = "";
 
@@ -34,7 +35,7 @@ export const Hero = ({ content }: HeroProps) => {
       });
 
       headline.appendChild(wordSpan);
-      
+
       // Add space after word (except last word)
       if (wordIndex < words.length - 1) {
         const space = document.createElement("span");
@@ -44,9 +45,9 @@ export const Hero = ({ content }: HeroProps) => {
       }
     });
 
-    // Add cursor
+    // Add cursor (positioned absolutely so it doesn't affect centering)
     const cursor = document.createElement("span");
-    cursor.className = "cursor-blink inline-block w-0.5 h-12 bg-primary ml-1";
+    cursor.className = "cursor-blink absolute w-0.5 h-[1em] bg-primary left-[100%] translate-x-1";
     cursor.style.animationDelay = `${words.length * 0.15}s`;
     headline.appendChild(cursor);
   }, [content]);
@@ -67,12 +68,12 @@ export const Hero = ({ content }: HeroProps) => {
       <div className="absolute inset-0 -z-10 min-h-[560px] md:min-h-[640px]">
         <Orb hue={-20} hoverIntensity={0.5} rotateOnHover={true} forceHoverState={false} capture="window" />
       </div>
-      
+
       <div className="container mx-auto max-w-5xl relative z-10">
-        <div className="text-center space-y-8">
+        <div className="text-center space-y-8 flex flex-col items-center">
           <h1
             ref={headlineRef}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight **mx-auto max-w-3xl tracking-normal [word-spacing:normal] [letter-spacing:0] [text-wrap:balance]**"
+            className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mx-auto max-w-3xl tracking-normal [word-spacing:normal] [letter-spacing:0] [text-wrap:balance]"
           >
             {content?.hero?.headline || "Turn AI into ROI in 90 days"}
           </h1>
