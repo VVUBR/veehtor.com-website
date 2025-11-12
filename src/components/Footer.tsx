@@ -27,9 +27,12 @@ export const Footer = ({ content }: FooterProps) => {
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-3 gap-12 mb-8">
             <div>
-              <h3 className="text-xl font-bold mb-4">
+              <h3 className="text-xl font-bold mb-2">
                 {content?.personal?.name || "AI Consultant"}
               </h3>
+              <p className="text-sm text-muted-foreground">
+                Based in the United States 🇺🇸
+              </p>
             </div>
 
             <div>
