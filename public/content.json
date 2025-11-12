@@ -2,7 +2,7 @@
   "ui": {
     "sections": {
       "hero": { "bg": "orb", "effects": ["reveal"] },
-      "socialProof": { "bg": "surface", "effects": ["count-up", "reveal"], "theme": "inverted", "brandBlue": "#0B3BFF" },
+      "socialProof": { "bg": "surface", "effects": ["count-up", "reveal"] },
       "problemSolution": { "bg": "tint", "effects": ["reveal"] },
       "services": { "bg": "surface", "effects": ["spotlight", "reveal"] },
       "outcomes": { "bg": "tint", "effects": ["reveal"] },
