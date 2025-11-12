@@ -54,9 +54,9 @@ export const Hero = ({ content }: HeroProps) => {
   };
 
   return (
-    <section className="relative min-h-[620px] md:min-h-[700px] flex items-center justify-center pt-28 md:pt-36 pb-24 md:pb-28 px-4 overflow-hidden">
+    <section className="relative min-h-[620px] md:min-h-[700px] flex items-center justify-center pt-32 md:pt-40 pb-12 md:pb-16 px-4 overflow-hidden">
       {/* Orb background */}
-      <div className="absolute inset-0 -z-10">
+      <div className="absolute inset-0 -z-10 min-h-[560px] md:min-h-[640px]">
         <Orb hue={-20} hoverIntensity={0.5} rotateOnHover={true} forceHoverState={false} capture="window" />
       </div>
       
