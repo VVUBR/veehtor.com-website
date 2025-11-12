@@ -7,9 +7,11 @@ interface CountStatProps {
   suffix?: string;
   label: string;
   duration?: number;
+  className?: string;
+  labelClassName?: string;
 }
 
-export default function CountStat({ value, suffix = '', label, duration = 1.5 }: CountStatProps) {
+export default function CountStat({ value, suffix = '', label, duration = 1.5, className = '', labelClassName = '' }: CountStatProps) {
   const [hasStarted, setHasStarted] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const shouldReduce = useReducedMotion();
@@ -36,7 +38,7 @@ export default function CountStat({ value, suffix = '', label, duration = 1.5 }:
 
   return (
     <div ref={ref} className="text-center">
-      <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
+      <div className={`text-3xl md:text-4xl font-bold mb-2 ${className || 'text-primary'}`}>
         {isNumeric && hasStarted && !shouldReduce ? (
           <>
             <CountUp end={numericValue} duration={duration} separator="," />
@@ -46,7 +48,7 @@ export default function CountStat({ value, suffix = '', label, duration = 1.5 }:
           `${value}${suffix}`
         )}
       </div>
-      <p className="text-sm md:text-base text-muted-foreground">{label}</p>
+      <p className={`text-sm md:text-base ${labelClassName || 'text-muted-foreground'}`}>{label}</p>
     </div>
   );
 }

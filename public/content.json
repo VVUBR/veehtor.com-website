@@ -2,7 +2,7 @@
   "ui": {
     "sections": {
       "hero": { "bg": "orb", "effects": ["reveal"] },
-      "socialProof": { "bg": "surface", "effects": ["count-up", "reveal"] },
+      "socialProof": { "bg": "surface", "effects": ["count-up", "reveal"], "theme": "inverted", "brandBlue": "#0B3BFF" },
       "problemSolution": { "bg": "tint", "effects": ["reveal"] },
       "services": { "bg": "surface", "effects": ["spotlight", "reveal"] },
       "outcomes": { "bg": "tint", "effects": ["reveal"] },
@@ -24,7 +24,6 @@
     "links": [
       { "label": "Services", "href": "#services" },
       { "label": "Case Studies", "href": "#case-studies" },
-      { "label": "About", "href": "#about" },
       { "label": "Contact", "href": "#contact" }
     ],
     "cta": "Get your AI Audit"
