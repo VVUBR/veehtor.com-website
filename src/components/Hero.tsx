@@ -22,8 +22,6 @@ export const Hero = ({ content }: HeroProps) => {
     words.forEach((word, wordIndex) => {
       const wordSpan = document.createElement("span");
       wordSpan.style.display = "inline-block";
-      wordSpan.style.whiteSpace = "pre";
-      wordSpan.style.marginRight = "0.25em";
 
       word.split("").forEach((char, charIndex) => {
         const span = document.createElement("span");
@@ -74,9 +72,9 @@ export const Hero = ({ content }: HeroProps) => {
         <div className="text-center space-y-8">
           <h1
             ref={headlineRef}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight"
+            className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight **mx-auto max-w-3xl tracking-normal [word-spacing:normal] [letter-spacing:0] [text-wrap:balance]**"
           >
-            {content?.hero?.headline || "Ship AI that pays for itself in 90 days"}
+            {content?.hero?.headline || "Turn AI into ROI in 90 days"}
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
