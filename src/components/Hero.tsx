@@ -22,6 +22,7 @@ export const Hero = ({ content }: HeroProps) => {
     words.forEach((word, wordIndex) => {
       const wordSpan = document.createElement("span");
       wordSpan.style.display = "inline-block";
+      wordSpan.style.whiteSpace = "pre";
 
       word.split("").forEach((char, charIndex) => {
         const span = document.createElement("span");
