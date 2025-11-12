@@ -10,8 +10,7 @@ export const FinalCTA = ({ content }: FinalCTAProps) => {
   if (!content?.finalCTA) return null;
 
   const handleCTA = () => {
-    const ctaSection = document.getElementById("contact");
-    ctaSection?.scrollIntoView({ behavior: "smooth" });
+    window.open("https://cal.com/veehtorai/ai.audit.meeting", "_blank");
   };
 
   return (
