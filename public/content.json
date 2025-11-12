@@ -29,7 +29,7 @@
     "cta": "Get your AI Audit"
   },
   "hero": {
-    "headline": "Turn  AI  into  ROI  in  90  days",
+    "headline": "Turn AI into ROI in 90 days",
     "subheadline": "Stop overpaying for AI experiments. Get a custom roadmap that delivers 20–40% efficiency gains and ROI you can measure.",
     "proofPoints": [
       "Reduce manual work by 20–40% in the first quarter",
@@ -201,14 +201,7 @@
     }
   ],
   "about": {
-    "title": "About Vitor Ungari",
-    "bio": "",
-    "credentials": [
-      "Entrepreneur with 8+ years of experience in business, technology, and social impact",
-      "Former Founder (climate tech)",
-      "Helped 20+ companies implement AI workflows",
-      "MBA, concentration in Machine Learning and Business Analytics"
-    ]
+    "title": "Vitor Ungari",    
   },
   "finalCTA": {
     "headline": "Ready to see ROI in 90 days?",
