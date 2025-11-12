@@ -201,7 +201,14 @@
     }
   ],
   "about": {
-    "title": "Vitor Ungari",    
+    "title": "About Vitor Ungari",
+    "bio": "I bring practical operations experience with modern AI to turn pilots into production outcomes.",
+    "credentials": [
+      "Entrepreneur with 8+ years of experience in business, technology, and social impact",
+      "Former Founder (climate tech)",
+      "Helped 20+ companies implement AI workflows",
+      "MBA, concentration in Machine Learning and Business Analytics"
+    ]
   },
   "finalCTA": {
     "headline": "Ready to see ROI in 90 days?",
