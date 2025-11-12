@@ -33,12 +33,12 @@
     "subheadline": "Stop overpaying for AI experiments. Get a custom roadmap that delivers 20-40% efficiency gains and ROI you can measure.",
     "proofPoints": [
       "Reduce manual work by 20-40% in the first quarter",
-      "Apply AI where and how it actually makes sense",
-      "Clear ROI tracking from day 1, invest in high priority areas"
+      "Clear ROI tracking from day one",
+      "Apply AI where and how it actually makes sense"
     ],
     "primaryCTA": "Get your AI Audit",
     "secondaryCTA": "See how it works",
-    "trustLogos": [https://yt3.googleusercontent.com/MopgmVAFV9BqlzOJ-UINtmutvEPcNe5IbKMmP_4vZZo3vnJXcZGtybUBsXaEVxkmxKyGqX9R=s900-c-k-c0x00ffffff-no-rj]
+    "trustLogos": []
   },
   "socialProof": {
     "stats": [
@@ -53,9 +53,9 @@
       "title": "The AI trap most companies fall into",
       "points": [
         "Spending $20–50K+ on tools that sit unused",
-        "Teams overwhelmed by AI hype, unclear where to start",
-        "Consultants who pitch 6-month roadmaps with no guaranteed outcomes (just a pretty PPT)",
-        "Vendor lock-in with enterprise licenses you don't need"
+        "Teams overwhelmed by AI hype, unclear where to start, spending time and money with non-sense tools",
+        "Consultants who pitch 6-month roadmaps with no tangible outcomes (just a pretty PPT)",
+        "Vendor lock-in with enterprise licenses your company doesn't need"
       ]
     },
     "solution": {
@@ -90,7 +90,7 @@
         "Vendor/tool recommendations",
         "3-month roadmap with ROI projections"
       ],
-      "price": "$4,000",
+      "price": "$3,500",
       "cta": "Book your audit"
     },
     {
@@ -103,7 +103,7 @@
         "Team training and Playbook building",
         "Ongoing optimization and ROI tracking"
       ],
-      "price": "$15,000–40,000",
+      "price": "$10,000–30,000",
       "cta": "Schedule a call"
     }
   ],
@@ -202,7 +202,7 @@
   ],
   "about": {
     "title": "About Vitor Ungari",
-    "bio": "I bring practical operations experience with modern AI to turn pilots into production outcomes.",
+    "bio": "Accessible AI into your context.",
     "credentials": [
       "Entrepreneur with 8+ years of experience in business, technology, and social impact",
       "Former Founder (climate tech)",
