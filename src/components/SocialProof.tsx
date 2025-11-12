@@ -14,7 +14,7 @@ export const SocialProof = ({ content }: SocialProofProps) => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {content.socialProof.stats.map((stat: any, idx: number) => (
             <Reveal key={idx} delay={idx * 0.1}>
-              <div className="bg-white/10 rounded-2xl p-6 ring-1 ring-white/15">
+              <div className="bg-white/30 rounded-2xl p-6 ring-1 ring-white/15">
                 <CountStat
                   value={stat.value}
                   suffix={stat.suffix || ''}
