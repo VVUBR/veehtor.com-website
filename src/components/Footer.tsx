@@ -1,6 +1,7 @@
 import { ArrowUp, Linkedin, Twitter, Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import vaiLogoFooter from "@/assets/vai-logo-footer.png";
 
 interface FooterProps {
   content: any;
@@ -27,9 +28,11 @@ export const Footer = ({ content }: FooterProps) => {
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-3 gap-12 mb-8">
             <div>
-              <h3 className="text-xl font-bold mb-2">
-                {content?.personal?.name || "AI Consultant"}
-              </h3>
+              <img 
+                src={vaiLogoFooter} 
+                alt="v.AI Logo" 
+                className="h-16 md:h-20 w-auto mb-3"
+              />
               <p className="text-sm text-muted-foreground">
                 Based in the United States 🇺🇸
               </p>
