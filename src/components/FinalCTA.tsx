@@ -18,7 +18,7 @@ export const FinalCTA = ({ content }: FinalCTAProps) => {
       <div className="container mx-auto max-w-4xl text-center">
         <Reveal>
           <div className="space-y-6">
-            <h2 className="text-3xl md:text-5xl font-bold text-primary">
+            <h2 className="text-3xl md:text-5xl font-bold text-[#020617]">
               {content.finalCTA.headline}
             </h2>
             <p className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto">

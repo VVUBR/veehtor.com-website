@@ -25,7 +25,7 @@ export const HowItWorks = ({ content }: HowItWorksProps) => {
       <div className="container mx-auto max-w-6xl">
         <Reveal>
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-primary">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-[#020617]">
               {content.howItWorks.title || "How it works"}
             </h2>
           </div>

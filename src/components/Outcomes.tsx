@@ -13,7 +13,7 @@ export const Outcomes = ({ content }: OutcomesProps) => {
       <div className="container mx-auto max-w-6xl">
         <Reveal>
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-[#020617]">
               Real results from real companies
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground">

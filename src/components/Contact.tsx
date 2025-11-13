@@ -50,7 +50,7 @@ export const Contact = ({ content }: ContactProps) => {
               >
                 <Mail className="w-8 h-8" />
                 <div>
-                  <div className="font-semibold">Email me</div>
+                  <div className="font-semibold text-[#020617]">Email me</div>
                 <div className="text-xs opacity-70">{email}</div>
               </div>
             </Button>
@@ -65,7 +65,7 @@ export const Contact = ({ content }: ContactProps) => {
               >
                 <Phone className="w-8 h-8" />
                 <div>
-                  <div className="font-semibold">Call me</div>
+                  <div className="font-semibold text-[#020617]">Call me</div>
                 <div className="text-xs opacity-70">{phone}</div>
               </div>
             </Button>
