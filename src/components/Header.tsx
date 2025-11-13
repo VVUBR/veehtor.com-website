@@ -52,7 +52,7 @@ export const Header = ({ content }: HeaderProps) => {
               <button
                 key={link.href}
                 onClick={() => handleNavClick(link.href)}
-                className="text-sm font-medium text-white hover:text-secondary transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-secondary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300"
+                className="text-base font-medium text-white hover:text-secondary transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-secondary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300"
               >
                 {link.label}
               </button>
@@ -82,7 +82,7 @@ export const Header = ({ content }: HeaderProps) => {
                 <button
                   key={link.href}
                   onClick={() => handleNavClick(link.href)}
-                  className="text-left px-4 py-2 text-sm font-medium text-white hover:text-secondary transition-colors"
+                  className="text-left px-4 py-2 text-base font-medium text-white hover:text-secondary transition-colors"
                 >
                   {link.label}
                 </button>
