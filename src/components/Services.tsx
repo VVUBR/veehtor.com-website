@@ -17,14 +17,14 @@ export const Services = ({ content }: ServicesProps) => {
   };
 
   return (
-    <section id="services" className="py-16 md:py-24 px-4 border-t border-slate-200">
+    <section id="services" className="py-16 md:py-24 px-4 border-t border-border bg-background">
       <div className="container mx-auto max-w-6xl">
         <Reveal>
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-primary">
               Two ways to work together
             </h2>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto">
               Start with an audit to get clarity, then implement what matters
             </p>
           </div>
@@ -35,17 +35,17 @@ export const Services = ({ content }: ServicesProps) => {
             const isAudit = idx === 0;
             
             const CardContent = (
-              <div className="p-8">
+              <div className="p-8 bg-white">
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-2xl md:text-3xl font-bold mb-2">{service.title}</h3>
+                    <h3 className="text-2xl md:text-3xl font-bold mb-2 text-primary">{service.title}</h3>
                     <div className="mb-2">
                       <p className="text-muted-foreground mb-1">{service.duration}</p>
                       <strong className="text-3xl md:text-4xl font-bold text-primary">
                         {service.price}
                       </strong>
                     </div>
-                    <p className="text-muted-foreground mt-4">{service.description}</p>
+                    <p className="text-foreground/80 mt-4">{service.description}</p>
                   </div>
 
                   <div className="space-y-3">
@@ -54,7 +54,7 @@ export const Services = ({ content }: ServicesProps) => {
                     </p>
                     {service.deliverables?.map((item: string, itemIdx: number) => (
                       <div key={itemIdx} className="flex items-start gap-3">
-                        <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <Check className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
                         <span className="text-foreground">{item}</span>
                       </div>
                     ))}

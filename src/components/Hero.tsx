@@ -63,7 +63,7 @@ export const Hero = ({ content }: HeroProps) => {
   };
 
   return (
-    <section className="relative min-h-[620px] md:min-h-[700px] flex items-center justify-center pt-40 md:pt-48 pb-14 md:pb-20 px-4 overflow-hidden">
+    <section className="relative min-h-[620px] md:min-h-[700px] flex items-center justify-center pt-40 md:pt-48 pb-14 md:pb-20 px-4 overflow-hidden bg-background">
       {/* Orb background */}
       <div className="absolute inset-0 -z-10 min-h-[560px] md:min-h-[640px]">
         <Orb hue={-20} hoverIntensity={0.5} rotateOnHover={true} forceHoverState={false} capture="window" />
@@ -73,12 +73,12 @@ export const Hero = ({ content }: HeroProps) => {
         <div className="text-center space-y-8 flex flex-col items-center">
           <h1
             ref={headlineRef}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mx-auto max-w-3xl tracking-normal [word-spacing:normal] [letter-spacing:0] [text-wrap:balance]"
+            className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mx-auto max-w-3xl tracking-normal [word-spacing:normal] [letter-spacing:0] [text-wrap:balance] text-primary"
           >
             {content?.hero?.headline || "Turn AI into ROI in 90 days"}
           </h1>
 
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed whitespace-pre-line">
+          <p className="text-lg md:text-xl text-foreground/80 max-w-3xl mx-auto leading-relaxed whitespace-pre-line">
             {content?.hero?.subheadline || "Stop overpaying for AI experiments."}
           </p>
 
@@ -97,10 +97,10 @@ export const Hero = ({ content }: HeroProps) => {
               {content.hero.proofPoints.map((point: string, idx: number) => (
                 <div
                   key={idx}
-                  className="reveal flex items-center justify-center text-sm md:text-base text-foreground bg-card/50 backdrop-blur-sm rounded-lg px-4 py-3 border border-border"
+                  className="reveal flex items-center justify-center text-sm md:text-base text-foreground bg-card/70 backdrop-blur-sm rounded-lg px-4 py-3 border border-border"
                   style={{ animationDelay: `${0.8 + idx * 0.1}s` }}
                 >
-                  <span className="mr-2 text-primary">✓</span>
+                  <span className="mr-2 text-secondary">✓</span>
                   {point}
                 </div>
               ))}
