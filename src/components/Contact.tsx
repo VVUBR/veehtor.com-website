@@ -63,10 +63,10 @@ export const Contact = ({ content }: ContactProps) => {
                 onClick={() => (window.location.href = `tel:${phone}`)}
                 className="h-auto flex-col py-6 gap-3"
               >
-                <Phone className="w-8 h-8" />
+                <Phone className="w-8 h-8 text-[#020617]" />
                 <div>
                   <div className="font-semibold text-[#020617]">Call me</div>
-                <div className="text-xs opacity-70">{phone}</div>
+                <div className="text-xs text-[#020617] opacity-70">{phone}</div>
               </div>
             </Button>
           )}
