@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import GlareButton from "./GlareButton";
-import vaiLogo from "@/assets/vai-logo.svg";
+import vaiLogo from "@/assets/vai-logo.png";
 
 interface HeaderProps {
   content: any;
