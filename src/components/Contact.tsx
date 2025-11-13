@@ -48,10 +48,10 @@ export const Contact = ({ content }: ContactProps) => {
                 onClick={() => (window.location.href = `mailto:${email}`)}
                 className="h-auto flex-col py-6 gap-3"
               >
-                <Mail className="w-8 h-8" />
+                <Mail className="w-8 h-8 text-[#020617]" />
                 <div>
                   <div className="font-semibold text-[#020617]">Email me</div>
-                <div className="text-xs opacity-70">{email}</div>
+                <div className="text-xs text-[#020617] opacity-70">{email}</div>
               </div>
             </Button>
           )}
