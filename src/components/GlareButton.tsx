@@ -14,7 +14,7 @@ const GlareButton = forwardRef<HTMLButtonElement, GlareButtonProps>(
         ref={ref}
         variant={variant}
         size={size}
-        className={cn('glare-effect relative overflow-hidden font-bold', className)}
+        className={cn('glare-effect relative overflow-hidden font-semibold', className)}
         {...props}
       >
         {children}

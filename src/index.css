@@ -8,46 +8,67 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Light theme - white background, dark text, cyan accent */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 4%;
+    /* v.AI Brand Colors */
+    --background: 210 20% 98%;
+    --foreground: 222 84% 5%;
     
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 4%;
+    --card: 220 13% 91%;
+    --card-foreground: 222 84% 5%;
     
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 4%;
+    --popover-foreground: 222 84% 5%;
     
-    /* Cyan accent color #0ea5e9 */
-    --primary: 199 89% 48%;
+    /* Operator Navy #111827 */
+    --primary: 217 33% 17%;
     --primary-foreground: 0 0% 100%;
     
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 0 0% 4%;
+    /* Fresh Teal #14B8A6 */
+    --secondary: 173 80% 40%;
+    --secondary-foreground: 0 0% 100%;
     
-    --muted: 210 40% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 220 13% 91%;
+    --muted-foreground: 215.4 16.3% 46.9%;
     
-    --accent: 199 89% 48%;
+    /* Ownership Orange #F97316 */
+    --accent: 25 95% 53%;
     --accent-foreground: 0 0% 100%;
     
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    /* ROI Green #22C55E */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
     
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 199 89% 48%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 173 80% 40%;
     
     --radius: 0.5rem;
     
-    /* Aurora gradient colors */
-    --aurora-1: 199 89% 48%;
-    --aurora-2: 204 94% 94%;
-    --aurora-3: 186 100% 94%;
+    /* Aurora gradient colors - updated for v.AI */
+    --aurora-1: 173 80% 40%;
+    --aurora-2: 173 80% 95%;
+    --aurora-3: 142 71% 90%;
     
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    --chart-1: 173 80% 40%;
+    --chart-2: 142 71% 45%;
+    --chart-3: 25 95% 53%;
+    --chart-4: 217 33% 17%;
+    --chart-5: 220 13% 91%;
+    
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 217 33% 17%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 173 80% 40%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 173 80% 40%;
   }
 }
 

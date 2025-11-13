@@ -14,14 +14,14 @@ export const FinalCTA = ({ content }: FinalCTAProps) => {
   };
 
   return (
-    <section className="py-16 md:py-24 px-4 border-t border-slate-200 bg-gradient-to-br from-primary/10 via-background to-accent/10">
+    <section className="py-16 md:py-24 px-4 border-t border-border bg-gradient-to-br from-secondary/5 via-background to-accent/5">
       <div className="container mx-auto max-w-4xl text-center">
         <Reveal>
           <div className="space-y-6">
-            <h2 className="text-3xl md:text-5xl font-bold">
+            <h2 className="text-3xl md:text-5xl font-bold text-primary">
               {content.finalCTA.headline}
             </h2>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto">
               {content.finalCTA.subheadline}
             </p>
             <div className="pt-4">

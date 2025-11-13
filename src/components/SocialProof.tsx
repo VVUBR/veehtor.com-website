@@ -9,19 +9,19 @@ export const SocialProof = ({ content }: SocialProofProps) => {
   if (!content?.socialProof?.stats) return null;
 
   return (
-    <section className="relative py-16 md:py-20 px-4 bg-primary text-white">
+    <section className="relative py-16 md:py-20 px-4 bg-primary text-primary-foreground">
       <div className="container mx-auto max-w-6xl">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {content.socialProof.stats.map((stat: any, idx: number) => (
             <Reveal key={idx} delay={idx * 0.1}>
-              <div className="bg-white/30 rounded-2xl p-6 ring-1 ring-white/15">
+              <div className="bg-white/10 rounded-2xl p-6 ring-1 ring-white/20 backdrop-blur-sm">
                 <CountStat
                   value={stat.value}
                   suffix={stat.suffix || ''}
                   label={stat.label}
                   duration={1.5}
-                  className="text-white"
-                  labelClassName="text-white/80"
+                  className="text-white font-bold"
+                  labelClassName="text-white/90"
                 />
               </div>
             </Reveal>
