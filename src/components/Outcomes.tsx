@@ -26,7 +26,7 @@ export const Outcomes = ({ content }: OutcomesProps) => {
           {content.outcomes.map((outcome: any, idx: number) => (
             <Reveal key={idx} delay={idx * 0.1}>
               <SpotlightCard className="text-center p-8">
-                <div className="text-4xl md:text-5xl font-bold text-primary mb-3 shiny-text">
+                <div className="text-4xl md:text-5xl font-bold text-[#14b8a6] mb-3 shiny-text">
                   {outcome.metric}
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{outcome.title}</h3>
