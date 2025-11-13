@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
-import SpotlightCard from "./SpotlightCard";
+import ElectricBorder from "./ui/ElectricBorder";
 
 interface PricingProps {
   content: any;
@@ -28,13 +28,16 @@ export const Pricing = ({ content }: PricingProps) => {
 
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           {content.pricing.tiers?.map((tier: any, idx: number) => (
-            <SpotlightCard
+            <ElectricBorder
               key={idx}
-              className={`reveal bg-white p-8 shadow-lg ${
-                idx === 0 ? "border-secondary border-2" : ""
-              }`}
+              color="#14b8a6"
+              speed={1.5}
+              chaos={0.8}
+              thickness={2}
+              className="reveal"
+              style={{ borderRadius: '1rem' }}
             >
-              <div className="space-y-6" style={{ animationDelay: `${idx * 0.1}s` }}>
+              <div className="bg-white rounded-2xl p-8 space-y-6" style={{ animationDelay: `${idx * 0.1}s` }}>
                 <div>
                   <h3 className="text-2xl font-bold mb-2 text-primary">{tier.name}</h3>
                   <div className="mb-2">
@@ -62,7 +65,7 @@ export const Pricing = ({ content }: PricingProps) => {
                   {idx === 0 ? "Book your audit" : "Schedule a call"}
                 </Button>
               </div>
-            </SpotlightCard>
+            </ElectricBorder>
           ))}
         </div>
       </div>
