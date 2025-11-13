@@ -21,7 +21,7 @@ export const Services = ({ content }: ServicesProps) => {
       <div className="container mx-auto max-w-6xl">
         <Reveal>
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-primary">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-[#020617]">
               Two ways to work together
             </h2>
             <p className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto">

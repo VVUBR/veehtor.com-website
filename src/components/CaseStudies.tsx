@@ -14,7 +14,7 @@ export const CaseStudies = ({ content }: CaseStudiesProps) => {
       <div className="container mx-auto max-w-6xl">
         <Reveal>
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-primary">Case studies</h2>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-[#020617]">Case studies</h2>
             <p className="text-lg md:text-xl text-foreground/80">
               See how we've helped companies ship AI that delivers ROI
             </p>

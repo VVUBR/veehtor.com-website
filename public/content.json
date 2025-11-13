@@ -43,7 +43,7 @@
   "socialProof": {
     "stats": [
       { "value": 60, "suffix": "s", "label": "Lead response time with AI agents" },
-      { "value": 20, "suffix": "–40%", "label": "Reduction in manual hours" },
+      { "value": 20, "suffix": "-40%", "label": "Reduction in manual hours" },
       { "value": 90, "suffix": " days", "label": "Average time to positive ROI" },
       { "value": 2, "suffix": " weeks", "label": "Audit turnaround (fixed scope)" }
     ]
@@ -52,7 +52,7 @@
     "problem": {
       "title": "The AI trap most companies fall into",
       "points": [
-        "Spending $20–50K+ on tools that sit unused",
+        "Spending $20-50K+ on tools that sit unused",
         "Teams overwhelmed by AI hype and unclear where to start",
         "Consultants who pitch 6-month roadmaps with no tangible outcomes (just a pretty slide deck)",
         "Vendor lock-in with enterprise licenses you don't need"
@@ -95,7 +95,7 @@
     },
     {
       "title": "AI Roadmap & Implementation",
-      "duration": "3–6 months",
+      "duration": "3-6 months",
       "description": "End-to-end implementation of AI agents, workflows, and integrations",
       "deliverables": [
         "Custom AI agent development",
@@ -144,7 +144,7 @@
       {
         "number": "3",
         "title": "Build & Scale",
-        "duration": "8–12 weeks",
+        "duration": "8-12 weeks",
         "description": "We implement AI agents and workflows in sprints, measuring ROI at each milestone.",
         "icon": "rocket"
       }
@@ -185,7 +185,7 @@
     },
     {
       "question": "How do you measure ROI on AI projects?",
-      "answer": "We establish baseline metrics during the audit (e.g., revenue per customer, time spent on manual tasks, cost per customer interaction) and track improvements post-implementation. Most clients see measurable ROI within 60–90 days through reduced labor costs, faster response times, or increased conversion rates."
+      "answer": "We establish baseline metrics during the audit (e.g., revenue per customer, time spent on manual tasks, cost per customer interaction) and track improvements post-implementation. Most clients see measurable ROI within 60-90 days through reduced labor costs, faster response times, or increased conversion rates."
     }
   ],
   "testimonials": [
