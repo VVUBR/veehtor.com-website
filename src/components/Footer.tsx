@@ -1,6 +1,7 @@
 import { ArrowUp, Linkedin, Twitter, Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { LegalModal } from "@/components/LegalModal";
 
 interface FooterProps {
   content: any;
@@ -8,6 +9,8 @@ interface FooterProps {
 
 export const Footer = ({ content }: FooterProps) => {
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [legalModalOpen, setLegalModalOpen] = useState(false);
+  const [legalModalType, setLegalModalType] = useState<"privacy" | "terms">("privacy");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,6 +22,11 @@ export const Footer = ({ content }: FooterProps) => {
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const openLegalModal = (type: "privacy" | "terms") => {
+    setLegalModalType(type);
+    setLegalModalOpen(true);
   };
 
   return (
@@ -88,18 +96,21 @@ export const Footer = ({ content }: FooterProps) => {
 
           <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-muted-foreground">
-              {content?.footer?.copyright || "© 2025 AI Audit. All rights reserved."}
+              {content?.footer?.copyright || "© 2025 Veehtor AI, LLC. All rights reserved."}
             </p>
             <div className="flex gap-6">
-              {content?.footer?.links?.map((link: any, idx: number) => (
-                <a
-                  key={idx}
-                  href={link.href}
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {link.label}
-                </a>
-              ))}
+              <button
+                onClick={() => openLegalModal("privacy")}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                Privacy Policy
+              </button>
+              <button
+                onClick={() => openLegalModal("terms")}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                Terms of Service
+              </button>
             </div>
           </div>
         </div>
@@ -138,6 +149,12 @@ export const Footer = ({ content }: FooterProps) => {
           <ArrowUp className="w-5 h-5" />
         </Button>
       )}
+
+      <LegalModal
+        open={legalModalOpen}
+        onOpenChange={setLegalModalOpen}
+        type={legalModalType}
+      />
     </>
   );
 };
