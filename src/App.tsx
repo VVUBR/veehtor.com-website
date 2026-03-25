@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
+import Complo from "./pages/Complo";
 
 const queryClient = new QueryClient();
 
