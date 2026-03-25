@@ -26,21 +26,7 @@ export const Contact = ({ content }: ContactProps) => {
 
         <Reveal delay={0.2}>
           <div className="bg-card rounded-xl p-8 md:p-12 border border-border shadow-lg">
-            <div className="grid md:grid-cols-3 gap-6">
-              {calendarLink && (
-                <GlareButton
-                  size="lg"
-                  onClick={() => window.open(calendarLink, "_blank")}
-                  className="h-auto flex-col py-6 gap-3"
-                >
-                <Calendar className="w-8 h-8" />
-                <div>
-                  <div className="font-semibold">Book a call</div>
-                  <div className="text-xs opacity-90">Schedule on my calendar</div>
-                </div>
-              </GlareButton>
-            )}
-
+            <div className="grid md:grid-cols-2 gap-6">
             {email && (
               <Button
                 size="lg"
