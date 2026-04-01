@@ -248,7 +248,6 @@ export default function LandingPage() {
         </a>
         <nav style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
           <button className="nav-link-style hidden md:inline-block" onClick={() => scrollTo("process")}>How it works</button>
-          <button className="nav-link-style hidden md:inline-block" onClick={() => scrollTo("outcomes")}>About</button>
           <button className="nav-link-style hidden md:inline-block" onClick={() => scrollTo("pricing")}>Pricing</button>
           <button className="nav-cta" onClick={() => scrollTo("contact")}>Get in touch</button>
         </nav>
