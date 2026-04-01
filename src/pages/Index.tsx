@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import vaiLogo from "@/assets/vai-logo.svg";
+import vaiLogo from "@/assets/vai-logo-new.png";
 
 const PAIN_CARDS = [
   { text: "Missed lead", type: "warn" },
