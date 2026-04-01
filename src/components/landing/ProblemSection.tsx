@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const ROTATING_WORDS = ["expensive.", "dreams.", "promises.", "hype."];
+const ROTATING_WORDS = ["promises.", "expensive.", "dreams.", "hype."];
 
 const CARDS = [
   {
