@@ -453,8 +453,8 @@ export default function LandingPage() {
                 <div className="pricing-tier">After the audit</div>
                 <div className="pricing-name">Build & Scale</div>
                 <div className="pricing-timeline">3-6 months</div>
-                <div className="pricing-amount">$12,500–30K</div>
-                <p className="pricing-desc">Custom AI agents and workflow automation that delivers measurable ROI.</p>
+                <div className="pricing-amount">$12,500-30K</div>
+                <p className="pricing-desc">End-to-end implementation of the roadmap - AI agents, workflow automations, and team training, measured against ROI at every milestone.</p>
                 <ul className="pricing-features">
                   <li>Custom AI agent development</li>
                   <li>Workflow automation & integrations</li>
