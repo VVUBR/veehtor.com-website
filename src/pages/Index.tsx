@@ -27,22 +27,22 @@ const PAIN_CARDS = [
 const ROTATING_WORDS = ["expensive.", "dreams.", "promises.", "hype."];
 
 const STATS = [
-  { value: 60, suffix: "s", label: "Lead response time", desc: "AI agents auto-qualify, route, and draft proposals — first touch under a minute, 24/7." },
+  { value: 60, suffix: "s", label: "Lead response time", desc: "AI agents auto-qualify, route, and draft proposals - first touch under a minute, 24/7." },
   { value: 40, suffix: "%", label: "Less manual work", desc: "Your team stops copying, pasting, and chasing. AI handles the repetition so humans handle the relationships." },
-  { value: 3, suffix: "x", label: "Pipeline efficiency", desc: "Automated prospect research, enrichment, and personalized outreach triples qualified meetings — no new headcount." },
+  { value: 3, suffix: "x", label: "Pipeline efficiency", desc: "Automated prospect research, enrichment, and personalized outreach triples qualified meetings - no new headcount." },
   { value: 90, suffix: " days", label: "To positive ROI", desc: "Not 6 months. Not 'eventually.' Measurable return within one quarter, tracked from day one." },
 ];
 
 const STEPS = [
-  { num: 1, title: "AI Audit", timeline: "2 WEEKS · $1,500", desc: "We map your real workflows — not theoretical ones. You get a scorecard of your highest-ROI automation opportunities, with cost estimates and timelines you can actually trust." },
+  { num: 1, title: "AI Audit", timeline: "2 WEEKS · $1,500", desc: "We map your real workflows - not theoretical ones. You get a scorecard of your highest-ROI automation opportunities, with cost estimates and timelines you can actually trust." },
   { num: 2, title: "Custom Roadmap", timeline: "1 WEEK", desc: "We prioritize together based on ROI, effort, and what your team can realistically adopt. You approve the plan before a single line of code is written." },
   { num: 3, title: "Build & Scale", timeline: "8-12 WEEKS", desc: "AI agents and workflows go live in sprints. We measure ROI at every milestone. If something isn't working, we pivot. No vendor lock-in." },
 ];
 
 const CASES = [
-  { industry: "Legal Tech · B2B SaaS", metric: "< 60s", metricLabel: "lead response", before: "5-min avg. response, leads lost overnight", after: "<60s response, 24/7 qualification" },
-  { industry: "B2B SaaS · Customer Support", metric: "$180K", metricLabel: "annual savings", before: "Overloaded support team, slow ticket resolution", after: "30% tickets automated, 2 FTEs saved" },
-  { industry: "Professional Services · Sales", metric: "3x", metricLabel: "qualified meetings", before: "Manual research, generic outreach, low conversion", after: "3x qualified meetings, fully automated SDR workflow" },
+  { industry: "Legal Tech · B2B SaaS", metric: "< 60s", metricLabel: "lead response", desc: "Automated lead qualification and intelligent routing replaced a 5-minute manual process. AI agents now handle first contact in under 60 seconds, around the clock.", before: "5-min avg. response, leads lost overnight", after: "<60s response, 24/7 qualification" },
+  { industry: "B2B SaaS · Customer Support", metric: "$180K", metricLabel: "annual savings", desc: "An AI support agent now handles 30% of customer tickets autonomously, saving the equivalent of 2 full-time employees - without sacrificing satisfaction scores.", before: "Overloaded support team, slow ticket resolution", after: "30% tickets automated, 2 FTEs saved" },
+  { industry: "Professional Services · Sales", metric: "3x", metricLabel: "qualified meetings", desc: "Automated prospect research, data enrichment, and hyper-personalized outreach tripled sales development efficiency - zero new headcount.", before: "Manual research, generic outreach, low conversion", after: "3x qualified meetings, fully automated SDR workflow" },
 ];
 
 // --- Counter hook ---
@@ -234,7 +234,7 @@ export default function LandingPage() {
     <>
       {/* LOADER */}
       <div id="loader" className={loading ? "" : "hidden"}>
-        <div className="loader-brand">veehtor.ai</div>
+        <div className="loader-brand">veehtor AI</div>
         <div id="loader-bar-wrap">
           <div id="loader-bar" style={{ width: `${loaderProgress}%` }} />
         </div>
@@ -244,11 +244,10 @@ export default function LandingPage() {
       <header className={`site-header ${scrolled ? "scrolled" : ""}`}>
         <a href="/" className="logo">
           <img src={vaiLogo} alt="Veehtor AI" className="logo-icon" style={{ height: 28 }} />
-          <span>veehtor</span> AI
+          veehtor <span>AI</span>
         </a>
         <nav style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
           <button className="nav-link-style hidden md:inline-block" onClick={() => scrollTo("process")}>How it works</button>
-          <button className="nav-link-style hidden md:inline-block" onClick={() => scrollTo("outcomes")}>About</button>
           <button className="nav-link-style hidden md:inline-block" onClick={() => scrollTo("pricing")}>Pricing</button>
           <button className="nav-cta" onClick={() => scrollTo("contact")}>Get in touch</button>
         </nav>
@@ -278,12 +277,12 @@ export default function LandingPage() {
 
           {/* Phase 2 */}
           <div className="transform-phase phase-transition" style={{ opacity: phase2Opacity }}>
-            <h2>What if <em>AI</em> handled the busywork — and you focused on <em>growth</em>?</h2>
+            <h2>What if <em>AI</em> handled the busywork - and you focused on <em>growth</em>?</h2>
           </div>
 
           {/* Phase 3 */}
           <div className="transform-phase phase-transformed" style={{ opacity: phase3Opacity }}>
-            <h2>Your team. <em>Amplified.</em></h2>
+            <h2>Your team. <em style={{ color: '#2dd4a8' }}>Amplified.</em></h2>
             <p>We build what matters to your business results while your team does what only humans can.</p>
             <button className="btn-primary" onClick={() => scrollTo("contact")}>
               <strong>Book Your AI Audit</strong> →
@@ -297,7 +296,7 @@ export default function LandingPage() {
         <div className="marquee-track">
           {Array.from({ length: 4 }).map((_, i) => (
             <span key={i} className="marquee-text">
-              <span className="highlight">AI that pays for itself</span> — Stop experimenting. Start profiting.{" "}
+              <span className="highlight">AI that pays for itself</span> - Stop experimenting. Start profiting.{" "}
             </span>
           ))}
         </div>
@@ -325,9 +324,9 @@ export default function LandingPage() {
 
           <div className="problem-grid">
             {[
-              { icon: "💸", title: "$20-50K spent on tools that sit unused", desc: "Enterprise licenses, pilot programs, and shiny demos that never made it past the POC phase." },
-              { icon: "🤯", title: "Your team is overwhelmed by the hype", desc: "Every vendor promises transformation. Your team just wants to know what actually works for them." },
-              { icon: "📊", title: "Consultants pitch decks, not results", desc: "You've seen beautiful strategy presentations. What you haven't seen is measurable ROI." },
+              { icon: "💸", title: "$20-50K spent on tools that sit unused", desc: "Enterprise licenses, chatbot platforms, analytics dashboards - all collecting dust because nobody knows how to connect them to actual workflows." },
+              { icon: "🤯", title: "Your team is overwhelmed by the hype", desc: "Everyone says you need AI. Nobody tells you where it actually moves the needle in your specific business. So nothing changes." },
+              { icon: "📊", title: "Consultants pitch decks, not results", desc: "Six-month roadmaps. Fifty-page PDFs. Zero implementation. You're paying for slides while your competitors are shipping AI that works." },
             ].map((card, i) => (
               <StaggerChild key={i} delay={i * 0.15}>
                 <div className="problem-card">
@@ -401,6 +400,7 @@ export default function LandingPage() {
                     <div style={{ fontSize: "0.85rem", color: "#8a8580", fontFamily: "var(--font-body)" }}>{c.metricLabel}</div>
                   </div>
                   <div className="case-body">
+                    <p>{c.desc}</p>
                     <div className="case-before-after">
                       <div className="case-ba case-before">
                         <strong>Before</strong>
@@ -424,17 +424,17 @@ export default function LandingPage() {
         <div className="pricing-inner">
           <RevealDiv>
             <h2 className="pricing-heading">Start with <em>clarity.</em> Scale with <em>confidence.</em></h2>
-            <p className="pricing-sub">Begin with a 2-week audit — then only implement what proves its value.</p>
+            <p className="pricing-sub">Begin with a 2-week audit - then only implement what proves its value.</p>
           </RevealDiv>
 
           <div className="pricing-cards">
             <StaggerChild delay={0}>
               <div className="pricing-card featured">
-                <div className="pricing-tier">Audit</div>
+                <div className="pricing-tier">Start here</div>
                 <div className="pricing-name">AI Audit</div>
                 <div className="pricing-timeline">2 weeks</div>
                 <div className="pricing-amount">$1,500</div>
-                <p className="pricing-desc">A deep-dive into your workflows to find the highest-ROI AI opportunities.</p>
+                <p className="pricing-desc">A deep-dive into your business to find where AI will generate the highest return - not where it's trendiest.</p>
                 <ul className="pricing-features">
                   <li>Workflow analysis & bottleneck mapping</li>
                   <li>Prioritized opportunity scorecard</li>
@@ -450,17 +450,17 @@ export default function LandingPage() {
 
             <StaggerChild delay={0.15}>
               <div className="pricing-card">
-                <div className="pricing-tier">Implementation</div>
+                <div className="pricing-tier">After the audit</div>
                 <div className="pricing-name">Build & Scale</div>
                 <div className="pricing-timeline">3-6 months</div>
-                <div className="pricing-amount">$12,500–30K</div>
-                <p className="pricing-desc">Custom AI agents and workflow automation that delivers measurable ROI.</p>
+                <div className="pricing-amount">$12,500-30K</div>
+                <p className="pricing-desc">End-to-end implementation of the roadmap - AI agents, workflow automations, and team training, measured against ROI at every milestone.</p>
                 <ul className="pricing-features">
                   <li>Custom AI agent development</li>
                   <li>Workflow automation & integrations</li>
                   <li>Team training & adoption playbooks</li>
                   <li>Ongoing optimization & ROI tracking</li>
-                  <li>No vendor lock-in — you own everything</li>
+                  <li>No vendor lock-in - you own everything</li>
                 </ul>
                 <a href="tel:+17813288464" className="pricing-btn outline">Call me now →</a>
               </div>
