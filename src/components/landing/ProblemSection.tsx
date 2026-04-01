@@ -53,7 +53,6 @@ export default function ProblemSection() {
             You've heard AI will change everything.
             <br />
             But so far, it's just been{" "}
-            <br />
             <span className="inline-block relative align-bottom overflow-hidden" style={{ minWidth: "5.5em", height: "1.15em", verticalAlign: "bottom" }}>
               <AnimatePresence mode="wait">
                 <motion.span
