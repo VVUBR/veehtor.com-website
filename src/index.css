@@ -303,7 +303,7 @@
   line-height: 1.2;
   color: var(--text-dark);
 }
-.problem-card p { font-size: 0.9rem; color: #5a5550; line-height: 1.7; font-family: var(--font-body); }
+.problem-card p { font-size: 1rem; color: #5a5550; line-height: 1.7; font-family: var(--font-body); }
 
 /* ROTATING WORDS */
 .rotating-wrapper {
