@@ -460,7 +460,7 @@ export default function LandingPage() {
                   <li>Workflow automation & integrations</li>
                   <li>Team training & adoption playbooks</li>
                   <li>Ongoing optimization & ROI tracking</li>
-                  <li>No vendor lock-in — you own everything</li>
+                  <li>No vendor lock-in - you own everything</li>
                 </ul>
                 <a href="tel:+17813288464" className="pricing-btn outline">Call me now →</a>
               </div>
