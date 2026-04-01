@@ -680,7 +680,7 @@
 .footer-text { font-size: 0.85rem; color: var(--text-muted-dark); font-family: var(--font-body); }
 .footer-links { display: flex; gap: 1.5rem; }
 .footer-links a {
-  font-size: 0.75rem; color: var(--text-muted-dark);
+  font-size: 0.85rem; color: var(--text-muted-dark);
   text-decoration: none; transition: color 0.3s; font-family: var(--font-body);
 }
 .footer-links a:hover { color: var(--text-light); }
