@@ -50,7 +50,10 @@ export default function ProblemSection() {
             className="text-3xl sm:text-4xl md:text-5xl leading-tight max-w-4xl"
             style={{ color: "hsl(222 33% 10%)" }}
           >
-            You've heard AI will change everything. But so far, it's just been{" "}
+            You've heard AI will change everything.
+            <br />
+            But so far, it's just been{" "}
+            <br />
             <span className="inline-block relative align-bottom overflow-hidden" style={{ minWidth: "5.5em", height: "1.15em", verticalAlign: "bottom" }}>
               <AnimatePresence mode="wait">
                 <motion.span
