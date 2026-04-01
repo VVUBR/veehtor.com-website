@@ -602,7 +602,7 @@
 }
 .cta-heading em { font-style: italic; color: var(--teal); }
 .cta-sub {
-  font-size: 1.1rem; color: var(--text-muted);
+  font-size: 1.2rem; color: var(--text-muted);
   margin-bottom: 2.5rem; line-height: 1.6; font-family: var(--font-body);
 }
 .cta-buttons {
