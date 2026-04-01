@@ -376,7 +376,7 @@
 }
 .stat-suffix { font-size: 0.5em; color: var(--text-muted); margin-left: 0.1em; }
 .stat-label {
-  font-size: 0.8rem; color: var(--text-muted);
+  font-size: 0.95rem; color: var(--text-muted);
   text-transform: uppercase; letter-spacing: 0.1em;
   margin-top: 0.6rem; font-family: var(--font-body);
 }
