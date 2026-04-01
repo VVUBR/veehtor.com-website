@@ -556,7 +556,7 @@
 }
 .pricing-features { list-style: none; margin-bottom: 2rem; }
 .pricing-features li {
-  padding: 0.5rem 0; font-size: 0.88rem; color: var(--text-muted);
+  padding: 0.5rem 0; font-size: 1rem; color: var(--text-muted);
   display: flex; align-items: flex-start; gap: 0.6rem;
   line-height: 1.5; font-family: var(--font-body);
 }
