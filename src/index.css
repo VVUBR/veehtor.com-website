@@ -707,7 +707,7 @@
   animation: scrollPulse 2s ease infinite;
 }
 .scroll-indicator span {
-  font-size: 0.65rem; text-transform: uppercase;
+  font-size: 0.75rem; text-transform: uppercase;
   letter-spacing: 0.15em; color: var(--text-muted-dark);
   font-family: var(--font-body);
 }
