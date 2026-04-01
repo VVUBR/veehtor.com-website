@@ -381,7 +381,7 @@
   margin-top: 0.6rem; font-family: var(--font-body);
 }
 .stat-desc {
-  font-size: 0.85rem; color: var(--text-muted-dark);
+  font-size: 1rem; color: var(--text-muted-dark);
   margin-top: 0.4rem; line-height: 1.5; font-family: var(--font-body);
 }
 
