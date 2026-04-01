@@ -40,9 +40,9 @@ const STEPS = [
 ];
 
 const CASES = [
-  { industry: "CONSTRUCTION · COMPANY", metric: "< 60s", metricLabel: "lead response", desc: "Automated lead qualification and intelligent routing replaced a 5-minute manual process. AI agents now handle first contact in under 60 seconds, around the clock.", before: "5-min avg. response, leads lost overnight", after: "<60s response, 24/7 qualification" },
-  { industry: "B2B SAAS · CUSTOMER SUPPORT", metric: "$180K", metricLabel: "annual savings", desc: "An AI support agent now handles 30% of customer tickets autonomously, saving the equivalent of 2 full-time employees - without sacrificing satisfaction scores.", before: "Overloaded support team, slow ticket resolution", after: "30% tickets automated, 2 FTEs saved" },
-  { industry: "Professional Services · Sales", metric: "3x", metricLabel: "qualified meetings", desc: "Automated prospect research, data enrichment, and hyper-personalized outreach tripled sales development efficiency - zero new headcount.", before: "Manual research, generic outreach, low conversion", after: "3x qualified meetings, fully automated SDR workflow" },
+  { industry: "CONSTRUCTION · COMPANY", metric: "less than 1 min", metricLabel: "lead response", desc: "Every new lead now gets a response in under 60 seconds - day or night. No one falls through the cracks.", before: "Leads waited 1+ day. Many were lost overnight", after: "Instant response, 24/7. No leads lost." },
+  { industry: "B2B SAAS · CUSTOMER SUPPORT", metric: "$180K", metricLabel: "annual savings", desc: "Repetitive support questions now get answered automatically. The team focuses on real problems instead of password resets.", before: "Support team overwhelmed, slow replies", after: "2 teams freed up for higher-value work." },
+  { industry: "Professional Services · Sales", metric: "3x", metricLabel: "qualified meetings", desc: "Finding and reaching the right prospects used to take all day. Now it happens automatically, and the results tripled.", before: "Hours spent researching leads, low conversion", after: "3x qualified meetings. Same team, no extra hires." },
 ];
 
 // --- Counter hook ---
@@ -404,11 +404,11 @@ export default function LandingPage() {
                     <p>{c.desc}</p>
                     <div className="case-before-after">
                       <div className="case-ba case-before">
-                        <strong>Before</strong>
+                        <strong>BEFORE</strong>
                         {c.before}
                       </div>
                       <div className="case-ba case-after">
-                        <strong>After</strong>
+                        <strong>AFTER</strong>
                         {c.after}
                       </div>
                     </div>
