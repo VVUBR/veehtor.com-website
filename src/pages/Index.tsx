@@ -398,7 +398,7 @@ export default function LandingPage() {
                   <div className="case-header">
                     <div className="case-industry">{c.industry}</div>
                     <div className="case-metric">{c.metric}</div>
-                    <div style={{ fontSize: "0.85rem", color: "#8a8580", fontFamily: "var(--font-body)" }}>{c.metricLabel}</div>
+                    <div style={{ fontSize: "1rem", color: "#8a8580", fontFamily: "var(--font-body)" }}>{c.metricLabel}</div>
                   </div>
                   <div className="case-body">
                     <p>{c.desc}</p>

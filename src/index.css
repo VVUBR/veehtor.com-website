@@ -172,7 +172,7 @@
 }
 .chaos-cell {
   border-radius: 6px;
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -197,7 +197,7 @@
   color: var(--text-light);
 }
 .phase-text p {
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: var(--text-muted);
   line-height: 1.7;
 }
@@ -225,7 +225,7 @@
 }
 .phase-transformed h2 em { font-style: italic; color: var(--teal); }
 .phase-transformed p {
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: var(--text-muted);
   line-height: 1.7;
   text-align: center;
@@ -272,7 +272,7 @@
 }
 .problem-inner { max-width: 1100px; margin: 0 auto; }
 .section-label {
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.2em;
   color: var(--teal);
@@ -303,7 +303,7 @@
   line-height: 1.2;
   color: var(--text-dark);
 }
-.problem-card p { font-size: 0.9rem; color: #5a5550; line-height: 1.7; font-family: var(--font-body); }
+.problem-card p { font-size: 1rem; color: #5a5550; line-height: 1.7; font-family: var(--font-body); }
 
 /* ROTATING WORDS */
 .rotating-wrapper {
@@ -355,7 +355,7 @@
 }
 .outcomes-heading em { font-style: italic; color: var(--teal); }
 .outcomes-sub {
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   color: var(--text-muted);
   margin-bottom: 4rem;
   max-width: 500px;
@@ -376,12 +376,12 @@
 }
 .stat-suffix { font-size: 0.5em; color: var(--text-muted); margin-left: 0.1em; }
 .stat-label {
-  font-size: 0.8rem; color: var(--text-muted);
+  font-size: 0.95rem; color: var(--text-muted);
   text-transform: uppercase; letter-spacing: 0.1em;
   margin-top: 0.6rem; font-family: var(--font-body);
 }
 .stat-desc {
-  font-size: 0.85rem; color: var(--text-muted-dark);
+  font-size: 1rem; color: var(--text-muted-dark);
   margin-top: 0.4rem; line-height: 1.5; font-family: var(--font-body);
 }
 
@@ -433,11 +433,11 @@
   color: var(--text-dark);
 }
 .step .duration {
-  font-size: 0.75rem; color: var(--teal);
+  font-size: 0.85rem; color: var(--teal);
   text-transform: uppercase; letter-spacing: 0.1em;
   font-weight: 600; margin-bottom: 0.8rem; font-family: var(--font-body);
 }
-.step p { font-size: 0.9rem; color: #5a5550; line-height: 1.7; font-family: var(--font-body); }
+.step p { font-size: 1rem; color: #5a5550; line-height: 1.7; font-family: var(--font-body); }
 
 /* ── CASE STUDIES (Light) ── */
 .cases-section {
@@ -472,7 +472,7 @@
 }
 .case-header { padding: 2rem 2rem 1rem; border-bottom: 1px solid rgba(0,0,0,0.04); }
 .case-industry {
-  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em;
+  font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.15em;
   color: var(--teal); font-weight: 600; margin-bottom: 0.5rem; font-family: var(--font-body);
 }
 .case-metric {
@@ -486,11 +486,11 @@
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
-.case-ba { padding: 0.8rem; border-radius: 8px; font-size: 0.8rem; font-family: var(--font-body); }
+.case-ba { padding: 0.8rem; border-radius: 8px; font-size: 0.95rem; font-family: var(--font-body); }
 .case-before { background: rgba(255,80,60,0.06); color: var(--coral); }
 .case-after { background: rgba(45,212,168,0.06); color: var(--teal); }
 .case-ba strong {
-  display: block; font-size: 0.65rem; text-transform: uppercase;
+  display: block; font-size: 0.75rem; text-transform: uppercase;
   letter-spacing: 0.1em; margin-bottom: 0.2rem;
 }
 
@@ -535,7 +535,7 @@
   color: var(--teal); font-weight: 700; font-family: var(--font-body);
 }
 .pricing-tier {
-  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em;
+  font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.15em;
   color: var(--text-muted-dark); font-weight: 600; font-family: var(--font-body);
 }
 .pricing-name {
@@ -543,7 +543,7 @@
   font-size: 1.6rem; margin: 0.5rem 0 0.3rem;
 }
 .pricing-timeline {
-  font-size: 0.8rem; color: var(--teal);
+  font-size: 0.9rem; color: var(--teal);
   font-weight: 600; margin-bottom: 1rem; font-family: var(--font-body);
 }
 .pricing-amount {
@@ -551,12 +551,12 @@
   font-size: 2.5rem; margin-bottom: 0.5rem;
 }
 .pricing-desc {
-  font-size: 0.9rem; color: var(--text-muted);
+  font-size: 1rem; color: var(--text-muted);
   line-height: 1.6; margin-bottom: 1.5rem; font-family: var(--font-body);
 }
 .pricing-features { list-style: none; margin-bottom: 2rem; }
 .pricing-features li {
-  padding: 0.5rem 0; font-size: 0.88rem; color: var(--text-muted);
+  padding: 0.5rem 0; font-size: 1rem; color: var(--text-muted);
   display: flex; align-items: flex-start; gap: 0.6rem;
   line-height: 1.5; font-family: var(--font-body);
 }
@@ -574,7 +574,7 @@
 .pricing-btn.outline:hover { border-color: rgba(255,255,255,0.25); }
 .pricing-note {
   text-align: center; margin-top: 2rem;
-  font-size: 0.85rem; color: var(--text-muted-dark);
+  font-size: 0.95rem; color: var(--text-muted-dark);
   font-style: italic; font-family: var(--font-body);
 }
 
@@ -602,7 +602,7 @@
 }
 .cta-heading em { font-style: italic; color: var(--teal); }
 .cta-sub {
-  font-size: 1.1rem; color: var(--text-muted);
+  font-size: 1.2rem; color: var(--text-muted);
   margin-bottom: 2.5rem; line-height: 1.6; font-family: var(--font-body);
 }
 .cta-buttons {
@@ -612,7 +612,7 @@
 .cta-contact { display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap; }
 .cta-contact a {
   color: var(--text-muted-dark); text-decoration: none;
-  font-size: 0.85rem; transition: color 0.3s; font-family: var(--font-body);
+  font-size: 0.95rem; transition: color 0.3s; font-family: var(--font-body);
 }
 .cta-contact a:hover { color: var(--teal); }
 
@@ -642,7 +642,7 @@
 .nav-link-style {
   color: var(--text-muted-dark);
   text-decoration: none;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 500;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -662,7 +662,7 @@
   transition: transform 0.2s, box-shadow 0.3s !important;
   border: none; cursor: pointer;
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   text-decoration: none;
@@ -677,10 +677,10 @@
   display: flex; justify-content: space-between;
   align-items: center; flex-wrap: wrap; gap: 1rem;
 }
-.footer-text { font-size: 0.75rem; color: var(--text-muted-dark); font-family: var(--font-body); }
+.footer-text { font-size: 0.85rem; color: var(--text-muted-dark); font-family: var(--font-body); }
 .footer-links { display: flex; gap: 1.5rem; }
 .footer-links a {
-  font-size: 0.75rem; color: var(--text-muted-dark);
+  font-size: 0.85rem; color: var(--text-muted-dark);
   text-decoration: none; transition: color 0.3s; font-family: var(--font-body);
 }
 .footer-links a:hover { color: var(--text-light); }
@@ -707,7 +707,7 @@
   animation: scrollPulse 2s ease infinite;
 }
 .scroll-indicator span {
-  font-size: 0.65rem; text-transform: uppercase;
+  font-size: 0.75rem; text-transform: uppercase;
   letter-spacing: 0.15em; color: var(--text-muted-dark);
   font-family: var(--font-body);
 }
