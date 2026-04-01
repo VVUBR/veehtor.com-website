@@ -195,7 +195,6 @@ export default function LandingPage() {
     const scrolled = -rect.top;
     const progress = Math.max(0, Math.min(1, scrolled / totalHeight));
 
-    // Phase 1: 0-30%
     if (progress <= 0.25) {
       setPhase1Opacity(1);
       setPhase2Opacity(0);
@@ -222,8 +221,10 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
-    window.addEventListener("scroll", handleTransformScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleTransformScroll);
+    const onScroll = () => requestAnimationFrame(handleTransformScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    handleTransformScroll(); // run once on mount
+    return () => window.removeEventListener("scroll", onScroll);
   }, [handleTransformScroll]);
 
   const scrollTo = (id: string) => {
