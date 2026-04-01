@@ -404,7 +404,7 @@ export default function LandingPage() {
                     <p>{c.desc}</p>
                     <div className="case-before-after">
                       <div className="case-ba case-before">
-                        <strong>Before</strong>
+                        <strong>BEFORE</strong>
                         {c.before}
                       </div>
                       <div className="case-ba case-after">
