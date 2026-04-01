@@ -34,7 +34,7 @@ const STATS = [
 ];
 
 const STEPS = [
-  { num: 1, title: "AI Audit", timeline: "2 WEEKS · $1,500", desc: "We map your real workflows — not theoretical ones. You get a scorecard of your highest-ROI automation opportunities, with cost estimates and timelines you can actually trust." },
+  { num: 1, title: "AI Audit", timeline: "2 WEEKS · $1,500", desc: "We map your real workflows - not theoretical ones. You get a scorecard of your highest-ROI automation opportunities, with cost estimates and timelines you can actually trust." },
   { num: 2, title: "Custom Roadmap", timeline: "1 WEEK", desc: "We prioritize together based on ROI, effort, and what your team can realistically adopt. You approve the plan before a single line of code is written." },
   { num: 3, title: "Build & Scale", timeline: "8-12 WEEKS", desc: "AI agents and workflows go live in sprints. We measure ROI at every milestone. If something isn't working, we pivot. No vendor lock-in." },
 ];
