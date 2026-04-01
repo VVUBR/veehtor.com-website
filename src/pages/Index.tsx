@@ -434,7 +434,7 @@ export default function LandingPage() {
                 <div className="pricing-name">AI Audit</div>
                 <div className="pricing-timeline">2 weeks</div>
                 <div className="pricing-amount">$1,500</div>
-                <p className="pricing-desc">A deep-dive into your workflows to find the highest-ROI AI opportunities.</p>
+                <p className="pricing-desc">A deep-dive into your business to find where AI will generate the highest return - not where it's trendiest.</p>
                 <ul className="pricing-features">
                   <li>Workflow analysis & bottleneck mapping</li>
                   <li>Prioritized opportunity scorecard</li>
