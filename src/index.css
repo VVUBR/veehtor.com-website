@@ -486,7 +486,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
-.case-ba { padding: 0.8rem; border-radius: 8px; font-size: 0.8rem; font-family: var(--font-body); }
+.case-ba { padding: 0.8rem; border-radius: 8px; font-size: 0.95rem; font-family: var(--font-body); }
 .case-before { background: rgba(255,80,60,0.06); color: var(--coral); }
 .case-after { background: rgba(45,212,168,0.06); color: var(--teal); }
 .case-ba strong {
