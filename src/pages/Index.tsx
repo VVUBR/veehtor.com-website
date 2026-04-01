@@ -244,7 +244,7 @@ export default function LandingPage() {
       {/* HEADER */}
       <header className={`site-header ${scrolled ? "scrolled" : ""}`}>
         <a href="/" className="logo">
-          <img src={vaiLogo} alt="Veehtor AI" className="logo-icon" style={{ height: 28 }} />
+          <img src={vaiLogo} alt="Veehtor AI" className="logo-icon" style={{ height: 34 }} />
           veehtor <span>AI</span>
         </a>
         <nav style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
