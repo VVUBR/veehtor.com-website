@@ -430,7 +430,7 @@ export default function LandingPage() {
           <div className="pricing-cards">
             <StaggerChild delay={0}>
               <div className="pricing-card featured">
-                <div className="pricing-tier">Audit</div>
+                <div className="pricing-tier">Start here</div>
                 <div className="pricing-name">AI Audit</div>
                 <div className="pricing-timeline">2 weeks</div>
                 <div className="pricing-amount">$1,500</div>
