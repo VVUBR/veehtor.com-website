@@ -490,7 +490,7 @@
 .case-before { background: rgba(255,80,60,0.06); color: var(--coral); }
 .case-after { background: rgba(45,212,168,0.06); color: var(--teal); }
 .case-ba strong {
-  display: block; font-size: 0.65rem; text-transform: uppercase;
+  display: block; font-size: 0.75rem; text-transform: uppercase;
   letter-spacing: 0.1em; margin-bottom: 0.2rem;
 }
 
