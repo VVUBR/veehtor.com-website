@@ -324,9 +324,9 @@ export default function LandingPage() {
 
           <div className="problem-grid">
             {[
-              { icon: "💸", title: "$20-50K spent on tools that sit unused", desc: "Enterprise licenses, pilot programs, and shiny demos that never made it past the POC phase." },
-              { icon: "🤯", title: "Your team is overwhelmed by the hype", desc: "Every vendor promises transformation. Your team just wants to know what actually works for them." },
-              { icon: "📊", title: "Consultants pitch decks, not results", desc: "You've seen beautiful strategy presentations. What you haven't seen is measurable ROI." },
+              { icon: "💸", title: "$20-50K spent on tools that sit unused", desc: "Enterprise licenses, chatbot platforms, analytics dashboards - all collecting dust because nobody knows how to connect them to actual workflows." },
+              { icon: "🤯", title: "Your team is overwhelmed by the hype", desc: "Everyone says you need AI. Nobody tells you where it actually moves the needle in your specific business. So nothing changes." },
+              { icon: "📊", title: "Consultants pitch decks, not results", desc: "Six-month roadmaps. Fifty-page PDFs. Zero implementation. You're paying for slides while your competitors are shipping AI that works." },
             ].map((card, i) => (
               <StaggerChild key={i} delay={i * 0.15}>
                 <div className="problem-card">
