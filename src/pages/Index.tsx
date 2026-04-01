@@ -27,9 +27,9 @@ const PAIN_CARDS = [
 const ROTATING_WORDS = ["expensive.", "dreams.", "promises.", "hype."];
 
 const STATS = [
-  { value: 60, suffix: "s", label: "Lead response time", desc: "AI agents auto-qualify, route, and draft proposals — first touch under a minute, 24/7." },
+  { value: 60, suffix: "s", label: "Lead response time", desc: "AI agents auto-qualify, route, and draft proposals - first touch under a minute, 24/7." },
   { value: 40, suffix: "%", label: "Less manual work", desc: "Your team stops copying, pasting, and chasing. AI handles the repetition so humans handle the relationships." },
-  { value: 3, suffix: "x", label: "Pipeline efficiency", desc: "Automated prospect research, enrichment, and personalized outreach triples qualified meetings — no new headcount." },
+  { value: 3, suffix: "x", label: "Pipeline efficiency", desc: "Automated prospect research, enrichment, and personalized outreach triples qualified meetings - no new headcount." },
   { value: 90, suffix: " days", label: "To positive ROI", desc: "Not 6 months. Not 'eventually.' Measurable return within one quarter, tracked from day one." },
 ];
 
