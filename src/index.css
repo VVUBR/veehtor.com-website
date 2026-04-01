@@ -535,7 +535,7 @@
   color: var(--teal); font-weight: 700; font-family: var(--font-body);
 }
 .pricing-tier {
-  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em;
+  font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.15em;
   color: var(--text-muted-dark); font-weight: 600; font-family: var(--font-body);
 }
 .pricing-name {
