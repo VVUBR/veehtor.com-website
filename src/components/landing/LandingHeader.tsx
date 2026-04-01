@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
-import vaiLogo from "@/assets/vai-logo.svg";
+import vaiLogo from "@/assets/vai-logo-new.png";
 
 const NAV_LINKS = [
   { label: "How it works", href: "#process" },
