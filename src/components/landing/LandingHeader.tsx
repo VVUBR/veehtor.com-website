@@ -35,7 +35,7 @@ export default function LandingHeader() {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <a href="/" className="flex items-center gap-2.5">
-            <img src={vaiLogo} alt="Veehtor AI" className="h-8 md:h-9 w-auto" />
+            <img src={vaiLogo} alt="Veehtor AI" className="h-10 md:h-11 w-auto" />
             <span className="text-foreground font-medium text-lg" style={{ fontFamily: "'DM Sans', sans-serif" }}>
               veehtor <span className="text-primary">AI</span>
             </span>
