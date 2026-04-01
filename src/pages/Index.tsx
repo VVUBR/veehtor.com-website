@@ -40,9 +40,9 @@ const STEPS = [
 ];
 
 const CASES = [
-  { industry: "Legal Tech · B2B SaaS", metric: "< 60s", metricLabel: "lead response", before: "5-min avg. response, leads lost overnight", after: "<60s response, 24/7 qualification" },
-  { industry: "B2B SaaS · Customer Support", metric: "$180K", metricLabel: "annual savings", before: "Overloaded support team, slow ticket resolution", after: "30% tickets automated, 2 FTEs saved" },
-  { industry: "Professional Services · Sales", metric: "3x", metricLabel: "qualified meetings", before: "Manual research, generic outreach, low conversion", after: "3x qualified meetings, fully automated SDR workflow" },
+  { industry: "Legal Tech · B2B SaaS", metric: "< 60s", metricLabel: "lead response", desc: "Automated lead qualification and intelligent routing replaced a 5-minute manual process. AI agents now handle first contact in under 60 seconds, around the clock.", before: "5-min avg. response, leads lost overnight", after: "<60s response, 24/7 qualification" },
+  { industry: "B2B SaaS · Customer Support", metric: "$180K", metricLabel: "annual savings", desc: "An AI support agent now handles 30% of customer tickets autonomously, saving the equivalent of 2 full-time employees - without sacrificing satisfaction scores.", before: "Overloaded support team, slow ticket resolution", after: "30% tickets automated, 2 FTEs saved" },
+  { industry: "Professional Services · Sales", metric: "3x", metricLabel: "qualified meetings", desc: "Automated prospect research, data enrichment, and hyper-personalized outreach tripled sales development efficiency - zero new headcount.", before: "Manual research, generic outreach, low conversion", after: "3x qualified meetings, fully automated SDR workflow" },
 ];
 
 // --- Counter hook ---
