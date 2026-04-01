@@ -296,7 +296,7 @@ export default function LandingPage() {
         <div className="marquee-track">
           {Array.from({ length: 4 }).map((_, i) => (
             <span key={i} className="marquee-text">
-              <span className="highlight">AI that pays for itself</span> — Stop experimenting. Start profiting.{" "}
+              <span className="highlight">AI that pays for itself</span> - Stop experimenting. Start profiting.{" "}
             </span>
           ))}
         </div>
