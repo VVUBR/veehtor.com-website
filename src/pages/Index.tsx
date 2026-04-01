@@ -282,7 +282,7 @@ export default function LandingPage() {
 
           {/* Phase 3 */}
           <div className="transform-phase phase-transformed" style={{ opacity: phase3Opacity }}>
-            <h2>Your team. <em>Amplified.</em></h2>
+            <h2>Your team. <em style={{ color: '#2dd4a8' }}>Amplified.</em></h2>
             <p>We build what matters to your business results while your team does what only humans can.</p>
             <button className="btn-primary" onClick={() => scrollTo("contact")}>
               <strong>Book Your AI Audit</strong> →
