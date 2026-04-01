@@ -244,7 +244,7 @@ export default function LandingPage() {
       <header className={`site-header ${scrolled ? "scrolled" : ""}`}>
         <a href="/" className="logo">
           <img src={vaiLogo} alt="Veehtor AI" className="logo-icon" style={{ height: 28 }} />
-          <span>veehtor</span> AI
+          veehtor <span>AI</span>
         </a>
         <nav style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
           <button className="nav-link-style hidden md:inline-block" onClick={() => scrollTo("process")}>How it works</button>
