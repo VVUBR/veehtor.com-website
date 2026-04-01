@@ -355,7 +355,7 @@
 }
 .outcomes-heading em { font-style: italic; color: var(--teal); }
 .outcomes-sub {
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   color: var(--text-muted);
   margin-bottom: 4rem;
   max-width: 500px;
