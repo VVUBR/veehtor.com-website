@@ -2,73 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
 @layer base {
   :root {
-    /* v.AI Brand Colors */
-    --background: 210 20% 98%;
-    --foreground: 222 84% 5%;
-    
-    --card: 220 13% 91%;
-    --card-foreground: 222 84% 5%;
-    
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 84% 5%;
-    
-    /* Operator Navy #111827 */
-    --primary: 217 33% 17%;
-    --primary-foreground: 0 0% 100%;
-    
-    /* Fresh Teal #14B8A6 */
-    --secondary: 173 80% 40%;
-    --secondary-foreground: 0 0% 100%;
-    
-    --muted: 220 13% 91%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    
-    /* Ownership Orange #F97316 */
-    --accent: 25 95% 53%;
-    --accent-foreground: 0 0% 100%;
-    
-    /* ROI Green #22C55E */
+    /* New Veehtor AI Dark Theme */
+    --background: 222 33% 5%;         /* #0a0c10 */
+    --foreground: 38 21% 89%;         /* #e8e4dd */
+
+    --card: 225 24% 7%;              /* #0f1117 */
+    --card-foreground: 38 21% 89%;
+
+    --popover: 225 24% 7%;
+    --popover-foreground: 38 21% 89%;
+
+    /* Teal accent #2dd4a8 */
+    --primary: 164 65% 50%;
+    --primary-foreground: 222 33% 5%;
+
+    --secondary: 225 24% 12%;
+    --secondary-foreground: 38 21% 89%;
+
+    --muted: 225 15% 15%;
+    --muted-foreground: 30 4% 52%;    /* #8a8580 */
+
+    --accent: 164 65% 50%;
+    --accent-foreground: 222 33% 5%;
+
+    /* Coral #ff6b5a */
+    --destructive: 6 100% 68%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Light section bg #f7f5f0 */
+    --light-bg: 43 41% 95%;
+    --light-fg: 222 33% 10%;
+
     --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
-    
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 173 80% 40%;
-    
+
+    --border: 225 15% 15%;
+    --input: 225 15% 15%;
+    --ring: 164 65% 50%;
+
     --radius: 0.5rem;
-    
-    /* Aurora gradient colors - updated for v.AI */
-    --aurora-1: 173 80% 40%;
-    --aurora-2: 173 80% 95%;
-    --aurora-3: 142 71% 90%;
-    
-    /* Animations */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    
-    --chart-1: 173 80% 40%;
+
+    --chart-1: 164 65% 50%;
     --chart-2: 142 71% 45%;
-    --chart-3: 25 95% 53%;
-    --chart-4: 217 33% 17%;
-    --chart-5: 220 13% 91%;
-    
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 217 33% 17%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 173 80% 40%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 173 80% 40%;
+    --chart-3: 6 100% 68%;
+    --chart-4: 225 24% 7%;
+    --chart-5: 30 4% 52%;
+
+    --sidebar-background: 225 24% 7%;
+    --sidebar-foreground: 38 21% 89%;
+    --sidebar-primary: 164 65% 50%;
+    --sidebar-primary-foreground: 222 33% 5%;
+    --sidebar-accent: 164 65% 50%;
+    --sidebar-accent-foreground: 222 33% 5%;
+    --sidebar-border: 225 15% 15%;
+    --sidebar-ring: 164 65% 50%;
   }
 }
 
@@ -76,128 +65,41 @@ All colors MUST be HSL.
   * {
     @apply border-border;
   }
-  
+
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    line-height: 1.45;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.5;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold;
-    line-height: 1.2;
+    font-family: 'Instrument Serif', Georgia, serif;
+    line-height: 1.15;
   }
 }
 
-/* Aurora background animation */
-@keyframes aurora-1 {
-  0%, 100% { 
-    transform: translate(0%, 0%) scale(1);
-    opacity: 0.15;
-  }
-  50% { 
-    transform: translate(50%, 30%) scale(1.2);
-    opacity: 0.25;
-  }
+/* Marquee */
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
-@keyframes aurora-2 {
-  0%, 100% { 
-    transform: translate(0%, 0%) scale(1);
-    opacity: 0.2;
-  }
-  50% { 
-    transform: translate(-30%, 50%) scale(1.1);
-    opacity: 0.3;
-  }
+.animate-marquee {
+  animation: marquee-scroll 30s linear infinite;
 }
 
-@keyframes aurora-3 {
-  0%, 100% { 
-    transform: translate(0%, 0%) scale(1);
-    opacity: 0.15;
-  }
-  50% { 
-    transform: translate(40%, -20%) scale(1.15);
-    opacity: 0.25;
-  }
+/* Rotating word */
+@keyframes slide-up-in {
+  0% { transform: translateY(100%); opacity: 0; }
+  15% { transform: translateY(0); opacity: 1; }
+  85% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-100%); opacity: 0; }
 }
 
+/* Glare effect */
 @keyframes glare {
-  0% { 
-    background-position: -200% center;
-  }
-  100% { 
-    background-position: 200% center;
-  }
-}
-
-@keyframes electric-border {
-  0%, 100% { 
-    background-position: 0% 50%;
-  }
-  50% { 
-    background-position: 100% 50%;
-  }
-}
-
-@keyframes cursor-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-@keyframes reveal-up {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Utility classes */
-.aurora-bg {
-  position: relative;
-  overflow: hidden;
-}
-
-.aurora-bg::before,
-.aurora-bg::after,
-.aurora-bg > .aurora-orb {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  pointer-events: none;
-}
-
-.aurora-bg::before {
-  width: 600px;
-  height: 600px;
-  background: hsl(var(--aurora-1));
-  top: -10%;
-  right: -10%;
-  animation: aurora-1 20s ease-in-out infinite;
-}
-
-.aurora-bg::after {
-  width: 500px;
-  height: 500px;
-  background: hsl(var(--aurora-2));
-  bottom: -15%;
-  left: -10%;
-  animation: aurora-2 25s ease-in-out infinite;
-}
-
-.aurora-orb {
-  width: 550px;
-  height: 550px;
-  background: hsl(var(--aurora-3));
-  top: 50%;
-  left: 50%;
-  animation: aurora-3 30s ease-in-out infinite;
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
 }
 
 .glare-effect {
@@ -212,12 +114,7 @@ All colors MUST be HSL.
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    120deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   transform: translateX(-100%);
   transition: transform 0.6s;
 }
@@ -226,50 +123,39 @@ All colors MUST be HSL.
   transform: translateX(100%);
 }
 
-.shiny-text {
-  background: linear-gradient(
-    90deg,
-    hsl(var(--foreground)),
-    hsl(var(--primary)),
-    hsl(var(--foreground))
-  );
-  background-size: 200% auto;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: glare 3s linear infinite;
+/* Reveal animations */
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Pop animation for completion */
+@keyframes complo-pop {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@keyframes complo-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes complo-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Electric border */
+@keyframes electric-border {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 .electric-border {
   position: relative;
   border: 2px solid transparent;
-  background: linear-gradient(white, white) padding-box,
-    linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--primary))) border-box;
+  background: linear-gradient(hsl(225 24% 7%), hsl(225 24% 7%)) padding-box,
+    linear-gradient(90deg, hsl(var(--primary)), hsl(var(--destructive)), hsl(var(--primary))) border-box;
   background-size: 200% 100%;
   animation: electric-border 3s ease infinite;
-}
-
-.reveal {
-  opacity: 0;
-  animation: reveal-up 0.6s ease-out forwards;
-}
-
-.split-char {
-  display: inline-block;
-  opacity: 0;
-  animation: reveal-up 0.4s ease-out forwards;
-}
-
-.cursor-blink {
-  animation: cursor-blink 1s step-end infinite;
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
 }
