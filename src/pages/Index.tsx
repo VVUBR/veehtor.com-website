@@ -400,6 +400,7 @@ export default function LandingPage() {
                     <div style={{ fontSize: "0.85rem", color: "#8a8580", fontFamily: "var(--font-body)" }}>{c.metricLabel}</div>
                   </div>
                   <div className="case-body">
+                    <p>{c.desc}</p>
                     <div className="case-before-after">
                       <div className="case-ba case-before">
                         <strong>Before</strong>
