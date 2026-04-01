@@ -265,7 +265,7 @@ export default function LandingPage() {
               ))}
             </div>
             <div className="phase-text">
-              <h2>Still running your business like it's 2022?</h2>
+              <h2 style={{ fontWeight: 700 }}>Still running your business like it's 2022?</h2>
               <p>Missed leads. Manual busywork. Slow responses. The time spent on tasks AI could handle means you're not growing. And you know you could do better than that.</p>
             </div>
             <div className="scroll-indicator">
