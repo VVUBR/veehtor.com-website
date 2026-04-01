@@ -450,7 +450,7 @@ export default function LandingPage() {
 
             <StaggerChild delay={0.15}>
               <div className="pricing-card">
-                <div className="pricing-tier">Implementation</div>
+                <div className="pricing-tier">After the audit</div>
                 <div className="pricing-name">Build & Scale</div>
                 <div className="pricing-timeline">3-6 months</div>
                 <div className="pricing-amount">$12,500–30K</div>
