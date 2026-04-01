@@ -424,7 +424,7 @@ export default function LandingPage() {
         <div className="pricing-inner">
           <RevealDiv>
             <h2 className="pricing-heading">Start with <em>clarity.</em> Scale with <em>confidence.</em></h2>
-            <p className="pricing-sub">Begin with a 2-week audit — then only implement what proves its value.</p>
+            <p className="pricing-sub">Begin with a 2-week audit - then only implement what proves its value.</p>
           </RevealDiv>
 
           <div className="pricing-cards">
