@@ -272,7 +272,7 @@
 }
 .problem-inner { max-width: 1100px; margin: 0 auto; }
 .section-label {
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.2em;
   color: var(--teal);
