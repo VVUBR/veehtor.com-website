@@ -234,7 +234,7 @@ export default function LandingPage() {
     <>
       {/* LOADER */}
       <div id="loader" className={loading ? "" : "hidden"}>
-        <div className="loader-brand">veehtor.ai</div>
+        <div className="loader-brand">veehtor AI</div>
         <div id="loader-bar-wrap">
           <div id="loader-bar" style={{ width: `${loaderProgress}%` }} />
         </div>
