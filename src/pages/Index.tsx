@@ -277,7 +277,7 @@ export default function LandingPage() {
 
           {/* Phase 2 */}
           <div className="transform-phase phase-transition" style={{ opacity: phase2Opacity }}>
-            <h2>What if <em>AI</em> handled the busywork — and you focused on <em>growth</em>?</h2>
+            <h2>What if <em>AI</em> handled the busywork - and you focused on <em>growth</em>?</h2>
           </div>
 
           {/* Phase 3 */}
