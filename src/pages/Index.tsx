@@ -365,7 +365,7 @@ export default function LandingPage() {
         <div className="process-inner">
           <RevealDiv>
             <div className="section-label">How It Works</div>
-            <h2 className="process-heading">Three steps. <em>No fluff.</em></h2>
+            <h2 className="process-heading">Three steps. <em>That's it.</em></h2>
           </RevealDiv>
 
           <div className="steps">
