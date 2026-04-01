@@ -662,7 +662,7 @@
   transition: transform 0.2s, box-shadow 0.3s !important;
   border: none; cursor: pointer;
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   text-decoration: none;
