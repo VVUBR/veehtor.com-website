@@ -1,37 +1,39 @@
 
 
-# Increase Font Sizes Globally
+# New Route: `/Score.de.credito.DCarvalho`
 
-All text elements under 1rem will be bumped up by ~15-20%. The two fonts (Instrument Serif for headings, DM Sans for body) remain unchanged — only sizes increase.
+## What I Understand
+You want a new route at `/Score.de.credito.DCarvalho` (technically a path, not a subdomain — a true subdomain would be `score.veehtor.com`). I'll build it as a route accessible at `veehtor.com/Score.de.credito.DCarvalho`.
 
-## Changes in `src/index.css`
+## Open Questions
+Before building, I need to know what this page should contain. A few options:
 
-| Element | Current | New |
-|---|---|---|
-| Section labels (`.section-label`) | `0.7rem` | `0.85rem` |
-| Body paragraphs (`.problem-card p`, `.step p`, `.pricing-desc`, `.outcomes-sub`, `.cta-sub`) | `0.9rem – 1.05rem` | `1rem – 1.15rem` |
-| Stat label (`.stat-label`) | `0.8rem` | `0.95rem` |
-| Stat desc (`.stat-desc`) | `0.85rem` | `1rem` |
-| Step duration (`.step .duration`) | `0.75rem` | `0.85rem` |
-| Case industry (`.case-industry`) | `0.7rem` | `0.85rem` |
-| Case before/after (`.case-ba`) | `0.8rem` | `0.95rem` |
-| Case ba strong | `0.65rem` | `0.75rem` |
-| Nav links (`.nav-link-style`, `.nav-cta`) | `0.85rem` | `0.95rem` |
-| Footer text (`.footer-text`, `.footer-links a`) | `0.75rem` | `0.85rem` |
-| Pricing tier (`.pricing-tier`) | `0.7rem` | `0.85rem` |
-| Pricing features li | `0.88rem` | `1rem` |
-| Pricing timeline | `0.8rem` | `0.9rem` |
-| Pricing note | `0.85rem` | `0.95rem` |
-| CTA contact links | `0.85rem` | `0.95rem` |
-| Scroll indicator span | `0.65rem` | `0.75rem` |
-| Chaos cell font | `0.65rem` | `0.75rem` |
-| Hero body `p` in phase-text | `1rem` | `1.1rem` |
-| Phase transformed `p` | `1rem` | `1.1rem` |
+1. **A landing page in Portuguese about credit score** (DCarvalho = personal brand?)
+2. **A simple placeholder page** to reserve the URL
+3. **A duplicate of the main site** with different branding/content
+4. **Something else** — please describe
 
-## Changes in `src/pages/Index.tsx`
+## Plan (Pending Your Input)
 
-- Inline `fontSize` on case card metricLabel: `0.85rem` → `1rem`
-- Case card body `p` (if any inline style): bump similarly
+### 1. Create new page `src/pages/ScoreDeCredito.tsx`
+- Content TBD based on your answer above
+- Will follow the existing design system (DM Sans, Instrument Serif, teal accent, dark theme)
 
-All changes are purely CSS size adjustments — no layout or structural changes.
+### 2. Register route in `src/App.tsx`
+```tsx
+<Route path="/Score.de.credito.DCarvalho" element={<ScoreDeCredito />} />
+```
+- Placed above the catch-all `*` route
+- React Router handles the dotted path fine — no special config needed
+- SPA deep-link refresh works automatically on Lovable hosting
+
+### 3. Notes
+- This is **case-sensitive** as written (`/Score...` with capital S). Confirm if you want it lowercase or both.
+- If you actually want a true subdomain (`score.veehtor.com`), that requires a separate Lovable project + DNS CNAME setup — let me know.
+
+## Next Step
+Reply with:
+- **What content** should appear on this page
+- **Language** (English or Portuguese)
+- Whether the URL should be **case-sensitive** as-is or normalized to lowercase
 
