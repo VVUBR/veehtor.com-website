@@ -79,7 +79,8 @@
 
   .store-switcher { background: var(--paper-deep); border: 1px solid var(--rule); border-radius: 14px; padding: 6px; display: flex; align-self: end; box-shadow: var(--shadow-sm); }
   .store-btn { flex: 1; padding: 14px 18px; border-radius: 9px; background: transparent; border: none; cursor: pointer; font-family: inherit; text-align: left; color: var(--ink-soft); transition: all 0.22s ease; }
-  .store-btn.active { background: var(--forest); color: var(--paper); }
+  .store-btn:not(.active):hover { background: rgba(31,61,43,0.06); color: var(--ink); }
+  .store-btn.active { background: var(--forest); color: var(--paper); cursor: default; }
   .store-btn .city { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.7; margin-bottom: 3px; }
   .store-btn .name { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 500; }
 
@@ -165,7 +166,7 @@
         <div class="brand-label">Labor Command · Preview</div>
       </div>
       <div class="topbar-right">
-        <div class="live-dot">--:-- CST · live</div>
+        <div class="live-dot"><span id="clock">--:--</span> CST · live</div>
       </div>
     </div>
 
@@ -174,52 +175,53 @@
         <h1>Tuesday's read,<br><em>before lunch rush.</em></h1>
         <p>One screen. Two stores. Smart staffing calls your managers can make in under a minute — without leaving the floor.</p>
       </div>
-      <div class="store-switcher">
-        <button class="store-btn active">
+      <div class="store-switcher" id="storeSwitcher">
+        <button class="store-btn active" data-store="hs">
           <span class="city">Store 01 · Arkansas</span>
           <span class="name">Hot Springs</span>
         </button>
-        <button class="store-btn">
+        <button class="store-btn" data-store="es">
           <span class="city">Store 02 · Arkansas</span>
           <span class="name">Eureka Springs</span>
         </button>
       </div>
     </div>
 
-    <div class="ai-card">
+    <div class="ai-card" id="aiCard">
       <div class="ai-head">
         <span class="ai-tag">AI Read</span>
         <span class="ai-time">updated 2 min ago</span>
       </div>
-      <h2>Hot Springs is pacing 14% under forecast. To stay under your <strong>22% labor target</strong>, send one closer home at 4pm.</h2>
-      <p class="reason">Based on the last 6 Tuesdays + today's foot traffic + scheduled labor remaining. Acting now saves an estimated $42 in labor and keeps you on budget.</p>
-      <div class="ai-actions">
-        <button class="btn btn-primary">Apply suggestion</button>
-        <button class="btn btn-ghost">See the math</button>
-        <button class="btn btn-ghost">Ignore</button>
+      <h2 id="aiHeadline">Hot Springs is pacing 14% under forecast. To stay under your <strong>22% labor target</strong>, send one closer home at 4pm.</h2>
+      <p class="reason" id="aiReason">Based on the last 6 Tuesdays + today's foot traffic + scheduled labor remaining. Acting now saves an estimated $42 in labor and keeps you on budget.</p>
+      <div class="ai-actions" id="aiActions">
+        <button class="btn btn-primary" id="btnApply">Apply suggestion</button>
+        <button class="btn btn-ghost" id="btnMath">See the math</button>
+        <button class="btn btn-ghost" id="btnIgnore">Ignore</button>
       </div>
     </div>
+    <div id="aiPaused" style="display:none; background:var(--paper-deep); border:1px solid var(--rule); border-radius:12px; padding:14px 22px; margin-bottom:28px; text-align:center; cursor:pointer; font-size:13px; color:var(--ink-mute);">AI suggestions paused — tap to re-enable AI reads</div>
 
-    <div class="kpi-grid">
-      <div class="kpi">
+    <div class="kpi-grid" id="kpiGrid">
+      <div class="kpi" data-kpi="labor">
         <div class="label">Labor % · today</div>
-        <div class="value">24.3%</div>
-        <div class="delta delta-bad">▲ 2.3 vs 22% target</div>
+        <div class="value"></div>
+        <div class="delta"></div>
       </div>
-      <div class="kpi">
+      <div class="kpi" data-kpi="splh">
         <div class="label">Sales / Labor Hour</div>
-        <div class="value">$47.20</div>
-        <div class="delta delta-bad">▼ $4.80 vs $52 goal</div>
+        <div class="value"></div>
+        <div class="delta"></div>
       </div>
-      <div class="kpi">
+      <div class="kpi" data-kpi="sales">
         <div class="label">Sales · today</div>
-        <div class="value">$4,820</div>
-        <div class="delta">86% of $5,600 forecast</div>
+        <div class="value"></div>
+        <div class="delta"></div>
       </div>
-      <div class="kpi">
+      <div class="kpi" data-kpi="laborRem">
         <div class="label">Labor cost · remaining</div>
-        <div class="value">$680</div>
-        <div class="delta">4 staff on through 9pm</div>
+        <div class="value"></div>
+        <div class="delta"></div>
       </div>
     </div>
 
@@ -229,21 +231,13 @@
           <h3>This week · Labor %</h3>
           <span class="meta">Mon — Sun</span>
         </div>
-        <div class="chart">
-          <div class="bar"><span class="bar-value">21%</span><div class="bar-fill" style="height:60%"></div><div class="bar-label">M</div></div>
-          <div class="bar"><span class="bar-value">23%</span><div class="bar-fill over" style="height:68%"></div><div class="bar-label">T</div></div>
-          <div class="bar"><span class="bar-value">24%</span><div class="bar-fill today over" style="height:72%"></div><div class="bar-label">W</div></div>
-          <div class="bar"><span class="bar-value">—</span><div class="bar-fill" style="height:30%;opacity:0.3"></div><div class="bar-label">T</div></div>
-          <div class="bar"><span class="bar-value">—</span><div class="bar-fill" style="height:30%;opacity:0.3"></div><div class="bar-label">F</div></div>
-          <div class="bar"><span class="bar-value">—</span><div class="bar-fill" style="height:30%;opacity:0.3"></div><div class="bar-label">S</div></div>
-          <div class="bar"><span class="bar-value">—</span><div class="bar-fill" style="height:30%;opacity:0.3"></div><div class="bar-label">S</div></div>
-        </div>
+        <div class="chart" id="weekChart"></div>
       </div>
 
       <div class="panel">
         <div class="panel-head">
           <h3>Today's floor</h3>
-          <span class="meta">4 on now</span>
+          <span class="meta" id="floorMeta">4 on now</span>
         </div>
         <div class="shift">
           <div class="avatar">JM</div>
@@ -288,5 +282,233 @@
       <div class="veehtor">Built for PodunkAnnies by <span>Veehtor AI</span></div>
     </footer>
   </div>
+<script>
+(function(){
+  const STORES = {
+    hs: {
+      label: 'Hot Springs', headcount: '4 on now',
+      kpis: {
+        labor:    { value: 24.3, unit: '%',  delta: '▲ 2.3 vs 22% target',     deltaClass: 'delta-bad' },
+        splh:     { value: 47.20, prefix: '$', delta: '▼ $4.80 vs $52 goal',   deltaClass: 'delta-bad' },
+        sales:    { value: 4820, prefix: '$', delta: '86% of $5,600 forecast', deltaClass: '' },
+        laborRem: { value: 680,  prefix: '$', delta: '4 staff on through 9pm', deltaClass: '' }
+      },
+      week: [
+        { d:'M', v:21.8 },{ d:'T', v:23.0 },{ d:'W', v:24.0 },
+        { d:'T', v:24.3, today:true },{ d:'F', v:null },{ d:'S', v:null },{ d:'S', v:null }
+      ],
+      ai: {
+        headline: 'Hot Springs is pacing 14% under forecast. To stay under your <strong>22% labor target</strong>, send one closer home at 4pm.',
+        reason: "Based on the last 6 Tuesdays + today's foot traffic + scheduled labor remaining. Acting now saves an estimated $42 in labor and keeps you on budget."
+      }
+    },
+    es: {
+      label: 'Eureka Springs', headcount: '3 on now',
+      kpis: {
+        labor:    { value: 19.8, unit: '%',  delta: '▼ 2.2 under 22% target',   deltaClass: 'delta-good' },
+        splh:     { value: 54.10, prefix: '$', delta: '▲ $2.10 vs $52 goal',    deltaClass: 'delta-good' },
+        sales:    { value: 3210, prefix: '$', delta: '102% of $3,150 forecast', deltaClass: 'delta-good' },
+        laborRem: { value: 410,  prefix: '$', delta: '3 staff on through 8pm',  deltaClass: '' }
+      },
+      week: [
+        { d:'M', v:18.2 },{ d:'T', v:20.1 },{ d:'W', v:19.4 },
+        { d:'T', v:19.8, today:true },{ d:'F', v:null },{ d:'S', v:null },{ d:'S', v:null }
+      ],
+      ai: {
+        headline: 'Eureka Springs is ahead of plan. Hold current staffing — no action needed.',
+        reason: 'Labor pacing 2.2 points under target, sales 2% over forecast. Last 4 similar Thursdays ran consistent through close. Stay the course.'
+      }
+    }
+  };
+
+  // Clock
+  function tick(){
+    const d = new Date();
+    let h = d.getHours(), m = d.getMinutes();
+    const ap = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    document.getElementById('clock').textContent = h + ':' + String(m).padStart(2,'0') + ' ' + ap;
+  }
+  tick(); setInterval(tick, 30000);
+
+  // Format KPI value
+  function fmtKpi(k){
+    let v = k.value;
+    let s;
+    if (k.unit === '%') s = v.toFixed(1) + '%';
+    else if (v >= 1000) s = (k.prefix||'') + v.toLocaleString('en-US');
+    else if (v % 1 !== 0) s = (k.prefix||'') + v.toFixed(2);
+    else s = (k.prefix||'') + v;
+    return s;
+  }
+
+  function renderStore(id){
+    const s = STORES[id];
+    const grid = document.getElementById('kpiGrid');
+    // Fade out
+    grid.style.transition = 'opacity 180ms ease';
+    grid.style.opacity = '0';
+    const aiH = document.getElementById('aiHeadline');
+    const aiR = document.getElementById('aiReason');
+    aiH.style.transition = aiR.style.transition = 'opacity 180ms ease';
+    aiH.style.opacity = aiR.style.opacity = '0';
+
+    setTimeout(() => {
+      // KPIs
+      ['labor','splh','sales','laborRem'].forEach(key => {
+        const cell = grid.querySelector('[data-kpi="'+key+'"]');
+        const k = s.kpis[key];
+        cell.querySelector('.value').textContent = fmtKpi(k);
+        const d = cell.querySelector('.delta');
+        d.className = 'delta' + (k.deltaClass ? ' ' + k.deltaClass : '');
+        d.textContent = k.delta;
+      });
+      // Chart
+      const chart = document.getElementById('weekChart');
+      chart.innerHTML = '';
+      const max = 30;
+      s.week.forEach(w => {
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        if (w.v == null) {
+          bar.innerHTML = '<span class="bar-value">—</span><div class="bar-fill" style="height:30%;background:var(--rule);opacity:0.5"></div><div class="bar-label">'+w.d+'</div>';
+        } else {
+          const h = Math.max(8, (w.v / max) * 100);
+          const over = w.v > 22;
+          const cls = 'bar-fill' + (w.today ? ' today' : '') + (over && !w.today ? ' over' : '') + (w.today && over ? ' over' : '');
+          bar.innerHTML = '<span class="bar-value">'+w.v.toFixed(0)+'%</span><div class="'+cls+'" style="height:'+h+'%"></div><div class="bar-label">'+(w.today?'Today':w.d)+'</div>';
+        }
+        chart.appendChild(bar);
+      });
+      // AI
+      aiH.innerHTML = s.ai.headline;
+      aiR.textContent = s.ai.reason;
+      // Floor meta
+      document.getElementById('floorMeta').textContent = s.headcount;
+
+      grid.style.opacity = '1';
+      aiH.style.opacity = aiR.style.opacity = '1';
+    }, 180);
+  }
+
+  // Store switcher
+  document.querySelectorAll('.store-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.classList.contains('active')) return;
+      document.querySelectorAll('.store-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderStore(btn.dataset.store);
+    });
+  });
+
+  // Initial render
+  renderStore('hs');
+
+  // AI buttons
+  const aiCard = document.getElementById('aiCard');
+  const aiActions = document.getElementById('aiActions');
+  let originalState = null;
+  function snapshot(){
+    return {
+      bg: aiCard.style.background,
+      headline: document.getElementById('aiHeadline').innerHTML,
+      reason: document.getElementById('aiReason').textContent,
+      actions: aiActions.innerHTML
+    };
+  }
+  document.getElementById('btnApply').addEventListener('click', () => {
+    if (!originalState) originalState = snapshot();
+    aiCard.style.transition = 'background 300ms ease';
+    aiCard.style.background = 'var(--moss)';
+    document.getElementById('aiHeadline').innerHTML = 'Suggestion applied. Closer scheduled to leave at 4pm.';
+    document.getElementById('aiReason').textContent = 'Logged to the schedule. Estimated savings: $42.';
+    aiActions.innerHTML = '<span style="display:inline-block;background:var(--amber-soft);color:var(--forest-deep);padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;">✓ Applied</span> <a href="#" id="btnUndo" style="display:inline-block;margin-left:12px;color:rgba(244,239,226,0.6);font-size:12px;text-decoration:underline;">Undo</a>';
+    document.getElementById('btnUndo').addEventListener('click', (e) => {
+      e.preventDefault();
+      aiCard.style.background = '';
+      document.getElementById('aiHeadline').innerHTML = originalState.headline;
+      document.getElementById('aiReason').textContent = originalState.reason;
+      aiActions.innerHTML = originalState.actions;
+      wireAi();
+      originalState = null;
+    });
+  });
+
+  // Modal
+  let lastFocus = null;
+  function openModal(){
+    lastFocus = document.activeElement;
+    const wrap = document.createElement('div');
+    wrap.id = 'mathModal';
+    wrap.setAttribute('role','dialog');
+    wrap.setAttribute('aria-modal','true');
+    wrap.setAttribute('aria-labelledby','mathTitle');
+    wrap.style.cssText = 'position:fixed;inset:0;background:rgba(20,42,29,0.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:grid;place-items:center;z-index:1000;padding:20px;';
+    wrap.innerHTML = '<div style="background:var(--paper);border:1px solid var(--rule);border-radius:16px;padding:32px;max-width:480px;width:100%;box-shadow:var(--shadow-md);position:relative;">'
+      + '<button id="mathClose" aria-label="Close" style="position:absolute;top:16px;right:16px;background:none;border:none;cursor:pointer;font-size:20px;color:var(--ink-mute);line-height:1;">×</button>'
+      + '<h3 id="mathTitle" style="font-family:Fraunces,serif;font-size:22px;font-weight:500;margin-bottom:18px;letter-spacing:-0.015em;">Why we\'re suggesting this</h3>'
+      + '<pre style="font-family:\'JetBrains Mono\',monospace;font-size:13px;line-height:1.7;color:var(--ink-soft);white-space:pre;margin:0;overflow-x:auto;">  Forecast 3pm–9pm        $1,840\n  Current pace            $1,580   (−14%)\n  Labor cost remaining    $  680\n  ──────────────────────────────\n  Send 1 closer home 4pm  −$  42\n  New labor %             22.0%   (on target)</pre>'
+      + '</div>';
+    document.body.appendChild(wrap);
+    const close = () => { wrap.remove(); document.removeEventListener('keydown', onKey); if (lastFocus) lastFocus.focus(); };
+    function onKey(e){ if (e.key === 'Escape') close(); }
+    document.addEventListener('keydown', onKey);
+    wrap.addEventListener('click', (e) => { if (e.target === wrap) close(); });
+    wrap.querySelector('#mathClose').addEventListener('click', close);
+    wrap.querySelector('#mathClose').focus();
+  }
+
+  function wireAi(){
+    document.getElementById('btnMath').addEventListener('click', openModal);
+    document.getElementById('btnIgnore').addEventListener('click', () => {
+      aiCard.style.transition = 'all 350ms ease';
+      aiCard.style.maxHeight = aiCard.offsetHeight + 'px';
+      requestAnimationFrame(() => {
+        aiCard.style.maxHeight = '0';
+        aiCard.style.opacity = '0';
+        aiCard.style.margin = '0';
+        aiCard.style.padding = '0';
+        aiCard.style.overflow = 'hidden';
+      });
+      setTimeout(() => {
+        aiCard.style.display = 'none';
+        document.getElementById('aiPaused').style.display = 'block';
+      }, 360);
+    });
+  }
+  // Re-wire apply on undo
+  const origApply = document.getElementById('btnApply');
+  // Already wired above for apply; wire math + ignore
+  document.getElementById('btnMath').addEventListener('click', openModal);
+  document.getElementById('btnIgnore').addEventListener('click', () => {
+    aiCard.style.transition = 'all 350ms ease';
+    aiCard.style.maxHeight = aiCard.offsetHeight + 'px';
+    requestAnimationFrame(() => {
+      aiCard.style.maxHeight = '0';
+      aiCard.style.opacity = '0';
+      aiCard.style.margin = '0';
+      aiCard.style.paddingTop = '0';
+      aiCard.style.paddingBottom = '0';
+      aiCard.style.overflow = 'hidden';
+    });
+    setTimeout(() => {
+      aiCard.style.display = 'none';
+      document.getElementById('aiPaused').style.display = 'block';
+    }, 360);
+  });
+
+  document.getElementById('aiPaused').addEventListener('click', () => {
+    const p = document.getElementById('aiPaused');
+    p.style.display = 'none';
+    aiCard.style.display = '';
+    aiCard.style.maxHeight = '';
+    aiCard.style.opacity = '';
+    aiCard.style.margin = '';
+    aiCard.style.paddingTop = '';
+    aiCard.style.paddingBottom = '';
+    aiCard.style.overflow = '';
+  });
+})();
+</script>
 </body>
 </html>
