@@ -10,6 +10,7 @@ import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 import Complo from "./pages/Complo";
 import ScoreDeCredito from "./pages/ScoreDeCredito";
+import PodunkAnnies from "./pages/PodunkAnnies";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/terms" element={<Terms />} />
           <Route path="/complo" element={<Complo />} />
           <Route path="/Score.de.credito.DCarvalho" element={<ScoreDeCredito />} />
+          <Route path="/PodunkAnnies" element={<PodunkAnnies />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
