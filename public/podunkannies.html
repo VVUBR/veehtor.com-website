@@ -165,7 +165,7 @@
         <div class="brand-label">Labor Command · Preview</div>
       </div>
       <div class="topbar-right">
-        <div class="live-dot">--:-- CST · live</div>
+        <div class="live-dot"><span id="clock">--:--</span> CST · live</div>
       </div>
     </div>
 
@@ -174,52 +174,53 @@
         <h1>Tuesday's read,<br><em>before lunch rush.</em></h1>
         <p>One screen. Two stores. Smart staffing calls your managers can make in under a minute — without leaving the floor.</p>
       </div>
-      <div class="store-switcher">
-        <button class="store-btn active">
+      <div class="store-switcher" id="storeSwitcher">
+        <button class="store-btn active" data-store="hs">
           <span class="city">Store 01 · Arkansas</span>
           <span class="name">Hot Springs</span>
         </button>
-        <button class="store-btn">
+        <button class="store-btn" data-store="es">
           <span class="city">Store 02 · Arkansas</span>
           <span class="name">Eureka Springs</span>
         </button>
       </div>
     </div>
 
-    <div class="ai-card">
+    <div class="ai-card" id="aiCard">
       <div class="ai-head">
         <span class="ai-tag">AI Read</span>
         <span class="ai-time">updated 2 min ago</span>
       </div>
-      <h2>Hot Springs is pacing 14% under forecast. To stay under your <strong>22% labor target</strong>, send one closer home at 4pm.</h2>
-      <p class="reason">Based on the last 6 Tuesdays + today's foot traffic + scheduled labor remaining. Acting now saves an estimated $42 in labor and keeps you on budget.</p>
-      <div class="ai-actions">
-        <button class="btn btn-primary">Apply suggestion</button>
-        <button class="btn btn-ghost">See the math</button>
-        <button class="btn btn-ghost">Ignore</button>
+      <h2 id="aiHeadline">Hot Springs is pacing 14% under forecast. To stay under your <strong>22% labor target</strong>, send one closer home at 4pm.</h2>
+      <p class="reason" id="aiReason">Based on the last 6 Tuesdays + today's foot traffic + scheduled labor remaining. Acting now saves an estimated $42 in labor and keeps you on budget.</p>
+      <div class="ai-actions" id="aiActions">
+        <button class="btn btn-primary" id="btnApply">Apply suggestion</button>
+        <button class="btn btn-ghost" id="btnMath">See the math</button>
+        <button class="btn btn-ghost" id="btnIgnore">Ignore</button>
       </div>
     </div>
+    <div id="aiPaused" style="display:none; background:var(--paper-deep); border:1px solid var(--rule); border-radius:12px; padding:14px 22px; margin-bottom:28px; text-align:center; cursor:pointer; font-size:13px; color:var(--ink-mute);">AI suggestions paused — tap to re-enable AI reads</div>
 
-    <div class="kpi-grid">
-      <div class="kpi">
+    <div class="kpi-grid" id="kpiGrid">
+      <div class="kpi" data-kpi="labor">
         <div class="label">Labor % · today</div>
-        <div class="value">24.3%</div>
-        <div class="delta delta-bad">▲ 2.3 vs 22% target</div>
+        <div class="value"></div>
+        <div class="delta"></div>
       </div>
-      <div class="kpi">
+      <div class="kpi" data-kpi="splh">
         <div class="label">Sales / Labor Hour</div>
-        <div class="value">$47.20</div>
-        <div class="delta delta-bad">▼ $4.80 vs $52 goal</div>
+        <div class="value"></div>
+        <div class="delta"></div>
       </div>
-      <div class="kpi">
+      <div class="kpi" data-kpi="sales">
         <div class="label">Sales · today</div>
-        <div class="value">$4,820</div>
-        <div class="delta">86% of $5,600 forecast</div>
+        <div class="value"></div>
+        <div class="delta"></div>
       </div>
-      <div class="kpi">
+      <div class="kpi" data-kpi="laborRem">
         <div class="label">Labor cost · remaining</div>
-        <div class="value">$680</div>
-        <div class="delta">4 staff on through 9pm</div>
+        <div class="value"></div>
+        <div class="delta"></div>
       </div>
     </div>
 
@@ -229,21 +230,13 @@
           <h3>This week · Labor %</h3>
           <span class="meta">Mon — Sun</span>
         </div>
-        <div class="chart">
-          <div class="bar"><span class="bar-value">21%</span><div class="bar-fill" style="height:60%"></div><div class="bar-label">M</div></div>
-          <div class="bar"><span class="bar-value">23%</span><div class="bar-fill over" style="height:68%"></div><div class="bar-label">T</div></div>
-          <div class="bar"><span class="bar-value">24%</span><div class="bar-fill today over" style="height:72%"></div><div class="bar-label">W</div></div>
-          <div class="bar"><span class="bar-value">—</span><div class="bar-fill" style="height:30%;opacity:0.3"></div><div class="bar-label">T</div></div>
-          <div class="bar"><span class="bar-value">—</span><div class="bar-fill" style="height:30%;opacity:0.3"></div><div class="bar-label">F</div></div>
-          <div class="bar"><span class="bar-value">—</span><div class="bar-fill" style="height:30%;opacity:0.3"></div><div class="bar-label">S</div></div>
-          <div class="bar"><span class="bar-value">—</span><div class="bar-fill" style="height:30%;opacity:0.3"></div><div class="bar-label">S</div></div>
-        </div>
+        <div class="chart" id="weekChart"></div>
       </div>
 
       <div class="panel">
         <div class="panel-head">
           <h3>Today's floor</h3>
-          <span class="meta">4 on now</span>
+          <span class="meta" id="floorMeta">4 on now</span>
         </div>
         <div class="shift">
           <div class="avatar">JM</div>
