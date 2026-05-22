@@ -38,6 +38,9 @@ const FontStyles = () => (
     .denis-slider:focus-visible { box-shadow: 0 0 0 3px rgba(13,148,136,0.3); }
     .pillar-card:hover .pillar-detail { max-height: 600px; opacity: 1; margin-top: 1.25rem; }
     .pillar-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -20px rgba(13,148,136,0.25); }
+    .addon-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .addon-card:hover { transform: translateY(-6px); box-shadow: 0 24px 48px -20px rgba(13,148,136,0.2); }
+    .addon-card:hover .addon-detail { max-height: 600px; opacity: 1; margin-top: 1rem; }
   `}</style>
 );
 
@@ -519,6 +522,83 @@ function Investimento() {
   );
 }
 
+function Adicionais() {
+  const cards = [
+    {
+      badge: "Módulo adicional",
+      title: "Análise de Conta e Simulação Calibrada pelo Fio B",
+      details: [
+        "Upload da conta de luz (PDF ou foto) com leitura automática por OCR.",
+        "Estimativa de economia calibrada pela Lei 14.300 (o Fio B está em 60% em 2026 e sobe no cronograma até 100% em 2029). Calibrar por isso garante números realistas e defensáveis, o que protege sua reputação no pós-venda.",
+        "Diagnóstico comercial gerado automaticamente.",
+        "Etapa A: análise via upload manual. Etapa B: integração direta com a CEMIG como marco, sujeita a validação técnica (disponibilidade de API e regras da concessionária).",
+      ],
+    },
+    {
+      badge: "Fase futura",
+      title: "Totem e Simulador Interativo",
+      details: [
+        "Tela em lojas parceiras com simulação de economia personalizada.",
+        "Captação de WhatsApp com envio automático para o funil.",
+      ],
+    },
+    {
+      badge: "Fase futura",
+      title: "Pós-venda e Manutenção Inteligente",
+      details: [
+        "Checklist digital de instalação.",
+        "Controle de manutenções anuais.",
+        "Alertas automáticos via WhatsApp.",
+        "Comunicação proativa sobre o desempenho do sistema.",
+      ],
+    },
+  ];
+  return (
+    <Section className="py-24 md:py-32 px-5 lg:px-8 bg-[#F3FAF8]">
+      <div className="max-w-6xl mx-auto">
+        <Reveal>
+          <p className="text-[#0D9488] text-xs uppercase tracking-[0.2em] font-semibold mb-4">Adicionais</p>
+        </Reveal>
+        <Reveal i={1}>
+          <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight max-w-3xl">
+            Adicionais que agregam valor
+          </h2>
+        </Reveal>
+        <Reveal i={2}>
+          <p className="mt-5 text-[#64748B] text-lg max-w-2xl leading-relaxed">
+            Módulos opcionais para expandir a operação quando fizer sentido. Escopo e investimento definidos em orçamento dedicado. O módulo de Análise de Conta já vem incluído no plano Crescimento.
+          </p>
+        </Reveal>
+        <div className="mt-14 grid md:grid-cols-3 gap-6">
+          {cards.map((c, i) => (
+            <Reveal key={c.title} i={i + 3}>
+              <article className="addon-card h-full p-7 md:p-8 rounded-2xl bg-[#FAFAF8] border border-[#0D9488]/20 transition-all duration-300 cursor-default">
+                <span className="inline-block px-3 py-1 rounded-full bg-[#F59E0B] text-white text-xs font-semibold uppercase tracking-wider mb-5">
+                  {c.badge}
+                </span>
+                <h3 className="font-display text-xl md:text-2xl font-bold text-[#0F172A]">{c.title}</h3>
+                <ul className="addon-detail overflow-hidden max-h-0 opacity-0 transition-all duration-500 space-y-3 text-sm text-[#1E293B] md:max-h-0 max-h-none md:opacity-0 opacity-100 md:mt-0 mt-5">
+                  {c.details.map((d, j) => (
+                    <li key={j} className="flex gap-2 items-start">
+                      <span className="text-[#0D9488] mt-0.5">→</span>
+                      <span>{d}</span>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+        <Reveal i={6}>
+          <p className="mt-10 text-xs text-[#64748B] max-w-3xl leading-relaxed">
+            Estes módulos são escopados e orçados separadamente, após a entrega e validação da Fase 1.
+          </p>
+        </Reveal>
+      </div>
+    </Section>
+  );
+}
+
 function Condicoes() {
   return (
     <Section className="py-14 px-5 lg:px-8 bg-[#FAFAF8] border-y border-[#E2E8F0]">
@@ -594,6 +674,7 @@ export default function DenisEnergiaSolar() {
       <Cronograma />
       <Confianca />
       <Investimento />
+      <Adicionais />
       <Condicoes />
       <ProximoPasso />
       <Footer />
