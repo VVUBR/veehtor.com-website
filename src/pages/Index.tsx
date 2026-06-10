@@ -1,49 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import vaiLogo from "@/assets/vai-logo-new.png";
-
-const PAIN_CARDS = [
-  { text: "Missed lead", type: "warn" },
-  { text: "Manual entry", type: "dim" },
-  { text: "Late reply", type: "alert" },
-  { text: "Spreadsheet", type: "dim" },
-  { text: "Lost deal", type: "warn" },
-  { text: "No follow-up", type: "warn" },
-  { text: "Copy/paste", type: "dim" },
-  { text: "5-min wait", type: "alert" },
-  { text: "Inbox chaos", type: "warn" },
-  { text: "Forgot task", type: "dim" },
-  { text: "Wrong data", type: "warn" },
-  { text: "Manual report", type: "dim" },
-  { text: "Burnout", type: "alert" },
-  { text: "No tracking", type: "dim" },
-  { text: "Revenue leak", type: "warn" },
-  { text: "Guesswork", type: "alert" },
-  { text: "Overtime", type: "dim" },
-  { text: "Customer churn", type: "warn" },
-  { text: "Slow quotes", type: "dim" },
-  { text: "Missed calls", type: "warn" },
-];
-
-const ROTATING_WORDS = ["expensive.", "dreams.", "promises.", "hype."];
-
-const STATS = [
-  { value: 60, suffix: "s", label: "Lead response time", desc: "AI agents auto-qualify, route, and draft proposals - first touch under a minute, 24/7." },
-  { value: 40, suffix: "%", label: "Less manual work", desc: "Your team stops copying, pasting, and chasing. AI handles the repetition so humans handle the relationships." },
-  { value: 3, suffix: "x", label: "Pipeline efficiency", desc: "Automated prospect research, enrichment, and personalized outreach triples qualified meetings - no new headcount." },
-  { value: 90, suffix: " days", label: "To positive ROI", desc: "Not 6 months. Not 'eventually.' Measurable return within one quarter, tracked from day one." },
-];
-
-const STEPS = [
-  { num: 1, title: "AI Audit", timeline: "2 WEEKS · $1,500", desc: "We map your real workflows - not theoretical ones. You get a scorecard of your highest-ROI automation opportunities, with cost estimates and timelines you can actually trust." },
-  { num: 2, title: "Custom Roadmap", timeline: "1 WEEK", desc: "We prioritize together based on ROI, effort, and what your team can realistically adopt. You approve the plan before a single line of code is written." },
-  { num: 3, title: "Build & Scale", timeline: "8-12 WEEKS", desc: "AI agents and workflows go live in sprints. We measure ROI at every milestone. If something isn't working, we pivot. No vendor lock-in." },
-];
-
-const CASES = [
-  { industry: "CONSTRUCTION · COMPANY", metric: "less than 1 min", metricLabel: "lead response", desc: "Every new lead now gets a response in under 60 seconds - day or night. No one falls through the cracks.", before: "Leads waited 1+ day. Many were lost overnight", after: "Instant response, 24/7. No leads lost." },
-  { industry: "B2B SAAS · CUSTOMER SUPPORT", metric: "$180K", metricLabel: "annual savings", desc: "Repetitive support questions now get answered automatically. The team focuses on real problems instead of password resets.", before: "Support team overwhelmed, slow replies", after: "2 teams freed up for higher-value work." },
-  { industry: "Professional Services · Sales", metric: "3x", metricLabel: "qualified meetings", desc: "Finding and reaching the right prospects used to take all day. Now it happens automatically, and the results tripled.", before: "Hours spent researching leads, low conversion", after: "3x qualified meetings. Same team, no extra hires." },
-];
+import { useLanguage } from "@/i18n/LanguageContext";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 // --- Counter hook ---
 function useCountUp(end: number, duration: number = 2000) {
@@ -127,7 +85,7 @@ function StaggerChild({ children, delay = 0 }: { children: React.ReactNode; dela
 }
 
 // --- Stat Block ---
-function StatBlock({ stat }: { stat: typeof STATS[0] }) {
+function StatBlock({ stat }: { stat: { value: number; suffix: string; label: string; desc: string } }) {
   const { count, ref } = useCountUp(stat.value);
   return (
     <div className="stat-block" ref={ref}>
@@ -144,6 +102,14 @@ function StatBlock({ stat }: { stat: typeof STATS[0] }) {
 // MAIN COMPONENT
 // ============================
 export default function LandingPage() {
+  const { language, t } = useLanguage();
+
+  const PAIN_CARDS = useMemo(() => t.painCards, [language]);
+  const ROTATING_WORDS = useMemo(() => t.rotatingWords, [language]);
+  const STATS = useMemo(() => t.outcomes.stats, [language]);
+  const STEPS = useMemo(() => t.process.steps, [language]);
+  const CASES = useMemo(() => t.cases.items, [language]);
+
   const [loading, setLoading] = useState(true);
   const [loaderProgress, setLoaderProgress] = useState(0);
   const [scrolled, setScrolled] = useState(false);
@@ -185,7 +151,7 @@ export default function LandingPage() {
       setWordIndex((prev) => (prev + 1) % ROTATING_WORDS.length);
     }, 2200);
     return () => clearInterval(interval);
-  }, [wordIndex]);
+  }, [wordIndex, ROTATING_WORDS]);
 
   // Scroll-driven hero transformation
   const handleTransformScroll = useCallback(() => {
@@ -196,34 +162,24 @@ export default function LandingPage() {
     const progress = Math.max(0, Math.min(1, scrolled / totalHeight));
 
     if (progress <= 0.25) {
-      setPhase1Opacity(1);
-      setPhase2Opacity(0);
-      setPhase3Opacity(0);
+      setPhase1Opacity(1); setPhase2Opacity(0); setPhase3Opacity(0);
     } else if (progress <= 0.32) {
-      const t = (progress - 0.25) / 0.07;
-      setPhase1Opacity(1 - t);
-      setPhase2Opacity(t);
-      setPhase3Opacity(0);
+      const tt = (progress - 0.25) / 0.07;
+      setPhase1Opacity(1 - tt); setPhase2Opacity(tt); setPhase3Opacity(0);
     } else if (progress <= 0.5) {
-      setPhase1Opacity(0);
-      setPhase2Opacity(1);
-      setPhase3Opacity(0);
+      setPhase1Opacity(0); setPhase2Opacity(1); setPhase3Opacity(0);
     } else if (progress <= 0.57) {
-      const t = (progress - 0.5) / 0.07;
-      setPhase1Opacity(0);
-      setPhase2Opacity(1 - t);
-      setPhase3Opacity(t);
+      const tt = (progress - 0.5) / 0.07;
+      setPhase1Opacity(0); setPhase2Opacity(1 - tt); setPhase3Opacity(tt);
     } else {
-      setPhase1Opacity(0);
-      setPhase2Opacity(0);
-      setPhase3Opacity(1);
+      setPhase1Opacity(0); setPhase2Opacity(0); setPhase3Opacity(1);
     }
   }, []);
 
   useEffect(() => {
     const onScroll = () => requestAnimationFrame(handleTransformScroll);
     window.addEventListener("scroll", onScroll, { passive: true });
-    handleTransformScroll(); // run once on mount
+    handleTransformScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, [handleTransformScroll]);
 
@@ -235,7 +191,7 @@ export default function LandingPage() {
     <>
       {/* LOADER */}
       <div id="loader" className={loading ? "" : "hidden"}>
-        <div className="loader-brand">veehtor AI</div>
+        <div className="loader-brand">{t.loader.brand}</div>
         <div id="loader-bar-wrap">
           <div id="loader-bar" style={{ width: `${loaderProgress}%` }} />
         </div>
@@ -247,17 +203,17 @@ export default function LandingPage() {
           <img src={vaiLogo} alt="Veehtor AI" className="logo-icon" style={{ height: 34 }} />
           veehtor <span>AI</span>
         </a>
-        <nav style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
-          <button className="nav-link-style hidden md:inline-block" onClick={() => scrollTo("process")}>How it works</button>
-          <button className="nav-link-style hidden md:inline-block" onClick={() => scrollTo("pricing")}>Pricing</button>
-          <button className="nav-cta" onClick={() => scrollTo("contact")}>Get in touch</button>
+        <nav style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
+          <button className="nav-link-style hidden md:inline-block" onClick={() => scrollTo("process")}>{t.header.howItWorks}</button>
+          <button className="nav-link-style hidden md:inline-block" onClick={() => scrollTo("pricing")}>{t.header.pricing}</button>
+          <button className="nav-cta" onClick={() => scrollTo("contact")}>{t.header.getInTouch}</button>
+          <LanguageSwitcher />
         </nav>
       </header>
 
-      {/* HERO: SCROLL-DRIVEN TRANSFORMATION */}
+      {/* HERO */}
       <div className="transformation-wrapper" ref={transformRef}>
         <div className="transformation-sticky">
-          {/* Phase 1 */}
           <div className="transform-phase phase-lost" style={{ opacity: phase1Opacity }}>
             <div className="phase-lost-visual">
               {PAIN_CARDS.map((card, i) => (
@@ -265,28 +221,28 @@ export default function LandingPage() {
               ))}
             </div>
             <div className="phase-text">
-              <h2 style={{ fontWeight: 700 }}>Still running your business like it's 2022?</h2>
-              <p>Missed leads. Manual busywork. Slow responses. The time spent on tasks AI could handle means you're not growing. And you know you could do better than that.</p>
+              <h2 style={{ fontWeight: 700 }}>{t.hero.phase1.heading}</h2>
+              <p>{t.hero.phase1.paragraph}</p>
             </div>
             <div className="scroll-indicator">
-              <span>Scroll</span>
+              <span>{t.hero.phase1.scroll}</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M12 5v14M5 12l7 7 7-7" />
               </svg>
             </div>
           </div>
 
-          {/* Phase 2 */}
           <div className="transform-phase phase-transition" style={{ opacity: phase2Opacity }}>
-            <h2>What if <em>AI</em> handled the busywork - and you focused on <em>growth</em>?</h2>
+            <h2>
+              {t.hero.phase2.headingBefore}<em>{t.hero.phase2.em1}</em>{t.hero.phase2.headingMid}<em>{t.hero.phase2.em2}</em>{t.hero.phase2.headingAfter}
+            </h2>
           </div>
 
-          {/* Phase 3 */}
           <div className="transform-phase phase-transformed" style={{ opacity: phase3Opacity }}>
-            <h2>Your team. <em style={{ color: '#2dd4a8' }}>Amplified.</em></h2>
-            <p>We build what matters to your business results while your team does what only humans can.</p>
+            <h2>{t.hero.phase3.headingBefore}<em style={{ color: '#2dd4a8' }}>{t.hero.phase3.em}</em></h2>
+            <p>{t.hero.phase3.paragraph}</p>
             <button className="btn-primary" onClick={() => scrollTo("contact")}>
-              <strong>Book Your AI Audit</strong> →
+              <strong>{t.hero.phase3.cta}</strong> →
             </button>
           </div>
         </div>
@@ -297,7 +253,7 @@ export default function LandingPage() {
         <div className="marquee-track">
           {Array.from({ length: 4 }).map((_, i) => (
             <span key={i} className="marquee-text">
-              <span className="highlight">AI that pays for itself</span> - Stop experimenting. Start profiting.{" "}
+              <span className="highlight">{t.marquee.highlight}</span>{t.marquee.rest}
             </span>
           ))}
         </div>
@@ -307,9 +263,9 @@ export default function LandingPage() {
       <section className="problem-section">
         <div className="problem-inner">
           <RevealDiv>
-            <div className="section-label">The Problem</div>
+            <div className="section-label">{t.problem.label}</div>
             <h2 className="problem-heading">
-              You've heard AI will change everything. But so far, it's just been{" "}
+              {t.problem.headingBefore}
               <span className="rotating-wrapper">
                 {ROTATING_WORDS.map((word, i) => (
                   <span
@@ -324,11 +280,7 @@ export default function LandingPage() {
           </RevealDiv>
 
           <div className="problem-grid">
-            {[
-              { icon: "💸", title: "$20-50K spent on tools that sit unused", desc: "Enterprise licenses, chatbot platforms, analytics dashboards - all collecting dust because nobody knows how to connect them to actual workflows." },
-              { icon: "🤯", title: "Your team is overwhelmed by the hype", desc: "Everyone says you need AI. Nobody tells you where it actually moves the needle in your specific business. So nothing changes." },
-              { icon: "📊", title: "Consultants pitch decks, not results", desc: "Six-month roadmaps. Fifty-page PDFs. Zero implementation. You're paying for slides while your competitors are shipping AI that works." },
-            ].map((card, i) => (
+            {t.problem.cards.map((card, i) => (
               <StaggerChild key={i} delay={i * 0.15}>
                 <div className="problem-card">
                   <div className="icon">{card.icon}</div>
@@ -345,9 +297,9 @@ export default function LandingPage() {
       <section className="outcomes-section" id="outcomes">
         <div className="outcomes-inner">
           <RevealDiv>
-            <div className="section-label">What Changes</div>
-            <h2 className="outcomes-heading">The results <em>speak in dollars,</em> not decks.</h2>
-            <p className="outcomes-sub">Real numbers from real companies in the first 90 days.</p>
+            <div className="section-label">{t.outcomes.label}</div>
+            <h2 className="outcomes-heading">{t.outcomes.headingBefore}<em>{t.outcomes.em}</em>{t.outcomes.headingAfter}</h2>
+            <p className="outcomes-sub">{t.outcomes.sub}</p>
           </RevealDiv>
 
           <div className="stats-row">
@@ -364,8 +316,8 @@ export default function LandingPage() {
       <section className="process-section" id="process">
         <div className="process-inner">
           <RevealDiv>
-            <div className="section-label">How It Works</div>
-            <h2 className="process-heading">Three steps. <em>That's it.</em></h2>
+            <div className="section-label">{t.process.label}</div>
+            <h2 className="process-heading">{t.process.headingBefore}<em>{t.process.em}</em></h2>
           </RevealDiv>
 
           <div className="steps">
@@ -387,8 +339,8 @@ export default function LandingPage() {
       <section className="cases-section" id="case-studies">
         <div className="cases-inner">
           <RevealDiv>
-            <div className="section-label">Results</div>
-            <h2 className="cases-heading">Companies that <em>shipped AI</em> that works.</h2>
+            <div className="section-label">{t.cases.label}</div>
+            <h2 className="cases-heading">{t.cases.headingBefore}<em>{t.cases.em}</em>{t.cases.headingAfter}</h2>
           </RevealDiv>
 
           <div className="case-cards">
@@ -404,11 +356,11 @@ export default function LandingPage() {
                     <p>{c.desc}</p>
                     <div className="case-before-after">
                       <div className="case-ba case-before">
-                        <strong>BEFORE</strong>
+                        <strong>{t.cases.before}</strong>
                         {c.before}
                       </div>
                       <div className="case-ba case-after">
-                        <strong>AFTER</strong>
+                        <strong>{t.cases.after}</strong>
                         {c.after}
                       </div>
                     </div>
@@ -424,53 +376,43 @@ export default function LandingPage() {
       <section className="pricing-section" id="pricing">
         <div className="pricing-inner">
           <RevealDiv>
-            <h2 className="pricing-heading">Start with <em>clarity.</em> Scale with <em>confidence.</em></h2>
-            <p className="pricing-sub">Begin with a 2-week audit - then only implement what proves its value.</p>
+            <h2 className="pricing-heading">{t.pricing.headingBefore}<em>{t.pricing.em1}</em>{t.pricing.headingMid}<em>{t.pricing.em2}</em></h2>
+            <p className="pricing-sub">{t.pricing.sub}</p>
           </RevealDiv>
 
           <div className="pricing-cards">
             <StaggerChild delay={0}>
               <div className="pricing-card featured">
-                <div className="pricing-tier">Start here</div>
-                <div className="pricing-name">AI Audit</div>
-                <div className="pricing-timeline">2 weeks</div>
-                <div className="pricing-amount">$1,500</div>
-                <p className="pricing-desc">A deep-dive into your business to find where AI will generate the highest return - not where it's trendiest.</p>
+                <div className="pricing-tier">{t.pricing.cardA.tier}</div>
+                <div className="pricing-name">{t.pricing.cardA.name}</div>
+                <div className="pricing-timeline">{t.pricing.cardA.timeline}</div>
+                <div className="pricing-amount">{t.pricing.cardA.amount}</div>
+                <p className="pricing-desc">{t.pricing.cardA.desc}</p>
                 <ul className="pricing-features">
-                  <li>Workflow analysis & bottleneck mapping</li>
-                  <li>Prioritized opportunity scorecard</li>
-                  <li>Tool & vendor recommendations</li>
-                  <li>3-month roadmap with ROI projections</li>
-                  <li>30-min strategy debrief call</li>
+                  {t.pricing.cardA.features.map((f, i) => <li key={i}>{f}</li>)}
                 </ul>
                 <button className="pricing-btn primary" onClick={() => scrollTo("contact")}>
-                  <strong>Book your audit →</strong>
+                  <strong>{t.pricing.cardA.cta}</strong>
                 </button>
               </div>
             </StaggerChild>
 
             <StaggerChild delay={0.15}>
               <div className="pricing-card">
-                <div className="pricing-tier">After the audit</div>
-                <div className="pricing-name">Build & Scale</div>
-                <div className="pricing-timeline">3-6 months</div>
-                <div className="pricing-amount">$12,500-30K</div>
-                <p className="pricing-desc">End-to-end implementation of the roadmap - AI agents, workflow automations, and team training, measured against ROI at every milestone.</p>
+                <div className="pricing-tier">{t.pricing.cardB.tier}</div>
+                <div className="pricing-name">{t.pricing.cardB.name}</div>
+                <div className="pricing-timeline">{t.pricing.cardB.timeline}</div>
+                <div className="pricing-amount">{t.pricing.cardB.amount}</div>
+                <p className="pricing-desc">{t.pricing.cardB.desc}</p>
                 <ul className="pricing-features">
-                  <li>Custom AI agent development</li>
-                  <li>Workflow automation & integrations</li>
-                  <li>Team training & adoption playbooks</li>
-                  <li>Ongoing optimization & ROI tracking</li>
-                  <li>No vendor lock-in - you own everything</li>
+                  {t.pricing.cardB.features.map((f, i) => <li key={i}>{f}</li>)}
                 </ul>
-                <a href="tel:+17813288464" className="pricing-btn outline">Call me now →</a>
+                <a href="tel:+17813288464" className="pricing-btn outline">{t.pricing.cardB.cta}</a>
               </div>
             </StaggerChild>
           </div>
 
-          <p className="pricing-note">
-            Implementation only starts after you've seen the audit results and approved the plan. No surprises.
-          </p>
+          <p className="pricing-note">{t.pricing.note}</p>
         </div>
       </section>
 
@@ -478,14 +420,14 @@ export default function LandingPage() {
       <section className="cta-section" id="contact">
         <div className="cta-inner">
           <RevealDiv>
-            <div className="section-label">Let's Talk</div>
-            <h2 className="cta-heading">Ready to see what AI can <em>actually do</em> for your business?</h2>
-            <p className="cta-sub">Book a 2-week AI Audit. Get a roadmap with real ROI projections. Only pay to implement what proves its value.</p>
+            <div className="section-label">{t.finalCta.label}</div>
+            <h2 className="cta-heading">{t.finalCta.headingBefore}<em>{t.finalCta.em}</em>{t.finalCta.headingAfter}</h2>
+            <p className="cta-sub">{t.finalCta.sub}</p>
             <div className="cta-buttons">
               <a href="mailto:vitor@veehtor.com?subject=AI%20Audit%20Inquiry" className="btn-primary">
-                <strong>Book your AI Audit</strong> →
+                <strong>{t.finalCta.primary}</strong> →
               </a>
-              <a href="tel:+17813288464" className="btn-secondary">Call me now</a>
+              <a href="tel:+17813288464" className="btn-secondary">{t.finalCta.secondary}</a>
             </div>
             <div className="cta-contact">
               <a href="mailto:vitor@veehtor.com">vitor@veehtor.com</a>
@@ -496,9 +438,9 @@ export default function LandingPage() {
 
       {/* FOOTER */}
       <footer className="site-footer">
-        <span className="footer-text">© 2026 Veehtor AI LLC. Tampa, FL.</span>
+        <span className="footer-text">{t.footer.copyright}</span>
         <div className="footer-links">
-          <a href="https://www.linkedin.com/in/vitorungari/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          <a href="https://www.linkedin.com/in/vitorungari/" target="_blank" rel="noopener noreferrer">{t.footer.linkedin}</a>
         </div>
       </footer>
     </>
