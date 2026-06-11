@@ -165,7 +165,7 @@ const en = {
         metricLabel: "annual savings",
         desc: "Repetitive support questions now get answered automatically. The team focuses on real problems instead of password resets.",
         before: "Support team overwhelmed, slow replies",
-        after: "2 teams freed up for higher-value work.",
+        after: "2 people freed up for higher-value work.",
       },
       {
         industry: "Professional Services · Sales",
@@ -247,9 +247,9 @@ const pt: typeof en = {
   },
   hero: {
     phase1: {
-      heading: "Ainda toca a empresa como se fosse 2022?",
+      heading: "Ainda toca a sua empresa como se a IA não existisse?",
       paragraph:
-        "Leads perdidos. Trabalho manual. Respostas lentas. O tempo gasto em tarefas que a IA poderia resolver é tempo que você não está crescendo. E você sabe que dá pra fazer muito melhor.",
+        "Leads perdidos. Trabalho manual. Respostas lentas. O tempo gasto em tarefas que a IA poderia resolver é tempo que você deixa de crescer. E no fundo você sabe que dá pra fazer muito melhor.",
       scroll: "Role",
     },
     phase2: {
@@ -264,7 +264,7 @@ const pt: typeof en = {
       em: "Amplificado.",
       paragraph:
         "A gente constrói o que realmente move o resultado do seu negócio, enquanto seu time faz o que só humanos sabem fazer.",
-      cta: "Agende seu AI Audit",
+      cta: "Agende seu Raio-X de IA",
     },
   },
   painCards: [
@@ -289,7 +289,7 @@ const pt: typeof en = {
     { text: "Proposta lenta", type: "dim" },
     { text: "Ligação perdida", type: "warn" },
   ],
-  rotatingWords: ["cara.", "sonho.", "promessa.", "hype."],
+  rotatingWords: ["cara.", "ilusão.", "promessa.", "hype."],
   marquee: {
     highlight: "IA que se paga sozinha",
     rest: " - Pare de experimentar. Comece a lucrar. ",
@@ -300,7 +300,7 @@ const pt: typeof en = {
     cards: [
       {
         icon: "💸",
-        title: "R$ 100-250 mil em ferramentas paradas",
+        title: "US$ 20-50 mil em ferramentas paradas",
         desc: "Licenças enterprise, plataformas de chatbot, dashboards de analytics - tudo encostado porque ninguém sabe conectar isso ao trabalho real do dia a dia.",
       },
       {
@@ -311,7 +311,7 @@ const pt: typeof en = {
       {
         icon: "📊",
         title: "Consultorias entregam slide, não resultado",
-        desc: "Roadmaps de seis meses. PDFs de cinquenta páginas. Zero implementação. Você paga por apresentação enquanto seus concorrentes estão entregando IA que funciona.",
+        desc: "Roadmaps de seis meses. PDFs de cinquenta páginas. Zero implementação. Você paga por slide enquanto seus concorrentes entregam IA que funciona.",
       },
     ],
   },
@@ -355,7 +355,7 @@ const pt: typeof en = {
     steps: [
       {
         num: 1,
-        title: "AI Audit",
+        title: "Raio-X de IA",
         timeline: "2 SEMANAS · US$ 1.500",
         desc: "Mapeamos os fluxos reais do seu negócio - não os teóricos. Você recebe um scorecard com as oportunidades de maior ROI, com estimativas de custo e prazos confiáveis.",
       },
@@ -367,7 +367,7 @@ const pt: typeof en = {
       },
       {
         num: 3,
-        title: "Build & Scale",
+        title: "Implementar e Escalar",
         timeline: "8-12 SEMANAS",
         desc: "Agentes de IA e automações entram em produção em sprints. Medimos ROI em cada marco. Se algo não funciona, ajustamos. Sem vendor lock-in.",
       },
@@ -412,10 +412,10 @@ const pt: typeof en = {
     em1: "clareza.",
     headingMid: " Escale com ",
     em2: "confiança.",
-    sub: "Comece com um audit de 2 semanas - depois implemente apenas o que provar valor.",
+    sub: "Comece com um Raio-X de 2 semanas - depois implemente apenas o que provar valor.",
     cardA: {
       tier: "Comece aqui",
-      name: "AI Audit",
+      name: "Raio-X de IA",
       timeline: "2 semanas",
       amount: "US$ 1.500",
       desc: "Um mergulho profundo no seu negócio para encontrar onde a IA gera o maior retorno - não onde está mais na moda.",
@@ -424,13 +424,13 @@ const pt: typeof en = {
         "Scorecard de oportunidades priorizadas",
         "Recomendações de ferramentas e fornecedores",
         "Roadmap de 3 meses com projeções de ROI",
-        "Reunião de debrief estratégico de 30 min",
+        "Reunião de estratégia de 30 min",
       ],
-      cta: "Agende seu audit →",
+      cta: "Agende seu Raio-X →",
     },
     cardB: {
-      tier: "Depois do audit",
-      name: "Build & Scale",
+      tier: "Depois do Raio-X",
+      name: "Implementar e Escalar",
       timeline: "3-6 meses",
       amount: "US$ 12.500-30K",
       desc: "Implementação ponta a ponta do roadmap - agentes de IA, automação de fluxos e treinamento do time, medidos por ROI em cada marco.",
@@ -441,18 +441,18 @@ const pt: typeof en = {
         "Otimização contínua e tracking de ROI",
         "Sem vendor lock-in - tudo é seu",
       ],
-      cta: "Me ligue agora →",
+      cta: "Quero conversar →",
     },
-    note: "A implementação só começa depois que você vê os resultados do audit e aprova o plano. Sem surpresas.",
+    note: "A implementação só começa depois que você vê os resultados do Raio-X e aprova o plano. Sem surpresas.",
   },
   finalCta: {
     label: "Vamos conversar",
-    headingBefore: "Pronto pra ver o que a IA pode ",
-    em: "de verdade fazer",
+    headingBefore: "Pronto pra ver o que a IA pode fazer ",
+    em: "de verdade",
     headingAfter: " pelo seu negócio?",
-    sub: "Agende um AI Audit de 2 semanas. Receba um roadmap com projeções reais de ROI. Você só paga pra implementar o que provar valor.",
-    primary: "Agende seu AI Audit",
-    secondary: "Me ligue agora",
+    sub: "Agende um Raio-X de IA de 2 semanas. Receba um roadmap com projeções reais de ROI. Você só paga pra implementar o que provar valor.",
+    primary: "Agende seu Raio-X de IA",
+    secondary: "Quero conversar",
   },
   footer: {
     copyright: "© 2026 Veehtor AI LLC. Tampa, FL.",
