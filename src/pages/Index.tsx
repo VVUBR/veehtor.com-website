@@ -214,7 +214,7 @@ export default function LandingPage() {
       {/* HERO */}
       <div className="transformation-wrapper" ref={transformRef}>
         <div className="transformation-sticky">
-          <div className="transform-phase phase-lost" style={{ opacity: phase1Opacity }}>
+          <div className="transform-phase phase-lost" style={{ opacity: phase1Opacity, pointerEvents: phase1Opacity > 0.5 ? "auto" : "none" }}>
             <div className="phase-lost-visual">
               {PAIN_CARDS.map((card, i) => (
                 <div key={i} className={`chaos-cell ${card.type}`}>{card.text}</div>
@@ -232,13 +232,13 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="transform-phase phase-transition" style={{ opacity: phase2Opacity }}>
+          <div className="transform-phase phase-transition" style={{ opacity: phase2Opacity, pointerEvents: phase2Opacity > 0.5 ? "auto" : "none" }}>
             <h2>
               {t.hero.phase2.headingBefore}<em>{t.hero.phase2.em1}</em>{t.hero.phase2.headingMid}<em>{t.hero.phase2.em2}</em>{t.hero.phase2.headingAfter}
             </h2>
           </div>
 
-          <div className="transform-phase phase-transformed" style={{ opacity: phase3Opacity }}>
+          <div className="transform-phase phase-transformed" style={{ opacity: phase3Opacity, pointerEvents: phase3Opacity > 0.5 ? "auto" : "none" }}>
             <h2>{t.hero.phase3.headingBefore}<em style={{ color: '#2dd4a8' }}>{t.hero.phase3.em}</em></h2>
             <p>{t.hero.phase3.paragraph}</p>
             <button className="btn-primary" onClick={() => scrollTo("contact")}>
