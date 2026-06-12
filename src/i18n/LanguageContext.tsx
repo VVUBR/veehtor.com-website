@@ -24,14 +24,67 @@ function setMetaDescription(content: string) {
   document.querySelector('meta[name="twitter:title"]')?.setAttribute("content", document.title);
 }
 
+async function detectInitialLanguage(): Promise<"en" | "pt"> {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 1200);
+    const res = await fetch("https://ipapi.co/json/", { signal: controller.signal });
+    clearTimeout(timer);
+    const data = await res.json();
+    if (data && data.country_code) {
+      return data.country_code === "BR" ? "pt" : "en";
+    }
+  } catch {
+    // ignora e cai no fallback abaixo
+  }
+  try {
+    const lang = (navigator.language || "en").toLowerCase();
+    return lang.startsWith("pt") ? "pt" : "en";
+  } catch {
+    return "en";
+  }
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>("en");
+  const [langReady, setLangReady] = useState(false);
+
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+    try { localStorage.setItem(STORAGE_KEY, lang); } catch {}
+  };
 
   useEffect(() => {
+    let cancelled = false;
+
+    let saved: string | null = null;
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved === "pt" || saved === "en") setLanguageState(saved);
-    } catch {}
+      saved = localStorage.getItem(STORAGE_KEY);
+    } catch {
+      saved = null;
+    }
+
+    if (saved === "en" || saved === "pt") {
+      setLanguage(saved);
+      setLangReady(true);
+      return;
+    }
+
+    detectInitialLanguage()
+      .then((lang) => {
+        if (cancelled) return;
+        setLanguage(lang);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setLanguage("en");
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setLangReady(true);
+      });
+
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
@@ -41,10 +94,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = language === "pt" ? "pt-BR" : "en";
   }, [language]);
 
-  const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
-    try { localStorage.setItem(STORAGE_KEY, lang); } catch {}
-  };
+  if (!langReady) {
+    const brand = translations.en.loader.brand;
+    return (
+      <div id="loader">
+        <div className="loader-brand">{brand}</div>
+        <div id="loader-bar-wrap">
+          <div id="loader-bar" style={{ width: "30%" }} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t: translations[language] }}>
