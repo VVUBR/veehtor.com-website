@@ -34,7 +34,7 @@ export default function ScrollHero() {
 
   return (
     <div ref={containerRef} className="relative" style={{ height: "300vh" }}>
-      <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
+      <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden pointer-events-none">
         <div className="max-w-6xl mx-auto px-4 w-full">
           {/* Phase 1: Pain cards */}
           <motion.div style={{ opacity: phase1Opacity }} className="absolute inset-0 flex flex-col items-center justify-center px-4">
@@ -74,7 +74,7 @@ export default function ScrollHero() {
           {/* Phase 3: Amplified */}
           <motion.div
             style={{ opacity: phase3Opacity, y: phase3Y }}
-            className="absolute inset-0 flex flex-col items-center justify-center px-4"
+            className="absolute inset-0 flex flex-col items-center justify-center px-4 pointer-events-auto"
           >
             <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl text-center text-foreground leading-tight">
               Your team. <span className="text-primary italic">Amplified.</span>
