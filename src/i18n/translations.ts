@@ -240,7 +240,7 @@ const pt: typeof en = {
   },
   header: {
     howItWorks: "Como funciona",
-    pricing: "Investimento",
+    pricing: "SERVIÇOS",
     getInTouch: "Fale conosco",
     switchToEnglish: "Switch to English",
     switchToPortuguese: "Mudar para português",
