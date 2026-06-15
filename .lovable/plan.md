@@ -1,68 +1,126 @@
+# Family Realty Holdings — Dashboard de Controle de Custos
 
-# Site bilíngue EN / PT-BR com seletor de bandeiras
+Preview visual com dado fictício, acessível em uma nova rota dentro do projeto atual.
 
-## Escopo
+## Rota e acesso
 
-A landing page principal (`/`) é `src/pages/Index.tsx`, com todo o texto inline. Esta tarefa internacionaliza essa página + o seletor de bandeiras no header dela. As demais rotas (`/privacy`, `/terms`, `/complo`, `/PodunkAnnies`, `/Score.de.credito.DCarvalho`, `/denis-energia-solar`) ficam fora do escopo.
+- Nova rota SPA: `/family-realty` (registrada em `src/App.tsx`, antes do catch-all).
+- Sem auth, sem persistência, sem backend. Reload reseta filtros.
+- O domínio `family-realty.veehtor.com` (subdomínio real) não é configurado por código — é DNS + Custom Domain no painel Lovable. Eu entrego a rota; depois você conecta o subdomínio em Project Settings → Domains apontando para este projeto (ou publicamos como projeto separado, se preferir). Ver pergunta no fim.
 
-Nada de design muda: mesmas cores, fontes, layouts, animações, espaçamentos e CTAs. A única adição visual é o par de bandeirinhas no header.
+## Identidade visual
 
-## Arquivos novos
+Tokens dedicados (escopo isolado, não afetam o site Veehtor):
+- Aplicados via classe wrapper `.family-realty` na página, definindo CSS vars locais.
+- Cores: `--fr-navy #041C2C`, `--fr-gold #EAAA00`, `--fr-text #2C2C2C`, `--fr-muted #808080`, `--fr-bg #FFFFFF`, `--fr-surface #F3F5F8`, `--fr-green #2E7D52`, `--fr-red #B70200`.
+- Fontes: Roboto (700/900) headings, Lato (400/700) body, carregadas via `<link>` injetado só nesta página (não global).
+- Raio 8px, light mode, header navy, tipografia generosa.
 
-1. **`src/i18n/LanguageContext.tsx`**
-   - Estado `language: 'en' | 'pt'`, default `'en'`.
-   - Hidrata de `localStorage.getItem('veehtor-lang')` no mount; se inválido/vazio, fica `'en'`.
-   - `setLanguage(lang)` persiste em `localStorage` e atualiza `document.title` + `<meta name="description">` para a versão correspondente.
-   - Hooks: `useLanguage()` (lang + setter) e `useT()` (retorna o dicionário ativo).
+## Estrutura da página
 
-2. **`src/i18n/translations.ts`**
-   - Dicionário tipado com raízes `en` e `pt`, cobrindo TODO texto visível da landing:
-     - Header (nav links, CTA, aria-labels das bandeiras).
-     - Loader.
-     - Hero 3 fases (manchetes, parágrafos, indicador "Scroll", botão final).
-     - `painCards` (20 chips), `rotatingWords` (4 palavras), `marquee`.
-     - Problem (heading + 3 cards).
-     - Outcomes (label, heading, sub, `stats` x4 com label e desc).
-     - Process (label, heading, `steps` x3 com title, timeline, desc).
-     - Cases (label, heading, `cases` x3 com industry, metric, metricLabel, desc, before, after).
-     - Pricing (heading, sub, cards e bullets).
-     - FAQ (verificar o restante do arquivo antes de implementar).
-     - Final CTA, formulário (placeholders/labels) e footer.
-     - `meta`: `{ title, description }`.
-   - EN copiado literalmente do código atual (sem reescrita).
-   - PT-BR: tradução natural, persuasiva, marketing-style.
-     - "Veehtor AI" não traduzido.
-     - "AI that pays for itself" → "IA que se paga sozinha".
-     - Termos consagrados (AI, ROI, dashboard, pipeline, follow-up, lead, SaaS) mantidos em inglês quando soar natural.
-     - APENAS hífens simples `-` (sem en/em dashes), conforme regra do projeto.
-   - Tipo `Translations = typeof translations.en`, com `translations.pt: Translations` para garantir paridade em build.
+```text
+┌────────────────────────────────────────────────────────────┐
+│ HEADER NAVY  [logo FR] Controle de Custos por Obra  [filtros período] │
+├────────────────────────────────────────────────────────────┤
+│ KPI1  KPI2  KPI3(gold)  KPI4(red?)  KPI5(red?)             │
+├──────────────────────────────┬─────────────────────────────┤
+│ Budget vs Realizado por obra │ Agenda de desembolsos /semana│
+│ (horizontal bars, 8 linhas)  │ (colunas 8–12 semanas)      │
+├──────────────────────────────┴─────────────────────────────┤
+│ Realizado por etapa (donut)  │ (espaço para legenda)       │
+├────────────────────────────────────────────────────────────┤
+│ Tabela: Data Obra Fornecedor Tipo Etapa Valor Status       │
+│ Filtros: Obra ▾  Status ▾   (sort por header)              │
+├────────────────────────────────────────────────────────────┤
+│ "Preview visual com dado fictício..." (cinza, pequeno)     │
+└────────────────────────────────────────────────────────────┘
+```
 
-3. **`src/components/LanguageSwitcher.tsx`**
-   - Dois botões com SVGs inline das bandeiras BR e US (sem libs externas, sem emoji).
-   - ~22x16px, `rounded-sm`, gap pequeno.
-   - Ativo: `opacity-100` + `ring-1 ring-white/60`. Inativo: `opacity-50 hover:opacity-100`.
-   - `aria-label` "Switch to English" / "Mudar para português", `aria-pressed` no ativo, foco visível por teclado.
+### Header
+- Background `--fr-navy`, texto branco.
+- Esquerda: placeholder "Family Realty" (caixa branca outline, mesmo footprint do logo futuro).
+- Centro: título "Controle de Custos por Obra".
+- Direita: 4 botões filtro período — "Esta semana", "Este mês", "Próximas 12 semanas", "Tudo". Ativo em gold.
 
-## Arquivos editados
+### KPIs (5 cards)
+1. Budget total (obras ativas) — USD grande.
+2. Realizado — USD + % do budget + seta variação vs período anterior (verde/vermelho).
+3. A desembolsar (próximos 30 dias) — número em gold.
+4. Pagamentos em alerta — contagem, vermelho se > 0.
+5. Compliance a vencer (30 dias) — contagem, vermelho se > 0.
 
-4. **`src/main.tsx`** — envolver `<App />` em `<LanguageProvider>`.
+Cada card: label cinza topo, número grande, indicador variação.
 
-5. **`src/pages/Index.tsx`**
-   - Trocar todas as strings hardcoded por `t.*` do hook `useT()`.
-   - **Mover** `PAIN_CARDS`, `ROTATING_WORDS`, `STATS`, `STEPS`, `CASES` (e quaisquer outros arrays de conteúdo) para dentro do componente, cada um derivado via `useMemo(() => [...], [language])`. Isso mantém referência estável por idioma, evitando que a animação de palavras girando, o marquee e os reveals reiniciem a cada render.
-   - Adicionar `<LanguageSwitcher />` no header, à direita após o botão "Get in touch", visível em desktop e mobile (o header atual não tem hambúrguer, então fica sempre visível).
-   - `useEffect([language])` que sincroniza `document.title` e `<meta name="description">`.
+### Gráficos (Recharts, já compatível com stack)
+- **Budget vs Realizado por obra**: BarChart horizontal, 2 séries (navy/gold). Barra realizado vira vermelha se > budget.
+- **Agenda de desembolsos**: BarChart colunas, 8–12 semanas no eixo X, stacked por obra (paleta derivada de navy/gold/neutros).
+- **Realizado por etapa**: Donut (PieChart) — Fundação, Estrutura, Elétrica, Hidráulica, Drywall, Acabamento.
+- Tooltips com valor exato em USD.
 
-6. **`index.html`** — meta description default permanece em EN; o contexto atualiza no client.
+### Tabela
+- Colunas: Data, Obra, Fornecedor, Tipo, Etapa, Valor, Status.
+- Sort ao clicar header (asc/desc).
+- Filtros dropdown: Obra, Status.
+- Linha "Em alerta": fundo vermelho 6% opacidade. "Pago": dot verde. "A pagar": dot cinza.
+- Sem paginação pesada: scroll vertical interno com ~150 linhas.
 
-## Notas técnicas
+### Rodapé
+Texto cinza pequeno: "Preview visual com dado fictício. A versão final terá dado real das obras e a identidade visual completa da Family Realty."
 
-- Sem libs novas. SVGs de bandeira inline.
-- Persistência: `localStorage` key `veehtor-lang`.
-- Troca de idioma instantânea via contexto, sem reload.
-- Se você quiser depois estender para as outras rotas, é uma tarefa separada.
+Botão decorativo "Exportar" disabled no canto, conforme pedido.
 
-## Arquivos tocados
+## Dado fictício (gerado em arquivo, determinístico)
 
-- novos: `src/i18n/LanguageContext.tsx`, `src/i18n/translations.ts`, `src/components/LanguageSwitcher.tsx`
-- editados: `src/main.tsx`, `src/pages/Index.tsx`
+`src/pages/family-realty/data.ts`:
+- 8 obras: Melrose, Barrington NH, Merrimack, Putnam Triplex, Brighton, Westford MA, Lexington MA, Carlisle MA. Budget aleatório entre 280k–1.2M (seed fixa), realizado 35%–110% (2 acima de 100%).
+- ~150 line items últimos 90 dias + ~40 pagamentos futuros próximos 12 semanas.
+- Suppliers materiais: Home Depot, Lowe's, Lansing Building Products, 84 Lumber.
+- Subs: Rivera Electric LLC, Coastal Plumbing Co, Granite State Framing, BayState Drywall.
+- Stages: 6 listadas.
+- Variabilidade: semanas pesadas e fracas; 3–5 pagamentos off-term; 2 compliances vencendo.
+- Gerador com PRNG semeado (mulberry32) para resultados estáveis a cada reload.
+
+## Comportamento de filtros
+
+- Filtro período no header re-deriva KPIs, gráficos e tabela via `useMemo`.
+- Filtros Obra e Status na tabela são locais à tabela.
+- Sort: estado local `{column, dir}`.
+
+## Arquivos a criar
+
+```text
+src/pages/family-realty/
+  index.tsx              # página principal (wrapper .family-realty)
+  data.ts                # gerador determinístico de dados
+  theme.css              # CSS vars + fontes Family Realty (escopo .family-realty)
+  components/
+    FRHeader.tsx
+    KpiCard.tsx
+    BudgetVsRealizadoChart.tsx
+    DisbursementScheduleChart.tsx
+    StageDonut.tsx
+    CostTable.tsx
+```
+
+Alteração mínima em `src/App.tsx`: adicionar `<Route path="/family-realty" element={<FamilyRealty />} />` antes do `*`.
+
+Nada mais é tocado (sem mudanças em Veehtor landing, i18n, etc.).
+
+## Detalhes técnicos
+
+- Recharts (instalar se ainda não estiver) para todos os gráficos.
+- Tailwind: usar arbitrary values `bg-[#041C2C]` e classes utilitárias; cores também expostas como CSS vars para reuso.
+- Formato moeda: `Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:0 })`.
+- Datas: `Intl.DateTimeFormat('pt-BR')` curto.
+- Responsivo: grid `lg:grid-cols-5` KPIs, `lg:grid-cols-2` gráficos secundários; abaixo de `lg` empilha. Sem scroll horizontal em 1280+.
+- Acessibilidade básica: contraste OK navy/branco, gold sobre branco apenas em números grandes.
+
+## O que NÃO entra
+
+- Sem "saldo em caixa" ou cash flow.
+- Sem login, sem API, sem persistência, sem CRUD, sem export real.
+- Sem ícones decorativos sem função.
+
+## Pergunta antes de implementar
+
+Quer que o `/family-realty` viva **dentro deste mesmo projeto Veehtor** (rota interna, e depois você aponta `family-realty.veehtor.com` como custom domain extra para este projeto) — ou prefere que eu te oriente a **duplicar como projeto Lovable separado** para o subdomínio ficar isolado da landing? A implementação da rota é a mesma; muda só o passo de DNS/publish depois.
