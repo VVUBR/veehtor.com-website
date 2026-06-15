@@ -2,23 +2,28 @@ import { useEffect, useMemo, useState } from "react";
 import "./theme.css";
 import FRHeader from "./components/FRHeader";
 import KpiCard from "./components/KpiCard";
-import BudgetVsRealizadoChart from "./components/BudgetVsRealizadoChart";
-import DisbursementScheduleChart from "./components/DisbursementScheduleChart";
-import StageDonut from "./components/StageDonut";
+import BudgetStatusList from "./components/BudgetStatusList";
+import StageDetailTable from "./components/StageDetailTable";
+import MonthlySpendChart from "./components/MonthlySpendChart";
+import PayablesList from "./components/PayablesList";
 import CostTable from "./components/CostTable";
 import {
+  ALL_JOBS,
   COST_ITEMS,
-  JOBS_META,
   countAlerts,
   expiringCompliance,
+  filterByJob,
   filterByPeriod,
   fmtUSD,
+  jobsMetaFor,
   sumUpcoming30d,
+  type JobFilter,
   type PeriodKey,
 } from "./data";
 
 export default function FamilyRealty() {
   const [period, setPeriod] = useState<PeriodKey>("month");
+  const [job, setJob] = useState<JobFilter>(ALL_JOBS);
 
   useEffect(() => {
     const prev = document.title;
@@ -28,19 +33,15 @@ export default function FamilyRealty() {
     };
   }, []);
 
-  const filtered = useMemo(() => filterByPeriod(COST_ITEMS, period), [period]);
+  // Apply Obra filter globally, then period for views that need it
+  const jobItems = useMemo(() => filterByJob(COST_ITEMS, job), [job]);
+  const periodItems = useMemo(() => filterByPeriod(jobItems, period), [jobItems, period]);
 
-  const totalBudget = useMemo(
-    () => JOBS_META.reduce((s, j) => s + j.budget, 0),
-    []
-  );
-  const totalRealizado = useMemo(
-    () => JOBS_META.reduce((s, j) => s + j.realizado, 0),
-    []
-  );
-  const pctConsumed = Math.round((totalRealizado / totalBudget) * 100);
+  const jobsScope = useMemo(() => jobsMetaFor(job), [job]);
+  const totalBudget = jobsScope.reduce((s, j) => s + j.budget, 0);
+  const totalRealizado = jobsScope.reduce((s, j) => s + j.realizado, 0);
+  const pctConsumed = totalBudget > 0 ? Math.round((totalRealizado / totalBudget) * 100) : 0;
 
-  // Synthetic "vs previous period" variation, deterministic per period
   const variations: Record<PeriodKey, { text: string; good: boolean; dir: "up" | "down" }> = {
     week: { text: "3.2% vs semana anterior", good: true, dir: "down" },
     month: { text: "1.8% vs mês anterior", good: false, dir: "up" },
@@ -48,21 +49,26 @@ export default function FamilyRealty() {
     all: { text: "Sob controle no agregado", good: true, dir: "down" },
   };
 
-  const upcoming = useMemo(() => sumUpcoming30d(COST_ITEMS), []);
-  const alerts = useMemo(() => countAlerts(COST_ITEMS), []);
+  const upcoming = useMemo(() => sumUpcoming30d(jobItems), [jobItems]);
+  const alerts = useMemo(() => countAlerts(jobItems), [jobItems]);
   const compl = useMemo(() => expiringCompliance(30), []);
 
   return (
     <div className="family-realty">
-      <FRHeader period={period} onChange={setPeriod} />
+      <FRHeader
+        period={period}
+        onPeriodChange={setPeriod}
+        job={job}
+        onJobChange={setJob}
+      />
 
       <main className="px-6 py-6 mx-auto" style={{ maxWidth: 1480 }}>
         {/* KPI row */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <KpiCard
-            label="Budget total (obras ativas)"
+            label={job === ALL_JOBS ? "Budget total (obras ativas)" : "Budget da obra"}
             value={fmtUSD(totalBudget)}
-            sub={`${JOBS_META.length} obras`}
+            sub={job === ALL_JOBS ? `${jobsScope.length} obras` : job}
           />
           <KpiCard
             label="Realizado"
@@ -78,7 +84,7 @@ export default function FamilyRealty() {
           <KpiCard
             label="Pagamentos em alerta"
             value={alerts}
-            sub="fora dos termos do contrato"
+            sub="atrasados ou fora dos termos"
             tone={alerts > 0 ? "red" : "default"}
           />
           <KpiCard
@@ -89,15 +95,20 @@ export default function FamilyRealty() {
           />
         </section>
 
-        {/* Charts row 1 */}
+        {/* Budget status + Monthly spend */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-          <BudgetVsRealizadoChart />
-          <DisbursementScheduleChart items={COST_ITEMS} />
+          <BudgetStatusList job={job} />
+          <MonthlySpendChart items={jobItems} />
         </section>
 
-        {/* Charts row 2 */}
+        {/* Stage detail */}
+        <section className="mt-4">
+          <StageDetailTable job={job} />
+        </section>
+
+        {/* Payables + Compliance */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-          <StageDonut items={COST_ITEMS} />
+          <PayablesList items={jobItems} />
           <div className="fr-card p-5">
             <h3 className="fr-heading" style={{ fontSize: 16, color: "var(--fr-navy)", marginBottom: 12 }}>
               Compliance a vencer
@@ -122,9 +133,9 @@ export default function FamilyRealty() {
           </div>
         </section>
 
-        {/* Table */}
+        {/* Line-item table */}
         <section className="mt-6">
-          <CostTable items={filtered} />
+          <CostTable items={periodItems} />
         </section>
 
         <p
