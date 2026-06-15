@@ -1,4 +1,4 @@
-import type { PeriodKey } from "../data";
+import { ALL_JOBS, JOBS, type JobFilter, type PeriodKey } from "../data";
 
 const PERIODS: { key: PeriodKey; label: string }[] = [
   { key: "week", label: "Esta semana" },
@@ -9,14 +9,18 @@ const PERIODS: { key: PeriodKey; label: string }[] = [
 
 export default function FRHeader({
   period,
-  onChange,
+  onPeriodChange,
+  job,
+  onJobChange,
 }: {
   period: PeriodKey;
-  onChange: (p: PeriodKey) => void;
+  onPeriodChange: (p: PeriodKey) => void;
+  job: JobFilter;
+  onJobChange: (j: JobFilter) => void;
 }) {
   return (
     <header
-      className="w-full px-6 py-4 flex items-center gap-6"
+      className="w-full px-6 py-4 flex flex-wrap items-center gap-4"
       style={{ background: "var(--fr-navy)", color: "#fff" }}
     >
       <div
@@ -32,19 +36,36 @@ export default function FRHeader({
         FAMILY REALTY
       </div>
 
-      <h1
-        className="flex-1 text-center"
-        style={{ fontSize: 20, margin: 0, color: "#fff" }}
-      >
+      <h1 className="flex-1 text-center" style={{ fontSize: 20, margin: 0, color: "#fff" }}>
         Controle de Custos por Obra
       </h1>
 
       <div className="flex items-center gap-2">
+        <label
+          className="flex items-center gap-2"
+          style={{ fontSize: 12, color: "rgba(255,255,255,0.75)" }}
+        >
+          Obra
+          <select
+            className="fr-select"
+            value={job}
+            onChange={(e) => onJobChange(e.target.value as JobFilter)}
+            style={{ minWidth: 160 }}
+          >
+            <option value={ALL_JOBS}>{ALL_JOBS}</option>
+            {JOBS.map((j) => (
+              <option key={j} value={j}>
+                {j}
+              </option>
+            ))}
+          </select>
+        </label>
+
         {PERIODS.map((p) => (
           <button
             key={p.key}
             className={`fr-btn ${period === p.key ? "fr-btn-active" : ""}`}
-            onClick={() => onChange(p.key)}
+            onClick={() => onPeriodChange(p.key)}
           >
             {p.label}
           </button>
