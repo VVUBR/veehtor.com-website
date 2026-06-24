@@ -355,10 +355,11 @@ export default function Adcole() {
 
           <div className="adcole-iframe-card">
             <iframe
-              src="/adcoach-demo.html"
+              src="https://remarkable-hotteok-e67140.netlify.app/"
               title="AdCoach interactive concept"
-              className="adcole-iframe"
               loading="lazy"
+              allowFullScreen
+              style={{ width: "100%", height: "820px", border: 0, borderRadius: "14px" }}
             />
           </div>
         </div>
