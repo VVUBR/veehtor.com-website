@@ -66,28 +66,19 @@ export default function Adcole() {
         .adcole-btn:focus-visible { outline: 3px solid ${TEAL}; outline-offset: 3px; }
         .adcole-btn-primary { background: ${TEAL}; color: ${NAVY}; }
         .adcole-btn-primary:hover { background: #13a596; }
-        .adcole-btn-outline { background: transparent; color: #fff; border-color: rgba(255,255,255,0.4); }
-        .adcole-btn-outline:hover { border-color: #fff; background: rgba(255,255,255,0.06); }
-        .adcole-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-top: 2.5rem; }
-        .adcole-card { background: #fff; border: 1px solid ${LIGHT2}; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
-        .adcole-card h3 { font-size: 1.05rem; font-weight: 700; margin: 0 0 0.5rem; color: ${NAVY}; }
-        .adcole-tag { display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.25rem 0.55rem; border-radius: 4px; background: rgba(33,198,93,0.12); color: ${GREEN}; margin-bottom: 0.75rem; }
         .adcole-flow { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.75rem; margin-top: 2.5rem; }
         .adcole-node { padding: 1rem 1.25rem; border-radius: 10px; font-weight: 600; font-size: 0.95rem; text-align: center; min-width: 200px; }
         .adcole-arrow { color: ${NAVY}; opacity: 0.4; font-size: 1.5rem; }
-        .adcole-stepper { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-top: 2.5rem; }
-        .adcole-step { background: #fff; border-radius: 12px; padding: 1.75rem; border-top: 4px solid ${TEAL}; }
-        .adcole-step-num { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: ${NAVY}; color: #fff; font-weight: 700; margin-bottom: 1rem; }
-        .adcole-step h3 { font-size: 1.1rem; font-weight: 700; margin: 0 0 0.5rem; color: ${NAVY}; }
-        .adcole-check-list { list-style: none; padding: 0; margin: 1.5rem 0 0; display: grid; gap: 0.85rem; }
-        .adcole-check-list li { display: flex; align-items: flex-start; gap: 0.75rem; font-size: 1.02rem; }
-        .adcole-check { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; background: ${TEAL}; color: ${NAVY}; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; margin-top: 2px; }
+        .adcole-cards-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 2rem; }
+        .adcole-card { background: #fff; border: 1px solid ${LIGHT2}; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+        .adcole-card h3 { font-size: 1.05rem; font-weight: 700; margin: 0 0 0.5rem; color: ${NAVY}; }
+        .adcole-tag { display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.25rem 0.55rem; border-radius: 4px; background: rgba(33,198,93,0.12); color: ${GREEN}; margin-bottom: 0.75rem; }
         .adcole-iframe-card { background: #fff; border: 1px solid ${LIGHT2}; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 24px rgba(17,24,40,0.08); margin-top: 2rem; }
-        .adcole-callout { margin-top: 2rem; padding: 1rem 1.25rem; background: #fff; border-left: 3px solid ${TEAL}; border-radius: 4px; font-size: 0.95rem; color: ${NAVY}; }
         .adcole-iframe { width: 100%; height: 820px; border: 0; display: block; }
         @media (max-width: 820px) {
           .adcole-iframe { height: 1040px; }
           .adcole-section { padding: 3.5rem 1.25rem; }
+          .adcole-cards-3 { grid-template-columns: 1fr; }
         }
       `}</style>
 
@@ -118,29 +109,16 @@ export default function Adcole() {
               marginTop: "1.5rem",
             }}
           >
-            A field service assistant that resolves faster, captures what it
-            learns, and protects the expertise that walks out the door when a
-            senior engineer retires.
+            A field service assistant that resolves faster and captures what it
+            learns, so expertise stops walking out the door when a senior
+            engineer retires.
           </p>
-          <div
-            style={{
-              display: "flex",
-              gap: "1rem",
-              marginTop: "2.5rem",
-              flexWrap: "wrap",
-            }}
-          >
+          <div style={{ marginTop: "2.5rem" }}>
             <button
               className="adcole-btn adcole-btn-primary"
               onClick={() => scrollToId("live-concept")}
             >
               See the live concept
-            </button>
-            <button
-              className="adcole-btn adcole-btn-outline"
-              onClick={() => scrollToId("success")}
-            >
-              What success looks like
             </button>
           </div>
         </div>
@@ -153,15 +131,14 @@ export default function Adcole() {
             The opportunity
           </p>
           <h2 className="adcole-h2" style={{ color: NAVY, marginTop: "1rem" }}>
-            Today the knowledge is leaving the building.
+            The knowledge is leaving the building.
           </h2>
           <p style={{ fontSize: "1.1rem", maxWidth: "820px" }}>
-            Every resolution lives in a senior engineer's head, a scattered
-            guide, or an email thread. When that engineer retires, the knowledge
-            goes with them, and there is no structured way to put it back.
-            AdCoach reverses the flow. It answers from your own documented
-            knowledge, and it captures every new resolution, so the knowledge
-            base grows with use instead of draining with turnover.
+            Today every resolution lives in a senior engineer's head or a
+            scattered guide, and it leaves when they retire. AdCoach answers
+            from your own documented knowledge and captures every new
+            resolution, so the knowledge base compounds with use instead of
+            draining with turnover.
           </p>
 
           <div className="adcole-flow" role="img" aria-label="Flow: knowledge drains, AdCoach captures, knowledge compounds">
@@ -195,148 +172,6 @@ export default function Adcole() {
         </div>
       </section>
 
-      {/* SUCCESS */}
-      <section className="adcole-section" id="success" style={{ background: "#fff" }}>
-        <div className="adcole-container">
-          <p className="adcole-eyebrow" style={{ color: NAVY, opacity: 0.7 }}>
-            What success looks like
-          </p>
-          <h2 className="adcole-h2" style={{ color: NAVY, marginTop: "1rem" }}>
-            Your own success metrics.
-          </h2>
-          <p style={{ fontSize: "1.05rem", maxWidth: "780px" }}>
-            Measured against the baseline we set together in the proof of
-            concept. These are your own success metrics.
-          </p>
-
-          <div className="adcole-cards">
-            {[
-              {
-                title: "Time to resolution",
-                tag: "Down",
-                desc:
-                  "Technicians get a cited answer in seconds, instead of waiting on an escalation.",
-              },
-              {
-                title: "Escalations per month",
-                tag: "Down",
-                desc:
-                  "The senior engineer becomes the last resort, not the first call.",
-              },
-              {
-                title: "Knowledge captured",
-                tag: "Up",
-                desc:
-                  "Every resolved case becomes reusable knowledge, validated by an engineer before it is finalized.",
-              },
-              {
-                title: "Technician adoption and usage",
-                tag: "High",
-                desc:
-                  "One clean interface, online or offline, in the technician's language, by voice or text.",
-              },
-              {
-                title: "FTE hours saved per case",
-                tag: "Up",
-                desc:
-                  "Less searching, less re-documenting, less waiting, captured against your current baseline.",
-              },
-            ].map((c) => (
-              <div key={c.title} className="adcole-card">
-                <span className="adcole-tag">{c.tag}</span>
-                <h3>{c.title}</h3>
-                <p style={{ margin: 0, fontSize: "0.98rem", color: "#374151" }}>
-                  {c.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* POTENTIAL */}
-      <section className="adcole-section" style={{ background: NAVY, color: "#fff" }}>
-        <div className="adcole-container">
-          <p className="adcole-eyebrow" style={{ color: TEAL }}>
-            Where this goes
-          </p>
-          <h2 className="adcole-h2" style={{ color: "#fff", marginTop: "1rem" }}>
-            The proof of concept is phase one of a larger system.
-          </h2>
-          <p
-            style={{
-              fontSize: "1.1rem",
-              color: "rgba(255,255,255,0.82)",
-              maxWidth: "820px",
-            }}
-          >
-            We build the foundation right the first time, so the future state is
-            an extension, not a rebuild. The same knowledge foundation supports,
-            with no architectural rework:
-          </p>
-          <ul className="adcole-check-list">
-            {[
-              "Dashboards and monitoring across the service organization.",
-              "Trend and failure analysis that feeds product improvement.",
-              "Predictive maintenance on the gages themselves.",
-              "Self-diagnostic machines that detect and report issues on their own: a new service line and revenue stream for Adcole.",
-            ].map((t) => (
-              <li key={t} style={{ color: "rgba(255,255,255,0.92)" }}>
-                <span className="adcole-check" aria-hidden>✓</span>
-                <span>{t}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* HOW WE BUILD */}
-      <section className="adcole-section" style={{ background: LIGHT2 }}>
-        <div className="adcole-container">
-          <p className="adcole-eyebrow" style={{ color: NAVY, opacity: 0.7 }}>
-            How we build it
-          </p>
-          <h2 className="adcole-h2" style={{ color: NAVY, marginTop: "1rem" }}>
-            Three steps, foundation first.
-          </h2>
-
-          <div className="adcole-stepper">
-            {[
-              {
-                n: 1,
-                title: "Proof of concept, 4 to 6 weeks.",
-                body:
-                  "One bounded data set. We prove retrieval, citations, confidence, and capture. You see it working before committing to the full build.",
-              },
-              {
-                n: 2,
-                title: "MVP build.",
-                body:
-                  "Core data sources, the full diagnostic tree, structured capture, admin and reporting, offline access, governance.",
-              },
-              {
-                n: 3,
-                title: "Run and evolve.",
-                body:
-                  "The knowledge loop, model operations, and new knowledge memos, on a monthly retainer.",
-              },
-            ].map((s) => (
-              <div key={s.n} className="adcole-step">
-                <div className="adcole-step-num">{s.n}</div>
-                <h3>{s.title}</h3>
-                <p style={{ margin: 0, color: "#374151" }}>{s.body}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="adcole-callout">
-            <strong style={{ color: ORANGE }}>Governance first.</strong>{" "}
-            Your data stays in your environment, no third-party training, every
-            answer cited, every query logged.
-          </div>
-        </div>
-      </section>
-
       {/* LIVE CONCEPT */}
       <section className="adcole-section" id="live-concept" style={{ background: "#fff" }}>
         <div className="adcole-container">
@@ -347,10 +182,9 @@ export default function Adcole() {
             An interactive concept of AdCoach.
           </h2>
           <p style={{ fontSize: "1.05rem", maxWidth: "820px" }}>
-            It uses your own diagnostic tree and the guardrails from your scope.
-            It is illustrative and not trained on Adcole data. Click the
-            options, switch the language, and toggle Online to see the offline
-            behavior.
+            It uses your own diagnostic tree and the guardrails from your scope,
+            illustrative and not trained on Adcole data. Click the options,
+            switch the language, and toggle Online to see the offline behavior.
           </p>
 
           <div className="adcole-iframe-card">
@@ -365,12 +199,87 @@ export default function Adcole() {
         </div>
       </section>
 
+      {/* SUCCESS */}
+      <section className="adcole-section" id="success" style={{ background: LIGHT1 }}>
+        <div className="adcole-container">
+          <p className="adcole-eyebrow" style={{ color: NAVY, opacity: 0.7 }}>
+            What success looks like
+          </p>
+          <p style={{ fontSize: "1.05rem", maxWidth: "780px", marginTop: "1rem" }}>
+            Measured against the baseline we set in the proof of concept, on
+            your own metrics.
+          </p>
+
+          <div className="adcole-cards-3">
+            <div className="adcole-card">
+              <span className="adcole-tag">Down</span>
+              <h3>Time to resolution</h3>
+              <p style={{ margin: 0, fontSize: "0.98rem", color: "#374151" }}>
+                A cited answer in seconds, not an escalation.
+              </p>
+            </div>
+            <div className="adcole-card">
+              <span className="adcole-tag">Down</span>
+              <h3>Escalations per month</h3>
+              <p style={{ margin: 0, fontSize: "0.98rem", color: "#374151" }}>
+                The senior engineer is the last resort, not the first call.
+              </p>
+            </div>
+            <div className="adcole-card">
+              <span className="adcole-tag">Up</span>
+              <h3>Knowledge captured</h3>
+              <p style={{ margin: 0, fontSize: "0.98rem", color: "#374151" }}>
+                Every resolved case becomes reusable, validated knowledge.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* WHERE THIS GOES */}
+      <section className="adcole-section" style={{ background: NAVY, color: "#fff" }}>
+        <div className="adcole-container">
+          <p className="adcole-eyebrow" style={{ color: TEAL }}>
+            Where this goes
+          </p>
+          <p
+            style={{
+              fontSize: "1.1rem",
+              color: "rgba(255,255,255,0.82)",
+              maxWidth: "820px",
+              marginTop: "1rem",
+            }}
+          >
+            The proof of concept is phase one. The same foundation extends, with
+            no rebuild, to dashboards, predictive maintenance, and self-diagnostic
+            machines that detect and report issues on their own, a new service
+            line and revenue stream for Adcole.
+          </p>
+          <p
+            style={{
+              marginTop: "1.5rem",
+              fontSize: "0.95rem",
+              color: "rgba(255,255,255,0.7)",
+              maxWidth: "820px",
+            }}
+          >
+            Governance first. Your data stays in your environment, no
+            third-party training, every answer cited, every query logged.
+          </p>
+        </div>
+      </section>
+
       {/* FOOTER */}
       <footer style={{ background: NAVY, color: "#fff", padding: "3rem 1.25rem" }}>
         <div className="adcole-container">
-          <Wordmark light />
+          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+            <Wordmark light />
+            <span style={{ fontSize: "1.05rem", fontWeight: 600, color: "rgba(255,255,255,0.85)" }}>
+              Veehtor AI
+            </span>
+          </div>
           <p style={{ marginTop: "1.25rem", fontSize: "1rem", color: "rgba(255,255,255,0.9)" }}>
-            Vitor Ungari · vitor@veehtor.com · (781) 655-9279 · veehtor.com
+            Vitor Ungari, vitor@veehtor.com, (781) 655-9279, veehtor.com
           </p>
           <p style={{ marginTop: "1.5rem", fontSize: "0.85rem", color: "rgba(255,255,255,0.55)" }}>
             Private concept prepared for Adcole Corporation. Sample content for
