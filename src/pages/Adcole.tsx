@@ -358,7 +358,7 @@ export default function Adcole() {
               src="https://remarkable-hotteok-e67140.netlify.app/"
               title="AdCoach interactive concept"
               loading="lazy"
-              allowfullscreen
+              allowFullScreen
               style={{ width: "100%", height: "820px", border: 0, borderRadius: "14px" }}
             />
           </div>
