@@ -1,74 +1,66 @@
-# Plan: /family-realty production dashboard
 
-Replace the existing visual preview at `/family-realty` with a production, read-only cost-control dashboard connected to the real Supabase project (`yklcfwhpkvtrjbqxhiln`), gated by auth, bilingual PT/EN, driven by global Obra + period filters.
+## Family Realty Dashboard — Production Wiring
 
-## 1. Backend wiring (Supabase — connect, not enable)
+Connect the existing `/family-realty` visual to the external Supabase project `yklcfwhpkvtrjbqxhiln` with authentication and live data. No data mutations; read-only dashboard.
 
-The target project already exists (`https://yklcfwhpkvtrjbqxhiln.supabase.co`). I will connect this Lovable project to that external Supabase using the native integration. This is different from Lovable Cloud (which would provision a brand new backend).
+### 1. Supabase client (external, isolated)
+- Add `src/pages/family-realty/lib/frSupabase.ts` creating a standalone client using:
+  - URL: `https://yklcfwhpkvtrjbqxhiln.supabase.co`
+  - anon key: the one you provided (safe to embed — publishable)
+  - Custom `storageKey: "fr-auth"` so it never collides with the Lovable Cloud client used elsewhere.
+- No env vars needed for the anon key (publishable). This keeps Family Realty fully isolated from the rest of the site.
 
-**I need from you before I can code:**
-- The **Supabase anon/publishable key** for project `yklcfwhpkvtrjbqxhiln` (Project Settings → API). Safe to paste; it's a public key.
-- Confirmation that RLS on all listed views/tables grants `SELECT` to `authenticated` (and revokes `anon`). If not set, I'll give you the SQL to run in the Supabase SQL editor — I will not write to your DB from here.
-- A single existing auth user (email + password) already created in Supabase Auth, since there is no sign-up flow.
+### 2. Auth gate
+- New `/family-realty/login` route: email + password form, brand navy `#041C2C` / gold `#EAAA00`, Roboto.
+- `FRAuthProvider` around `/family-realty/*` that:
+  - Registers `onAuthStateChange` first, then calls `getSession()`.
+  - Redirects unauthenticated users to `/family-realty/login`.
+  - Shows a "Sair" button in the header.
+- No public sign-up. User `info@familyrealtyinvestments.com` logs in with the password set in the Supabase dashboard.
+- Password reset link → `/family-realty/reset-password` page (updates password via `updateUser`).
 
-Once I have the anon key I'll create `src/integrations/supabase/client.ts` and typed helpers for each view/table listed in the spec. No writes anywhere.
+### 3. Filters context
+- `FRFiltersContext` with:
+  - `job`: `"all" | <project_id>`
+  - `period`: `"week" | "month" | "12w" | "all" | "custom"`, plus `from`/`to` for custom.
+- Header exposes both filters globally; every section reads from the context via `useMemo`.
 
-## 2. Auth
+### 4. Data layer
+Read-only hooks (React Query) per view, all filtered by `job` + `period`:
+- `useBudgetVsActual` → `v_budget_vs_actual_by_project`, `v_budget_vs_actual`
+- `usePayables` → `v_invoices_to_pay`
+- `useUnassignedCosts` → `v_unassigned_costs`
+- `useEstimateVsBilled` → `v_estimate_vs_billed`
+- `useContracts` → `contracts`, `v_contract_payment_summary`
+- `useDisbursements` → `v_disbursement_schedule`
+- `useHistory` → `history`
+- `useMonthlySpend` derived client-side from cost rows (or a dedicated view if present).
 
-- `/family-realty/login` — navy `#041C2C` background, white card, "Family Realty" text logo, title, email + password, red error state. No sign-up, no reset UI.
-- `AuthProvider` wraps the dashboard; `onAuthStateChange` + `getSession` on mount. Unauthenticated users on any `/family-realty/*` route get redirected to login.
-- Logout button in header.
+Currency: `Intl.NumberFormat("en-US",{style:"currency",currency:"USD"})`. Invalid dates guarded (skip rows with null/NaN `invoice_date`).
 
-## 3. i18n (scoped to this page)
+### 5. UI sections (replaces mock)
+Reuses existing components; swaps `data.ts` mock for hook results:
+1. KPI row (Budget total, Actual, Variance, Payables due, Overdue count)
+2. Budget status per obra (progress bars, color tags)
+3. Stage detail table
+4. Monthly spend chart (10 real months + 3 forecast)
+5. Payables ("A pagar", overdue highlighted red)
+6. Contracts summary
+7. Estimate vs Billed
+8. Unassigned costs (action-required list)
+9. Disbursement schedule
+10. History (audit log, last 50)
+11. Empty/loading/error states per section
 
-Small local `FRLangProvider` with `pt` (default) / `en` dictionaries, persisted in `localStorage` under `fr-lang`. Independent of the site-wide `veehtor-lang` so it doesn't affect the marketing site. Domain terms (budget, subcontractor, invoice, downpayment, estimate, billed) stay in English in both languages. Dates via `Intl.DateTimeFormat` with `pt-BR` / `en-US`; currency always USD via `en-US`.
+### 6. i18n
+- Small `FRLangProvider` (PT/EN), persisted in `localStorage`. Toggle in header. Does not touch the main site's LanguageContext.
 
-## 4. Global filters (header)
+### Technical notes
+- No changes to Lovable Cloud config; this uses the external Supabase project directly.
+- The anon key is publishable and safe in source; RLS on the Supabase side is the security boundary.
+- No writes anywhere; all queries are `select`.
+- I still need confirmation that RLS `SELECT` is granted to `authenticated` on the listed views/tables. If any query returns "permission denied", I'll surface a clear message per section and give you the exact `GRANT` SQL to run.
 
-- **Obra** dropdown: "Todas as obras" + the 8 fixed job names.
-- **Period**: preset chips (Este mês, Últimos 30 dias, Últimos 3 meses, Este ano, Tudo) **plus** a custom range picker (shadcn `Calendar` in a `Popover`, two dates). Active range printed as text.
-- Filter state lives in a `FRFiltersContext` and is consumed by every section.
-- Semantics enforced per section exactly as spec: period applies to Realizado KPI, budget status, stage detail, monthly chart, line-items. "A pagar", Contratos, Estimate vs Billed, A classificar ignore period. Obra applies everywhere.
-- Date-guard helper drops `invoice_date` outside `[2020-01-01, 2027-12-31]`; dateless rows excluded from period-scoped views and reported as a small "N linhas sem data excluídas · $X" note.
-
-## 5. Sections (top to bottom)
-
-1. **Header** (navy) — logo, title, Obra dropdown, period presets + custom range, PT/EN toggle, logout.
-2. **KPI row** (5 cards) — Budget total, Realizado (currency + % with green/gold/red), A pagar (gold, ignores period), Em atraso (red when > 0, ignores period), A classificar (gray/gold, ignores period).
-3. **Status de budget por obra** — one row per job from `v_budget_vs_actual_by_project`: name, horizontal progress bar of `pct_consumed`, big % at end, status tag. Bar overflows past 100% mark with hatched red segment for over-budget. When a single Obra is selected, collapses to that job and expands the stage detail below.
-4. **Detalhe por etapa** — table from `v_budget_vs_actual` grouped by `phase` (consolidated when "Todas"). Columns: Etapa, Budget, Realizado, % consumido (colored). Includes `(sem etapa)` / `(sem linha de budget)` rows labeled "Sem linha de budget". Row expander shows underlying `description`-level lines.
-5. **Gastos por mês** — solid navy vertical bars from `history` summed by `invoice_date` month, plain labels (Jan/26, Fev/26 …). Two dashed bars ahead labeled "previsto (média dos últimos 3 meses)". Caption "Quanto a empresa gasta por mês." Single color, no stacks.
-6. **A pagar** — from `v_invoices_to_pay`. Overdue rows first (red), then by `due_date` asc, dateless last. Columns: Fornecedor (canonical → fallback), Obra (or "A classificar" tag), Material, Valor, Vencimento ("18 jun"), Status ("Em atraso há X dias" / "Vence em X dias" / "Sem vencimento"). File-link icon when present.
-7. **Contratos** — cards/rows from `contracts` + `v_contract_payment_summary` + `v_disbursement_schedule`. Vendor (canonical fallback), Obra (or "Sem obra definida"), contact_name, total_value, contract_date, `review_status` badge, `notes` in "ver condições" expander. Expander also lists installments (`installment_label` · `pct` · `amount`) as a milestone list and shows `schedule_gap` warning when `abs > 1`. Search by vendor. NO date timeline.
-8. **Estimate vs Billed** — table from `v_estimate_vs_billed`. Diferença colored: green when `abs(diff) < 1`, red when `billed > estimate`, gray when `billed = 0`. Sorted by `abs(difference)` desc. Caption per spec. Row click opens a drawer of underlying `history` invoices (matching `supplier_canonical` + `project_name`).
-9. **A classificar** — table from `v_unassigned_costs` with Sugestão parsed from `address_pointer` (gold when it starts with "Sugestao IA:"). Caption per spec.
-10. **Linha a linha de custos** — full `history` detail, paginated 50/page, sortable, follows both global filters. Columns per spec.
-11. **Footer** — small gray text with sync sentence + last-loaded timestamp (`new Date()` at fetch time).
-
-## 6. Data quality guards (shared helpers)
-
-- `isValidInvoiceDate(d)` — inside `[2020-01-01, 2027-12-31]`.
-- Currency: `Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })` in both languages.
-- Negatives kept in sums.
-- `supplierLabel = supplier_canonical || supplier`, `vendorLabel = vendor_canonical || subcontractor`.
-
-## 7. Behavior
-
-Hover tooltips with exact values on bars and KPI values. Sortable tables. Loading skeletons per section during fetch. Empty states with plain sentences. Error state per section with a "Tentar de novo" button. All queries use `select('*')` on the specific view; `history` is paginated with `.range()` client-side by page.
-
-## 8. Files touched
-
-- New: `src/pages/family-realty/lib/supabase.ts`, `lib/types.ts`, `lib/i18n.tsx`, `lib/filters.tsx`, `lib/format.ts`, `lib/auth.tsx`, `pages/login.tsx`.
-- New section components in `src/pages/family-realty/components/`: `StatusBudget.tsx` (replaces existing BudgetStatusList to use live data), `StageDetail.tsx`, `MonthlySpend.tsx`, `Payables.tsx`, `Contracts.tsx`, `EstimateVsBilled.tsx`, `Unassigned.tsx`, `HistoryTable.tsx`.
-- Rewrites: `src/pages/family-realty/index.tsx`, `components/FRHeader.tsx`.
-- Deletes: static `data.ts` mock data and unused preview components (`CostTable.tsx`, `PayablesList.tsx`, `BudgetStatusList.tsx`, `StageDetailTable.tsx`, `MonthlySpendChart.tsx`, old chart files).
-- Route change in `src/App.tsx` to add `/family-realty/login` and protect `/family-realty`.
-- `bun add @supabase/supabase-js date-fns` (small, needed for period math and formatting).
-
-## 9. What I need from you to start
-
-1. **Supabase anon key** for `yklcfwhpkvtrjbqxhiln` (paste it — it's public).
-2. Confirmation that RLS `SELECT` policies for `authenticated` exist on all 7 views + `contracts` + `history`. If missing, I'll give you the SQL; you'll run it in the Supabase SQL editor.
-3. That an auth user exists (email + password) — or create one now in Supabase → Authentication → Users.
-
-As soon as those three are in place, I ship the whole page in one build.
+### What I need from you to finish
+1. Confirm the password for `info@familyrealtyinvestments.com` is already set in Supabase → Authentication → Users (or set one and share you've done it — don't paste it here).
+2. If you haven't verified RLS grants, reply "run grants" and I'll paste the SQL to run in the Supabase SQL editor before we test.
