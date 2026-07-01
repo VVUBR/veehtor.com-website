@@ -1,150 +1,27 @@
-import { useEffect, useMemo, useState } from "react";
-import "./theme.css";
-import FRHeader from "./components/FRHeader";
-import KpiCard from "./components/KpiCard";
-import BudgetStatusList from "./components/BudgetStatusList";
-import StageDetailTable from "./components/StageDetailTable";
-import MonthlySpendChart from "./components/MonthlySpendChart";
-import PayablesList from "./components/PayablesList";
-import CostTable from "./components/CostTable";
-import {
-  ALL_JOBS,
-  COST_ITEMS,
-  countAlerts,
-  expiringCompliance,
-  filterByJob,
-  filterByPeriod,
-  fmtUSD,
-  jobsMetaFor,
-  sumUpcoming30d,
-  type JobFilter,
-  type PeriodKey,
-} from "./data";
+import { Routes, Route } from "react-router-dom";
+import { FRAuthProvider } from "./auth/FRAuthProvider";
+import RequireFRAuth from "./auth/RequireFRAuth";
+import FRLogin from "./pages/FRLogin";
+import FRForgotPassword from "./pages/FRForgotPassword";
+import FRResetPassword from "./pages/FRResetPassword";
+import FRDashboard from "./pages/FRDashboard";
 
 export default function FamilyRealty() {
-  const [period, setPeriod] = useState<PeriodKey>("month");
-  const [job, setJob] = useState<JobFilter>(ALL_JOBS);
-
-  useEffect(() => {
-    const prev = document.title;
-    document.title = "Family Realty — Controle de Custos";
-    return () => {
-      document.title = prev;
-    };
-  }, []);
-
-  // Apply Obra filter globally, then period for views that need it
-  const jobItems = useMemo(() => filterByJob(COST_ITEMS, job), [job]);
-  const periodItems = useMemo(() => filterByPeriod(jobItems, period), [jobItems, period]);
-
-  const jobsScope = useMemo(() => jobsMetaFor(job), [job]);
-  const totalBudget = jobsScope.reduce((s, j) => s + j.budget, 0);
-  const totalRealizado = jobsScope.reduce((s, j) => s + j.realizado, 0);
-  const pctConsumed = totalBudget > 0 ? Math.round((totalRealizado / totalBudget) * 100) : 0;
-
-  const variations: Record<PeriodKey, { text: string; good: boolean; dir: "up" | "down" }> = {
-    week: { text: "3.2% vs semana anterior", good: true, dir: "down" },
-    month: { text: "1.8% vs mês anterior", good: false, dir: "up" },
-    next12w: { text: "Plano em linha", good: true, dir: "down" },
-    all: { text: "Sob controle no agregado", good: true, dir: "down" },
-  };
-
-  const upcoming = useMemo(() => sumUpcoming30d(jobItems), [jobItems]);
-  const alerts = useMemo(() => countAlerts(jobItems), [jobItems]);
-  const compl = useMemo(() => expiringCompliance(30), []);
-
   return (
-    <div className="family-realty">
-      <FRHeader
-        period={period}
-        onPeriodChange={setPeriod}
-        job={job}
-        onJobChange={setJob}
-      />
-
-      <main className="px-6 py-6 mx-auto" style={{ maxWidth: 1480 }}>
-        {/* KPI row */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <KpiCard
-            label={job === ALL_JOBS ? "Budget total (obras ativas)" : "Budget da obra"}
-            value={fmtUSD(totalBudget)}
-            sub={job === ALL_JOBS ? `${jobsScope.length} obras` : job}
-          />
-          <KpiCard
-            label="Realizado"
-            value={fmtUSD(totalRealizado)}
-            sub={`${pctConsumed}% do budget`}
-            trend={variations[period]}
-          />
-          <KpiCard
-            label="A desembolsar (próximos 30 dias)"
-            value={fmtUSD(upcoming)}
-            tone="gold"
-          />
-          <KpiCard
-            label="Pagamentos em alerta"
-            value={alerts}
-            sub="atrasados ou fora dos termos"
-            tone={alerts > 0 ? "red" : "default"}
-          />
-          <KpiCard
-            label="Compliance a vencer (30 dias)"
-            value={compl}
-            sub="Insurance / W-9"
-            tone={compl > 0 ? "red" : "default"}
-          />
-        </section>
-
-        {/* Budget status + Monthly spend */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-          <BudgetStatusList job={job} />
-          <MonthlySpendChart items={jobItems} />
-        </section>
-
-        {/* Stage detail */}
-        <section className="mt-4">
-          <StageDetailTable job={job} />
-        </section>
-
-        {/* Payables + Compliance */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-          <PayablesList items={jobItems} />
-          <div className="fr-card p-5">
-            <h3 className="fr-heading" style={{ fontSize: 16, color: "var(--fr-navy)", marginBottom: 12 }}>
-              Compliance a vencer
-            </h3>
-            <ul style={{ fontSize: 14 }}>
-              <li className="flex justify-between py-2" style={{ borderBottom: "1px solid var(--fr-border)" }}>
-                <span>Rivera Electric LLC — Insurance</span>
-                <span style={{ color: "var(--fr-red)", fontWeight: 700 }}>vence em 11 dias</span>
-              </li>
-              <li className="flex justify-between py-2" style={{ borderBottom: "1px solid var(--fr-border)" }}>
-                <span>Coastal Plumbing Co — W-9</span>
-                <span style={{ color: "var(--fr-red)", fontWeight: 700 }}>vence em 22 dias</span>
-              </li>
-              <li className="flex justify-between py-2">
-                <span>Granite State Framing — Insurance</span>
-                <span style={{ color: "var(--fr-red)", fontWeight: 700 }}>vence em 28 dias</span>
-              </li>
-            </ul>
-            <p className="fr-muted" style={{ fontSize: 12, marginTop: 12 }}>
-              Subcontractors precisam estar com Insurance e W-9 vigentes para liberação de pagamento.
-            </p>
-          </div>
-        </section>
-
-        {/* Line-item table */}
-        <section className="mt-6">
-          <CostTable items={periodItems} />
-        </section>
-
-        <p
-          className="fr-muted"
-          style={{ fontSize: 12, textAlign: "center", marginTop: 32, marginBottom: 16 }}
-        >
-          Preview visual com dado fictício. A versão final terá dado real das obras e a identidade visual completa da Family Realty.
-        </p>
-      </main>
-    </div>
+    <FRAuthProvider>
+      <Routes>
+        <Route path="login" element={<FRLogin />} />
+        <Route path="forgot-password" element={<FRForgotPassword />} />
+        <Route path="reset-password" element={<FRResetPassword />} />
+        <Route
+          path="*"
+          element={
+            <RequireFRAuth>
+              <FRDashboard />
+            </RequireFRAuth>
+          }
+        />
+      </Routes>
+    </FRAuthProvider>
   );
 }
