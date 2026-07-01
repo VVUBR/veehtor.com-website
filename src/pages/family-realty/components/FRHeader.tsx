@@ -1,4 +1,4 @@
-import { ALL_JOBS, JOBS, type JobFilter, type PeriodKey } from "../data";
+import { ALL_JOBS, type JobFilter, type PeriodKey } from "../data";
 
 const PERIODS: { key: PeriodKey; label: string }[] = [
   { key: "week", label: "Esta semana" },
@@ -21,6 +21,7 @@ export default function FRHeader({
   onPeriodChange,
   job,
   onJobChange,
+  jobs,
   customFrom,
   customTo,
   onCustomFromChange,
@@ -30,6 +31,7 @@ export default function FRHeader({
   onPeriodChange: (p: PeriodKey) => void;
   job: JobFilter;
   onJobChange: (j: JobFilter) => void;
+  jobs: string[];
   customFrom: Date | null;
   customTo: Date | null;
   onCustomFromChange: (d: Date | null) => void;
@@ -71,7 +73,7 @@ export default function FRHeader({
               style={{ minWidth: 160 }}
             >
               <option value={ALL_JOBS}>{ALL_JOBS}</option>
-              {JOBS.map((j) => (
+              {jobs.map((j) => (
                 <option key={j} value={j}>
                   {j}
                 </option>

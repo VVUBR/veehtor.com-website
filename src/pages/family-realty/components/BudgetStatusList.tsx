@@ -1,4 +1,4 @@
-import { JOBS_META, type JobFilter, ALL_JOBS } from "../data";
+import { ALL_JOBS, fmtUSD, type JobFilter, type JobMeta } from "../data";
 
 function statusFor(pct: number) {
   if (pct > 100) return { label: "Acima do budget", color: "var(--fr-red)" };
@@ -6,13 +6,20 @@ function statusFor(pct: number) {
   return { label: "Dentro do budget", color: "var(--fr-green)" };
 }
 
-export default function BudgetStatusList({ job }: { job: JobFilter }) {
-  const rows = (job === ALL_JOBS ? JOBS_META : JOBS_META.filter((j) => j.name === job)).map(
-    (j) => {
-      const pct = (j.realizado / j.budget) * 100;
-      return { name: j.name, pct, status: statusFor(pct) };
-    }
-  );
+export default function BudgetStatusList({
+  job,
+  jobsMeta,
+}: {
+  job: JobFilter;
+  jobsMeta: JobMeta[];
+}) {
+  const scope = job === ALL_JOBS ? jobsMeta : jobsMeta.filter((j) => j.name === job);
+  const rows = scope
+    .map((j) => {
+      const pct = j.budget > 0 ? (j.realizado / j.budget) * 100 : 0;
+      return { name: j.name, budget: j.budget, realizado: j.realizado, pct, status: statusFor(pct) };
+    })
+    .sort((a, b) => b.pct - a.pct);
 
   return (
     <div className="fr-card p-5 h-full">
@@ -27,9 +34,10 @@ export default function BudgetStatusList({ job }: { job: JobFilter }) {
         {rows.map((r) => {
           const fill = Math.min(r.pct, 100);
           const over = Math.max(r.pct - 100, 0);
+          const noBudget = r.budget === 0;
           return (
             <div key={r.name} className="flex items-center gap-3">
-              <div style={{ width: 110, fontSize: 13, fontWeight: 700, color: "var(--fr-navy)" }}>
+              <div style={{ width: 140, fontSize: 13, fontWeight: 700, color: "var(--fr-navy)" }}>
                 {r.name}
               </div>
 
@@ -70,16 +78,17 @@ export default function BudgetStatusList({ job }: { job: JobFilter }) {
 
               <div
                 style={{
-                  width: 70,
+                  width: 90,
                   textAlign: "right",
                   fontFamily: "Roboto",
                   fontWeight: 900,
-                  fontSize: 16,
-                  color: r.status.color,
+                  fontSize: 15,
+                  color: noBudget ? "var(--fr-muted)" : r.status.color,
                   fontVariantNumeric: "tabular-nums",
                 }}
+                title={`${fmtUSD(r.realizado)} de ${fmtUSD(r.budget)}`}
               >
-                {Math.round(r.pct)}%
+                {noBudget ? "s/ budget" : `${Math.round(r.pct)}%`}
               </div>
 
               <div
@@ -88,14 +97,19 @@ export default function BudgetStatusList({ job }: { job: JobFilter }) {
                   textAlign: "right",
                   fontSize: 12,
                   fontWeight: 700,
-                  color: r.status.color,
+                  color: noBudget ? "var(--fr-muted)" : r.status.color,
                 }}
               >
-                {r.status.label}
+                {noBudget ? "Sem estimate" : r.status.label}
               </div>
             </div>
           );
         })}
+        {rows.length === 0 && (
+          <div className="fr-muted" style={{ fontSize: 13, padding: 12 }}>
+            Nenhuma obra encontrada.
+          </div>
+        )}
       </div>
     </div>
   );
