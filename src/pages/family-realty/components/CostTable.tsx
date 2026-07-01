@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
-import { fmtDate, fmtUSD, JOBS, type CostItem, type PaymentStatus } from "../data";
+import { fmtDate, fmtUSD, type CostItem, type PaymentStatus } from "../data";
 
 type SortKey = "date" | "job" | "supplier" | "type" | "stage" | "amount" | "status";
 
-const STATUSES: ("Todos" | PaymentStatus)[] = ["Todos", "Pago", "A pagar", "Em alerta"];
+const STATUSES: ("Todos" | PaymentStatus)[] = ["Todos", "Pago", "A pagar", "Em atraso"];
 
-export default function CostTable({ items }: { items: CostItem[] }) {
+export default function CostTable({ items, jobs }: { items: CostItem[]; jobs: string[] }) {
   const [jobFilter, setJobFilter] = useState<string>("Todas");
   const [statusFilter, setStatusFilter] = useState<string>("Todos");
   const [sort, setSort] = useState<{ key: SortKey; dir: "asc" | "desc" }>({
@@ -24,14 +24,14 @@ export default function CostTable({ items }: { items: CostItem[] }) {
   const sorted = useMemo(() => {
     const arr = [...filtered];
     arr.sort((a, b) => {
-      let av: any = (a as any)[sort.key];
-      let bv: any = (b as any)[sort.key];
+      let av: unknown = (a as unknown as Record<string, unknown>)[sort.key];
+      let bv: unknown = (b as unknown as Record<string, unknown>)[sort.key];
       if (sort.key === "date") {
-        av = (a.date as Date).getTime();
-        bv = (b.date as Date).getTime();
+        av = a.date.getTime();
+        bv = b.date.getTime();
       }
-      if (av < bv) return sort.dir === "asc" ? -1 : 1;
-      if (av > bv) return sort.dir === "asc" ? 1 : -1;
+      if ((av as number) < (bv as number)) return sort.dir === "asc" ? -1 : 1;
+      if ((av as number) > (bv as number)) return sort.dir === "asc" ? 1 : -1;
       return 0;
     });
     return arr;
@@ -61,7 +61,7 @@ export default function CostTable({ items }: { items: CostItem[] }) {
               onChange={(e) => setJobFilter(e.target.value)}
             >
               <option>Todas</option>
-              {JOBS.map((j) => (
+              {jobs.map((j) => (
                 <option key={j}>{j}</option>
               ))}
             </select>
@@ -78,14 +78,6 @@ export default function CostTable({ items }: { items: CostItem[] }) {
               ))}
             </select>
           </label>
-          <button
-            disabled
-            className="fr-select"
-            style={{ opacity: 0.5, cursor: "not-allowed" }}
-            title="Disponível na versão final"
-          >
-            Exportar
-          </button>
         </div>
       </div>
 
@@ -103,8 +95,8 @@ export default function CostTable({ items }: { items: CostItem[] }) {
             </tr>
           </thead>
           <tbody>
-            {sorted.map((it) => (
-              <tr key={it.id} className={it.status === "Em alerta" ? "fr-row-alert" : ""}>
+            {sorted.slice(0, 500).map((it) => (
+              <tr key={it.id} className={it.status === "Em atraso" ? "fr-row-alert" : ""}>
                 <td>{fmtDate(it.date)}</td>
                 <td>{it.job}</td>
                 <td>{it.supplier}</td>
@@ -118,7 +110,7 @@ export default function CostTable({ items }: { items: CostItem[] }) {
                     className={
                       it.status === "Pago"
                         ? "fr-dot fr-dot-green"
-                        : it.status === "Em alerta"
+                        : it.status === "Em atraso"
                         ? "fr-dot fr-dot-red"
                         : "fr-dot fr-dot-gray"
                     }
@@ -137,6 +129,11 @@ export default function CostTable({ items }: { items: CostItem[] }) {
           </tbody>
         </table>
       </div>
+      {sorted.length > 500 && (
+        <p className="fr-muted" style={{ fontSize: 12, marginTop: 8 }}>
+          Mostrando 500 de {sorted.length.toLocaleString("pt-BR")} lançamentos. Refine os filtros para ver menos.
+        </p>
+      )}
     </div>
   );
 }

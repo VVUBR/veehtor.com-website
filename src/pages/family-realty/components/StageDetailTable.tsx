@@ -1,13 +1,15 @@
-import { stageBreakdown, fmtUSD, type JobFilter, ALL_JOBS } from "../data";
+import { ALL_JOBS, fmtUSD, stageBreakdown, type CostItem, type JobFilter } from "../data";
 
-function pctColor(pct: number) {
-  if (pct > 100) return "var(--fr-red)";
-  if (pct >= 90) return "var(--fr-gold)";
-  return "var(--fr-green)";
-}
-
-export default function StageDetailTable({ job }: { job: JobFilter }) {
-  const rows = stageBreakdown(job);
+export default function StageDetailTable({
+  job,
+  items,
+}: {
+  job: JobFilter;
+  items: CostItem[];
+}) {
+  const paid = items.filter((i) => i.status === "Pago");
+  const rows = stageBreakdown(paid);
+  const total = rows.reduce((s, r) => s + r.realizado, 0);
 
   return (
     <div className="fr-card p-5">
@@ -16,7 +18,7 @@ export default function StageDetailTable({ job }: { job: JobFilter }) {
           Detalhe por etapa
         </h3>
         <span className="fr-muted" style={{ fontSize: 12 }}>
-          {job === ALL_JOBS ? "Consolidado de todas as obras" : `Obra: ${job}`}
+          {job === ALL_JOBS ? "Consolidado de todas as obras" : `Obra: ${job}`} · Realizado pago
         </span>
       </div>
 
@@ -25,9 +27,9 @@ export default function StageDetailTable({ job }: { job: JobFilter }) {
           <thead>
             <tr>
               <th>Etapa</th>
-              <th style={{ textAlign: "right" }}>Budget</th>
               <th style={{ textAlign: "right" }}>Realizado</th>
-              <th style={{ textAlign: "right" }}>% consumido</th>
+              <th style={{ textAlign: "right" }}>% do total</th>
+              <th style={{ textAlign: "right" }}>Nº de lançamentos</th>
             </tr>
           </thead>
           <tbody>
@@ -35,24 +37,42 @@ export default function StageDetailTable({ job }: { job: JobFilter }) {
               <tr key={r.stage}>
                 <td style={{ fontWeight: 700, color: "var(--fr-navy)" }}>{r.stage}</td>
                 <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
-                  {fmtUSD(r.budget)}
-                </td>
-                <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
                   {fmtUSD(r.realizado)}
                 </td>
                 <td
                   style={{
                     textAlign: "right",
                     fontVariantNumeric: "tabular-nums",
-                    fontWeight: 900,
-                    fontFamily: "Roboto",
-                    color: pctColor(r.pct),
+                    fontWeight: 700,
+                    color: "var(--fr-navy)",
                   }}
                 >
-                  {Math.round(r.pct)}%
+                  {Math.round(r.share * 100)}%
+                </td>
+                <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
+                  {r.count}
                 </td>
               </tr>
             ))}
+            {rows.length > 0 && (
+              <tr style={{ background: "var(--fr-surface)" }}>
+                <td style={{ fontWeight: 900, color: "var(--fr-navy)" }}>Total</td>
+                <td style={{ textAlign: "right", fontWeight: 900, fontVariantNumeric: "tabular-nums", color: "var(--fr-navy)" }}>
+                  {fmtUSD(total)}
+                </td>
+                <td style={{ textAlign: "right" }}>—</td>
+                <td style={{ textAlign: "right", fontWeight: 900, fontVariantNumeric: "tabular-nums" }}>
+                  {rows.reduce((s, r) => s + r.count, 0)}
+                </td>
+              </tr>
+            )}
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={4} className="fr-muted" style={{ textAlign: "center", padding: 24 }}>
+                  Sem lançamentos pagos no filtro atual.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
