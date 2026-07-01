@@ -26,6 +26,8 @@ import {
 export default function FRDashboard() {
   const [period, setPeriod] = useState<PeriodKey>("month");
   const [job, setJob] = useState<JobFilter>(ALL_JOBS);
+  const [customFrom, setCustomFrom] = useState<Date | null>(null);
+  const [customTo, setCustomTo] = useState<Date | null>(null);
   const { user, signOut } = useFRAuth();
 
   useEffect(() => {
@@ -37,7 +39,10 @@ export default function FRDashboard() {
   }, []);
 
   const jobItems = useMemo(() => filterByJob(COST_ITEMS, job), [job]);
-  const periodItems = useMemo(() => filterByPeriod(jobItems, period), [jobItems, period]);
+  const periodItems = useMemo(
+    () => filterByPeriod(jobItems, period, customFrom, customTo),
+    [jobItems, period, customFrom, customTo],
+  );
 
   const jobsScope = useMemo(() => jobsMetaFor(job), [job]);
   const totalBudget = jobsScope.reduce((s, j) => s + j.budget, 0);
@@ -49,6 +54,7 @@ export default function FRDashboard() {
     month: { text: "1.8% vs mês anterior", good: false, dir: "up" },
     next12w: { text: "Plano em linha", good: true, dir: "down" },
     all: { text: "Sob controle no agregado", good: true, dir: "down" },
+    custom: { text: "Intervalo personalizado", good: true, dir: "down" },
   };
 
   const upcoming = useMemo(() => sumUpcoming30d(jobItems), [jobItems]);

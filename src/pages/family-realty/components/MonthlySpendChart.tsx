@@ -22,7 +22,7 @@ export default function MonthlySpendChart({ items }: { items: CostItem[] }) {
         Gastos por mês
       </h3>
       <p className="fr-muted" style={{ fontSize: 12, marginBottom: 12 }}>
-        Quanto a empresa gasta por mês — uma visão que vocês não têm hoje.
+        Quanto a empresa gasta por mês.
       </p>
 
       <div style={{ flex: 1 }}>

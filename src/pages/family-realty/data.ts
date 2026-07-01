@@ -264,9 +264,14 @@ export const fmtMonthYY = (d: Date) => {
   return `${m.charAt(0).toUpperCase() + m.slice(1)}/${String(d.getFullYear()).slice(-2)}`;
 };
 
-export type PeriodKey = "week" | "month" | "next12w" | "all";
+export type PeriodKey = "week" | "month" | "next12w" | "all" | "custom";
 
-export function filterByPeriod(items: CostItem[], period: PeriodKey): CostItem[] {
+export function filterByPeriod(
+  items: CostItem[],
+  period: PeriodKey,
+  customFrom?: Date | null,
+  customTo?: Date | null,
+): CostItem[] {
   const now = today.getTime();
   switch (period) {
     case "week": {
@@ -282,6 +287,14 @@ export function filterByPeriod(items: CostItem[], period: PeriodKey): CostItem[]
     case "next12w": {
       const end = daysAhead(84).getTime();
       return items.filter((i) => i.date.getTime() >= now && i.date.getTime() <= end);
+    }
+    case "custom": {
+      const start = customFrom ? new Date(customFrom).setHours(0, 0, 0, 0) : -Infinity;
+      const end = customTo ? new Date(customTo).setHours(23, 59, 59, 999) : Infinity;
+      return items.filter((i) => {
+        const t = i.date.getTime();
+        return t >= start && t <= end;
+      });
     }
     case "all":
     default:
