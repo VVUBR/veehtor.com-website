@@ -97,6 +97,10 @@ export default function FRDashboard() {
         onPeriodChange={setPeriod}
         job={job}
         onJobChange={setJob}
+        customFrom={customFrom}
+        customTo={customTo}
+        onCustomFromChange={setCustomFrom}
+        onCustomToChange={setCustomTo}
       />
 
       <main className="px-6 py-6 mx-auto" style={{ maxWidth: 1480 }}>
