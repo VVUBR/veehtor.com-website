@@ -96,7 +96,7 @@ export default function CostTable({ items }: { items: HistoryItem[] }) {
               );
             })}
             {pageItems.length === 0 && (
-              <tr><td colSpan={8} className="fr-muted" style={{ textAlign: "center", padding: 24 }}>{t("empty_none")}</td></tr>
+              <tr><td colSpan={7} className="fr-muted" style={{ textAlign: "center", padding: 24 }}>{t("empty_none")}</td></tr>
             )}
           </tbody>
         </table>

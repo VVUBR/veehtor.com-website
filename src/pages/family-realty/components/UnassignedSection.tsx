@@ -34,7 +34,6 @@ export default function UnassignedSection({ items }: { items: UnassignedItem[] }
                 <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{fmtCurrency(i.amount)}</td>
                 <td style={{ fontSize: 12 }}>{i.documentType}</td>
                 <td style={{ fontSize: 12, color: "var(--fr-gold)", fontWeight: 700 }}>{i.suggestion || ""}</td>
-                <td>{i.fileLink && <a href={i.fileLink} target="_blank" rel="noreferrer">📄</a>}</td>
               </tr>
             ))}
             {items.length === 0 && (
