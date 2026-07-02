@@ -59,12 +59,14 @@ export default function BudgetStatusList({ job, jobsMeta }: { job: string; jobsM
                   )}
                 </div>
                 <div style={{
-                  width: 60, textAlign: "right", fontFamily: "Roboto", fontWeight: 900,
-                  fontSize: 15, color: st.color, fontVariantNumeric: "tabular-nums",
+                  width: 64, minWidth: 64, flexShrink: 0, textAlign: "right",
+                  fontFamily: "Roboto", fontWeight: 900, fontSize: 15, color: st.color,
+                  fontVariantNumeric: "tabular-nums",
+                  position: "relative", zIndex: 2, background: "var(--fr-bg)", paddingLeft: 4,
                 }} title={`${fmtCurrency(r.realizado)} / ${fmtCurrency(r.budget)}`}>
                   {`${Math.round(r.pctConsumed)}%`}
                 </div>
-                <div style={{ width: 150, textAlign: "right", fontSize: 12, fontWeight: 700, color: st.color }}>
+                <div style={{ width: 150, minWidth: 150, flexShrink: 0, textAlign: "right", fontSize: 12, fontWeight: 700, color: st.color, position: "relative", zIndex: 2, background: "var(--fr-bg)" }}>
                   {st.label}
                 </div>
               </div>

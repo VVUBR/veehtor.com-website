@@ -22,6 +22,16 @@ const DICT: Record<string, { pt: string; en: string }> = {
   exportCsv: { pt: "Exportar CSV", en: "Export CSV" },
   signOut: { pt: "Sair", en: "Sign out" },
 
+  // tabs
+  tab_overview: { pt: "Visão geral", en: "Overview" },
+  tab_weekly: { pt: "Semanal (contabilidade)", en: "Weekly (accounting)" },
+  tab_payables: { pt: "Pagamentos e contratos", en: "Payments & contracts" },
+  tab_ledger: { pt: "Lançamentos", en: "Entries" },
+
+  // supplier types
+  type_supplier: { pt: "Fornecedor", en: "Supplier" },
+  type_subcontractor: { pt: "Subcontratada", en: "Subcontractor" },
+
   loading: { pt: "Carregando dados do banco…", en: "Loading data…" },
   loadFail: { pt: "Falha ao carregar dados", en: "Failed to load data" },
 
