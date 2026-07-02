@@ -1,139 +1,113 @@
 import { useMemo, useState } from "react";
-import { fmtDate, fmtUSD, type CostItem, type PaymentStatus } from "../data";
+import { useI18n, fmtCurrency, fmtDateLocale } from "../lib/i18n";
+import { today0, type HistoryItem } from "../data";
 
 type SortKey = "date" | "job" | "supplier" | "type" | "stage" | "amount" | "status";
+const PAGE = 50;
 
-const STATUSES: ("Todos" | PaymentStatus)[] = ["Todos", "Pago", "A pagar", "Em atraso"];
-
-export default function CostTable({ items, jobs }: { items: CostItem[]; jobs: string[] }) {
-  const [jobFilter, setJobFilter] = useState<string>("Todas");
-  const [statusFilter, setStatusFilter] = useState<string>("Todos");
-  const [sort, setSort] = useState<{ key: SortKey; dir: "asc" | "desc" }>({
-    key: "date",
-    dir: "desc",
-  });
-
-  const filtered = useMemo(() => {
-    return items.filter(
-      (i) =>
-        (jobFilter === "Todas" || i.job === jobFilter) &&
-        (statusFilter === "Todos" || i.status === statusFilter)
-    );
-  }, [items, jobFilter, statusFilter]);
+export default function CostTable({ items }: { items: HistoryItem[] }) {
+  const { t, lang } = useI18n();
+  const [sort, setSort] = useState<{ key: SortKey; dir: "asc" | "desc" }>({ key: "date", dir: "desc" });
+  const [page, setPage] = useState(1);
 
   const sorted = useMemo(() => {
-    const arr = [...filtered];
+    const arr = [...items];
+    const dir = sort.dir === "asc" ? 1 : -1;
     arr.sort((a, b) => {
-      let av: unknown = (a as unknown as Record<string, unknown>)[sort.key];
-      let bv: unknown = (b as unknown as Record<string, unknown>)[sort.key];
-      if (sort.key === "date") {
-        av = a.date.getTime();
-        bv = b.date.getTime();
-      }
-      if ((av as number) < (bv as number)) return sort.dir === "asc" ? -1 : 1;
-      if ((av as number) > (bv as number)) return sort.dir === "asc" ? 1 : -1;
-      return 0;
+      const k = sort.key;
+      if (k === "date") return ((a.date?.getTime() ?? 0) - (b.date?.getTime() ?? 0)) * dir;
+      if (k === "amount") return (a.amount - b.amount) * dir;
+      const av = String((a as unknown as Record<string, unknown>)[k] || "");
+      const bv = String((b as unknown as Record<string, unknown>)[k] || "");
+      return av.localeCompare(bv) * dir;
     });
     return arr;
-  }, [filtered, sort]);
+  }, [items, sort]);
 
-  const toggle = (key: SortKey) => {
-    setSort((s) =>
-      s.key === key ? { key, dir: s.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" }
-    );
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE));
+  const clampedPage = Math.min(page, totalPages);
+  const pageItems = sorted.slice((clampedPage - 1) * PAGE, clampedPage * PAGE);
+  const today = today0().getTime();
+
+  const toggle = (key: SortKey) => setSort((s) => (s.key === key ? { key, dir: s.dir === "asc" ? "desc" : "asc" } : { key, dir: "desc" }));
+  const arrow = (key: SortKey) => (sort.key === key ? (sort.dir === "asc" ? " ▲" : " ▼") : "");
+
+  const downloadCsv = () => {
+    const header = ["Date", "Job", "Supplier", "Type", "Phase", "Amount", "Status", "DueDate"];
+    const lines = sorted.map((r) => [
+      r.date ? r.date.toISOString().slice(0, 10) : "",
+      r.job || "Unassigned",
+      r.supplier, r.type, r.stage, r.amount.toFixed(2), r.status,
+      r.dueDate ? r.dueDate.toISOString().slice(0, 10) : "",
+    ].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","));
+    const blob = new Blob([header.join(",") + "\n" + lines.join("\n")], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "family-realty-line-items.csv"; a.click();
+    URL.revokeObjectURL(url);
   };
-
-  const arrow = (key: SortKey) =>
-    sort.key === key ? (sort.dir === "asc" ? " ▲" : " ▼") : "";
 
   return (
     <div className="fr-card p-5">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
         <h3 className="fr-heading" style={{ fontSize: 16, color: "var(--fr-navy)", margin: 0 }}>
-          Linha a linha de custos
+          {t("sec_ledger")} <span className="fr-muted" style={{ fontSize: 12, fontWeight: 400 }}>({sorted.length})</span>
         </h3>
-        <div className="flex items-center gap-2 flex-wrap">
-          <label className="fr-muted" style={{ fontSize: 12 }}>
-            Obra
-            <select
-              className="fr-select ml-2"
-              value={jobFilter}
-              onChange={(e) => setJobFilter(e.target.value)}
-            >
-              <option>Todas</option>
-              {jobs.map((j) => (
-                <option key={j}>{j}</option>
-              ))}
-            </select>
-          </label>
-          <label className="fr-muted" style={{ fontSize: 12 }}>
-            Status
-            <select
-              className="fr-select ml-2"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              {STATUSES.map((s) => (
-                <option key={s}>{s}</option>
-              ))}
-            </select>
-          </label>
-        </div>
+        <button className="fr-btn fr-print-hide" onClick={downloadCsv} style={{ color: "var(--fr-navy)", borderColor: "var(--fr-navy)" }}>
+          {t("exportCsv")}
+        </button>
       </div>
-
-      <div style={{ maxHeight: 480, overflowY: "auto", border: "1px solid var(--fr-border)", borderRadius: 8 }}>
+      <div style={{ maxHeight: 520, overflowY: "auto", border: "1px solid var(--fr-border)", borderRadius: 8 }}>
         <table className="fr-table">
           <thead style={{ position: "sticky", top: 0, zIndex: 1 }}>
             <tr>
-              <th onClick={() => toggle("date")}>Data{arrow("date")}</th>
-              <th onClick={() => toggle("job")}>Obra{arrow("job")}</th>
-              <th onClick={() => toggle("supplier")}>Fornecedor{arrow("supplier")}</th>
-              <th onClick={() => toggle("type")}>Tipo{arrow("type")}</th>
-              <th onClick={() => toggle("stage")}>Etapa{arrow("stage")}</th>
-              <th onClick={() => toggle("amount")} style={{ textAlign: "right" }}>Valor{arrow("amount")}</th>
-              <th onClick={() => toggle("status")}>Status{arrow("status")}</th>
+              <th onClick={() => toggle("date")}>{t("th_date")}{arrow("date")}</th>
+              <th onClick={() => toggle("job")}>{t("th_job")}{arrow("job")}</th>
+              <th onClick={() => toggle("supplier")}>{t("th_supplier")}{arrow("supplier")}</th>
+              <th onClick={() => toggle("type")}>{t("th_type")}{arrow("type")}</th>
+              <th onClick={() => toggle("stage")}>{t("th_phase")}{arrow("stage")}</th>
+              <th onClick={() => toggle("amount")} style={{ textAlign: "right" }}>{t("th_value")}{arrow("amount")}</th>
+              <th onClick={() => toggle("status")}>{t("th_status")}{arrow("status")}</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            {sorted.slice(0, 500).map((it) => (
-              <tr key={it.id} className={it.status === "Em atraso" ? "fr-row-alert" : ""}>
-                <td>{fmtDate(it.date)}</td>
-                <td>{it.job}</td>
-                <td>{it.supplier}</td>
-                <td>{it.type}</td>
-                <td>{it.stage}</td>
-                <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
-                  {fmtUSD(it.amount)}
-                </td>
-                <td>
-                  <span
-                    className={
-                      it.status === "Pago"
-                        ? "fr-dot fr-dot-green"
-                        : it.status === "Em atraso"
-                        ? "fr-dot fr-dot-red"
-                        : "fr-dot fr-dot-gray"
-                    }
-                  />
-                  {it.status}
-                </td>
-              </tr>
-            ))}
-            {sorted.length === 0 && (
-              <tr>
-                <td colSpan={7} className="fr-muted" style={{ textAlign: "center", padding: 24 }}>
-                  Nenhum item no filtro atual.
-                </td>
-              </tr>
+            {pageItems.map((it) => {
+              const overdueBadge = it.status === "A pagar" && it.dueDate && it.dueDate.getTime() < today;
+              const displayStatus = overdueBadge ? "Em atraso" : it.status;
+              return (
+                <tr key={it.id} className={overdueBadge || it.status === "Em atraso" ? "fr-row-alert" : ""}>
+                  <td>
+                    {it.date ? fmtDateLocale(it.date, lang) : "—"}
+                    {it.future && <span style={{ marginLeft: 4, fontSize: 10, background: "rgba(234,170,0,0.15)", color: "var(--fr-gold)", padding: "1px 4px", borderRadius: 3 }}>{t("future_date")}</span>}
+                  </td>
+                  <td>{it.job || <span style={{ color: "var(--fr-gold)", fontSize: 11 }}>{t("unassigned")}</span>}</td>
+                  <td>{it.supplier}</td>
+                  <td>{it.type}</td>
+                  <td>{it.stage}</td>
+                  <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{fmtCurrency(it.amount)}</td>
+                  <td>
+                    <span className={
+                      displayStatus === "Pago" ? "fr-dot fr-dot-green" :
+                      displayStatus === "Em atraso" ? "fr-dot fr-dot-red" : "fr-dot fr-dot-gray"
+                    } />
+                    {displayStatus === "Pago" ? t("st_paid") : displayStatus === "Em atraso" ? t("st_overdue") : t("st_topay")}
+                  </td>
+                  <td>{it.fileLink && <a href={it.fileLink} target="_blank" rel="noreferrer">📄</a>}</td>
+                </tr>
+              );
+            })}
+            {pageItems.length === 0 && (
+              <tr><td colSpan={8} className="fr-muted" style={{ textAlign: "center", padding: 24 }}>{t("empty_none")}</td></tr>
             )}
           </tbody>
         </table>
       </div>
-      {sorted.length > 500 && (
-        <p className="fr-muted" style={{ fontSize: 12, marginTop: 8 }}>
-          Mostrando 500 de {sorted.length.toLocaleString("pt-BR")} lançamentos. Refine os filtros para ver menos.
-        </p>
-      )}
+      <div className="fr-print-hide flex items-center justify-end gap-3 mt-3" style={{ fontSize: 12 }}>
+        <button className="fr-btn" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={clampedPage === 1} style={{ color: "var(--fr-navy)", borderColor: "var(--fr-border)" }}>{t("prev")}</button>
+        <span>{t("page")} {clampedPage} {t("of")} {totalPages}</span>
+        <button className="fr-btn" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={clampedPage === totalPages} style={{ color: "var(--fr-navy)", borderColor: "var(--fr-border)" }}>{t("next")}</button>
+      </div>
     </div>
   );
 }

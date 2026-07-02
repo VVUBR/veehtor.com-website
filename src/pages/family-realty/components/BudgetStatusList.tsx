@@ -1,114 +1,83 @@
-import { ALL_JOBS, fmtUSD, type JobFilter, type JobMeta } from "../data";
+import { useI18n, fmtCurrency, fmtDateLocale } from "../lib/i18n";
+import { today0, type JobMeta } from "../data";
 
-function statusFor(pct: number) {
-  if (pct > 100) return { label: "Acima do budget", color: "var(--fr-red)" };
-  if (pct >= 90) return { label: "Perto do limite", color: "var(--fr-gold)" };
-  return { label: "Dentro do budget", color: "var(--fr-green)" };
+function statusFor(pct: number, t: (k: string) => string) {
+  if (pct > 100) return { key: "over_budget", label: t("over_budget"), color: "var(--fr-red)" };
+  if (pct >= 90) return { key: "near_limit", label: t("near_limit"), color: "var(--fr-gold)" };
+  return { key: "within_budget", label: t("within_budget"), color: "var(--fr-green)" };
 }
 
-export default function BudgetStatusList({
-  job,
-  jobsMeta,
-}: {
-  job: JobFilter;
-  jobsMeta: JobMeta[];
-}) {
-  const scope = job === ALL_JOBS ? jobsMeta : jobsMeta.filter((j) => j.name === job);
-  const rows = scope
-    .map((j) => {
-      const pct = j.budget > 0 ? (j.realizado / j.budget) * 100 : 0;
-      return { name: j.name, budget: j.budget, realizado: j.realizado, pct, status: statusFor(pct) };
-    })
-    .sort((a, b) => b.pct - a.pct);
+function monthsBetween(a: Date, b: Date) {
+  return Math.max(1, (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth()) + 1);
+}
+
+export default function BudgetStatusList({ job, jobsMeta }: { job: string; jobsMeta: JobMeta[] }) {
+  const { t, lang } = useI18n();
+  const scope = job === "__ALL__" ? jobsMeta : jobsMeta.filter((j) => j.name === job);
+  const rows = [...scope].sort((a, b) => b.pctConsumed - a.pctConsumed);
 
   return (
     <div className="fr-card p-5 h-full">
-      <h3
-        className="fr-heading"
-        style={{ fontSize: 16, color: "var(--fr-navy)", marginBottom: 16 }}
-      >
-        Status de budget por obra
+      <h3 className="fr-heading" style={{ fontSize: 16, color: "var(--fr-navy)", marginBottom: 16 }}>
+        {t("sec_budget_status")}
       </h3>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4">
         {rows.map((r) => {
-          const fill = Math.min(r.pct, 100);
-          const over = Math.max(r.pct - 100, 0);
-          const noBudget = r.budget === 0;
+          const st = statusFor(r.pctConsumed, t);
+          const fill = Math.min(r.pctConsumed, 100);
+          const over = Math.max(r.pctConsumed - 100, 0);
+          const endDate = r.dateFinished || today0();
+          const months = r.dateStarted ? monthsBetween(r.dateStarted, endDate) : 0;
+          const burn = months > 0 ? r.realizado / months : 0;
+
           return (
-            <div key={r.name} className="flex items-center gap-3">
-              <div style={{ width: 140, fontSize: 13, fontWeight: 700, color: "var(--fr-navy)" }}>
-                {r.name}
-              </div>
-
-              <div
-                style={{
-                  flex: 1,
-                  position: "relative",
-                  height: 14,
-                  background: "var(--fr-surface)",
-                  borderRadius: 4,
-                  overflow: "visible",
-                }}
-              >
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    width: `${fill}%`,
-                    background: r.status.color,
-                    borderRadius: 4,
-                  }}
-                />
-                {over > 0 && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: -2,
-                      left: "100%",
-                      height: 18,
+            <div key={r.name} className="flex flex-col gap-1">
+              <div className="flex items-center gap-3">
+                <div style={{ width: 160, fontSize: 13, fontWeight: 700, color: "var(--fr-navy)" }}>
+                  {r.name}
+                </div>
+                <span style={{
+                  fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 4,
+                  background: r.active ? "rgba(46,125,82,0.12)" : "rgba(128,128,128,0.12)",
+                  color: r.active ? "var(--fr-green)" : "var(--fr-muted)",
+                }}>
+                  {r.active ? t("active") : t("completed")}
+                </span>
+                <div style={{
+                  flex: 1, position: "relative", height: 14,
+                  background: "var(--fr-surface)", borderRadius: 4,
+                }}>
+                  <div style={{ position: "absolute", inset: 0, width: `${fill}%`, background: st.color, borderRadius: 4 }} />
+                  {over > 0 && (
+                    <div style={{
+                      position: "absolute", top: -2, left: "100%", height: 18,
                       width: `${Math.min(over, 40)}%`,
-                      background:
-                        "repeating-linear-gradient(45deg, var(--fr-red), var(--fr-red) 4px, #8a0200 4px, #8a0200 8px)",
+                      background: "repeating-linear-gradient(45deg, var(--fr-red), var(--fr-red) 4px, #8a0200 4px, #8a0200 8px)",
                       borderRadius: 4,
-                    }}
-                  />
-                )}
+                    }} />
+                  )}
+                </div>
+                <div style={{
+                  width: 60, textAlign: "right", fontFamily: "Roboto", fontWeight: 900,
+                  fontSize: 15, color: st.color, fontVariantNumeric: "tabular-nums",
+                }} title={`${fmtCurrency(r.realizado)} / ${fmtCurrency(r.budget)}`}>
+                  {`${Math.round(r.pctConsumed)}%`}
+                </div>
+                <div style={{ width: 150, textAlign: "right", fontSize: 12, fontWeight: 700, color: st.color }}>
+                  {st.label}
+                </div>
               </div>
-
-              <div
-                style={{
-                  width: 90,
-                  textAlign: "right",
-                  fontFamily: "Roboto",
-                  fontWeight: 900,
-                  fontSize: 15,
-                  color: noBudget ? "var(--fr-muted)" : r.status.color,
-                  fontVariantNumeric: "tabular-nums",
-                }}
-                title={`${fmtUSD(r.realizado)} de ${fmtUSD(r.budget)}`}
-              >
-                {noBudget ? "s/ budget" : `${Math.round(r.pct)}%`}
-              </div>
-
-              <div
-                style={{
-                  width: 150,
-                  textAlign: "right",
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: noBudget ? "var(--fr-muted)" : r.status.color,
-                }}
-              >
-                {noBudget ? "Sem estimate" : r.status.label}
+              <div style={{ paddingLeft: 172, fontSize: 11, color: "var(--fr-muted)" }}>
+                {r.dateStarted
+                  ? <>{t("since")} {fmtDateLocale(r.dateStarted, lang)} · {fmtCurrency(burn)} {t("monthly_avg")}</>
+                  : <>{t("period_unknown")}</>}
               </div>
             </div>
           );
         })}
         {rows.length === 0 && (
-          <div className="fr-muted" style={{ fontSize: 13, padding: 12 }}>
-            Nenhuma obra encontrada.
-          </div>
+          <div className="fr-muted" style={{ fontSize: 13, padding: 12 }}>{t("empty_none")}</div>
         )}
       </div>
     </div>
