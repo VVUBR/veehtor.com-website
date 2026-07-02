@@ -22,7 +22,7 @@ export default function UnassignedSection({ items }: { items: UnassignedItem[] }
               <th style={{ textAlign: "right" }}>{t("th_value")}</th>
               <th>{t("th_doc")}</th>
               <th>{t("th_suggestion")}</th>
-              <th></th>
+              
             </tr>
           </thead>
           <tbody>
@@ -37,7 +37,7 @@ export default function UnassignedSection({ items }: { items: UnassignedItem[] }
               </tr>
             ))}
             {items.length === 0 && (
-              <tr><td colSpan={7} className="fr-muted" style={{ textAlign: "center", padding: 24 }}>{t("empty_none")}</td></tr>
+              <tr><td colSpan={6} className="fr-muted" style={{ textAlign: "center", padding: 24 }}>{t("empty_none")}</td></tr>
             )}
           </tbody>
         </table>
