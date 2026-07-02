@@ -120,3 +120,7 @@ export default function StageDetailTable({ job, budgetLines }: { job: string; bu
     </div>
   );
 }
+
+function FragmentRow({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
+}
