@@ -43,10 +43,6 @@ export default function ContractsSection({ items, job }: { items: ContractRow[];
           style={{ minWidth: 200 }}
         />
       </div>
-      <div style={{ display: "grid", gap: 12 }}>
-        {rows.map((c) => {
-          const open = !!expanded[c.id];
-          const gapWarn = c.scheduleGap != null && Math.abs(c.scheduleGap) > 1;
       <div style={{ maxHeight: 520, overflowY: "auto", border: "1px solid var(--fr-border)", borderRadius: 8 }}>
         <div style={{ display: "grid", gap: 8, padding: 8 }}>
           {pageRows.map((c) => {
