@@ -169,6 +169,10 @@ function DashboardInner() {
         </section>
 
         <section className="mt-4">
+          <WeeklySummarySection rows={data.weeklyRows} job={job} />
+        </section>
+
+        <section className="mt-4">
           <PayablesList items={data.payables} job={job} />
         </section>
 
