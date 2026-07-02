@@ -127,3 +127,18 @@ const inputStyle: React.CSSProperties = {
   background: "#fff",
   color: "#041C2C",
 };
+
+function LangBtn({ code, cur, onClick }: { code: Lang; cur: Lang; onClick: () => void }) {
+  const active = code === cur;
+  return (
+    <button type="button" onClick={onClick} title={code === "pt" ? "Português" : "English"}
+      style={{ background: "transparent", border: active ? "2px solid #EAAA00" : "2px solid transparent",
+               borderRadius: 4, padding: 2, cursor: "pointer", lineHeight: 0, opacity: active ? 1 : 0.55 }}>
+      {code === "pt" ? (
+        <svg width="22" height="14" viewBox="0 0 24 16"><rect width="24" height="16" fill="#009c3b"/><polygon points="12,2 22,8 12,14 2,8" fill="#ffdf00"/><circle cx="12" cy="8" r="3" fill="#002776"/></svg>
+      ) : (
+        <svg width="22" height="14" viewBox="0 0 24 16"><rect width="24" height="16" fill="#fff"/>{[0,2,4,6,8,10,12,14].map((y)=>(<rect key={y} y={y} width="24" height="1.23" fill="#b22234"/>))}<rect width="10" height="7" fill="#3c3b6e"/></svg>
+      )}
+    </button>
+  );
+}
