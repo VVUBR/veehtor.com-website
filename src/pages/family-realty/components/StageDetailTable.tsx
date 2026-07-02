@@ -65,10 +65,10 @@ export default function StageDetailTable({ job, budgetLines }: { job: string; bu
             {rows.map((r) => {
               const opened = !!expanded[r.phase];
               return (
-                <>
-                  <tr key={r.phase}
-                      style={{ cursor: r.lines.length > 1 ? "pointer" : "default" }}
-                      onClick={() => setExpanded((s) => ({ ...s, [r.phase]: !s[r.phase] }))}>
+                <FragmentRow key={r.phase}>
+                  <tr
+                    style={{ cursor: r.lines.length > 1 ? "pointer" : "default" }}
+                    onClick={() => setExpanded((s) => ({ ...s, [r.phase]: !s[r.phase] }))}>
                     <td>{r.lines.length > 1 ? (opened ? "▾" : "▸") : ""}</td>
                     <td style={{ fontWeight: 700, color: r.noBudgetLine ? "var(--fr-muted)" : "var(--fr-navy)" }}>
                       {r.noBudgetLine ? t("no_budget_line") : r.phase}
@@ -96,7 +96,7 @@ export default function StageDetailTable({ job, budgetLines }: { job: string; bu
                       </td>
                     </tr>
                   ))}
-                </>
+                </FragmentRow>
               );
             })}
             {rows.length === 0 && (
