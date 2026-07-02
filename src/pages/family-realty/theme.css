@@ -126,3 +126,12 @@
     max-height: none !important; overflow: visible !important;
   }
 }
+
+/* Weekly-only print: hide everything except the weekly wrap and print title */
+@media print {
+  body.fr-print-weekly-only .fr-print-hide,
+  body.fr-print-weekly-only header,
+  body.fr-print-weekly-only .family-realty > div:first-child,
+  body.fr-print-weekly-only .family-realty main > *:not(.fr-weekly-wrap),
+  body.fr-print-weekly-only .family-realty main > section:not(:has(.fr-weekly-wrap)) { display: none !important; }
+}

@@ -13,7 +13,19 @@ import {
   type EstimateBilledRow,
   type ContractRow,
   type Installment,
+  type WeeklyCostRow,
 } from "../data";
+
+type WeeklyRow = {
+  week_start?: string | null;
+  week_end?: string | null;
+  project?: string | null;
+  phase?: string | null;
+  supplier?: string | null;
+  cost_type?: string | null;
+  total?: number | string | null;
+  n_lancamentos?: number | string | null;
+};
 
 const PAGE = 1000;
 
@@ -141,6 +153,7 @@ async function loadAll() {
     contracts,
     contractSum,
     disbursement,
+    weekly,
   ] = await Promise.all([
     fetchAll<BvaProjectRow>("v_budget_vs_actual_by_project").catch(() => []),
     fetchAll<BvaLineRow>("v_budget_vs_actual").catch(() => []),
@@ -151,6 +164,7 @@ async function loadAll() {
     fetchAll<ContractRaw>("contracts").catch(() => []),
     fetchAll<ContractPaySumRow>("v_contract_payment_summary").catch(() => []),
     fetchAll<DisbursementRow>("v_disbursement_schedule").catch(() => []),
+    fetchAll<WeeklyRow>("v_weekly_costs").catch(() => []),
   ]);
 
   // -- Jobs (from v_budget_vs_actual_by_project) --
@@ -293,6 +307,17 @@ async function loadAll() {
     };
   });
 
+  const weeklyRows: WeeklyCostRow[] = weekly.map((r) => ({
+    weekStart: parseSafeDate(r.week_start).date,
+    weekEnd: parseSafeDate(r.week_end).date,
+    project: r.project || "",
+    phase: r.phase || "",
+    supplier: r.supplier || "—",
+    costType: r.cost_type || "",
+    total: num(r.total),
+    count: r.n_lancamentos != null ? Number(r.n_lancamentos) : 0,
+  }));
+
   return {
     jobs,
     jobsMeta,
@@ -303,6 +328,7 @@ async function loadAll() {
     evbRows,
     historyItems,
     contractRows,
+    weeklyRows,
   };
 }
 
@@ -311,7 +337,7 @@ type Ctx = { loading: boolean; error: Error | null; data: FRData };
 
 const empty: FRData = {
   jobs: [], jobsMeta: [], budgetLines: [], payables: [], unassignedItems: [],
-  unassignedTotal: 0, evbRows: [], historyItems: [], contractRows: [],
+  unassignedTotal: 0, evbRows: [], historyItems: [], contractRows: [], weeklyRows: [],
 };
 
 const FRDataContext = createContext<Ctx | null>(null);

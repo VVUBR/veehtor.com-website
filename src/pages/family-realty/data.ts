@@ -187,3 +187,14 @@ export function normalizeStatus(payment: string | null, due: Date | null): Payme
   if (due && due.getTime() < today0().getTime()) return "Em atraso";
   return "A pagar";
 }
+
+export type WeeklyCostRow = {
+  weekStart: Date | null;
+  weekEnd: Date | null;
+  project: string;
+  phase: string;
+  supplier: string;
+  costType: string;
+  total: number;
+  count: number;
+};

@@ -10,6 +10,7 @@ import CostTable from "../components/CostTable";
 import ContractsSection from "../components/ContractsSection";
 import EstimateVsBilledSection from "../components/EstimateVsBilledSection";
 import UnassignedSection from "../components/UnassignedSection";
+import WeeklySummarySection from "../components/WeeklySummarySection";
 import { useFRAuth } from "../auth/FRAuthProvider";
 import { FRDataProvider, useFRData } from "../lib/useFRData";
 import { useI18n, fmtCurrency } from "../lib/i18n";
@@ -165,6 +166,10 @@ function DashboardInner() {
 
         <section className="mt-4">
           <StageDetailTable job={job} budgetLines={data.budgetLines} />
+        </section>
+
+        <section className="mt-4">
+          <WeeklySummarySection rows={data.weeklyRows} job={job} />
         </section>
 
         <section className="mt-4">
