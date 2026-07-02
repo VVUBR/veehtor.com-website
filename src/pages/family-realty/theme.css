@@ -111,3 +111,18 @@
   background: #fff;
   color: var(--fr-text);
 }
+
+/* Print styles */
+.family-realty .fr-print-only { display: none; }
+@media print {
+  .family-realty .fr-print-hide { display: none !important; }
+  .family-realty .fr-print-only { display: block !important; }
+  .family-realty { background: #fff; }
+  .family-realty main { max-width: none !important; padding: 12px !important; }
+  .family-realty .fr-card { break-inside: avoid; page-break-inside: avoid; box-shadow: none; }
+  .family-realty section { page-break-after: auto; }
+  .family-realty table { font-size: 10px; }
+  .family-realty [style*="overflow-y"], .family-realty [style*="overflowY"] {
+    max-height: none !important; overflow: visible !important;
+  }
+}
