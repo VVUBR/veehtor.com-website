@@ -1,203 +1,189 @@
-// Family Realty dashboard — types + pure helpers.
-// All data comes from Supabase views/tables (see useFRData).
+// Family Realty — pure helpers, types and date guards.
 
-export const ALL_JOBS = "Todas as obras" as const;
-export type JobFilter = typeof ALL_JOBS | string;
+export const ALL_JOBS = "__ALL__" as const;
+export const UNASSIGNED_JOB = "__UNASSIGNED__" as const;
+export type JobFilter = string;
 
-export type PaymentStatus = "Pago" | "A pagar" | "Em alerta" | "Em atraso";
-export type SupplierType = "Material" | "Subcontractor";
+export type PaymentStatus = "Pago" | "A pagar" | "Em atraso";
+export type SupplierType = "Material" | "Subcontractor" | "?";
 
-export type CostItem = {
+// Line item — from history table ONLY.
+export type HistoryItem = {
   id: string;
-  date: Date;
-  job: string;
+  date: Date | null;    // null = missing/out of range
+  future: boolean;      // date > today
+  job: string;          // '' means unassigned
   supplier: string;
   type: SupplierType;
   stage: string;
   amount: number;
   status: PaymentStatus;
-  dueDate?: Date;
+  dueDate: Date | null;
+  fileLink?: string | null;
+};
+
+export type PayableItem = {
+  id: string;
+  supplier: string;
+  job: string;
+  material: string;
+  amount: number;
+  invoiceDate: Date | null;
+  dueDate: Date | null;
+  status: PaymentStatus;
+  overdue: boolean;
+  documentType: string;
+  fileLink?: string | null;
+};
+
+export type UnassignedItem = {
+  id: string;
+  date: Date | null;
+  supplier: string;
+  material: string;
+  amount: number;
+  documentType: string;
+  suggestion: string | null;
+  fileLink?: string | null;
 };
 
 export type JobMeta = {
   name: string;
-  budget: number;      // sum(estimate) from v_estimate_vs_billed
-  realizado: number;   // sum(history.amount) for that project
+  budget: number;
+  realizado: number;
+  balance: number;
+  pctConsumed: number;
+  dateStarted: Date | null;
+  dateFinished: Date | null;
+  active: boolean;
+};
+
+export type BudgetLine = {
+  job: string;
+  phase: string;
+  description: string;
+  budget: number;
+  realizado: number;
+  balance: number;
+  pctConsumed: number;
+  noBudgetLine: boolean;
 };
 
 export type StageRow = {
-  stage: string;
+  phase: string;
+  budget: number;
   realizado: number;
-  count: number;
-  share: number; // share of total realizado for the current scope (0..1)
+  balance: number;
+  pctConsumed: number;
+  noBudgetLine: boolean;
+  lines: BudgetLine[];
 };
 
-export type PeriodKey = "week" | "month" | "next12w" | "all" | "custom";
-
-// ---------- formatting ----------
-
-export const fmtUSD = (n: number) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(n);
-
-export const fmtUSDCompact = (n: number) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(n);
-
-export const fmtDate = (d: Date) =>
-  new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit" }).format(d);
-
-const PT_MONTHS_SHORT = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
-
-export const fmtDayMonth = (d: Date) =>
-  `${String(d.getDate()).padStart(2, "0")} ${PT_MONTHS_SHORT[d.getMonth()]}`;
-
-export const fmtMonthYY = (d: Date) => {
-  const m = PT_MONTHS_SHORT[d.getMonth()];
-  return `${m.charAt(0).toUpperCase() + m.slice(1)}/${String(d.getFullYear()).slice(-2)}`;
+export type EstimateBilledRow = {
+  vendor: string;
+  project: string;
+  estimate: number;
+  billed: number;
+  difference: number;
+  pctBilled: number;
 };
+
+export type Installment = {
+  label: string;
+  pct: number | null;
+  amount: number | null;
+};
+
+export type ContractRow = {
+  id: string;
+  vendor: string;
+  project: string;
+  contactName: string | null;
+  totalValue: number;
+  contractDate: Date | null;
+  reviewStatus: string | null;
+  notes: string | null;
+  documentLink: string | null;
+  scheduleGap: number | null;
+  installments: Installment[];
+};
+
+export type PeriodKey = "month" | "last30" | "last3m" | "year" | "all" | "custom";
 
 // ---------- date helpers ----------
+export const DATE_MIN = new Date("2020-01-01T00:00:00").getTime();
+export const DATE_MAX = new Date("2027-12-31T23:59:59").getTime();
 
-const today = () => {
+export function parseSafeDate(s: string | null | undefined): { date: Date | null; future: boolean } {
+  if (!s) return { date: null, future: false };
+  const iso = s.length === 10 ? s + "T00:00:00" : s;
+  const d = new Date(iso);
+  const t = d.getTime();
+  if (isNaN(t) || t < DATE_MIN || t > DATE_MAX) return { date: null, future: false };
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+  return { date: d, future: d.getTime() > today.getTime() };
+}
+
+export function today0(): Date {
   const d = new Date();
   d.setHours(0, 0, 0, 0);
   return d;
-};
-const daysAgo = (n: number) => {
-  const d = today();
-  d.setDate(d.getDate() - n);
-  return d;
-};
-const daysAhead = (n: number) => {
-  const d = today();
-  d.setDate(d.getDate() + n);
-  return d;
-};
-
-// ---------- filters ----------
-
-export function filterByJob(items: CostItem[], job: JobFilter): CostItem[] {
-  return job === ALL_JOBS ? items : items.filter((i) => i.job === job);
 }
 
-export function filterByPeriod(
-  items: CostItem[],
+// ---------- period ----------
+export function periodRange(
   period: PeriodKey,
   customFrom?: Date | null,
   customTo?: Date | null,
-): CostItem[] {
-  const now = today().getTime();
-  switch (period) {
-    case "week": {
-      const start = daysAgo(7).getTime();
-      const end = daysAhead(7).getTime();
-      return items.filter((i) => i.date.getTime() >= start && i.date.getTime() <= end);
-    }
-    case "month": {
-      const start = daysAgo(30).getTime();
-      const end = daysAhead(30).getTime();
-      return items.filter((i) => i.date.getTime() >= start && i.date.getTime() <= end);
-    }
-    case "next12w": {
-      const end = daysAhead(84).getTime();
-      return items.filter((i) => i.date.getTime() >= now && i.date.getTime() <= end);
-    }
-    case "custom": {
-      const start = customFrom ? new Date(customFrom).setHours(0, 0, 0, 0) : -Infinity;
-      const end = customTo ? new Date(customTo).setHours(23, 59, 59, 999) : Infinity;
-      return items.filter((i) => {
-        const t = i.date.getTime();
-        return t >= start && t <= end;
-      });
-    }
-    case "all":
-    default:
-      return items;
+): { start: number; end: number } {
+  const now = new Date();
+  if (period === "all") return { start: -Infinity, end: Infinity };
+  if (period === "custom") {
+    const s = customFrom ? new Date(customFrom).setHours(0, 0, 0, 0) : -Infinity;
+    const e = customTo ? new Date(customTo).setHours(23, 59, 59, 999) : Infinity;
+    return { start: s, end: e };
   }
+  if (period === "month") {
+    const s = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+    const e = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999).getTime();
+    return { start: s, end: e };
+  }
+  if (period === "last30") {
+    const e = new Date(); e.setHours(23, 59, 59, 999);
+    const s = new Date(); s.setDate(s.getDate() - 30); s.setHours(0, 0, 0, 0);
+    return { start: s.getTime(), end: e.getTime() };
+  }
+  if (period === "last3m") {
+    const e = new Date(); e.setHours(23, 59, 59, 999);
+    const s = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate()).getTime();
+    return { start: s, end: e.getTime() };
+  }
+  if (period === "year") {
+    const s = new Date(now.getFullYear(), 0, 1).getTime();
+    const e = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999).getTime();
+    return { start: s, end: e };
+  }
+  return { start: -Infinity, end: Infinity };
 }
 
-// ---------- aggregations ----------
-
-export function stageBreakdown(items: CostItem[]): StageRow[] {
-  const buckets: Record<string, { realizado: number; count: number }> = {};
-  for (const it of items) {
-    const key = it.stage || "Sem etapa";
-    if (!buckets[key]) buckets[key] = { realizado: 0, count: 0 };
-    buckets[key].realizado += it.amount;
-    buckets[key].count += 1;
-  }
-  const total = Object.values(buckets).reduce((s, b) => s + b.realizado, 0) || 1;
-  return Object.entries(buckets)
-    .map(([stage, b]) => ({
-      stage,
-      realizado: b.realizado,
-      count: b.count,
-      share: b.realizado / total,
-    }))
-    .sort((a, b) => b.realizado - a.realizado);
+export function inPeriod(d: Date | null, range: { start: number; end: number }): boolean {
+  if (!d) return false;
+  const t = d.getTime();
+  return t >= range.start && t <= range.end;
 }
 
-export function monthlySpend(items: CostItem[], pastMonths = 10, forecastMonths = 3) {
-  const now = today();
-  const buckets: { key: string; date: Date; label: string; value: number; forecast: boolean }[] = [];
-  for (let i = pastMonths - 1; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    buckets.push({ key: `${d.getFullYear()}-${d.getMonth()}`, date: d, label: fmtMonthYY(d), value: 0, forecast: false });
-  }
-  for (let i = 1; i <= forecastMonths; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
-    buckets.push({ key: `${d.getFullYear()}-${d.getMonth()}`, date: d, label: fmtMonthYY(d), value: 0, forecast: true });
-  }
-  const idx: Record<string, number> = {};
-  buckets.forEach((b, i) => (idx[b.key] = i));
-
-  // Trailing average for forecast
-  for (const it of items) {
-    const key = `${it.date.getFullYear()}-${it.date.getMonth()}`;
-    const i = idx[key];
-    if (i !== undefined && !buckets[i].forecast) buckets[i].value += it.amount;
-  }
-
-  const past = buckets.filter((b) => !b.forecast && b.value > 0);
-  const avg = past.length ? past.slice(-3).reduce((s, b) => s + b.value, 0) / Math.min(3, past.length) : 0;
-  for (const b of buckets) if (b.forecast) b.value = Math.round(avg);
-
-  return buckets;
+// ---------- misc ----------
+export function normalizeType(s: string | null | undefined): SupplierType {
+  const v = (s || "").toLowerCase().trim();
+  if (v.startsWith("sub")) return "Subcontractor";
+  if (v.startsWith("supp") || v === "material") return "Material";
+  return "?";
 }
 
-export function payables(items: CostItem[]) {
-  const t = today().getTime();
-  const list = items
-    .filter((i) => i.status !== "Pago")
-    .map((i) => {
-      const due = i.dueDate ?? i.date;
-      const diff = Math.floor((due.getTime() - t) / (1000 * 60 * 60 * 24));
-      return { ...i, dueDate: due, daysDiff: diff };
-    });
-  list.sort((a, b) => a.daysDiff - b.daysDiff);
-  return list;
-}
-
-export function sumUpcoming30d(items: CostItem[]) {
-  const now = today().getTime();
-  const end = daysAhead(30).getTime();
-  return items
-    .filter((i) => {
-      if (i.status === "Pago") return false;
-      const d = (i.dueDate ?? i.date).getTime();
-      return d >= now && d <= end;
-    })
-    .reduce((s, i) => s + i.amount, 0);
-}
-
-export function countAlerts(items: CostItem[]) {
-  return items.filter((i) => i.status === "Em alerta" || i.status === "Em atraso").length;
+export function normalizeStatus(payment: string | null, due: Date | null): PaymentStatus {
+  const v = (payment || "").toLowerCase().trim();
+  if (v.startsWith("paid") || v.startsWith("pag")) return "Pago";
+  if (due && due.getTime() < today0().getTime()) return "Em atraso";
+  return "A pagar";
 }
