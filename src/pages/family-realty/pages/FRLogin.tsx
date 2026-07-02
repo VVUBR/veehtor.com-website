@@ -1,10 +1,12 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useFRAuth } from "../auth/FRAuthProvider";
+import { useI18n, type Lang } from "../lib/i18n";
 import "../theme.css";
 
 export default function FRLogin() {
   const { signIn, session } = useFRAuth();
+  const { lang, setLang, t } = useI18n();
   const nav = useNavigate();
   const loc = useLocation() as { state?: { from?: string } };
   const [email, setEmail] = useState("");
@@ -47,17 +49,21 @@ export default function FRLogin() {
           boxShadow: "0 20px 60px rgba(0,0,0,.35)",
         }}
       >
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginBottom: 8 }}>
+          <LangBtn code="pt" cur={lang} onClick={() => setLang("pt")} />
+          <LangBtn code="en" cur={lang} onClick={() => setLang("en")} />
+        </div>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
           <div style={{ color: "#EAAA00", fontWeight: 800, letterSpacing: 2, fontSize: 12 }}>
             FAMILY REALTY HOLDINGS
           </div>
           <h1 className="fr-heading" style={{ color: "#041C2C", fontSize: 22, marginTop: 6 }}>
-            Cost Control
+            {lang === "pt" ? "Controle de Custos" : "Cost Control"}
           </h1>
         </div>
         <form onSubmit={onSubmit} style={{ display: "grid", gap: 12 }}>
           <label style={{ display: "grid", gap: 6, fontSize: 13, color: "#041C2C" }}>
-            Email
+            {lang === "pt" ? "Email" : "Email"}
             <input
               type="email"
               autoComplete="email"
@@ -68,7 +74,7 @@ export default function FRLogin() {
             />
           </label>
           <label style={{ display: "grid", gap: 6, fontSize: 13, color: "#041C2C" }}>
-            Senha
+            {lang === "pt" ? "Senha" : "Password"}
             <input
               type="password"
               autoComplete="current-password"
@@ -97,15 +103,16 @@ export default function FRLogin() {
               cursor: busy ? "wait" : "pointer",
             }}
           >
-            {busy ? "Entrando…" : "ENTRAR"}
+            {busy ? (lang === "pt" ? "Entrando…" : "Signing in…") : lang === "pt" ? "ENTRAR" : "SIGN IN"}
           </button>
           <Link
             to="/family-realty/forgot-password"
             style={{ fontSize: 12, color: "#041C2C", textAlign: "center", marginTop: 4 }}
           >
-            Esqueci minha senha
+            {lang === "pt" ? "Esqueci minha senha" : "Forgot password"}
           </Link>
         </form>
+        <span style={{ display: "none" }}>{t("brand")}</span>
       </div>
     </div>
   );
