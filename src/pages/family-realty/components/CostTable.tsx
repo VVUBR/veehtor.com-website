@@ -68,7 +68,6 @@ export default function CostTable({ items }: { items: HistoryItem[] }) {
               <th onClick={() => toggle("stage")}>{t("th_phase")}{arrow("stage")}</th>
               <th onClick={() => toggle("amount")} style={{ textAlign: "right" }}>{t("th_value")}{arrow("amount")}</th>
               <th onClick={() => toggle("status")}>{t("th_status")}{arrow("status")}</th>
-              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -93,12 +92,11 @@ export default function CostTable({ items }: { items: HistoryItem[] }) {
                     } />
                     {displayStatus === "Pago" ? t("st_paid") : displayStatus === "Em atraso" ? t("st_overdue") : t("st_topay")}
                   </td>
-                  <td>{it.fileLink && <a href={it.fileLink} target="_blank" rel="noreferrer">📄</a>}</td>
                 </tr>
               );
             })}
             {pageItems.length === 0 && (
-              <tr><td colSpan={8} className="fr-muted" style={{ textAlign: "center", padding: 24 }}>{t("empty_none")}</td></tr>
+              <tr><td colSpan={7} className="fr-muted" style={{ textAlign: "center", padding: 24 }}>{t("empty_none")}</td></tr>
             )}
           </tbody>
         </table>

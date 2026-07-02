@@ -47,7 +47,6 @@ export default function PayablesList({ items, job }: { items: PayableItem[]; job
               <th>{t("th_material")}</th>
               <th style={{ textAlign: "right" }}>{t("th_value")}</th>
               <th>{t("th_due")}</th>
-              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -61,13 +60,10 @@ export default function PayablesList({ items, job }: { items: PayableItem[]; job
                   <div style={{ fontSize: 12 }}>{fmtDateLocale(r.dueDate, lang)}</div>
                   <div style={{ fontSize: 11, color: r.overdue ? "var(--fr-red)" : "var(--fr-muted)" }}>{r.dueLabel}</div>
                 </td>
-                <td>
-                  {r.fileLink && <a href={r.fileLink} target="_blank" rel="noreferrer" style={{ color: "var(--fr-navy)" }}>📄</a>}
-                </td>
               </tr>
             ))}
             {rows.length === 0 && (
-              <tr><td colSpan={6} className="fr-muted" style={{ textAlign: "center", padding: 24 }}>{t("empty_none")}</td></tr>
+              <tr><td colSpan={5} className="fr-muted" style={{ textAlign: "center", padding: 24 }}>{t("empty_none")}</td></tr>
             )}
           </tbody>
         </table>

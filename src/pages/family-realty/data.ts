@@ -19,7 +19,6 @@ export type HistoryItem = {
   amount: number;
   status: PaymentStatus;
   dueDate: Date | null;
-  fileLink?: string | null;
 };
 
 export type PayableItem = {
@@ -33,7 +32,6 @@ export type PayableItem = {
   status: PaymentStatus;
   overdue: boolean;
   documentType: string;
-  fileLink?: string | null;
 };
 
 export type UnassignedItem = {
@@ -44,7 +42,7 @@ export type UnassignedItem = {
   amount: number;
   documentType: string;
   suggestion: string | null;
-  fileLink?: string | null;
+  
 };
 
 export type JobMeta = {

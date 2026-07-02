@@ -22,7 +22,7 @@ export default function UnassignedSection({ items }: { items: UnassignedItem[] }
               <th style={{ textAlign: "right" }}>{t("th_value")}</th>
               <th>{t("th_doc")}</th>
               <th>{t("th_suggestion")}</th>
-              <th></th>
+              
             </tr>
           </thead>
           <tbody>
@@ -34,11 +34,10 @@ export default function UnassignedSection({ items }: { items: UnassignedItem[] }
                 <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{fmtCurrency(i.amount)}</td>
                 <td style={{ fontSize: 12 }}>{i.documentType}</td>
                 <td style={{ fontSize: 12, color: "var(--fr-gold)", fontWeight: 700 }}>{i.suggestion || ""}</td>
-                <td>{i.fileLink && <a href={i.fileLink} target="_blank" rel="noreferrer">📄</a>}</td>
               </tr>
             ))}
             {items.length === 0 && (
-              <tr><td colSpan={7} className="fr-muted" style={{ textAlign: "center", padding: 24 }}>{t("empty_none")}</td></tr>
+              <tr><td colSpan={6} className="fr-muted" style={{ textAlign: "center", padding: 24 }}>{t("empty_none")}</td></tr>
             )}
           </tbody>
         </table>
