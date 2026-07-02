@@ -63,7 +63,7 @@ export default function PayablesList({ items, job }: { items: PayableItem[]; job
               </tr>
             ))}
             {rows.length === 0 && (
-              <tr><td colSpan={6} className="fr-muted" style={{ textAlign: "center", padding: 24 }}>{t("empty_none")}</td></tr>
+              <tr><td colSpan={5} className="fr-muted" style={{ textAlign: "center", padding: 24 }}>{t("empty_none")}</td></tr>
             )}
           </tbody>
         </table>
