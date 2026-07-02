@@ -198,7 +198,7 @@ async function loadAll() {
     const inv = parseSafeDate(r.invoice_date).date;
     const due = parseSafeDate(r.due_date).date;
     const overdue = !!r.overdue;
-    const status = overdue ? "Em atraso" : "A pagar";
+    const status: "Em atraso" | "A pagar" = overdue ? "Em atraso" : "A pagar";
     return {
       id: String(r.invoice_id ?? `inv-${i}`),
       supplier: r.supplier_canonical || r.supplier || "—",
