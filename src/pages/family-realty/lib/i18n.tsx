@@ -49,6 +49,11 @@ const DICT: Record<string, { pt: string; en: string }> = {
   sec_evb: { pt: "Estimate vs Billed", en: "Estimate vs Billed" },
   sec_unassigned: { pt: "A classificar", en: "Unassigned costs" },
   sec_ledger: { pt: "Linha a linha", en: "Line items" },
+  sec_weekly: { pt: "Resumo semanal (contabilidade)", en: "Weekly summary (accounting)" },
+  weekly_export_pdf: { pt: "PDF para contabilidade", en: "PDF for accounting" },
+  no_phase: { pt: "Sem etapa", en: "No phase" },
+  no_job_short: { pt: "Sem obra", en: "No job" },
+  grand_total: { pt: "Total geral", en: "Grand total" },
 
   // badges
   within_budget: { pt: "Dentro do budget", en: "Within budget" },
