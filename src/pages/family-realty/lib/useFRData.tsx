@@ -13,7 +13,19 @@ import {
   type EstimateBilledRow,
   type ContractRow,
   type Installment,
+  type WeeklyCostRow,
 } from "../data";
+
+type WeeklyRow = {
+  week_start?: string | null;
+  week_end?: string | null;
+  project?: string | null;
+  phase?: string | null;
+  supplier?: string | null;
+  cost_type?: string | null;
+  total?: number | string | null;
+  n_lancamentos?: number | string | null;
+};
 
 const PAGE = 1000;
 
