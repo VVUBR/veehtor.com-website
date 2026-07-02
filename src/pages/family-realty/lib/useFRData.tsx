@@ -73,7 +73,6 @@ type InvoiceRow = {
   document_type?: string | null;
   payment_status?: string | null;
   overdue?: boolean | null;
-  file_link?: string | null;
 };
 type UnassignedRow = {
   invoice_id?: string;
@@ -84,7 +83,6 @@ type UnassignedRow = {
   invoice_date?: string | null;
   document_type?: string | null;
   address_pointer?: string | null;
-  file_link?: string | null;
 };
 type EvbRow = {
   vendor?: string | null;
@@ -106,7 +104,6 @@ type HistoryRow = {
   payment_status?: string | null;
   document_type?: string | null;
   type?: string | null;
-  file_link?: string | null;
 };
 type ContractRaw = {
   id?: string | number;
@@ -121,7 +118,6 @@ type ContractRaw = {
   review_status?: string | null;
   notes?: string | null;
   document_link?: string | null;
-  file_link?: string | null;
 };
 type ContractPaySumRow = {
   contract_id?: string | number;
@@ -224,7 +220,7 @@ async function loadAll() {
       status,
       overdue,
       documentType: r.document_type || "",
-      fileLink: r.file_link ?? null,
+
     };
   });
 
@@ -239,7 +235,7 @@ async function loadAll() {
     suggestion: r.address_pointer && r.address_pointer.startsWith("Sugestão IA:")
       ? r.address_pointer.replace(/^Sugestão IA:\s*/, "")
       : null,
-    fileLink: r.file_link ?? null,
+
   }));
   const unassignedTotal = unassignedItems.reduce((s, i) => s + i.amount, 0);
 
@@ -268,7 +264,7 @@ async function loadAll() {
       amount: Math.abs(num(r.amount)),
       status: normalizeStatus(r.payment_status, due),
       dueDate: due,
-      fileLink: r.file_link ?? null,
+
     };
   });
 
@@ -301,7 +297,7 @@ async function loadAll() {
       contractDate: parseSafeDate(c.contract_date).date,
       reviewStatus: c.review_status || null,
       notes: c.notes || null,
-      documentLink: c.document_link || c.file_link || null,
+      documentLink: c.document_link || null,
       scheduleGap: gapByContract.get(cid) ?? null,
       installments: instByContract.get(cid) || [],
     };
