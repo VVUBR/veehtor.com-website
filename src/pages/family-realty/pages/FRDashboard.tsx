@@ -12,7 +12,7 @@ import EstimateVsBilledSection from "../components/EstimateVsBilledSection";
 import UnassignedSection from "../components/UnassignedSection";
 import { useFRAuth } from "../auth/FRAuthProvider";
 import { FRDataProvider, useFRData } from "../lib/useFRData";
-import { I18nProvider, useI18n, fmtCurrency } from "../lib/i18n";
+import { useI18n, fmtCurrency } from "../lib/i18n";
 import { periodRange, inPeriod, type PeriodKey } from "../data";
 
 function DashboardInner() {
@@ -198,10 +198,8 @@ function DashboardInner() {
 
 export default function FRDashboard() {
   return (
-    <I18nProvider>
-      <FRDataProvider>
-        <DashboardInner />
-      </FRDataProvider>
-    </I18nProvider>
+    <FRDataProvider>
+      <DashboardInner />
+    </FRDataProvider>
   );
 }
