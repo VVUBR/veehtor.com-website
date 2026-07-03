@@ -6,11 +6,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-const WHATSAPP_URL =
-  "https://api.whatsapp.com/send?phone=5511973022058&text=" +
-  encodeURIComponent(
-    "Oi! Vim pela página de soluções pra cervejarias e quero entender como funciona pra minha operação."
-  );
+const WHATSAPP_URL = "https://api.whatsapp.com/send?phone=5511973022058";
 
 const DARK = "#0a0c10";
 const CREAM = "#f5f0e6";
