@@ -702,7 +702,7 @@ function FinalCTA() {
           Manda uma mensagem pra gente no WhatsApp, é só clicar no botão aqui embaixo. A conversa é sobre a sua operação, rápida e sem compromisso.
         </p>
         <div className="mt-10">
-          <CTA>Manda um oi pra gente</CTA>
+          <CTA>Bora conversar no WhatsApp</CTA>
         </div>
       </div>
     </section>
