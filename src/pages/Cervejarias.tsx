@@ -483,8 +483,8 @@ function RealResults() {
       <div className="max-w-5xl mx-auto">
         <Label>O que já mudou na Complô</Label>
         <TitleWithItalic
-          before="Sem promessa inflada. Só "
-          italic="números reais"
+          before="O que os números "
+          italic="já mostram"
           after="."
         />
         <div className="mt-16 grid md:grid-cols-2 gap-14">
@@ -702,7 +702,7 @@ function FinalCTA() {
           Manda uma mensagem pra gente no WhatsApp, é só clicar no botão aqui embaixo. A conversa é sobre a sua operação, rápida e sem compromisso.
         </p>
         <div className="mt-10">
-          <CTA>Manda um oi pra gente</CTA>
+          <CTA>Bora conversar no WhatsApp</CTA>
         </div>
       </div>
     </section>
