@@ -160,11 +160,13 @@ function Hero() {
           className="mt-8 max-w-3xl text-lg md:text-xl leading-relaxed"
           style={{ ...sans, color: "#b8b3a8" }}
         >
-          A gente melhorou a operação da Complô — 5 cervejarias — unificando tudo
-          num só painel inteligente. A folha de pagamento que tomava um dia agora
-          leva 30 minutos. Segurança jurídica para a empresa e para os colaboradores.
-          O padrão de qualidade, auditado por IA em cada abertura e fechamento. E
-          você só investe no que se paga.
+          Trabalhamos 3 meses dentro da operação da Complô, uma rede de 5
+          cervejarias, e colocamos tudo num painel só. A folha de pagamento que
+          tomava um dia inteiro do gerente toda semana hoje leva cerca de 2 horas no
+          mês. A empresa e os colaboradores ganharam segurança jurídica. E a
+          qualidade de cada abertura e fechamento passou a ser acompanhada por IA.
+          Queremos fazer o mesmo pela sua cervejaria, e só faz sentido pra gente se
+          fizer sentido pra você.
         </p>
         <div className="mt-10 flex flex-wrap items-center gap-6">
           <CTA />
@@ -195,7 +197,7 @@ function ProofBar() {
             className="text-lg md:text-xl leading-relaxed"
             style={{ ...sans, color: "#cfc9bc" }}
           >
-            Durante 3 meses, desenvolvemos o projeto com a Complô — uma rede de 5
+            Durante 3 meses, desenvolvemos o projeto com a Complô, uma rede de 5
             cervejarias consolidada e em plena operação. Mapeamos o negócio e
             construímos ponto eletrônico, controle de qualidade, gestão financeira,
             marketing e treinamento: tudo num só lugar, potencializado por
@@ -281,19 +283,19 @@ function TheShift() {
     {
       emoji: "⏱",
       title: "Economia de tempo",
-      body: "Folha, relatórios e conferências deixam de ser trabalho manual.",
+      body: "Folha de pagamento, relatórios e conferências deixam de ser trabalho manual e passam a rodar sozinhos.",
     },
     {
       emoji: "💰",
-      title: "Redução de gastos",
+      title: "Economia de dinheiro",
       body:
-        "Risco trabalhista documentado, equipe dimensionada pelo movimento real, compras e promoções baseadas em dados.",
+        "Risco trabalhista documentado, equipe do tamanho certo pro movimento, compras e promoções guiadas pelo que os dados mostram.",
     },
     {
       emoji: "🎯",
       title: "Mitigação de erros",
       body:
-        "Abertura e fechamento auditados por IA. Alerta no WhatsApp quando algo sai do padrão, em qualquer unidade.",
+        "Evitamos que análises e conclusões sejam feitas de maneira errada. Os planos de ação são traçados a partir de informações reais da operação, e qualquer desvio de padrão gera alerta no WhatsApp na hora.",
     },
   ];
   return (
@@ -352,11 +354,11 @@ function Modules() {
   const modules = [
     {
       n: "01",
-      title: "Ponto, freelancers e proteção jurídica",
+      title: "Registro de ponto, freelancers e segurança jurídica",
       dor:
         "Cervejaria depende de freelancer. Processos de vínculo empregatício custam caro - na Complô, já tinham passado de R$ 100 mil. E fechar a folha dos freelancers tomava um dia por semana do gerente.",
       faz:
-        "Ponto com verificação por GPS. Contrato digital assinado pelo freelancer no primeiro login e arquivado no banco de dados. Horas registradas automaticamente e folha enviada pronta para o financeiro.",
+        "O colaborador bate o ponto pelo aplicativo, com verificação por GPS, então só registra quem está de fato na unidade. No primeiro login, o freelancer assina um contrato digital que fica guardado no sistema. As horas se registram sozinhas e a folha chega pronta pro financeiro.",
       muda:
         "A documentação que protege a empresa é gerada todo dia, sozinha. O fechamento da folha caiu de um dia para 30 minutos.",
     },
@@ -491,16 +493,16 @@ function RealResults() {
               className="text-6xl md:text-7xl leading-none mb-4"
               style={{ ...serif, color: MINT }}
             >
-              1 dia → 30 min
+              1 dia/semana → 2h/mês
             </div>
             <div
               className="text-xs uppercase mb-3"
               style={{ letterSpacing: "0.22em", color: TEAL, ...sans }}
             >
-              Fechamento da folha de freelancers
+              FOLHA DOS FREELANCERS
             </div>
             <p className="text-base leading-relaxed" style={{ ...sans, color: "#b8b3a8" }}>
-              O que tomava um dia por semana do gerente agora leva 30 minutos.
+              O fechamento que tomava um dia inteiro do gerente toda semana hoje leva cerca de 2 horas no mês.
             </p>
           </div>
           <div>
@@ -523,15 +525,6 @@ function RealResults() {
             </p>
           </div>
         </div>
-        <p
-          className="mt-16 max-w-3xl italic text-base leading-relaxed"
-          style={{ ...sans, color: "#8a8578" }}
-        >
-          A implementação na Complô é recente. Os indicadores de faturamento, ticket
-          médio e satisfação ainda estão sendo medidos - e nós não inventamos
-          números. O que apresentamos aqui é o que já foi comprovado. O restante,
-          medimos junto com você, na sua operação.
-        </p>
       </div>
     </section>
   );
@@ -619,7 +612,7 @@ function Pricing() {
           </p>
         </div>
         <div className="mt-10">
-          <CTA />
+          <CTA>Quero fazer essa conta</CTA>
         </div>
       </div>
     </section>
@@ -642,7 +635,7 @@ function FAQ() {
     },
     {
       q: "Minha equipe vai saber usar?",
-      a: "Sim. A interface é simples — login por CPF, checklist com foto, alertas no WhatsApp. Além disso, desenvolvemos um treinamento específico para o uso da ferramenta e oferecemos acompanhamento mensal, garantindo que a equipe aproveite tudo o que o sistema entrega.",
+      a: "Sim. A interface é simples. Login por CPF, checklist com foto, alertas no WhatsApp. Além disso, desenvolvemos um treinamento específico para o uso da ferramenta e oferecemos acompanhamento mensal, garantindo que a equipe aproveite tudo o que o sistema entrega.",
     },
     {
       q: "E se não funcionar pra minha operação?",
@@ -698,19 +691,18 @@ function FinalCTA() {
       <div className="max-w-3xl mx-auto">
         <Label>Vamos conversar</Label>
         <TitleWithItalic
-          before="Quer ver o que isso faz "
-          italic="na sua cervejaria"
+          before="Bora conversar sobre "
+          italic="a sua cervejaria"
           after="?"
         />
         <p
           className="mt-8 text-lg leading-relaxed"
           style={{ ...sans, color: "#b8b3a8" }}
         >
-          Chama no WhatsApp. A gente conversa sobre a sua operação, sem compromisso -
-          e você decide se faz sentido seguir pro diagnóstico.
+          Manda uma mensagem pra gente no WhatsApp, é só clicar no botão aqui embaixo. A conversa é sobre a sua operação, rápida e sem compromisso.
         </p>
         <div className="mt-10">
-          <CTA />
+          <CTA>Manda um oi pra gente</CTA>
         </div>
       </div>
     </section>
