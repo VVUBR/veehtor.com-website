@@ -1,66 +1,56 @@
+# Landing Page /cervejarias — Veehtor AI
 
-## Family Realty Dashboard — Production Wiring
+Nova rota pública `/cervejarias` em PT-BR, focada em conversão via WhatsApp, seguindo a identidade visual do veehtor.com.
 
-Connect the existing `/family-realty` visual to the external Supabase project `yklcfwhpkvtrjbqxhiln` with authentication and live data. No data mutations; read-only dashboard.
+## Arquivos a criar
 
-### 1. Supabase client (external, isolated)
-- Add `src/pages/family-realty/lib/frSupabase.ts` creating a standalone client using:
-  - URL: `https://yklcfwhpkvtrjbqxhiln.supabase.co`
-  - anon key: the one you provided (safe to embed — publishable)
-  - Custom `storageKey: "fr-auth"` so it never collides with the Lovable Cloud client used elsewhere.
-- No env vars needed for the anon key (publishable). This keeps Family Realty fully isolated from the rest of the site.
+- `src/pages/Cervejarias.tsx` — página completa (single-file, com subcomponentes de seção internos para manter tudo local e evitar poluir a base).
+- Registro da rota em `src/App.tsx` (`/cervejarias`).
 
-### 2. Auth gate
-- New `/family-realty/login` route: email + password form, brand navy `#041C2C` / gold `#EAAA00`, Roboto.
-- `FRAuthProvider` around `/family-realty/*` that:
-  - Registers `onAuthStateChange` first, then calls `getSession()`.
-  - Redirects unauthenticated users to `/family-realty/login`.
-  - Shows a "Sair" button in the header.
-- No public sign-up. User `info@familyrealtyinvestments.com` logs in with the password set in the Supabase dashboard.
-- Password reset link → `/family-realty/reset-password` page (updates password via `updateUser`).
+Sem alterações no i18n global do site (a página é PT-BR estática) e sem tocar em `Index.tsx`, `content.json` ou componentes compartilhados.
 
-### 3. Filters context
-- `FRFiltersContext` with:
-  - `job`: `"all" | <project_id>`
-  - `period`: `"week" | "month" | "12w" | "all" | "custom"`, plus `from`/`to` for custom.
-- Header exposes both filters globally; every section reads from the context via `useMemo`.
+## Estrutura da página (10 seções + header + footer + FAB WhatsApp)
 
-### 4. Data layer
-Read-only hooks (React Query) per view, all filtered by `job` + `period`:
-- `useBudgetVsActual` → `v_budget_vs_actual_by_project`, `v_budget_vs_actual`
-- `usePayables` → `v_invoices_to_pay`
-- `useUnassignedCosts` → `v_unassigned_costs`
-- `useEstimateVsBilled` → `v_estimate_vs_billed`
-- `useContracts` → `contracts`, `v_contract_payment_summary`
-- `useDisbursements` → `v_disbursement_schedule`
-- `useHistory` → `history`
-- `useMonthlySpend` derived client-side from cost rows (or a dedicated view if present).
+1. **Header fixo** — logo "Veehtor AI" à esquerda, botão "Falar no WhatsApp" à direita. Glassmorphism escuro.
+2. **Hero** (fundo escuro, degradê verde-petróleo sutil) — etiqueta, título serifado com "Menos erro na operação" em itálico verde-menta, subtítulo, CTA primário + link âncora "Ver o que a gente fez ↓".
+3. **Barra de prova** (fundo escuro estreito) — texto + placeholder do logo Complô (div bordada com label).
+4. **Espelho da dor** (fundo creme, 3 colunas de cards brancos com emoji + título + texto).
+5. **A virada** (fundo escuro) — título com "Eles só não dizem nada" em itálico verde + 3 cards horizontais (Economia / Redução / Mitigação).
+6. **5 módulos** (fundo creme) — cards numerados 01–05, cada um com dor / o que fazemos / o que muda.
+7. **Resultados reais** (fundo escuro) — dois números gigantes serifados em verde-menta ("1 dia → 30 min" e "R$ 100 mil+") + parágrafo de honestidade em itálico.
+8. **Como funciona** (fundo creme) — 3 cards brancos numerados.
+9. **Precificação por ROI** (fundo escuro) — texto + CTA WhatsApp.
+10. **FAQ** (fundo creme) — acordeão usando `@/components/ui/accordion` (shadcn já disponível).
+11. **CTA final** (fundo escuro, centralizado) — título com "na sua cervejaria" em itálico + botão.
+12. **Rodapé** — © 2026 Veehtor AI LLC · veehtor.com · vitor@veehtor.com.
+13. **FAB WhatsApp** — botão flutuante fixo bottom-right, verde-menta, ícone WhatsApp (lucide `MessageCircle` ou SVG inline), visível em toda rolagem.
 
-Currency: `Intl.NumberFormat("en-US",{style:"currency",currency:"USD"})`. Invalid dates guarded (skip rows with null/NaN `invoice_date`).
+## Sistema visual (reuso dos tokens existentes)
 
-### 5. UI sections (replaces mock)
-Reuses existing components; swaps `data.ts` mock for hook results:
-1. KPI row (Budget total, Actual, Variance, Payables due, Overdue count)
-2. Budget status per obra (progress bars, color tags)
-3. Stage detail table
-4. Monthly spend chart (10 real months + 3 forecast)
-5. Payables ("A pagar", overdue highlighted red)
-6. Contracts summary
-7. Estimate vs Billed
-8. Unassigned costs (action-required list)
-9. Disbursement schedule
-10. History (audit log, last 50)
-11. Empty/loading/error states per section
+- Cores: `#0a0c10` (escuro), creme `#f5f0e6`, verde-menta `#2EE6A8`, verde-teal para etiquetas, cinza-claro/escuro para corpo.
+- Tipografia: `Instrument Serif` para títulos e números destaque; `DM Sans` para corpo (já carregadas globalmente).
+- Etiquetas: `text-xs uppercase tracking-[0.2em] text-[#2EE6A8]`.
+- Palavra em itálico verde dentro do título: `<em className="italic text-[#2EE6A8] font-normal">…</em>`.
+- Botão primário: bg verde-menta, texto escuro, `rounded-full`, hover suave.
+- Cards brancos sobre creme: `bg-white rounded-2xl p-8 shadow-sm`.
+- Regra de tipografia do projeto: apenas hífens simples (`-`), nunca en/em dash — vou normalizar os "—" do briefing para " - " no render (ou reescrever as frases mantendo o sentido).
 
-### 6. i18n
-- Small `FRLangProvider` (PT/EN), persisted in `localStorage`. Toggle in header. Does not touch the main site's LanguageContext.
+## CTA único
 
-### Technical notes
-- No changes to Lovable Cloud config; this uses the external Supabase project directly.
-- The anon key is publishable and safe in source; RLS on the Supabase side is the security boundary.
-- No writes anywhere; all queries are `select`.
-- I still need confirmation that RLS `SELECT` is granted to `authenticated` on the listed views/tables. If any query returns "permission denied", I'll surface a clear message per section and give you the exact `GRANT` SQL to run.
+Todos os botões e o FAB apontam para:
+`https://api.whatsapp.com/send?phone=5511973022058&text=Oi!%20Vim%20pela%20p%C3%A1gina%20de%20solu%C3%A7%C3%B5es%20pra%20cervejarias%20e%20quero%20entender%20como%20funciona%20pra%20minha%20opera%C3%A7%C3%A3o.`
+Constante `WHATSAPP_URL` no topo do arquivo.
 
-### What I need from you to finish
-1. Confirm the password for `info@familyrealtyinvestments.com` is already set in Supabase → Authentication → Users (or set one and share you've done it — don't paste it here).
-2. If you haven't verified RLS grants, reply "run grants" and I'll paste the SQL to run in the Supabase SQL editor before we test.
+## SEO
+
+`<title>Veehtor AI - Operação inteligente para cervejarias</title>` + meta description específica, setados via `useEffect` no topo da página (padrão já usado no projeto).
+
+## Verificação
+
+Após implementar, rodar Playwright headless em `http://localhost:8080/cervejarias`, screenshot desktop + mobile, conferir que todas as seções renderizam, âncora funciona e FAB fica fixo.
+
+## Fora de escopo
+
+- Sem tradução EN, sem integração ao `LanguageContext` global.
+- Sem link no menu principal do site (rota "oculta" para prospecção fria, conforme uso descrito).
+- Sem envio de logo Complô real — placeholder até você mandar o asset.
