@@ -14,6 +14,7 @@ import PodunkAnnies from "./pages/PodunkAnnies";
 import DenisEnergiaSolar from "./pages/DenisEnergiaSolar";
 import FamilyRealty from "./pages/family-realty";
 import Adcole from "./pages/Adcole";
+import Cervejarias from "./pages/Cervejarias";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/denis-energia-solar" element={<DenisEnergiaSolar />} />
           <Route path="/family-realty/*" element={<FamilyRealty />} />
           <Route path="/adcole" element={<Adcole />} />
+          <Route path="/cervejarias" element={<Cervejarias />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
