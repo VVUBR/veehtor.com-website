@@ -160,11 +160,11 @@ function Hero() {
           className="mt-8 max-w-3xl text-lg md:text-xl leading-relaxed"
           style={{ ...sans, color: "#b8b3a8" }}
         >
-          A gente reconstruiu a operação da Complô - 7 cervejarias - num só painel
-          inteligente. A folha que tomava um dia agora leva 30 minutos. O risco
-          trabalhista que já custou seis dígitos, blindado. O padrão de qualidade,
-          auditado por IA em cada abertura e fechamento. E você só investe no que se
-          paga.
+          A gente melhorou a operação da Complô — 5 cervejarias — unificando tudo
+          num só painel inteligente. A folha de pagamento que tomava um dia agora
+          leva 30 minutos. Segurança jurídica para a empresa e para os colaboradores.
+          O padrão de qualidade, auditado por IA em cada abertura e fechamento. E
+          você só investe no que se paga.
         </p>
         <div className="mt-10 flex flex-wrap items-center gap-6">
           <CTA />
@@ -195,10 +195,11 @@ function ProofBar() {
             className="text-lg md:text-xl leading-relaxed"
             style={{ ...sans, color: "#cfc9bc" }}
           >
-            Durante 3 meses, reconstruímos a operação da Complô - uma rede com 7
-            cervejarias. Ponto eletrônico, controle de qualidade, gestão financeira,
-            marketing e treinamento: tudo num só lugar, rodando com inteligência
-            artificial.
+            Durante 3 meses, desenvolvemos o projeto com a Complô — uma rede de 5
+            cervejarias consolidada e em plena operação. Mapeamos o negócio e
+            construímos ponto eletrônico, controle de qualidade, gestão financeira,
+            marketing e treinamento: tudo num só lugar, potencializado por
+            inteligência artificial.
           </p>
         </div>
         <div
@@ -633,7 +634,7 @@ function FAQ() {
     },
     {
       q: "Funciona pra quem tem uma unidade só?",
-      a: "Sim. O sistema foi construído numa rede de 7 cervejarias, mas os módulos funcionam de forma independente. No diagnóstico, definimos o que faz sentido pro seu tamanho.",
+      a: "Sim. O sistema foi construído numa rede de 5 cervejarias, mas os módulos funcionam de forma independente. No diagnóstico, definimos o que faz sentido pro seu tamanho.",
     },
     {
       q: "Quanto tempo leva pra implementar?",
@@ -641,7 +642,7 @@ function FAQ() {
     },
     {
       q: "Minha equipe vai saber usar?",
-      a: "Sim. A interface é simples - login por CPF, checklist com foto, alertas no WhatsApp. E a plataforma inclui o módulo de treinamento pra capacitar a equipe.",
+      a: "Sim. A interface é simples — login por CPF, checklist com foto, alertas no WhatsApp. Além disso, desenvolvemos um treinamento específico para o uso da ferramenta e oferecemos acompanhamento mensal, garantindo que a equipe aproveite tudo o que o sistema entrega.",
     },
     {
       q: "E se não funcionar pra minha operação?",
