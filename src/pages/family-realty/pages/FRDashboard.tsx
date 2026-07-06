@@ -134,7 +134,7 @@ function DashboardInner() {
           </div>
         )}
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
           <KpiCard
             label={job === "__ALL__" ? t("kpi_budget_total") : t("kpi_budget_job")}
             value={fmtCurrency(totalBudget)}
@@ -149,6 +149,11 @@ function DashboardInner() {
                   ? `${Math.round(pct)}% ${t("of_budget")} · ${t("includes_unassigned", { v: fmtCurrency(data.unassignedTotal) })}`
                   : `${Math.round(pct)}% ${t("of_budget")}`)
               : undefined}
+          />
+          <KpiCard
+            label={t("kpi_committed")}
+            value={fmtCurrency(data.committed.total)}
+            sub={t("kpi_committed_sub")}
           />
           <KpiCard
             label={t("kpi_topay")}
@@ -166,7 +171,7 @@ function DashboardInner() {
             label={t("kpi_unassigned")}
             value={fmtCurrency(data.unassignedTotal)}
             tone={data.unassignedItems.length > 0 ? "gold" : "default"}
-            sub={`${data.unassignedItems.length} ${t("no_job_costs")}`}
+            sub={`${data.unassignedItems.length} · ${t("unassigned_sub")}`}
           />
         </section>
 
@@ -205,7 +210,7 @@ function DashboardInner() {
         {tab === "overview" && (
           <>
             <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-              <BudgetStatusList job={job} jobsMeta={data.jobsMeta} />
+              <BudgetStatusList job={job} jobsMeta={data.jobsMeta} committed={data.committed} />
               <div>
                 <MonthlySpendChart items={historyByJob} activeJob={activeJobMeta} />
                 {missingDate && (
