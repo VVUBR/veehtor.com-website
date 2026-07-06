@@ -14,16 +14,19 @@ export type HistoryItem = {
   future: boolean;      // date > today
   job: string;          // '' means unassigned
   supplier: string;
+  supplierCanonical: string;
   type: SupplierType;
   stage: string;
   amount: number;
   status: PaymentStatus;
   dueDate: Date | null;
+  paymentStatusRaw: string; // for chart classification ('Paid' etc.)
 };
 
 export type PayableItem = {
   id: string;
   supplier: string;
+  supplierCanonical: string;
   job: string;
   material: string;
   amount: number;
@@ -38,11 +41,17 @@ export type UnassignedItem = {
   id: string;
   date: Date | null;
   supplier: string;
+  supplierCanonical: string;
   material: string;
   amount: number;
   documentType: string;
   suggestion: string | null;
-  
+  projectName: string;
+  phase: string;
+  description: string;
+  missingProject: boolean;
+  missingPhase: boolean;
+  missingDescription: boolean;
 };
 
 export type JobMeta = {
@@ -84,6 +93,9 @@ export type EstimateBilledRow = {
   billed: number;
   difference: number;
   pctBilled: number;
+  nContracts: number;
+  hasProject: boolean;
+  hasEstimate: boolean;
 };
 
 export type Installment = {
@@ -104,6 +116,13 @@ export type ContractRow = {
   documentLink: string | null;
   scheduleGap: number | null;
   installments: Installment[];
+};
+
+export type CommittedContracts = {
+  total: number;
+  byProject: Map<string, number>;
+  unassignedAmount: number;
+  unassignedCount: number;
 };
 
 export type PeriodKey = "month" | "last30" | "last3m" | "year" | "all" | "custom";
@@ -195,4 +214,13 @@ export type WeeklyCostRow = {
   costType: string;
   total: number;
   count: number;
+  paymentMethod: string;
+  cardNumber: string | null;
 };
+
+export function fmtCardNumber(v: string | null | undefined): string {
+  if (!v) return "";
+  const digits = String(v).replace(/\D/g, "");
+  if (!digits) return String(v);
+  return `**** ${digits.slice(-4)}`;
+}

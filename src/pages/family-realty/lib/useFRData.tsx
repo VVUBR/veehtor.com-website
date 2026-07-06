@@ -14,6 +14,7 @@ import {
   type ContractRow,
   type Installment,
   type WeeklyCostRow,
+  type CommittedContracts,
 } from "../data";
 
 type WeeklyRow = {
@@ -25,6 +26,8 @@ type WeeklyRow = {
   cost_type?: string | null;
   total?: number | string | null;
   n_lancamentos?: number | string | null;
+  payment_method?: string | null;
+  card_number?: string | null;
 };
 
 const PAGE = 1000;
@@ -83,6 +86,9 @@ type UnassignedRow = {
   invoice_date?: string | null;
   document_type?: string | null;
   address_pointer?: string | null;
+  project_name?: string | null;
+  phase?: string | null;
+  description?: string | null;
 };
 type EvbRow = {
   vendor?: string | null;
@@ -91,6 +97,7 @@ type EvbRow = {
   billed?: number | string | null;
   difference?: number | string | null;
   pct_billed?: number | string | null;
+  n_contracts?: number | string | null;
 };
 type HistoryRow = {
   invoice_id?: string | null;
@@ -163,7 +170,7 @@ async function loadAll() {
     fetchAll<WeeklyRow>("v_weekly_costs").catch(() => []),
   ]);
 
-  // -- Jobs (from v_budget_vs_actual_by_project) --
+  // -- Jobs --
   const jobsMeta: JobMeta[] = bvaProject
     .filter((r) => r.project)
     .map((r) => {
@@ -186,7 +193,7 @@ async function loadAll() {
 
   const jobs = jobsMeta.map((j) => j.name);
 
-  // -- Budget lines by project (for stage detail) --
+  // -- Budget lines --
   const budgetLines: BudgetLine[] = bvaLine.map((r) => {
     const phase = (r.phase || "").trim();
     const description = (r.description || "").trim();
@@ -203,15 +210,17 @@ async function loadAll() {
     };
   });
 
-  // -- Payables (v_invoices_to_pay) --
+  // -- Payables --
   const payables: PayableItem[] = invoices.map((r, i) => {
     const inv = parseSafeDate(r.invoice_date).date;
     const due = parseSafeDate(r.due_date).date;
     const overdue = !!r.overdue;
     const status: "Em atraso" | "A pagar" = overdue ? "Em atraso" : "A pagar";
+    const canonical = r.supplier_canonical || r.supplier || "";
     return {
       id: String(r.invoice_id ?? `inv-${i}`),
-      supplier: r.supplier_canonical || r.supplier || "—",
+      supplier: canonical || "—",
+      supplierCanonical: canonical,
       job: r.project_name || "",
       material: r.material || "—",
       amount: Math.abs(num(r.amount)),
@@ -220,51 +229,93 @@ async function loadAll() {
       status,
       overdue,
       documentType: r.document_type || "",
-
     };
   });
 
-  // -- Unassigned costs --
-  const unassignedItems: UnassignedItem[] = unassigned.map((r, i) => ({
-    id: String(r.invoice_id ?? `un-${i}`),
-    date: parseSafeDate(r.invoice_date).date,
-    supplier: r.supplier_canonical || r.supplier || "—",
-    material: r.material || "—",
-    amount: Math.abs(num(r.amount)),
-    documentType: r.document_type || "",
-    suggestion: r.address_pointer && r.address_pointer.startsWith("Sugestão IA:")
-      ? r.address_pointer.replace(/^Sugestão IA:\s*/, "")
-      : null,
-
-  }));
+  // -- Unassigned --
+  const unassignedItems: UnassignedItem[] = unassigned.map((r, i) => {
+    const projectName = (r.project_name || "").trim();
+    const phase = (r.phase || "").trim();
+    const description = (r.description || "").trim();
+    const canonical = r.supplier_canonical || r.supplier || "";
+    return {
+      id: String(r.invoice_id ?? `un-${i}`),
+      date: parseSafeDate(r.invoice_date).date,
+      supplier: canonical || "—",
+      supplierCanonical: canonical,
+      material: r.material || "—",
+      amount: Math.abs(num(r.amount)),
+      documentType: r.document_type || "",
+      suggestion: r.address_pointer && r.address_pointer.startsWith("Sugestão IA:")
+        ? r.address_pointer.replace(/^Sugestão IA:\s*/, "")
+        : null,
+      projectName,
+      phase,
+      description,
+      missingProject: !projectName,
+      missingPhase: !phase,
+      missingDescription: !description,
+    };
+  });
   const unassignedTotal = unassignedItems.reduce((s, i) => s + i.amount, 0);
 
-  // -- Estimate vs billed --
-  const evbRows: EstimateBilledRow[] = evb.map((r) => ({
-    vendor: r.vendor || "—",
-    project: r.project || "",
-    estimate: num(r.estimate),
-    billed: num(r.billed),
-    difference: r.difference != null ? num(r.difference) : num(r.estimate) - num(r.billed),
-    pctBilled: r.pct_billed != null ? num(r.pct_billed) : num(r.estimate) > 0 ? (num(r.billed) / num(r.estimate)) * 100 : 0,
-  }));
+  // -- EvB --
+  const evbRows: EstimateBilledRow[] = evb.map((r) => {
+    const hasProject = !!(r.project && String(r.project).trim());
+    const hasEstimate = r.estimate != null && String(r.estimate) !== "";
+    const estimate = num(r.estimate);
+    const billed = num(r.billed);
+    return {
+      vendor: r.vendor || "—",
+      project: hasProject ? String(r.project) : "",
+      estimate,
+      billed,
+      difference: r.difference != null ? num(r.difference) : estimate - billed,
+      pctBilled: r.pct_billed != null ? num(r.pct_billed) : estimate > 0 ? (billed / estimate) * 100 : 0,
+      nContracts: r.n_contracts != null ? Number(r.n_contracts) : 1,
+      hasProject,
+      hasEstimate,
+    };
+  });
 
-  // -- History (line items only) --
+  // Committed contracts aggregation
+  const committed: CommittedContracts = {
+    total: 0,
+    byProject: new Map(),
+    unassignedAmount: 0,
+    unassignedCount: 0,
+  };
+  for (const row of evbRows) {
+    if (!row.hasEstimate) continue;
+    const remain = Math.max(row.estimate - row.billed, 0);
+    if (remain <= 0) continue;
+    committed.total += remain;
+    if (row.hasProject) {
+      committed.byProject.set(row.project, (committed.byProject.get(row.project) || 0) + remain);
+    } else {
+      committed.unassignedAmount += remain;
+      committed.unassignedCount += row.nContracts || 1;
+    }
+  }
+
+  // -- History --
   const historyItems: HistoryItem[] = history.map((r, i) => {
     const p = parseSafeDate(r.invoice_date);
     const due = parseSafeDate(r.due_date).date;
+    const canonical = r.supplier_canonical || r.supplier || "";
     return {
       id: String(r.invoice_id ?? `h-${i}`),
       date: p.date,
       future: p.future,
       job: r.project_name || "",
-      supplier: r.supplier_canonical || r.supplier || "—",
+      supplier: canonical || "—",
+      supplierCanonical: canonical,
       type: normalizeType(r.type),
       stage: r.phase || "—",
       amount: Math.abs(num(r.amount)),
       status: normalizeStatus(r.payment_status, due),
       dueDate: due,
-
+      paymentStatusRaw: (r.payment_status || "").trim(),
     };
   });
 
@@ -312,6 +363,8 @@ async function loadAll() {
     costType: r.cost_type || "",
     total: num(r.total),
     count: r.n_lancamentos != null ? Number(r.n_lancamentos) : 0,
+    paymentMethod: r.payment_method || "",
+    cardNumber: r.card_number || null,
   }));
 
   return {
@@ -325,6 +378,7 @@ async function loadAll() {
     historyItems,
     contractRows,
     weeklyRows,
+    committed,
   };
 }
 
@@ -334,13 +388,14 @@ type Ctx = { loading: boolean; error: Error | null; data: FRData };
 const empty: FRData = {
   jobs: [], jobsMeta: [], budgetLines: [], payables: [], unassignedItems: [],
   unassignedTotal: 0, evbRows: [], historyItems: [], contractRows: [], weeklyRows: [],
+  committed: { total: 0, byProject: new Map(), unassignedAmount: 0, unassignedCount: 0 },
 };
 
 const FRDataContext = createContext<Ctx | null>(null);
 
 export function FRDataProvider({ children }: { children: ReactNode }) {
   const q = useQuery({
-    queryKey: ["fr-real-data-v2"],
+    queryKey: ["fr-real-data-v3"],
     queryFn: loadAll,
     staleTime: 5 * 60_000,
     retry: 1,
