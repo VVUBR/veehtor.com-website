@@ -142,6 +142,46 @@ const DICT: Record<string, { pt: string; en: string }> = {
   st_paid: { pt: "Pago", en: "Paid" },
   st_topay: { pt: "A pagar", en: "To pay" },
   st_overdue: { pt: "Em atraso", en: "Overdue" },
+
+  // supplier filter
+  supplier_filter: { pt: "Filtrar por fornecedor", en: "Filter by supplier" },
+  all_suppliers: { pt: "Todos os fornecedores", en: "All suppliers" },
+
+  // stage table
+  expand_all: { pt: "Expandir tudo", en: "Expand all" },
+  collapse_all: { pt: "Recolher tudo", en: "Collapse all" },
+
+  // monthly chart segments
+  seg_realizado: { pt: "Realizado", en: "Realized" },
+  seg_compromissos: { pt: "Compromissos", en: "Committed" },
+  seg_previsto: { pt: "Previsto", en: "Forecast" },
+  seg_total: { pt: "Total", en: "Total" },
+  chart_baseline: { pt: "previsto = média dos 3 meses completos anteriores", en: "forecast = avg of last 3 complete months" },
+
+  // committed KPI
+  kpi_committed: { pt: "Comprometido em contratos", en: "Committed in contracts" },
+  kpi_committed_sub: { pt: "assinado, ainda não faturado", en: "signed, not yet billed" },
+  budget_projection: { pt: "Projeção", en: "Projection" },
+  budget_committed_remaining: { pt: "Comprometido restante", en: "Committed remaining" },
+  committed_no_project: { pt: "Comprometido sem obra definida: {v} ({n} contratos)", en: "Committed with no job assigned: {v} ({n} contracts)" },
+
+  // EvB badges
+  badge_no_project: { pt: "Sem obra", en: "No job" },
+  badge_no_estimate: { pt: "Sem valor no contrato", en: "No estimate on contract" },
+  n_contracts: { pt: "{n} contratos", en: "{n} contracts" },
+
+  // Unassigned chips
+  chip_missing_project: { pt: "Sem obra", en: "No job" },
+  chip_missing_phase: { pt: "Sem etapa", en: "No phase" },
+  chip_missing_description: { pt: "Sem linha de budget", en: "No budget line" },
+  unassigned_sub: { pt: "lançamentos sem classificação completa", en: "entries without full classification" },
+
+  // filtered totals header
+  filtered_meta: { pt: "{n} lançamentos · {v}", en: "{n} entries · {v}" },
+
+  // weekly extras
+  th_payment_method: { pt: "Forma de pagamento", en: "Payment method" },
+  th_card: { pt: "Cartão", en: "Card" },
 };
 
 type Ctx = { lang: Lang; setLang: (l: Lang) => void; t: (k: string, vars?: Record<string, string | number>) => string };
