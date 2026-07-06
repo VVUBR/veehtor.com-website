@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useI18n, fmtCurrency, fmtDateLocale } from "../lib/i18n";
+import SupplierSelect, { matchSupplier } from "./SupplierSelect";
 import { today0, type HistoryItem } from "../data";
 
 type SortKey = "date" | "job" | "supplier" | "type" | "stage" | "amount" | "status";
@@ -9,9 +10,15 @@ export default function CostTable({ items }: { items: HistoryItem[] }) {
   const { t, lang } = useI18n();
   const [sort, setSort] = useState<{ key: SortKey; dir: "asc" | "desc" }>({ key: "date", dir: "desc" });
   const [page, setPage] = useState(1);
+  const [supplier, setSupplier] = useState<string>("");
+
+  const filtered = useMemo(
+    () => items.filter((i) => matchSupplier(i.supplier, i.supplierCanonical, supplier)),
+    [items, supplier],
+  );
 
   const sorted = useMemo(() => {
-    const arr = [...items];
+    const arr = [...filtered];
     const dir = sort.dir === "asc" ? 1 : -1;
     arr.sort((a, b) => {
       const k = sort.key;
@@ -22,12 +29,14 @@ export default function CostTable({ items }: { items: HistoryItem[] }) {
       return av.localeCompare(bv) * dir;
     });
     return arr;
-  }, [items, sort]);
+  }, [filtered, sort]);
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE));
   const clampedPage = Math.min(page, totalPages);
   const pageItems = sorted.slice((clampedPage - 1) * PAGE, clampedPage * PAGE);
   const today = today0().getTime();
+  const total = sorted.reduce((s, r) => s + r.amount, 0);
+  const supplierOptions = useMemo(() => items.map((i) => i.supplierCanonical || i.supplier), [items]);
 
   const toggle = (key: SortKey) => setSort((s) => (s.key === key ? { key, dir: s.dir === "asc" ? "desc" : "asc" } : { key, dir: "desc" }));
   const arrow = (key: SortKey) => (sort.key === key ? (sort.dir === "asc" ? " ▲" : " ▼") : "");
@@ -51,11 +60,17 @@ export default function CostTable({ items }: { items: HistoryItem[] }) {
     <div className="fr-card p-5">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
         <h3 className="fr-heading" style={{ fontSize: 16, color: "var(--fr-navy)", margin: 0 }}>
-          {t("sec_ledger")} <span className="fr-muted" style={{ fontSize: 12, fontWeight: 400 }}>({sorted.length})</span>
+          {t("sec_ledger")}{" "}
+          <span className="fr-muted" style={{ fontSize: 12, fontWeight: 400 }}>
+            ({t("filtered_meta", { n: sorted.length, v: fmtCurrency(total) })})
+          </span>
         </h3>
-        <button className="fr-btn fr-print-hide" onClick={downloadCsv} style={{ color: "var(--fr-navy)", borderColor: "var(--fr-navy)" }}>
-          {t("exportCsv")}
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <SupplierSelect value={supplier} onChange={setSupplier} suppliers={supplierOptions} />
+          <button className="fr-btn fr-print-hide" onClick={downloadCsv} style={{ color: "var(--fr-navy)", borderColor: "var(--fr-navy)" }}>
+            {t("exportCsv")}
+          </button>
+        </div>
       </div>
       <div style={{ maxHeight: 520, overflowY: "auto", border: "1px solid var(--fr-border)", borderRadius: 8 }}>
         <table className="fr-table">

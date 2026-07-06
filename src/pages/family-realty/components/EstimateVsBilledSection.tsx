@@ -1,5 +1,6 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useI18n, fmtCurrency } from "../lib/i18n";
+import SupplierSelect, { matchSupplier } from "./SupplierSelect";
 import type { EstimateBilledRow } from "../data";
 
 function diffColor(diff: number, billed: number) {
@@ -9,18 +10,48 @@ function diffColor(diff: number, billed: number) {
   return "var(--fr-text)";
 }
 
+const Badge = ({ label, tone = "muted" }: { label: string; tone?: "muted" | "gold" }) => (
+  <span style={{
+    display: "inline-block", fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 4,
+    marginLeft: 6,
+    background: tone === "gold" ? "rgba(234,170,0,0.15)" : "rgba(128,128,128,0.15)",
+    color: tone === "gold" ? "var(--fr-gold)" : "var(--fr-muted)",
+  }}>{label}</span>
+);
+
 export default function EstimateVsBilledSection({ items, job }: { items: EstimateBilledRow[]; job: string }) {
   const { t } = useI18n();
+  const [supplier, setSupplier] = useState<string>("");
+
+  const scoped = useMemo(() => {
+    let arr = job === "__ALL__" ? items : items.filter((r) => r.project === job);
+    if (supplier) arr = arr.filter((r) => matchSupplier(r.vendor, r.vendor, supplier));
+    return arr;
+  }, [items, job, supplier]);
+
   const rows = useMemo(() => {
-    const arr = job === "__ALL__" ? items : items.filter((r) => r.project === job);
-    return [...arr].sort((a, b) => Math.abs(b.difference) - Math.abs(a.difference));
-  }, [items, job]);
+    return [...scoped].sort((a, b) => {
+      const aMiss = !a.hasProject || !a.hasEstimate;
+      const bMiss = !b.hasProject || !b.hasEstimate;
+      if (aMiss !== bMiss) return aMiss ? -1 : 1;
+      return a.difference - b.difference;
+    });
+  }, [scoped]);
+
+  const totalBilled = rows.reduce((s, r) => s + r.billed, 0);
+  const supplierOptions = useMemo(() => items.map((r) => r.vendor), [items]);
 
   return (
     <div className="fr-card p-5">
-      <h3 className="fr-heading" style={{ fontSize: 16, color: "var(--fr-navy)", margin: 0, marginBottom: 4 }}>
-        {t("sec_evb")}
-      </h3>
+      <div className="flex items-center justify-between mb-1 gap-3 flex-wrap">
+        <h3 className="fr-heading" style={{ fontSize: 16, color: "var(--fr-navy)", margin: 0 }}>
+          {t("sec_evb")}{" "}
+          <span className="fr-muted" style={{ fontSize: 12, fontWeight: 400 }}>
+            ({t("filtered_meta", { n: rows.length, v: fmtCurrency(totalBilled) })})
+          </span>
+        </h3>
+        <SupplierSelect value={supplier} onChange={setSupplier} suppliers={supplierOptions} />
+      </div>
       <p className="fr-muted" style={{ fontSize: 12, marginBottom: 12 }}>{t("cap_evb")}</p>
       <div style={{ maxHeight: 420, overflowY: "auto", border: "1px solid var(--fr-border)", borderRadius: 8 }}>
         <table className="fr-table">
@@ -37,14 +68,23 @@ export default function EstimateVsBilledSection({ items, job }: { items: Estimat
           <tbody>
             {rows.map((r, i) => (
               <tr key={i}>
-                <td style={{ fontWeight: 700 }}>{r.vendor}</td>
-                <td>{r.project || "—"}</td>
-                <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{fmtCurrency(r.estimate)}</td>
+                <td>
+                  <div style={{ fontWeight: 700 }}>{r.vendor}</div>
+                  <div style={{ fontSize: 11, color: "var(--fr-muted)" }}>
+                    {t("n_contracts", { n: r.nContracts || 1 })}
+                  </div>
+                </td>
+                <td>
+                  {r.hasProject ? r.project : <Badge label={t("badge_no_project")} tone="gold" />}
+                </td>
+                <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
+                  {r.hasEstimate ? fmtCurrency(r.estimate) : <Badge label={t("badge_no_estimate")} />}
+                </td>
                 <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{fmtCurrency(r.billed)}</td>
                 <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", color: diffColor(r.difference, r.billed), fontWeight: 700 }}>
-                  {fmtCurrency(r.difference)}
+                  {r.hasEstimate ? fmtCurrency(r.difference) : "—"}
                 </td>
-                <td style={{ textAlign: "right" }}>{Math.round(r.pctBilled)}%</td>
+                <td style={{ textAlign: "right" }}>{r.hasEstimate && r.estimate > 0 ? `${Math.round(r.pctBilled)}%` : "—"}</td>
               </tr>
             ))}
             {rows.length === 0 && (

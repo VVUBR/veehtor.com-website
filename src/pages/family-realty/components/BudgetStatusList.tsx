@@ -1,5 +1,5 @@
 import { useI18n, fmtCurrency, fmtDateLocale } from "../lib/i18n";
-import { today0, type JobMeta } from "../data";
+import { today0, type JobMeta, type CommittedContracts } from "../data";
 
 function statusFor(pct: number, t: (k: string) => string) {
   if (pct > 100) return { key: "over_budget", label: t("over_budget"), color: "var(--fr-red)" };
@@ -11,7 +11,15 @@ function monthsBetween(a: Date, b: Date) {
   return Math.max(1, (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth()) + 1);
 }
 
-export default function BudgetStatusList({ job, jobsMeta }: { job: string; jobsMeta: JobMeta[] }) {
+export default function BudgetStatusList({
+  job,
+  jobsMeta,
+  committed,
+}: {
+  job: string;
+  jobsMeta: JobMeta[];
+  committed?: CommittedContracts;
+}) {
   const { t, lang } = useI18n();
   const scope = job === "__ALL__" ? jobsMeta : jobsMeta.filter((j) => j.name === job);
   const rows = [...scope].sort((a, b) => b.pctConsumed - a.pctConsumed);
@@ -25,11 +33,24 @@ export default function BudgetStatusList({ job, jobsMeta }: { job: string; jobsM
       <div className="flex flex-col gap-4">
         {rows.map((r) => {
           const st = statusFor(r.pctConsumed, t);
-          const fill = Math.min(r.pctConsumed, 100);
+          const committedRemain = committed?.byProject.get(r.name) ?? 0;
+          const projection = r.realizado + committedRemain;
+          const denom = Math.max(r.budget, projection, 1);
+          const realPctVisual = Math.min((r.realizado / denom) * 100, 100);
+          const commPctVisual = Math.min((committedRemain / denom) * 100, 100 - realPctVisual);
           const over = Math.max(r.pctConsumed - 100, 0);
           const endDate = r.dateFinished || today0();
           const months = r.dateStarted ? monthsBetween(r.dateStarted, endDate) : 0;
           const burn = months > 0 ? r.realizado / months : 0;
+          const pctProjection = r.budget > 0 ? (projection / r.budget) * 100 : 0;
+
+          const tooltip = [
+            `${t("th_budget")}: ${fmtCurrency(r.budget)}`,
+            `${t("th_realizado")}: ${fmtCurrency(r.realizado)}`,
+            `${t("budget_committed_remaining")}: ${fmtCurrency(committedRemain)}`,
+            `${t("budget_projection")}: ${fmtCurrency(projection)} (${Math.round(pctProjection)}%)`,
+            `${Math.round(r.pctConsumed)}% ${t("of_budget")}`,
+          ].join("\n");
 
           return (
             <div key={r.name} className="flex flex-col gap-1">
@@ -44,11 +65,22 @@ export default function BudgetStatusList({ job, jobsMeta }: { job: string; jobsM
                 }}>
                   {r.active ? t("active") : t("completed")}
                 </span>
-                <div style={{
-                  flex: 1, position: "relative", height: 14,
-                  background: "var(--fr-surface)", borderRadius: 4,
-                }}>
-                  <div style={{ position: "absolute", inset: 0, width: `${fill}%`, background: st.color, borderRadius: 4 }} />
+                <div
+                  title={tooltip}
+                  style={{
+                    flex: 1, position: "relative", height: 14,
+                    background: "var(--fr-surface)", borderRadius: 4, overflow: "visible",
+                  }}
+                >
+                  <div style={{ position: "absolute", inset: 0, width: `${realPctVisual}%`, background: st.color, borderRadius: 4 }} />
+                  {commPctVisual > 0 && (
+                    <div style={{
+                      position: "absolute", top: 0, bottom: 0,
+                      left: `${realPctVisual}%`, width: `${commPctVisual}%`,
+                      background: st.color, opacity: 0.4,
+                      borderTopRightRadius: 4, borderBottomRightRadius: 4,
+                    }} />
+                  )}
                   {over > 0 && (
                     <div style={{
                       position: "absolute", top: -2, left: "100%", height: 18,
@@ -74,6 +106,9 @@ export default function BudgetStatusList({ job, jobsMeta }: { job: string; jobsM
                 {r.dateStarted
                   ? <>{t("since")} {fmtDateLocale(r.dateStarted, lang)} · {fmtCurrency(burn)} {t("monthly_avg")}</>
                   : <>{t("period_unknown")}</>}
+                {committedRemain > 0 && (
+                  <> · {t("budget_committed_remaining")}: <strong style={{ color: "var(--fr-navy)" }}>{fmtCurrency(committedRemain)}</strong></>
+                )}
               </div>
             </div>
           );
@@ -82,6 +117,18 @@ export default function BudgetStatusList({ job, jobsMeta }: { job: string; jobsM
           <div className="fr-muted" style={{ fontSize: 13, padding: 12 }}>{t("empty_none")}</div>
         )}
       </div>
+
+      {committed && committed.unassignedAmount > 0 && job === "__ALL__" && (
+        <div style={{
+          marginTop: 16, padding: "8px 12px", borderRadius: 6,
+          background: "rgba(234,170,0,0.10)", color: "var(--fr-navy)", fontSize: 12,
+        }}>
+          {t("committed_no_project", {
+            v: fmtCurrency(committed.unassignedAmount),
+            n: committed.unassignedCount,
+          })}
+        </div>
+      )}
     </div>
   );
 }
