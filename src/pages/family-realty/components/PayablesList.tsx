@@ -1,14 +1,17 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useI18n, fmtCurrency, fmtDateLocale } from "../lib/i18n";
+import SupplierSelect, { matchSupplier } from "./SupplierSelect";
 import { today0, type PayableItem } from "../data";
 
 const DAY = 86400000;
 
 export default function PayablesList({ items, job }: { items: PayableItem[]; job: string }) {
   const { t, lang } = useI18n();
+  const [supplier, setSupplier] = useState<string>("");
 
   const rows = useMemo(() => {
-    const scope = job === "__ALL__" ? items : items.filter((i) => i.job === job || (job === "__UNASSIGNED__" && !i.job));
+    let scope = job === "__ALL__" ? items : items.filter((i) => i.job === job || (job === "__UNASSIGNED__" && !i.job));
+    scope = scope.filter((i) => matchSupplier(i.supplier, i.supplierCanonical, supplier));
     const now = today0().getTime();
     return [...scope].sort((a, b) => {
       if (a.overdue !== b.overdue) return a.overdue ? -1 : 1;
@@ -24,19 +27,21 @@ export default function PayablesList({ items, job }: { items: PayableItem[]; job
       else dueLabel = t("due_in", { n: days! });
       return { ...p, days, dueLabel };
     });
-  }, [items, job, t]);
+  }, [items, job, t, supplier]);
 
   const total = rows.reduce((s, r) => s + r.amount, 0);
+  const supplierOptions = useMemo(() => items.map((i) => i.supplierCanonical || i.supplier), [items]);
 
   return (
     <div className="fr-card p-5">
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex flex-wrap items-center justify-between mb-3 gap-3">
         <h3 className="fr-heading" style={{ fontSize: 16, color: "var(--fr-navy)", margin: 0 }}>
-          {t("sec_topay")}
+          {t("sec_topay")}{" "}
+          <span className="fr-muted" style={{ fontSize: 12, fontWeight: 400 }}>
+            ({t("filtered_meta", { n: rows.length, v: fmtCurrency(total) })})
+          </span>
         </h3>
-        <div className="fr-muted" style={{ fontSize: 12 }}>
-          {rows.length} {t("invoices")} · <strong style={{ color: "var(--fr-navy)" }}>{fmtCurrency(total)}</strong>
-        </div>
+        <SupplierSelect value={supplier} onChange={setSupplier} suppliers={supplierOptions} />
       </div>
       <div style={{ maxHeight: 420, overflowY: "auto", border: "1px solid var(--fr-border)", borderRadius: 8 }}>
         <table className="fr-table">
