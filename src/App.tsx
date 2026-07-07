@@ -11,7 +11,6 @@ import NotFound from "./pages/NotFound";
 import Complo from "./pages/Complo";
 import ScoreDeCredito from "./pages/ScoreDeCredito";
 import PodunkAnnies from "./pages/PodunkAnnies";
-import DenisEnergiaSolar from "./pages/DenisEnergiaSolar";
 import FamilyRealty from "./pages/family-realty";
 import Adcole from "./pages/Adcole";
 import Cervejarias from "./pages/Cervejarias";
@@ -31,7 +30,7 @@ const App = () => (
           <Route path="/complo" element={<Complo />} />
           <Route path="/Score.de.credito.DCarvalho" element={<ScoreDeCredito />} />
           <Route path="/PodunkAnnies" element={<PodunkAnnies />} />
-          <Route path="/denis-energia-solar" element={<DenisEnergiaSolar />} />
+          
           <Route path="/family-realty/*" element={<FamilyRealty />} />
           <Route path="/adcole" element={<Adcole />} />
           <Route path="/cervejarias" element={<Cervejarias />} />
