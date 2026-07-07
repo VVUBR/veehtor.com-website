@@ -35,13 +35,7 @@ export default function ContractsSection({ items, job }: { items: ContractRow[];
         <h3 className="fr-heading" style={{ fontSize: 16, color: "var(--fr-navy)", margin: 0 }}>
           {t("sec_contracts")} <span className="fr-muted" style={{ fontSize: 12, fontWeight: 400 }}>({rows.length} · {totalInstallments} {t("th_installments").toLowerCase()})</span>
         </h3>
-        <input
-          className="fr-select fr-print-hide"
-          placeholder={t("th_supplier")}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          style={{ minWidth: 200 }}
-        />
+        <SupplierSelect value={supplier} onChange={setSupplier} suppliers={supplierOptions} />
       </div>
       <div style={{ maxHeight: 520, overflowY: "auto", border: "1px solid var(--fr-border)", borderRadius: 8 }}>
         <div style={{ display: "grid", gap: 8, padding: 8 }}>
