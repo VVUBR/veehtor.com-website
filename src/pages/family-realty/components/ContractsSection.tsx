@@ -7,7 +7,7 @@ const PER_PAGE = 10;
 
 export default function ContractsSection({ items, job }: { items: ContractRow[]; job: string }) {
   const { t, lang } = useI18n();
-  const [query, setQuery] = useState("");
+  const [supplier, setSupplier] = useState<string>("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [page, setPage] = useState(1);
 
@@ -15,17 +15,16 @@ export default function ContractsSection({ items, job }: { items: ContractRow[];
   const rows = useMemo(() => {
     let arr = items;
     if (job !== "__ALL__") arr = arr.filter((c) => c.project === job || (job === "__UNASSIGNED__" && !c.project));
-    if (query.trim()) {
-      const q = query.toLowerCase();
-      arr = arr.filter((c) => c.vendor.toLowerCase().includes(q));
-    }
+    if (supplier) arr = arr.filter((c) => matchSupplier(c.vendor, "", supplier));
     return arr;
-  }, [items, job, query]);
+  }, [items, job, supplier]);
+
+  const supplierOptions = useMemo(() => items.map((c) => c.vendor), [items]);
 
   const totalValue = rows.reduce((s, r) => s + r.totalValue, 0);
   const totalInstallments = rows.reduce((s, r) => s + r.installments.length, 0);
   const totalPages = Math.max(1, Math.ceil(rows.length / PER_PAGE));
-  useEffect(() => { setPage(1); }, [job, query]);
+  useEffect(() => { setPage(1); }, [job, supplier]);
   const clampedPage = Math.min(page, totalPages);
   const pageRows = rows.slice((clampedPage - 1) * PER_PAGE, clampedPage * PER_PAGE);
 
