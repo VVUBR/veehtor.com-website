@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { useI18n, fmtCurrency, fmtDateLocale } from "../lib/i18n";
+import SupplierSelect, { matchSupplier } from "./SupplierSelect";
 import type { ContractRow } from "../data";
 
 const PER_PAGE = 10;
