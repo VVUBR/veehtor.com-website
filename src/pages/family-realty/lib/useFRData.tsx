@@ -180,6 +180,13 @@ async function loadAll() {
     fetchAll<Record<string, unknown>>("w9").catch(() => []),
   ]);
 
+  // eslint-disable-next-line no-console
+  console.info("[FR] fetch counts", {
+    subCompliance: subCompliance.length,
+    insurance: insuranceRaw.length,
+    w9: w9Raw.length,
+  });
+
   // -- Jobs --
   const jobsMeta: JobMeta[] = bvaProject
     .filter((r) => r.project)
