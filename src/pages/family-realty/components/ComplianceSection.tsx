@@ -558,7 +558,7 @@ export default function ComplianceSection({ rows, insuranceBySub, w9BySub, job }
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               );
             })}
             {filtered.length === 0 && (
