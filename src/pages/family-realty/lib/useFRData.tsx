@@ -15,6 +15,10 @@ import {
   type Installment,
   type WeeklyCostRow,
   type CommittedContracts,
+  type SubComplianceRow,
+  type InsuranceRow,
+  type W9Row,
+  uniqueProjects,
 } from "../data";
 
 type WeeklyRow = {
@@ -157,6 +161,9 @@ async function loadAll() {
     contractSum,
     disbursement,
     weekly,
+    subCompliance,
+    insuranceRaw,
+    w9Raw,
   ] = await Promise.all([
     fetchAll<BvaProjectRow>("v_budget_vs_actual_by_project").catch(() => []),
     fetchAll<BvaLineRow>("v_budget_vs_actual").catch(() => []),
@@ -168,6 +175,9 @@ async function loadAll() {
     fetchAll<ContractPaySumRow>("v_contract_payment_summary").catch(() => []),
     fetchAll<DisbursementRow>("v_disbursement_schedule").catch(() => []),
     fetchAll<WeeklyRow>("v_weekly_costs").catch(() => []),
+    fetchAll<Record<string, unknown>>("v_sub_compliance").catch(() => []),
+    fetchAll<Record<string, unknown>>("insurance").catch(() => []),
+    fetchAll<Record<string, unknown>>("w9").catch(() => []),
   ]);
 
   // -- Jobs --
@@ -367,6 +377,83 @@ async function loadAll() {
     cardNumber: r.card_number || null,
   }));
 
+  // -- Compliance --
+  const str = (v: unknown): string => (v == null ? "" : String(v));
+  const strOrNull = (v: unknown): string | null => {
+    const s = v == null ? "" : String(v).trim();
+    return s ? s : null;
+  };
+
+  const subCompliance_: SubComplianceRow[] = subCompliance.map((r) => {
+    const raw = str(r.active_projects);
+    return {
+      subcontractor: str(r.subcontractor) || "—",
+      subcontractorCanonical: str(r.subcontractor_canonical || r.subcontractor),
+      activeProjects: uniqueProjects(raw),
+      activeProjectsRaw: raw,
+      severity: Number(r.severity ?? 0) || 0,
+      w9Status: str(r.w9_status),
+      glStatus: str(r.gl_status),
+      wcStatus: str(r.wc_status),
+      wcKind: strOrNull(r.wc_kind),
+      w9FileLink: strOrNull(r.w9_file_link),
+      glFileLink: strOrNull(r.gl_file_link),
+      wcFileLink: strOrNull(r.wc_file_link),
+      lastInvoiceDate: parseSafeDate(str(r.last_invoice_date)).date,
+      hasRecentInvoice: r.has_recent_invoice === true || r.has_recent_invoice === "true",
+      hasContract: r.has_contract === true || r.has_contract === "true",
+      w9DocId: strOrNull(r.w9_doc_id),
+      glPolicyKey: strOrNull(r.gl_policy_key),
+      wcPolicyKey: strOrNull(r.wc_policy_key),
+    };
+  });
+
+  const insuranceBySub = new Map<string, InsuranceRow[]>();
+  for (const r of insuranceRaw) {
+    const canon = str(r.subcontractor_canonical || r.subcontractor);
+    if (!canon) continue;
+    const row: InsuranceRow = {
+      policyKey: str(r.policy_key || r.id),
+      subcontractorCanonical: canon,
+      policyType: str(r.policy_type),
+      insurer: strOrNull(r.insurer),
+      policyNumber: strOrNull(r.policy_number),
+      effectiveDate: parseSafeDate(str(r.effective_date)).date,
+      expirationDate: parseSafeDate(str(r.expiration_date)).date,
+      limitOccurrence: r.limit_occurrence != null ? num(r.limit_occurrence) : null,
+      limitAggregate: r.limit_aggregate != null ? num(r.limit_aggregate) : null,
+      additionalInsured: strOrNull(r.additional_insured),
+      certificateHolderOk: strOrNull(r.certificate_holder_ok),
+      kind: strOrNull(r.kind),
+    };
+    const arr = insuranceBySub.get(canon) || [];
+    arr.push(row);
+    insuranceBySub.set(canon, arr);
+  }
+  for (const arr of insuranceBySub.values()) {
+    arr.sort((a, b) => (b.expirationDate?.getTime() ?? 0) - (a.expirationDate?.getTime() ?? 0));
+  }
+
+  const w9BySub = new Map<string, W9Row[]>();
+  for (const r of w9Raw) {
+    const canon = str(r.subcontractor_canonical || r.subcontractor);
+    if (!canon) continue;
+    const row: W9Row = {
+      docId: str(r.doc_id || r.id),
+      subcontractorCanonical: canon,
+      signatureDate: parseSafeDate(str(r.signature_date)).date,
+      w9Revision: strOrNull(r.w9_revision),
+      taxClassification: strOrNull(r.tax_classification),
+      reviewDue: parseSafeDate(str(r.review_due)).date,
+    };
+    const arr = w9BySub.get(canon) || [];
+    arr.push(row);
+    w9BySub.set(canon, arr);
+  }
+  for (const arr of w9BySub.values()) {
+    arr.sort((a, b) => (b.signatureDate?.getTime() ?? 0) - (a.signatureDate?.getTime() ?? 0));
+  }
+
   return {
     jobs,
     jobsMeta,
@@ -379,6 +466,9 @@ async function loadAll() {
     contractRows,
     weeklyRows,
     committed,
+    subCompliance: subCompliance_,
+    insuranceBySub,
+    w9BySub,
   };
 }
 
@@ -389,13 +479,14 @@ const empty: FRData = {
   jobs: [], jobsMeta: [], budgetLines: [], payables: [], unassignedItems: [],
   unassignedTotal: 0, evbRows: [], historyItems: [], contractRows: [], weeklyRows: [],
   committed: { total: 0, byProject: new Map(), unassignedAmount: 0, unassignedCount: 0 },
+  subCompliance: [], insuranceBySub: new Map(), w9BySub: new Map(),
 };
 
 const FRDataContext = createContext<Ctx | null>(null);
 
 export function FRDataProvider({ children }: { children: ReactNode }) {
   const q = useQuery({
-    queryKey: ["fr-real-data-v3"],
+    queryKey: ["fr-real-data-v4"],
     queryFn: loadAll,
     staleTime: 5 * 60_000,
     retry: 1,

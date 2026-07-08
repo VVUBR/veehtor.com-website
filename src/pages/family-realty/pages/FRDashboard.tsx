@@ -8,6 +8,7 @@ import MonthlySpendChart from "../components/MonthlySpendChart";
 import PayablesList from "../components/PayablesList";
 import CostTable from "../components/CostTable";
 import ContractsSection from "../components/ContractsSection";
+import ComplianceSection from "../components/ComplianceSection";
 import EstimateVsBilledSection from "../components/EstimateVsBilledSection";
 import UnassignedSection from "../components/UnassignedSection";
 import WeeklySummarySection from "../components/WeeklySummarySection";
@@ -239,6 +240,14 @@ function DashboardInner() {
             </section>
             <section className="mt-4">
               <ContractsSection items={data.contractRows} job={job} />
+            </section>
+            <section className="mt-4">
+              <ComplianceSection
+                rows={data.subCompliance}
+                insuranceBySub={data.insuranceBySub}
+                w9BySub={data.w9BySub}
+                job={job}
+              />
             </section>
             <section className="mt-4">
               <EstimateVsBilledSection items={data.evbRows} job={job} />
