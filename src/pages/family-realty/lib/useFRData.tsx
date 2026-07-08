@@ -486,7 +486,7 @@ const FRDataContext = createContext<Ctx | null>(null);
 
 export function FRDataProvider({ children }: { children: ReactNode }) {
   const q = useQuery({
-    queryKey: ["fr-real-data-v3"],
+    queryKey: ["fr-real-data-v4"],
     queryFn: loadAll,
     staleTime: 5 * 60_000,
     retry: 1,
