@@ -330,17 +330,77 @@ export default function ComplianceSection({ rows, insuranceBySub, w9BySub, job }
               const isOpen = !!expanded[key];
               const insAll = insuranceBySub.get(r.subcontractorCanonical) || [];
               const w9All = w9BySub.get(r.subcontractorCanonical) || [];
-              const glVigente =
-                (r.glPolicyKey && insAll.find((x) => x.policyKey === r.glPolicyKey)) || null;
-              const wcVigente =
-                (r.wcPolicyKey && insAll.find((x) => x.policyKey === r.wcPolicyKey)) || null;
-              const w9Vigente =
-                (r.w9DocId && w9All.find((x) => x.docId === r.w9DocId)) || null;
+
+              // Pick the most recent GL / WC row from the tables when available;
+              // otherwise fall back to a synthesized row from v_sub_compliance so
+              // the Vigente cards always reflect what the main-row badges show.
+              const glFromTable =
+                (r.glPolicyKey && insAll.find((x) => x.policyKey === r.glPolicyKey)) ||
+                insAll.find((x) => /general/i.test(x.policyType)) ||
+                null;
+              const wcFromTable =
+                (r.wcPolicyKey && insAll.find((x) => x.policyKey === r.wcPolicyKey)) ||
+                insAll.find((x) => /workers|exemption|isen/i.test(x.policyType)) ||
+                null;
+              const w9FromTable =
+                (r.w9DocId && w9All.find((x) => x.docId === r.w9DocId)) ||
+                w9All[0] ||
+                null;
+
+              const glVigente: InsuranceRow | null =
+                glFromTable ||
+                (r.glExpiration || r.glFileLink
+                  ? {
+                      policyKey: "view:gl",
+                      subcontractorCanonical: r.subcontractorCanonical,
+                      policyType: "General Liability",
+                      insurer: null,
+                      policyNumber: null,
+                      effectiveDate: null,
+                      expirationDate: r.glExpiration,
+                      limitOccurrence: null,
+                      limitAggregate: null,
+                      additionalInsured: null,
+                      certificateHolderOk: null,
+                      kind: null,
+                    }
+                  : null);
+              const wcVigente: InsuranceRow | null =
+                wcFromTable ||
+                (r.wcExpiration || r.wcFileLink
+                  ? {
+                      policyKey: "view:wc",
+                      subcontractorCanonical: r.subcontractorCanonical,
+                      policyType: "Workers Comp",
+                      insurer: null,
+                      policyNumber: null,
+                      effectiveDate: null,
+                      expirationDate: r.wcExpiration,
+                      limitOccurrence: null,
+                      limitAggregate: null,
+                      additionalInsured: null,
+                      certificateHolderOk: null,
+                      kind: r.wcKind,
+                    }
+                  : null);
+              const w9Vigente: W9Row | null =
+                w9FromTable ||
+                (r.w9SignatureDate || r.w9FileLink
+                  ? {
+                      docId: "view:w9",
+                      subcontractorCanonical: r.subcontractorCanonical,
+                      signatureDate: r.w9SignatureDate,
+                      w9Revision: null,
+                      taxClassification: null,
+                      reviewDue: r.w9ReviewDue,
+                    }
+                  : null);
+
               const vigenteKeys = new Set<string>(
-                [r.glPolicyKey, r.wcPolicyKey].filter(Boolean) as string[],
+                [glVigente?.policyKey, wcVigente?.policyKey].filter(Boolean) as string[],
               );
               const vigenteW9Ids = new Set<string>(
-                [r.w9DocId].filter(Boolean) as string[],
+                [w9Vigente?.docId].filter(Boolean) as string[],
               );
               const historyIns = insAll.filter((x) => !vigenteKeys.has(x.policyKey));
               const historyW9 = w9All.filter((x) => !vigenteW9Ids.has(x.docId));

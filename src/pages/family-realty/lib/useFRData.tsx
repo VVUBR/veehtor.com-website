@@ -180,6 +180,13 @@ async function loadAll() {
     fetchAll<Record<string, unknown>>("w9").catch(() => []),
   ]);
 
+  // eslint-disable-next-line no-console
+  console.info("[FR] fetch counts", {
+    subCompliance: subCompliance.length,
+    insurance: insuranceRaw.length,
+    w9: w9Raw.length,
+  });
+
   // -- Jobs --
   const jobsMeta: JobMeta[] = bvaProject
     .filter((r) => r.project)
@@ -402,6 +409,10 @@ async function loadAll() {
       lastInvoiceDate: parseSafeDate(str(r.last_invoice_date)).date,
       hasRecentInvoice: r.has_recent_invoice === true || r.has_recent_invoice === "true",
       hasContract: r.has_contract === true || r.has_contract === "true",
+      w9SignatureDate: parseSafeDate(str(r.w9_signature_date)).date,
+      w9ReviewDue: parseSafeDate(str(r.w9_review_due)).date,
+      glExpiration: parseSafeDate(str(r.gl_expiration)).date,
+      wcExpiration: parseSafeDate(str(r.wc_expiration)).date,
       w9DocId: strOrNull(r.w9_doc_id),
       glPolicyKey: strOrNull(r.gl_policy_key),
       wcPolicyKey: strOrNull(r.wc_policy_key),

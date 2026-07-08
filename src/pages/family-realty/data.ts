@@ -244,7 +244,12 @@ export type SubComplianceRow = {
   lastInvoiceDate: Date | null;
   hasRecentInvoice: boolean;
   hasContract: boolean;
-  // vigente identifiers, used to separate vigente vs histórico in drill-down
+  // Vigente snapshot straight from the view (source of truth for the drill-down).
+  w9SignatureDate: Date | null;
+  w9ReviewDue: Date | null;
+  glExpiration: Date | null;
+  wcExpiration: Date | null;
+  // Optional identifiers if the view exposes them (used to separate vigente vs histórico).
   w9DocId: string | null;
   glPolicyKey: string | null;
   wcPolicyKey: string | null;
