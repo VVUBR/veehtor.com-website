@@ -8,6 +8,7 @@ import MonthlySpendChart from "../components/MonthlySpendChart";
 import PayablesList from "../components/PayablesList";
 import CostTable from "../components/CostTable";
 import ContractsSection from "../components/ContractsSection";
+import ComplianceSection from "../components/ComplianceSection";
 import EstimateVsBilledSection from "../components/EstimateVsBilledSection";
 import UnassignedSection from "../components/UnassignedSection";
 import WeeklySummarySection from "../components/WeeklySummarySection";
