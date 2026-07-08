@@ -242,6 +242,14 @@ function DashboardInner() {
               <ContractsSection items={data.contractRows} job={job} />
             </section>
             <section className="mt-4">
+              <ComplianceSection
+                rows={data.subCompliance}
+                insuranceBySub={data.insuranceBySub}
+                w9BySub={data.w9BySub}
+                job={job}
+              />
+            </section>
+            <section className="mt-4">
               <EstimateVsBilledSection items={data.evbRows} job={job} />
             </section>
           </>
