@@ -224,3 +224,80 @@ export function fmtCardNumber(v: string | null | undefined): string {
   if (!digits) return String(v);
   return `**** ${digits.slice(-4)}`;
 }
+
+// ---------- Compliance ----------
+export type ComplianceStatus = string; // 'VIGENTE' | 'VENCE...' | 'VENCIDO' | 'SEM' | 'REVISAR' | 'REVISAO EM BREVE' | 'OK' | etc.
+
+export type SubComplianceRow = {
+  subcontractor: string;
+  subcontractorCanonical: string;
+  activeProjects: string[];
+  activeProjectsRaw: string;
+  severity: number; // 0..3
+  w9Status: ComplianceStatus;
+  glStatus: ComplianceStatus;
+  wcStatus: ComplianceStatus;
+  wcKind: string | null;
+  w9FileLink: string | null;
+  glFileLink: string | null;
+  wcFileLink: string | null;
+  lastInvoiceDate: Date | null;
+  hasRecentInvoice: boolean;
+  hasContract: boolean;
+  // vigente identifiers, used to separate vigente vs histórico in drill-down
+  w9DocId: string | null;
+  glPolicyKey: string | null;
+  wcPolicyKey: string | null;
+};
+
+export type InsuranceRow = {
+  policyKey: string;
+  subcontractorCanonical: string;
+  policyType: string; // GL / WC / Auto / Umbrella / ...
+  insurer: string | null;
+  policyNumber: string | null;
+  effectiveDate: Date | null;
+  expirationDate: Date | null;
+  limitOccurrence: number | null;
+  limitAggregate: number | null;
+  additionalInsured: string | null;
+  certificateHolderOk: string | null; // 'SIM' | 'NAO' | null
+  kind: string | null;
+};
+
+export type W9Row = {
+  docId: string;
+  subcontractorCanonical: string;
+  signatureDate: Date | null;
+  w9Revision: string | null;
+  taxClassification: string | null;
+  reviewDue: Date | null;
+};
+
+export function uniqueProjects(raw: string | null | undefined): string[] {
+  if (!raw) return [];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const p of String(raw).split(",")) {
+    const v = p.trim();
+    if (!v || seen.has(v)) continue;
+    seen.add(v);
+    out.push(v);
+  }
+  return out;
+}
+
+export function complianceSeverityBucket(sev: number): "critical" | "attention" | "ok" {
+  if (sev >= 3) return "critical";
+  if (sev === 2) return "attention";
+  return "ok"; // 0 and 1
+}
+
+export function complianceStatusTone(status: string | null | undefined): "red" | "amber" | "green" | "muted" {
+  const v = (status || "").toUpperCase().trim();
+  if (!v) return "muted";
+  if (v === "SEM" || v === "VENCIDO" || v === "REVISAR") return "red";
+  if (v.startsWith("VENCE") || v.startsWith("REVISAO") || v.startsWith("REVISÃO")) return "amber";
+  if (v === "VIGENTE" || v === "OK") return "green";
+  return "muted";
+}
