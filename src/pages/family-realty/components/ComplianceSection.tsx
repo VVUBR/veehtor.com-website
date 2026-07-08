@@ -22,6 +22,14 @@ const TONE_STYLE: Record<string, { bg: string; fg: string; border: string }> = {
   muted: { bg: "#eef0f4", fg: "#808080", border: "#e3e6ec" },
 };
 
+function fmtYesNo(v: string | null | undefined, lang: string): string {
+  const s = (v || "").trim().toUpperCase();
+  if (!s) return "—";
+  if (["Y", "YES", "SIM", "S", "TRUE", "1"].includes(s)) return lang === "pt" ? "Sim" : "Yes";
+  if (["N", "NO", "NAO", "NÃO", "FALSE", "0"].includes(s)) return lang === "pt" ? "Não" : "No";
+  return v as string;
+}
+
 function StatusBadge({
   status,
   link,
