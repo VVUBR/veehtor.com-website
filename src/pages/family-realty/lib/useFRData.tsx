@@ -161,6 +161,9 @@ async function loadAll() {
     contractSum,
     disbursement,
     weekly,
+    subCompliance,
+    insuranceRaw,
+    w9Raw,
   ] = await Promise.all([
     fetchAll<BvaProjectRow>("v_budget_vs_actual_by_project").catch(() => []),
     fetchAll<BvaLineRow>("v_budget_vs_actual").catch(() => []),
@@ -172,6 +175,9 @@ async function loadAll() {
     fetchAll<ContractPaySumRow>("v_contract_payment_summary").catch(() => []),
     fetchAll<DisbursementRow>("v_disbursement_schedule").catch(() => []),
     fetchAll<WeeklyRow>("v_weekly_costs").catch(() => []),
+    fetchAll<Record<string, unknown>>("v_sub_compliance").catch(() => []),
+    fetchAll<Record<string, unknown>>("insurance").catch(() => []),
+    fetchAll<Record<string, unknown>>("w9").catch(() => []),
   ]);
 
   // -- Jobs --
