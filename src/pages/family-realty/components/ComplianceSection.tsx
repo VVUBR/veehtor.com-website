@@ -147,8 +147,9 @@ function InsuranceCard({
             label={t("ins_limit_agg")}
             v={row.limitAggregate != null ? fmtCurrency(row.limitAggregate) : "—"}
           />
-          <Field label={t("ins_additional_insured")} v={row.additionalInsured || "—"} />
-          <Field label={t("ins_cert_holder_ok")} v={row.certificateHolderOk || "—"} />
+          <Field label={t("ins_additional_insured")} v={fmtYesNo(row.additionalInsured, lang)} />
+          <Field label={t("ins_cert_holder_ok")} v={fmtYesNo(row.certificateHolderOk, lang)} />
+
           {(row.certificateHolderOk || "").toUpperCase() === "NAO" && (
             <div
               style={{
