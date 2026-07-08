@@ -22,6 +22,14 @@ const TONE_STYLE: Record<string, { bg: string; fg: string; border: string }> = {
   muted: { bg: "#eef0f4", fg: "#808080", border: "#e3e6ec" },
 };
 
+function fmtYesNo(v: string | null | undefined, lang: string): string {
+  const s = (v || "").trim().toUpperCase();
+  if (!s) return "—";
+  if (["Y", "YES", "SIM", "S", "TRUE", "1"].includes(s)) return lang === "pt" ? "Sim" : "Yes";
+  if (["N", "NO", "NAO", "NÃO", "FALSE", "0"].includes(s)) return lang === "pt" ? "Não" : "No";
+  return v as string;
+}
+
 function StatusBadge({
   status,
   link,
@@ -147,8 +155,9 @@ function InsuranceCard({
             label={t("ins_limit_agg")}
             v={row.limitAggregate != null ? fmtCurrency(row.limitAggregate) : "—"}
           />
-          <Field label={t("ins_additional_insured")} v={row.additionalInsured || "—"} />
-          <Field label={t("ins_cert_holder_ok")} v={row.certificateHolderOk || "—"} />
+          <Field label={t("ins_additional_insured")} v={fmtYesNo(row.additionalInsured, lang)} />
+          <Field label={t("ins_cert_holder_ok")} v={fmtYesNo(row.certificateHolderOk, lang)} />
+
           {(row.certificateHolderOk || "").toUpperCase() === "NAO" && (
             <div
               style={{
