@@ -354,7 +354,7 @@ export default function ComplianceSection({ rows, insuranceBySub, w9BySub, job }
               const historyKey = key + "::hist";
               const isHistOpen = !!historyOpen[historyKey];
               return (
-                <>
+                <Fragment key={key}>
                   <tr key={key}>
                     <td style={{ fontWeight: 700, color: "var(--fr-navy)" }}>{r.subcontractor}</td>
                     <td style={{ fontSize: 11 }}>{projectsText}</td>
