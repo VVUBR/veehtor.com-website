@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import comploLogoAsset from "@/assets/complo-logo-white.png.asset.json";
 import {
   Accordion,
   AccordionContent,
@@ -210,7 +209,7 @@ function ProofBar() {
           style={{ borderColor: "rgba(46,230,168,0.3)", ...sans }}
         >
           <img
-            src={comploLogoAsset.url}
+            src="/complo-logo-white.png"
             alt="Logo Cervejaria Complô"
             className="max-h-[140px] w-auto object-contain"
           />
