@@ -206,9 +206,13 @@ function ProofBar() {
         </div>
         <div
           className="flex items-center justify-center rounded-xl border-2 border-dashed px-10 py-8 min-w-[180px]"
-          style={{ borderColor: "rgba(46,230,168,0.3)", color: "#6b6558", ...sans }}
+          style={{ borderColor: "rgba(46,230,168,0.3)", ...sans }}
         >
-          <span className="text-sm">logo Complô</span>
+          <img
+            src="/complo-logo-white.png"
+            alt="Logo Cervejaria Complô"
+            className="max-h-[140px] w-auto object-contain"
+          />
         </div>
       </div>
     </section>
