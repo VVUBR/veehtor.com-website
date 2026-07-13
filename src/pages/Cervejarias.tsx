@@ -228,15 +228,17 @@ function ProofBar() {
           </p>
         </div>
         <div
-          className="flex items-center justify-center rounded-xl border-2 border-dashed px-10 py-8 min-w-[180px]"
-          style={{ borderColor: "rgba(46,230,168,0.3)", ...sans }}
+          className="relative flex items-center justify-center rounded-xl overflow-hidden px-10 py-10 min-w-[220px] min-h-[200px] bg-cover bg-center"
+          style={{ backgroundImage: `url(${comploGarden.url})`, ...sans }}
         >
+          <div className="absolute inset-0" style={{ background: "rgba(10,12,16,0.7)" }} />
           <img
             src="/complo-logo-white.png"
             alt="Logo Cervejaria Complô"
-            className="max-h-[140px] w-auto object-contain"
+            className="relative max-h-[140px] w-auto object-contain"
           />
         </div>
+
       </div>
     </section>
   );
