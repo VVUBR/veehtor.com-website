@@ -711,13 +711,18 @@ function FAQ() {
 function FinalCTA() {
   return (
     <section
-      className="px-6 py-32 text-center"
-      style={{
-        background:
-          "radial-gradient(ellipse at center, rgba(46, 230, 168, 0.10), transparent 60%), #0a0c10",
-      }}
+      className="relative px-6 py-32 text-center overflow-hidden bg-cover bg-center"
+      style={{ backgroundImage: `url(${comploCheers.url})` }}
     >
-      <div className="max-w-3xl mx-auto">
+      <div className="absolute inset-0" style={{ background: "rgba(10,12,16,0.84)" }} />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, rgba(46, 230, 168, 0.12), transparent 60%)",
+        }}
+      />
+      <div className="relative max-w-3xl mx-auto">
         <Label>Vamos conversar</Label>
         <TitleWithItalic
           before="Bora conversar sobre "
@@ -735,6 +740,7 @@ function FinalCTA() {
         </div>
       </div>
     </section>
+
   );
 }
 
