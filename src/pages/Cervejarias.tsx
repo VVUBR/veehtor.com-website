@@ -165,13 +165,13 @@ function Hero() {
             className="mt-8 max-w-3xl text-lg md:text-xl leading-relaxed"
             style={{ ...sans, color: "#b8b3a8" }}
           >
-            Trabalhamos 3 meses dentro da operação da Complô, uma rede de 5
-            cervejarias, e colocamos tudo num painel só. A folha de pagamento que
-            tomava um dia inteiro do gerente toda semana hoje leva cerca de 2 horas no
+            Trabalhamos dentro da operação da Complô, uma rede de 5 cervejarias,
+            e colocamos tudo num painel só. A folha de pagamento que tomava um
+            dia inteiro do gerente toda semana hoje leva cerca de 2 horas no
             mês. A empresa e os colaboradores ganharam segurança jurídica. E a
-            qualidade de cada abertura e fechamento passou a ser acompanhada por IA.
-            Queremos fazer o mesmo pela sua cervejaria, e só faz sentido pra gente se
-            fizer sentido pra você.
+            qualidade de cada abertura e fechamento passou a ser acompanhada por
+            IA. Queremos fazer o mesmo pela sua cervejaria, e só faz sentido pra
+            gente se fizer sentido pra você.
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-6">
             <CTA />
@@ -250,7 +250,7 @@ function PainMirror() {
       emoji: "💸",
       title: "O risco que já custou caro",
       body:
-        "Freelancer em pico é a regra da operação - e uma bomba-relógio. Um pedido de vínculo na Justiça do Trabalho pode passar de R$ 80 mil, mesmo com contrato assinado. A maioria dos donos só descobre o tamanho do rombo quando a intimação chega.",
+        "Freelancer em pico é a regra da operação e uma bomba-relógio. Um pedido de vínculo na Justiça do Trabalho pode passar de R$ 80 mil, mesmo com contrato assinado. A maioria dos donos só descobre o tamanho do rombo quando a intimação chega.",
     },
     {
       emoji: "🧾",
@@ -262,7 +262,7 @@ function PainMirror() {
       emoji: "🔥",
       title: "O padrão que não se sustenta",
       body:
-        "O CO2 acaba no meio do movimento. A unidade abre torta e ninguém percebe. Cada gerente faz do seu jeito. Quanto mais lojas, mais difícil garantir que todas entreguem o mesmo padrão - e o cliente sente na primeira visita ruim.",
+        "O CO2 acaba no meio do movimento. A unidade abre torta e ninguém percebe. Cada gerente faz do seu jeito. Quanto mais lojas, mais difícil garantir que todas entreguem o mesmo padrão e o cliente sente na primeira visita ruim.",
     },
   ];
   return (
@@ -279,8 +279,8 @@ function PainMirror() {
           className="mt-6 max-w-3xl text-lg leading-relaxed"
           style={{ ...sans, color: "#4a4638" }}
         >
-          A cerveja é boa, o público aparece. Mas nos bastidores é tudo no braço - e é
-          aí que o dinheiro escorre.
+          A cerveja é boa, o público aparece. Mas nos bastidores é tudo no braço e
+          é aí que o dinheiro escorre.
         </p>
         <div className="mt-14 grid md:grid-cols-3 gap-6">
           {cols.map((c) => (
@@ -339,12 +339,12 @@ function TheShift() {
           <p>
             Toda cervejaria gera dados o dia inteiro: vendas no PDV, estoque, horas
             da equipe, avaliações no Google, resultado de anúncio. Mas cada
-            informação está num lugar - planilha, sistema, caderno, cabeça do
+            informação está num lugar, planilha, sistema, caderno, cabeça do
             gerente. Isolados, esses números não significam nada.
           </p>
           <p>
             O caminho do crescimento é outro: coletar tudo, guardar num lugar só e
-            transformar esses dados em informação útil - o que está funcionando, o
+            transformar esses dados em informação útil o que está funcionando, o
             que está dando prejuízo, o que fazer a respeito.
           </p>
           <p>
@@ -385,7 +385,7 @@ function Modules() {
       n: "01",
       title: "Registro de ponto, freelancers e segurança jurídica",
       dor:
-        "Cervejaria depende de freelancer. Processos de vínculo empregatício custam caro - na Complô, já tinham passado de R$ 100 mil. E fechar a folha dos freelancers tomava um dia por semana do gerente.",
+        "Cervejaria depende de freelancer. Processos de vínculo empregatício custam caro, na Complô, já tinham passado de R$ 100 mil. E fechar a folha dos freelancers tomava um dia por semana do gerente.",
       faz:
         "O colaborador bate o ponto pelo aplicativo, com verificação por GPS, então só registra quem está de fato na unidade. No primeiro login, o freelancer assina um contrato digital que fica guardado no sistema. As horas se registram sozinhas e a folha chega pronta pro financeiro.",
       muda:
@@ -405,7 +405,7 @@ function Modules() {
       n: "03",
       title: "Painel único da operação",
       dor:
-        "Faturamento num sistema, estoque noutro. Perguntas básicas - qual loja rende menos, qual produto some, quem são os melhores clientes - não têm resposta.",
+        "Faturamento num sistema, estoque em outro. Perguntas básicas: qual loja rende menos, qual produto some, quem são os melhores clientes, não têm resposta.",
       faz:
         "Integramos seus sistemas (Cardápio Web, Bier Held ou qualquer outro, mesmo sem API) num painel único: faturamento por loja e horário, ticket médio, estoque, produtos e combos mais vendidos, perfil dos clientes. Uma IA analisa os dados e envia insights e planos de ação por unidade, toda semana.",
       muda: "As decisões passam a ser tomadas com dados, não por estimativa.",
@@ -418,7 +418,7 @@ function Modules() {
       faz:
         "Toda avaliação do Google entra no painel automaticamente, junto com uma pesquisa NPS aplicada em cada unidade. A IA identifica o que está derrubando a nota. Reclamações recorrentes viram alerta. As respostas são feitas pelo próprio painel.",
       muda:
-        "O problema chega até você em dias, não semanas - com indicação clara do que corrigir em cada loja.",
+        "O problema chega até você em dias, não semanas, com indicação clara do que corrigir em cada loja.",
     },
     {
       n: "05",
@@ -426,7 +426,7 @@ function Modules() {
       dor:
         "Investimento em anúncio sem saber o retorno. Treinamento de novos funcionários informal, sem padrão.",
       faz:
-        "Dados do Instagram e Meta Ads no painel: o que engaja, o que dá retorno, quando um anúncio perde desempenho. E uma plataforma de treinamento onde a IA monta cursos sob demanda - vídeo, apostila e prova. O gerente delega o curso com prazo e acompanha pelo ranking.",
+        "Dados do Instagram e Meta Ads no painel: o que engaja, o que dá retorno, quando um anúncio perde desempenho. E uma plataforma de treinamento onde a IA monta cursos sob demanda, vídeo, apostila e prova. O gerente delega o curso com prazo e acompanha pelo ranking.",
       muda:
         "O investimento em marketing passa a ser medido. Funcionário novo só assume a função depois de aprovado no treinamento.",
     },
@@ -435,7 +435,7 @@ function Modules() {
   return (
     <section className="px-6 py-28" style={{ background: CREAM }}>
       <div className="max-w-6xl mx-auto">
-        <Label onCream>O que roda dentro do app</Label>
+        <Label onCream>O QUE RODA DENTRO DO PROJETO</Label>
         <TitleWithItalic
           before=""
           italic="Uma operação inteira"
@@ -510,7 +510,7 @@ function RealResults() {
   return (
     <section className="px-6 py-28" style={{ background: DARK }}>
       <div className="max-w-5xl mx-auto">
-        <Label>O que já mudou na Complô</Label>
+        <Label>IMPACTO NO DIA A DIA</Label>
         <TitleWithItalic
           before="O que os números "
           italic="já mostram"
@@ -549,7 +549,7 @@ function RealResults() {
             </div>
             <p className="text-base leading-relaxed" style={{ ...sans, color: "#b8b3a8" }}>
               Valor que a Complô já havia perdido em processos de vínculo. Hoje, cada
-              freelancer assina contrato digital no primeiro login - e a documentação
+              freelancer assina contrato digital no primeiro login e a documentação
               que protege a empresa se constrói sozinha, todo dia.
             </p>
           </div>
@@ -630,7 +630,7 @@ function Pricing() {
         <div className="mt-10 space-y-6 text-lg leading-relaxed" style={{ ...sans, color: "#b8b3a8" }}>
           <p>
             Nossa precificação parte de uma conta simples: quanto a sua operação
-            perde hoje em tempo, risco e erro - e em quanto tempo o investimento
+            perde hoje em tempo, risco e erro e em quanto tempo o investimento
             retorna. Se a conta não fechar a seu favor, a gente é o primeiro a dizer
             que não vale a pena.
           </p>
