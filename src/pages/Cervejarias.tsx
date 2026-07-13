@@ -154,35 +154,54 @@ function Hero() {
           "radial-gradient(ellipse at top right, rgba(15, 76, 65, 0.35), transparent 60%), radial-gradient(ellipse at bottom left, rgba(46, 230, 168, 0.08), transparent 55%), #0a0c10",
       }}
     >
-      <div className="max-w-5xl mx-auto">
-        <Label>Para donos de cervejaria</Label>
-        <TitleWithItalic
-          before="Menos tempo perdido. Menos dinheiro jogado fora. "
-          italic="Menos erro na operação."
-        />
-        <p
-          className="mt-8 max-w-3xl text-lg md:text-xl leading-relaxed"
-          style={{ ...sans, color: "#b8b3a8" }}
-        >
-          Trabalhamos 3 meses dentro da operação da Complô, uma rede de 5
-          cervejarias, e colocamos tudo num painel só. A folha de pagamento que
-          tomava um dia inteiro do gerente toda semana hoje leva cerca de 2 horas no
-          mês. A empresa e os colaboradores ganharam segurança jurídica. E a
-          qualidade de cada abertura e fechamento passou a ser acompanhada por IA.
-          Queremos fazer o mesmo pela sua cervejaria, e só faz sentido pra gente se
-          fizer sentido pra você.
-        </p>
-        <div className="mt-10 flex flex-wrap items-center gap-6">
-          <CTA />
-          <a
-            href="#case"
-            className="text-sm underline underline-offset-4 transition-colors"
-            style={{ color: TEAL, ...sans }}
+      <div className="max-w-6xl mx-auto grid md:grid-cols-[1.15fr_1fr] gap-12 md:gap-16 items-center">
+        <div>
+          <Label>Para donos de cervejaria</Label>
+          <TitleWithItalic
+            before="Menos tempo perdido. Menos dinheiro jogado fora. "
+            italic="Menos erro na operação."
+          />
+          <p
+            className="mt-8 max-w-3xl text-lg md:text-xl leading-relaxed"
+            style={{ ...sans, color: "#b8b3a8" }}
           >
-            Ver o que a gente fez ↓
-          </a>
+            Trabalhamos 3 meses dentro da operação da Complô, uma rede de 5
+            cervejarias, e colocamos tudo num painel só. A folha de pagamento que
+            tomava um dia inteiro do gerente toda semana hoje leva cerca de 2 horas no
+            mês. A empresa e os colaboradores ganharam segurança jurídica. E a
+            qualidade de cada abertura e fechamento passou a ser acompanhada por IA.
+            Queremos fazer o mesmo pela sua cervejaria, e só faz sentido pra gente se
+            fizer sentido pra você.
+          </p>
+          <div className="mt-10 flex flex-wrap items-center gap-6">
+            <CTA />
+            <a
+              href="#case"
+              className="text-sm underline underline-offset-4 transition-colors"
+              style={{ color: TEAL, ...sans }}
+            >
+              Ver o que a gente fez ↓
+            </a>
+          </div>
+        </div>
+        <div className="relative w-full max-w-md justify-self-center md:justify-self-end">
+          <img
+            src={complotap.url}
+            alt="Chopp da Cervejaria Complô sendo servido"
+            className="w-full h-[420px] md:h-[540px] object-cover rounded-2xl"
+            style={{ filter: "brightness(0.88)" }}
+          />
+          <div
+            className="pointer-events-none absolute inset-0 rounded-2xl"
+            style={{
+              boxShadow: "inset 0 0 80px 20px rgba(10,12,16,0.75)",
+              background:
+                "radial-gradient(ellipse at center, transparent 55%, rgba(10,12,16,0.55) 100%)",
+            }}
+          />
         </div>
       </div>
+
     </section>
   );
 }
