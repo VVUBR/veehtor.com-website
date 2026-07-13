@@ -5,6 +5,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import complotap from "@/assets/complo-tap.jpg.asset.json";
+import comploGarden from "@/assets/complo-garden.jpg.asset.json";
+import comploCheers from "@/assets/complo-cheers.jpg.asset.json";
+
 
 const WHATSAPP_URL = "https://wa.me/5511973022058";
 
