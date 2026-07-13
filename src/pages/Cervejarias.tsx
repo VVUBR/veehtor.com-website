@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import comploLogoAsset from "@/assets/complo-logo-white.png.asset.json";
 import {
   Accordion,
   AccordionContent,
