@@ -5,6 +5,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import complotap from "@/assets/complo-tap.jpg.asset.json";
+import comploGarden from "@/assets/complo-garden.jpg.asset.json";
+import comploCheers from "@/assets/complo-cheers.jpg.asset.json";
+
 
 const WHATSAPP_URL = "https://wa.me/5511973022058";
 
@@ -150,35 +154,54 @@ function Hero() {
           "radial-gradient(ellipse at top right, rgba(15, 76, 65, 0.35), transparent 60%), radial-gradient(ellipse at bottom left, rgba(46, 230, 168, 0.08), transparent 55%), #0a0c10",
       }}
     >
-      <div className="max-w-5xl mx-auto">
-        <Label>Para donos de cervejaria</Label>
-        <TitleWithItalic
-          before="Menos tempo perdido. Menos dinheiro jogado fora. "
-          italic="Menos erro na operação."
-        />
-        <p
-          className="mt-8 max-w-3xl text-lg md:text-xl leading-relaxed"
-          style={{ ...sans, color: "#b8b3a8" }}
-        >
-          Trabalhamos 3 meses dentro da operação da Complô, uma rede de 5
-          cervejarias, e colocamos tudo num painel só. A folha de pagamento que
-          tomava um dia inteiro do gerente toda semana hoje leva cerca de 2 horas no
-          mês. A empresa e os colaboradores ganharam segurança jurídica. E a
-          qualidade de cada abertura e fechamento passou a ser acompanhada por IA.
-          Queremos fazer o mesmo pela sua cervejaria, e só faz sentido pra gente se
-          fizer sentido pra você.
-        </p>
-        <div className="mt-10 flex flex-wrap items-center gap-6">
-          <CTA />
-          <a
-            href="#case"
-            className="text-sm underline underline-offset-4 transition-colors"
-            style={{ color: TEAL, ...sans }}
+      <div className="max-w-6xl mx-auto grid md:grid-cols-[1.15fr_1fr] gap-12 md:gap-16 items-center">
+        <div>
+          <Label>Para donos de cervejaria</Label>
+          <TitleWithItalic
+            before="Menos tempo perdido. Menos dinheiro jogado fora. "
+            italic="Menos erro na operação."
+          />
+          <p
+            className="mt-8 max-w-3xl text-lg md:text-xl leading-relaxed"
+            style={{ ...sans, color: "#b8b3a8" }}
           >
-            Ver o que a gente fez ↓
-          </a>
+            Trabalhamos 3 meses dentro da operação da Complô, uma rede de 5
+            cervejarias, e colocamos tudo num painel só. A folha de pagamento que
+            tomava um dia inteiro do gerente toda semana hoje leva cerca de 2 horas no
+            mês. A empresa e os colaboradores ganharam segurança jurídica. E a
+            qualidade de cada abertura e fechamento passou a ser acompanhada por IA.
+            Queremos fazer o mesmo pela sua cervejaria, e só faz sentido pra gente se
+            fizer sentido pra você.
+          </p>
+          <div className="mt-10 flex flex-wrap items-center gap-6">
+            <CTA />
+            <a
+              href="#case"
+              className="text-sm underline underline-offset-4 transition-colors"
+              style={{ color: TEAL, ...sans }}
+            >
+              Ver o que a gente fez ↓
+            </a>
+          </div>
+        </div>
+        <div className="relative w-full max-w-md justify-self-center md:justify-self-end">
+          <img
+            src={complotap.url}
+            alt="Chopp da Cervejaria Complô sendo servido"
+            className="w-full h-[420px] md:h-[540px] object-cover rounded-2xl"
+            style={{ filter: "brightness(0.88)" }}
+          />
+          <div
+            className="pointer-events-none absolute inset-0 rounded-2xl"
+            style={{
+              boxShadow: "inset 0 0 80px 20px rgba(10,12,16,0.75)",
+              background:
+                "radial-gradient(ellipse at center, transparent 55%, rgba(10,12,16,0.55) 100%)",
+            }}
+          />
         </div>
       </div>
+
     </section>
   );
 }
@@ -205,15 +228,17 @@ function ProofBar() {
           </p>
         </div>
         <div
-          className="flex items-center justify-center rounded-xl border-2 border-dashed px-10 py-8 min-w-[180px]"
-          style={{ borderColor: "rgba(46,230,168,0.3)", ...sans }}
+          className="relative flex items-center justify-center rounded-xl overflow-hidden px-10 py-10 min-w-[220px] min-h-[200px] bg-cover bg-center"
+          style={{ backgroundImage: `url(${comploGarden.url})`, ...sans }}
         >
+          <div className="absolute inset-0" style={{ background: "rgba(10,12,16,0.7)" }} />
           <img
             src="/complo-logo-white.png"
             alt="Logo Cervejaria Complô"
-            className="max-h-[140px] w-auto object-contain"
+            className="relative max-h-[140px] w-auto object-contain"
           />
         </div>
+
       </div>
     </section>
   );
@@ -686,13 +711,18 @@ function FAQ() {
 function FinalCTA() {
   return (
     <section
-      className="px-6 py-32 text-center"
-      style={{
-        background:
-          "radial-gradient(ellipse at center, rgba(46, 230, 168, 0.10), transparent 60%), #0a0c10",
-      }}
+      className="relative px-6 py-32 text-center overflow-hidden bg-cover bg-center"
+      style={{ backgroundImage: `url(${comploCheers.url})` }}
     >
-      <div className="max-w-3xl mx-auto">
+      <div className="absolute inset-0" style={{ background: "rgba(10,12,16,0.84)" }} />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, rgba(46, 230, 168, 0.12), transparent 60%)",
+        }}
+      />
+      <div className="relative max-w-3xl mx-auto">
         <Label>Vamos conversar</Label>
         <TitleWithItalic
           before="Bora conversar sobre "
@@ -710,6 +740,7 @@ function FinalCTA() {
         </div>
       </div>
     </section>
+
   );
 }
 
