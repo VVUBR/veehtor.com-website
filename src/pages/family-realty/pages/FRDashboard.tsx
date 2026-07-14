@@ -15,7 +15,7 @@ import WeeklySummarySection from "../components/WeeklySummarySection";
 import { useFRAuth } from "../auth/FRAuthProvider";
 import { FRDataProvider, useFRData } from "../lib/useFRData";
 import { useI18n, fmtCurrency } from "../lib/i18n";
-import { periodRange, inPeriod, type PeriodKey, type ProjectStatusFilter } from "../data";
+import { type ProjectStatusFilter } from "../data";
 
 type TabKey = "overview" | "weekly" | "payables" | "ledger";
 const TAB_KEYS: TabKey[] = ["overview", "weekly", "payables", "ledger"];
@@ -27,11 +27,8 @@ function readTabFromHash(): TabKey {
 }
 
 function DashboardInner() {
-  const [period, setPeriod] = useState<PeriodKey>("month");
   const [job, setJob] = useState<string>("__ALL__");
   const [projectStatus, setProjectStatus] = useState<ProjectStatusFilter>("active");
-  const [customFrom, setCustomFrom] = useState<Date | null>(null);
-  const [customTo, setCustomTo] = useState<Date | null>(null);
   const [tab, setTab] = useState<TabKey>(readTabFromHash);
   const { user, signOut } = useFRAuth();
   const { loading, error, data } = useFRData();
@@ -41,7 +38,6 @@ function DashboardInner() {
     document.title = lang === "pt" ? "Family Realty — Controle de Custos" : "Family Realty — Cost Control";
   }, [lang]);
 
-  // Persist tab in hash
   useEffect(() => {
     if (window.location.hash.replace(/^#/, "") !== tab) {
       window.history.replaceState(null, "", `#${tab}`);
@@ -53,28 +49,25 @@ function DashboardInner() {
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
 
-  const range = useMemo(() => periodRange(period, customFrom, customTo), [period, customFrom, customTo]);
-
-  // Allowed projects by projectStatus filter. Projects with no status entry (unknown) are kept for "all"
-  // and included as active by default.
+  // Allowed projects by projectStatus filter. Projects with no status entry (unknown) treated as active.
+  // CRITICAL: unassigned rows (empty/null project name) must NEVER be hidden by this filter — the
+  // inAllowed() helper below always returns true for empty names.
   const allowedProjects = useMemo(() => {
-    if (projectStatus === "all") return null; // null = no filter
+    if (projectStatus === "all") return null;
     const set = new Set<string>();
     for (const p of data.projects) {
       if (projectStatus === "active" && p.status === "Em andamento") set.add(p.project);
       if (projectStatus === "finished" && p.status === "Concluida") set.add(p.project);
     }
-    // Also include projects appearing in jobsMeta but missing from v_projects,
-    // treated as active when filtering active.
     if (projectStatus === "active") {
       for (const j of data.jobsMeta) if (!data.projectStatusMap.has(j.name)) set.add(j.name);
     }
     return set;
   }, [projectStatus, data.projects, data.jobsMeta, data.projectStatusMap]);
 
-  const inAllowed = (name: string) => allowedProjects == null || allowedProjects.has(name);
+  // Unassigned rows (empty name) are always allowed — treated as 'Em andamento', never as 'Concluída'.
+  const inAllowed = (name: string) => !name || allowedProjects == null || allowedProjects.has(name);
 
-  // If current selected job no longer matches the filter, reset to __ALL__.
   useEffect(() => {
     if (job !== "__ALL__" && job !== "__UNASSIGNED__" && allowedProjects && !allowedProjects.has(job)) {
       setJob("__ALL__");
@@ -90,20 +83,16 @@ function DashboardInner() {
     [data.jobsMeta, allowedProjects],
   );
   const budgetLinesFiltered = useMemo(
-    () => data.budgetLines.filter((l) => !l.job || inAllowed(l.job)),
+    () => data.budgetLines.filter((l) => inAllowed(l.job || "")),
     [data.budgetLines, allowedProjects],
   );
 
   const historyByJob = useMemo(
     () => data.historyItems.filter(
       (h) =>
-        (job === "__ALL__" ? (!h.job || inAllowed(h.job)) : h.job === job || (job === "__UNASSIGNED__" && !h.job))
+        (job === "__ALL__" ? inAllowed(h.job || "") : h.job === job || (job === "__UNASSIGNED__" && !h.job))
     ),
     [data.historyItems, job, allowedProjects],
-  );
-  const historyByPeriod = useMemo(
-    () => historyByJob.filter((h) => (period === "all" ? true : inPeriod(h.date, range))),
-    [historyByJob, range, period],
   );
 
   const jobsScope = useMemo(
@@ -120,7 +109,7 @@ function DashboardInner() {
   const payableDocsScope = useMemo(
     () => data.payableDocs.filter(
       (p) =>
-        (job === "__ALL__" ? (!p.job || inAllowed(p.job)) : p.job === job || (job === "__UNASSIGNED__" && !p.job))
+        (job === "__ALL__" ? inAllowed(p.job || "") : p.job === job || (job === "__UNASSIGNED__" && !p.job))
     ),
     [data.payableDocs, job, allowedProjects],
   );
@@ -128,19 +117,10 @@ function DashboardInner() {
   const overduePay = payableDocsScope.filter((p) => p.overdue);
   const overdueSum = overduePay.reduce((s, p) => s + p.docTotal, 0);
 
-  const missingDate = useMemo(() => {
-    if (period === "all") return null;
-    const missing = historyByJob.filter((h) => !h.date);
-    if (missing.length === 0) return null;
-    return { n: missing.length, v: fmtCurrency(missing.reduce((s, i) => s + i.amount, 0)) };
-  }, [historyByJob, period]);
-
   const activeJobMeta = useMemo(
     () => (job !== "__ALL__" ? data.jobsMeta.find((j) => j.name === job) ?? null : null),
     [job, data.jobsMeta],
   );
-
-
 
   const onExportPdf = () => window.print();
 
@@ -158,21 +138,17 @@ function DashboardInner() {
       </div>
 
       <FRHeader
-        period={period} onPeriodChange={setPeriod}
         job={job} onJobChange={setJob} jobs={jobsFiltered}
         projectStatus={projectStatus} onProjectStatusChange={setProjectStatus}
-        customFrom={customFrom} customTo={customTo}
-        onCustomFromChange={setCustomFrom} onCustomToChange={setCustomTo}
         onExportPdf={onExportPdf}
       />
-
 
       <div className="fr-print-only" style={{ padding: "16px 24px", borderBottom: "1px solid var(--fr-border)" }}>
         <div className="fr-heading" style={{ fontSize: 18, color: "var(--fr-navy)" }}>
           {t("title")} — {t("tab_" + tab)}
         </div>
         <div className="fr-muted" style={{ fontSize: 12 }}>
-          {t("job")}: {job === "__ALL__" ? t("allJobs") : job} · {t("period_" + (period === "last30" ? "30d" : period === "last3m" ? "3m" : period))} · {new Date().toLocaleString(lang === "pt" ? "pt-BR" : "en-US")}
+          {t("job")}: {job === "__ALL__" ? t("allJobs") : job} · {new Date().toLocaleString(lang === "pt" ? "pt-BR" : "en-US")}
         </div>
       </div>
 
@@ -264,11 +240,6 @@ function DashboardInner() {
               <BudgetStatusList job={job} jobsMeta={jobsMetaFiltered} committed={data.committed} />
               <div>
                 <MonthlySpendChart items={historyByJob} activeJob={activeJobMeta} />
-                {missingDate && (
-                  <p className="fr-muted" style={{ fontSize: 11, marginTop: 4 }}>
-                    {t("cap_date_missing", missingDate)}
-                  </p>
-                )}
               </div>
             </section>
             <section className="mt-4">
@@ -297,12 +268,12 @@ function DashboardInner() {
                 insuranceBySub={data.insuranceBySub}
                 w9BySub={data.w9BySub}
                 job={job}
+                allowedProjects={allowedProjects}
               />
             </section>
             <section className="mt-4">
               <EstimateVsBilledSection items={data.evbRows} job={job} allowedProjects={allowedProjects} />
             </section>
-
           </>
         )}
 
@@ -312,12 +283,7 @@ function DashboardInner() {
               <UnassignedSection items={data.unassignedItems} />
             </section>
             <section className="mt-6">
-              <CostTable items={historyByPeriod} />
-              {missingDate && (
-                <p className="fr-muted" style={{ fontSize: 11, marginTop: 4 }}>
-                  {t("cap_date_missing", missingDate)}
-                </p>
-              )}
+              <CostTable items={historyByJob} />
             </section>
           </>
         )}

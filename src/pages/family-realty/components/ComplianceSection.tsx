@@ -13,6 +13,7 @@ type Props = {
   insuranceBySub: Map<string, InsuranceRow[]>;
   w9BySub: Map<string, W9Row[]>;
   job: string; // "__ALL__" | "__UNASSIGNED__" | project name
+  allowedProjects: Set<string> | null;
 };
 
 const TONE_STYLE: Record<string, { bg: string; fg: string; border: string }> = {
@@ -219,7 +220,7 @@ function Field({ label, v }: { label: string; v: string }) {
   );
 }
 
-export default function ComplianceSection({ rows, insuranceBySub, w9BySub, job }: Props) {
+export default function ComplianceSection({ rows, insuranceBySub, w9BySub, job, allowedProjects }: Props) {
   const { t, lang } = useI18n();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"" | "critical" | "attention" | "ok">("");
@@ -227,12 +228,19 @@ export default function ComplianceSection({ rows, insuranceBySub, w9BySub, job }
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [historyOpen, setHistoryOpen] = useState<Record<string, boolean>>({});
 
-  // Scope by global job selector (KPIs also honor this — but ignore local filters).
+  // Scope by global job selector + project-status filter. Subcontractors with no active projects
+  // are always kept (unassigned rows must never be hidden by the status filter).
   const jobScoped = useMemo(() => {
-    if (job === "__ALL__") return rows;
-    if (job === "__UNASSIGNED__") return rows.filter((r) => r.activeProjects.length === 0);
-    return rows.filter((r) => r.activeProjects.includes(job));
-  }, [rows, job]);
+    let arr = rows;
+    if (allowedProjects) {
+      arr = arr.filter((r) =>
+        r.activeProjects.length === 0 || r.activeProjects.some((p) => allowedProjects.has(p))
+      );
+    }
+    if (job === "__ALL__") return arr;
+    if (job === "__UNASSIGNED__") return arr.filter((r) => r.activeProjects.length === 0);
+    return arr.filter((r) => r.activeProjects.includes(job));
+  }, [rows, job, allowedProjects]);
 
   const counts = useMemo(() => {
     let critical = 0, attention = 0, ok = 0;
