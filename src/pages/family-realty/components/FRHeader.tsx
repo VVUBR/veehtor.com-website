@@ -1,42 +1,16 @@
 import { useI18n, type Lang } from "../lib/i18n";
-import { type PeriodKey, type ProjectStatusFilter } from "../data";
-
-
-const PERIODS: { key: PeriodKey; labelKey: string }[] = [
-  { key: "month", labelKey: "period_month" },
-  { key: "last30", labelKey: "period_30d" },
-  { key: "last3m", labelKey: "period_3m" },
-  { key: "year", labelKey: "period_year" },
-  { key: "all", labelKey: "period_all" },
-  { key: "custom", labelKey: "period_custom" },
-];
-
-function toInputValue(d: Date | null): string {
-  if (!d) return "";
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
+import { type ProjectStatusFilter } from "../data";
 
 export default function FRHeader({
-  period, onPeriodChange,
   job, onJobChange, jobs,
   projectStatus, onProjectStatusChange,
-  customFrom, customTo, onCustomFromChange, onCustomToChange,
   onExportPdf,
 }: {
-  period: PeriodKey;
-  onPeriodChange: (p: PeriodKey) => void;
   job: string;
   onJobChange: (j: string) => void;
   jobs: string[];
   projectStatus: ProjectStatusFilter;
   onProjectStatusChange: (s: ProjectStatusFilter) => void;
-  customFrom: Date | null;
-  customTo: Date | null;
-  onCustomFromChange: (d: Date | null) => void;
-  onCustomToChange: (d: Date | null) => void;
   onExportPdf: () => void;
 }) {
 
@@ -103,65 +77,10 @@ export default function FRHeader({
             <option value="all">{t("job_status_all")}</option>
           </select>
         </label>
-
-
-        <div className="flex items-center gap-1 flex-wrap ml-auto">
-          {PERIODS.map((p) => (
-            <button
-              key={p.key}
-              className={`fr-btn ${period === p.key ? "fr-btn-active" : ""}`}
-              onClick={() => onPeriodChange(p.key)}
-            >
-              {t(p.labelKey)}
-            </button>
-          ))}
-        </div>
       </div>
-
-      {period === "custom" && (
-        <div className="flex flex-wrap items-center gap-3 self-end" style={{ fontSize: 12, color: "rgba(255,255,255,0.85)" }}>
-          <label className="flex items-center gap-2">
-            {t("from")}
-            <input
-              type="date"
-              value={toInputValue(customFrom)}
-              onChange={(e) => onCustomFromChange(e.target.value ? new Date(e.target.value + "T00:00:00") : null)}
-              style={dateInputStyle}
-            />
-          </label>
-          <label className="flex items-center gap-2">
-            {t("to")}
-            <input
-              type="date"
-              value={toInputValue(customTo)}
-              onChange={(e) => onCustomToChange(e.target.value ? new Date(e.target.value + "T00:00:00") : null)}
-              style={dateInputStyle}
-            />
-          </label>
-          {(customFrom || customTo) && (
-            <button
-              type="button"
-              onClick={() => { onCustomFromChange(null); onCustomToChange(null); }}
-              style={{
-                background: "transparent", color: "#EAAA00",
-                border: "1px solid #EAAA00", padding: "3px 10px",
-                borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: "pointer",
-              }}
-            >
-              {t("clear")}
-            </button>
-          )}
-        </div>
-      )}
     </header>
   );
 }
-
-const dateInputStyle: React.CSSProperties = {
-  background: "#fff", color: "#041C2C",
-  border: "1px solid rgba(255,255,255,0.4)",
-  borderRadius: 6, padding: "4px 8px", fontSize: 12,
-};
 
 function LangFlag({ code, current, onClick }: { code: Lang; current: Lang; onClick: () => void }) {
   const active = code === current;
