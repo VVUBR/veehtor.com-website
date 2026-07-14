@@ -159,11 +159,13 @@ function DashboardInner() {
 
       <FRHeader
         period={period} onPeriodChange={setPeriod}
-        job={job} onJobChange={setJob} jobs={data.jobs}
+        job={job} onJobChange={setJob} jobs={jobsFiltered}
+        projectStatus={projectStatus} onProjectStatusChange={setProjectStatus}
         customFrom={customFrom} customTo={customTo}
         onCustomFromChange={setCustomFrom} onCustomToChange={setCustomTo}
         onExportPdf={onExportPdf}
       />
+
 
       <div className="fr-print-only" style={{ padding: "16px 24px", borderBottom: "1px solid var(--fr-border)" }}>
         <div className="fr-heading" style={{ fontSize: 18, color: "var(--fr-navy)" }}>
@@ -208,7 +210,7 @@ function DashboardInner() {
             label={t("kpi_topay")}
             value={fmtCurrency(openPay)}
             tone="gold"
-            sub={`${payablesScope.length} ${t("invoices")}`}
+            sub={`${payableDocsScope.length} ${t("invoices")}`}
           />
           <KpiCard
             label={t("kpi_overdue")}
