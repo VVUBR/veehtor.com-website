@@ -7,6 +7,8 @@ import {
   normalizeStatus,
   type HistoryItem,
   type PayableItem,
+  type PayableDoc,
+  type PayableLine,
   type UnassignedItem,
   type JobMeta,
   type BudgetLine,
@@ -18,8 +20,11 @@ import {
   type SubComplianceRow,
   type InsuranceRow,
   type W9Row,
+  type ProjectInfo,
+  type ProjectStatus,
   uniqueProjects,
 } from "../data";
+
 
 type WeeklyRow = {
   week_start?: string | null;
@@ -75,11 +80,17 @@ type InvoiceRow = {
   project_name?: string | null;
   material?: string | null;
   amount?: number | string | null;
+  quantity?: number | string | null;
+  unit_price?: number | string | null;
   invoice_date?: string | null;
   due_date?: string | null;
   document_type?: string | null;
   payment_status?: string | null;
   overdue?: boolean | null;
+  invoice_number?: string | null;
+  doc_key?: string | null;
+  doc_total?: number | string | null;
+  doc_due_date?: string | null;
 };
 type UnassignedRow = {
   invoice_id?: string;
@@ -102,7 +113,17 @@ type EvbRow = {
   difference?: number | string | null;
   pct_billed?: number | string | null;
   n_contracts?: number | string | null;
+  status?: string | null;
 };
+type ProjectRow = {
+  project?: string | null;
+  address?: string | null;
+  date_started?: string | null;
+  date_finished?: string | null;
+  status?: string | null;
+  budget_total?: number | string | null;
+};
+
 type HistoryRow = {
   invoice_id?: string | null;
   supplier?: string | null;
@@ -129,6 +150,7 @@ type ContractRaw = {
   review_status?: string | null;
   notes?: string | null;
   document_link?: string | null;
+  status?: string | null;
 };
 type ContractPaySumRow = {
   contract_id?: string | number;
@@ -142,6 +164,7 @@ type DisbursementRow = {
   order?: number | null;
   seq?: number | null;
 };
+
 
 const num = (v: unknown): number => {
   if (v == null || v === "") return 0;
