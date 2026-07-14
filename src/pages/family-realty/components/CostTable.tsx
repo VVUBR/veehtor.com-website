@@ -6,16 +6,34 @@ import { today0, type HistoryItem } from "../data";
 type SortKey = "date" | "job" | "supplier" | "type" | "stage" | "amount" | "status";
 const PAGE = 50;
 
+type PeriodKey = "all" | "last30" | "last90" | "year";
+
+function periodStart(p: PeriodKey): number {
+  if (p === "all") return -Infinity;
+  const now = new Date();
+  if (p === "year") return new Date(now.getFullYear(), 0, 1).getTime();
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - (p === "last30" ? 30 : 90));
+  return d.getTime();
+}
+
 export default function CostTable({ items }: { items: HistoryItem[] }) {
   const { t, lang } = useI18n();
   const [sort, setSort] = useState<{ key: SortKey; dir: "asc" | "desc" }>({ key: "date", dir: "desc" });
   const [page, setPage] = useState(1);
   const [supplier, setSupplier] = useState<string>("");
+  const [period, setPeriod] = useState<PeriodKey>("all");
 
-  const filtered = useMemo(
-    () => items.filter((i) => matchSupplier(i.supplier, i.supplierCanonical, supplier)),
-    [items, supplier],
-  );
+  const filtered = useMemo(() => {
+    const start = periodStart(period);
+    return items.filter((i) => {
+      if (!matchSupplier(i.supplier, i.supplierCanonical, supplier)) return false;
+      if (period === "all") return true;
+      if (!i.date) return false;
+      return i.date.getTime() >= start;
+    });
+  }, [items, supplier, period]);
 
   const sorted = useMemo(() => {
     const arr = [...filtered];
@@ -66,6 +84,18 @@ export default function CostTable({ items }: { items: HistoryItem[] }) {
           </span>
         </h3>
         <div className="flex items-center gap-2 flex-wrap">
+          <select
+            className="fr-select"
+            value={period}
+            onChange={(e) => { setPeriod(e.target.value as PeriodKey); setPage(1); }}
+            style={{ fontSize: 12, minWidth: 160 }}
+            aria-label={t("ledger_period_label")}
+          >
+            <option value="all">{t("ledger_period_all")}</option>
+            <option value="last30">{t("ledger_period_30d")}</option>
+            <option value="last90">{t("ledger_period_90d")}</option>
+            <option value="year">{t("ledger_period_year")}</option>
+          </select>
           <SupplierSelect value={supplier} onChange={setSupplier} suppliers={supplierOptions} />
           <button className="fr-btn fr-print-hide" onClick={downloadCsv} style={{ color: "var(--fr-navy)", borderColor: "var(--fr-navy)" }}>
             {t("exportCsv")}
