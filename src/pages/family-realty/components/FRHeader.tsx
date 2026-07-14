@@ -90,6 +90,21 @@ export default function FRHeader({
           </select>
         </label>
 
+        <label className="flex items-center gap-2" style={{ fontSize: 12, color: "rgba(255,255,255,0.75)" }}>
+          {t("job_status_filter")}
+          <select
+            className="fr-select"
+            value={projectStatus}
+            onChange={(e) => onProjectStatusChange(e.target.value as ProjectStatusFilter)}
+            style={{ minWidth: 150 }}
+          >
+            <option value="active">{t("job_status_active")}</option>
+            <option value="finished">{t("job_status_finished")}</option>
+            <option value="all">{t("job_status_all")}</option>
+          </select>
+        </label>
+
+
         <div className="flex items-center gap-1 flex-wrap ml-auto">
           {PERIODS.map((p) => (
             <button
