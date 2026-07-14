@@ -37,6 +37,42 @@ export type PayableItem = {
   documentType: string;
 };
 
+export type PayableLine = {
+  id: string;
+  material: string;
+  quantity: number | null;
+  unitPrice: number | null;
+  amount: number;
+};
+
+export type PayableDoc = {
+  id: string;              // doc_key
+  invoiceNumber: string;
+  supplier: string;
+  supplierCanonical: string;
+  job: string;
+  documentType: string;
+  invoiceDate: Date | null;
+  dueDate: Date | null;    // doc_due_date
+  docTotal: number;
+  overdue: boolean;
+  items: PayableLine[];
+};
+
+export type ProjectStatus = "Em andamento" | "Concluida";
+export type ProjectStatusFilter = "active" | "finished" | "all";
+export type ContractStatusFilter = "active" | "inactive" | "all";
+
+export type ProjectInfo = {
+  project: string;
+  address: string;
+  dateStarted: Date | null;
+  dateFinished: Date | null;
+  status: ProjectStatus;
+  budgetTotal: number;
+};
+
+
 export type UnassignedItem = {
   id: string;
   date: Date | null;
@@ -96,6 +132,7 @@ export type EstimateBilledRow = {
   nContracts: number;
   hasProject: boolean;
   hasEstimate: boolean;
+  status: "Ativo" | "Inativo";
 };
 
 export type Installment = {
@@ -116,7 +153,9 @@ export type ContractRow = {
   documentLink: string | null;
   scheduleGap: number | null;
   installments: Installment[];
+  status: string; // Ativo | Concluído | Cancelado | ...
 };
+
 
 export type CommittedContracts = {
   total: number;
