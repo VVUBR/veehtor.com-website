@@ -62,7 +62,21 @@ export default function EstimateVsBilledSection({
             ({t("filtered_meta", { n: rows.length, v: fmtCurrency(totalBilled) })})
           </span>
         </h3>
-        <SupplierSelect value={supplier} onChange={setSupplier} suppliers={supplierOptions} />
+        <div className="flex items-center gap-2">
+          <select
+            className="fr-select"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as "active" | "inactive" | "all")}
+            style={{ fontSize: 12, minWidth: 130 }}
+            aria-label={t("contract_status_filter")}
+          >
+            <option value="active">{t("contract_status_active")}</option>
+            <option value="inactive">{t("contract_status_inactive")}</option>
+            <option value="all">{t("contract_status_all")}</option>
+          </select>
+          <SupplierSelect value={supplier} onChange={setSupplier} suppliers={supplierOptions} />
+        </div>
+
       </div>
       <p className="fr-muted" style={{ fontSize: 12, marginBottom: 12 }}>{t("cap_evb")}</p>
       <div style={{ maxHeight: 420, overflowY: "auto", border: "1px solid var(--fr-border)", borderRadius: 8 }}>
