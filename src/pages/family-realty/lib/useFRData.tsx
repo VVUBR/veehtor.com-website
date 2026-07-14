@@ -436,8 +436,29 @@ async function loadAll() {
       documentLink: c.document_link || null,
       scheduleGap: gapByContract.get(cid) ?? null,
       installments: instByContract.get(cid) || [],
+      status: (c.status || "").toString().trim() || "Ativo",
     };
   });
+
+  // -- Projects (v_projects) --
+  const projects: ProjectInfo[] = projectsView
+    .filter((p) => p.project)
+    .map((p) => {
+      const rawStatus = (p.status || "").toString().trim();
+      const status: ProjectStatus =
+        rawStatus.toLowerCase().startsWith("conclu") ? "Concluida" : "Em andamento";
+      return {
+        project: String(p.project),
+        address: p.address || "",
+        dateStarted: parseSafeDate(p.date_started).date,
+        dateFinished: parseSafeDate(p.date_finished).date,
+        status,
+        budgetTotal: num(p.budget_total),
+      };
+    });
+  const projectStatusMap = new Map<string, ProjectStatus>();
+  for (const p of projects) projectStatusMap.set(p.project, p.status);
+
 
   const weeklyRows: WeeklyCostRow[] = weekly.map((r) => ({
     weekStart: parseSafeDate(r.week_start).date,
@@ -538,6 +559,7 @@ async function loadAll() {
     jobsMeta,
     budgetLines,
     payables,
+    payableDocs,
     unassignedItems,
     unassignedTotal,
     evbRows,
@@ -548,6 +570,8 @@ async function loadAll() {
     subCompliance: subCompliance_,
     insuranceBySub,
     w9BySub,
+    projects,
+    projectStatusMap,
   };
 }
 
@@ -555,11 +579,13 @@ type FRData = Awaited<ReturnType<typeof loadAll>>;
 type Ctx = { loading: boolean; error: Error | null; data: FRData };
 
 const empty: FRData = {
-  jobs: [], jobsMeta: [], budgetLines: [], payables: [], unassignedItems: [],
+  jobs: [], jobsMeta: [], budgetLines: [], payables: [], payableDocs: [], unassignedItems: [],
   unassignedTotal: 0, evbRows: [], historyItems: [], contractRows: [], weeklyRows: [],
   committed: { total: 0, byProject: new Map(), unassignedAmount: 0, unassignedCount: 0 },
   subCompliance: [], insuranceBySub: new Map(), w9BySub: new Map(),
+  projects: [], projectStatusMap: new Map(),
 };
+
 
 const FRDataContext = createContext<Ctx | null>(null);
 
