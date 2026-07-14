@@ -253,10 +253,10 @@ async function loadAll() {
     };
   });
 
-  // -- Payables --
+  // -- Payables (line items, kept for legacy consumers) --
   const payables: PayableItem[] = invoices.map((r, i) => {
     const inv = parseSafeDate(r.invoice_date).date;
-    const due = parseSafeDate(r.due_date).date;
+    const due = parseSafeDate(r.due_date ?? r.doc_due_date).date;
     const overdue = !!r.overdue;
     const status: "Em atraso" | "A pagar" = overdue ? "Em atraso" : "A pagar";
     const canonical = r.supplier_canonical || r.supplier || "";
@@ -274,6 +274,44 @@ async function loadAll() {
       documentType: r.document_type || "",
     };
   });
+
+  // -- Payables grouped by document --
+  const payableDocsMap = new Map<string, PayableDoc>();
+  invoices.forEach((r, i) => {
+    const canonical = r.supplier_canonical || r.supplier || "";
+    const invoiceNumber = (r.invoice_number || "").trim();
+    const docKey = String(r.doc_key ?? invoiceNumber ?? r.invoice_id ?? `doc-${i}`);
+    const docDue = parseSafeDate(r.doc_due_date ?? r.due_date).date;
+    const line: PayableLine = {
+      id: String(r.invoice_id ?? `inv-${i}`),
+      material: r.material || "—",
+      quantity: r.quantity != null ? num(r.quantity) : null,
+      unitPrice: r.unit_price != null ? num(r.unit_price) : null,
+      amount: Math.abs(num(r.amount)),
+    };
+    const existing = payableDocsMap.get(docKey);
+    if (existing) {
+      existing.items.push(line);
+      // Overdue truthy if any line is overdue.
+      if (r.overdue) existing.overdue = true;
+    } else {
+      payableDocsMap.set(docKey, {
+        id: docKey,
+        invoiceNumber,
+        supplier: canonical || "—",
+        supplierCanonical: canonical,
+        job: r.project_name || "",
+        documentType: r.document_type || "",
+        invoiceDate: parseSafeDate(r.invoice_date).date,
+        dueDate: docDue,
+        docTotal: Math.abs(num(r.doc_total ?? r.amount)),
+        overdue: !!r.overdue,
+        items: [line],
+      });
+    }
+  });
+  const payableDocs: PayableDoc[] = [...payableDocsMap.values()];
+
 
   // -- Unassigned --
   const unassignedItems: UnassignedItem[] = unassigned.map((r, i) => {
@@ -308,6 +346,8 @@ async function loadAll() {
     const hasEstimate = r.estimate != null && String(r.estimate) !== "";
     const estimate = num(r.estimate);
     const billed = num(r.billed);
+    const rawStatus = (r.status || "").toString().trim();
+    const status: "Ativo" | "Inativo" = rawStatus === "Ativo" ? "Ativo" : "Inativo";
     return {
       vendor: r.vendor || "—",
       project: hasProject ? String(r.project) : "",
@@ -318,8 +358,10 @@ async function loadAll() {
       nContracts: r.n_contracts != null ? Number(r.n_contracts) : 1,
       hasProject,
       hasEstimate,
+      status,
     };
   });
+
 
   // Committed contracts aggregation
   const committed: CommittedContracts = {
