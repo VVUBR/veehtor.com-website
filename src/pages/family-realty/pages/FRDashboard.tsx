@@ -15,7 +15,7 @@ import WeeklySummarySection from "../components/WeeklySummarySection";
 import { useFRAuth } from "../auth/FRAuthProvider";
 import { FRDataProvider, useFRData } from "../lib/useFRData";
 import { useI18n, fmtCurrency } from "../lib/i18n";
-import { periodRange, inPeriod, type PeriodKey } from "../data";
+import { periodRange, inPeriod, type PeriodKey, type ProjectStatusFilter } from "../data";
 
 type TabKey = "overview" | "weekly" | "payables" | "ledger";
 const TAB_KEYS: TabKey[] = ["overview", "weekly", "payables", "ledger"];
@@ -29,6 +29,7 @@ function readTabFromHash(): TabKey {
 function DashboardInner() {
   const [period, setPeriod] = useState<PeriodKey>("month");
   const [job, setJob] = useState<string>("__ALL__");
+  const [projectStatus, setProjectStatus] = useState<ProjectStatusFilter>("active");
   const [customFrom, setCustomFrom] = useState<Date | null>(null);
   const [customTo, setCustomTo] = useState<Date | null>(null);
   const [tab, setTab] = useState<TabKey>(readTabFromHash);
@@ -54,9 +55,51 @@ function DashboardInner() {
 
   const range = useMemo(() => periodRange(period, customFrom, customTo), [period, customFrom, customTo]);
 
+  // Allowed projects by projectStatus filter. Projects with no status entry (unknown) are kept for "all"
+  // and included as active by default.
+  const allowedProjects = useMemo(() => {
+    if (projectStatus === "all") return null; // null = no filter
+    const set = new Set<string>();
+    for (const p of data.projects) {
+      if (projectStatus === "active" && p.status === "Em andamento") set.add(p.project);
+      if (projectStatus === "finished" && p.status === "Concluida") set.add(p.project);
+    }
+    // Also include projects appearing in jobsMeta but missing from v_projects,
+    // treated as active when filtering active.
+    if (projectStatus === "active") {
+      for (const j of data.jobsMeta) if (!data.projectStatusMap.has(j.name)) set.add(j.name);
+    }
+    return set;
+  }, [projectStatus, data.projects, data.jobsMeta, data.projectStatusMap]);
+
+  const inAllowed = (name: string) => allowedProjects == null || allowedProjects.has(name);
+
+  // If current selected job no longer matches the filter, reset to __ALL__.
+  useEffect(() => {
+    if (job !== "__ALL__" && job !== "__UNASSIGNED__" && allowedProjects && !allowedProjects.has(job)) {
+      setJob("__ALL__");
+    }
+  }, [allowedProjects, job]);
+
+  const jobsFiltered = useMemo(
+    () => data.jobs.filter((j) => inAllowed(j)),
+    [data.jobs, allowedProjects],
+  );
+  const jobsMetaFiltered = useMemo(
+    () => data.jobsMeta.filter((j) => inAllowed(j.name)),
+    [data.jobsMeta, allowedProjects],
+  );
+  const budgetLinesFiltered = useMemo(
+    () => data.budgetLines.filter((l) => !l.job || inAllowed(l.job)),
+    [data.budgetLines, allowedProjects],
+  );
+
   const historyByJob = useMemo(
-    () => data.historyItems.filter((h) => job === "__ALL__" || h.job === job || (job === "__UNASSIGNED__" && !h.job)),
-    [data.historyItems, job],
+    () => data.historyItems.filter(
+      (h) =>
+        (job === "__ALL__" ? (!h.job || inAllowed(h.job)) : h.job === job || (job === "__UNASSIGNED__" && !h.job))
+    ),
+    [data.historyItems, job, allowedProjects],
   );
   const historyByPeriod = useMemo(
     () => historyByJob.filter((h) => (period === "all" ? true : inPeriod(h.date, range))),
@@ -64,8 +107,8 @@ function DashboardInner() {
   );
 
   const jobsScope = useMemo(
-    () => (job === "__ALL__" ? data.jobsMeta : data.jobsMeta.filter((j) => j.name === job)),
-    [job, data.jobsMeta],
+    () => (job === "__ALL__" ? jobsMetaFiltered : jobsMetaFiltered.filter((j) => j.name === job)),
+    [job, jobsMetaFiltered],
   );
   const totalBudget = jobsScope.reduce((s, j) => s + j.budget, 0);
   const jobsRealizado = jobsScope.reduce((s, j) => s + j.realizado, 0);
@@ -74,13 +117,16 @@ function DashboardInner() {
   const realizadoTone = pct > 100 ? "red" : pct >= 90 ? "gold" : "green";
   const activeCount = jobsScope.filter((j) => j.active).length;
 
-  const payablesScope = useMemo(
-    () => data.payables.filter((p) => job === "__ALL__" || p.job === job || (job === "__UNASSIGNED__" && !p.job)),
-    [data.payables, job],
+  const payableDocsScope = useMemo(
+    () => data.payableDocs.filter(
+      (p) =>
+        (job === "__ALL__" ? (!p.job || inAllowed(p.job)) : p.job === job || (job === "__UNASSIGNED__" && !p.job))
+    ),
+    [data.payableDocs, job, allowedProjects],
   );
-  const openPay = payablesScope.reduce((s, p) => s + p.amount, 0);
-  const overduePay = payablesScope.filter((p) => p.overdue);
-  const overdueSum = overduePay.reduce((s, p) => s + p.amount, 0);
+  const openPay = payableDocsScope.reduce((s, p) => s + p.docTotal, 0);
+  const overduePay = payableDocsScope.filter((p) => p.overdue);
+  const overdueSum = overduePay.reduce((s, p) => s + p.docTotal, 0);
 
   const missingDate = useMemo(() => {
     if (period === "all") return null;
@@ -93,6 +139,8 @@ function DashboardInner() {
     () => (job !== "__ALL__" ? data.jobsMeta.find((j) => j.name === job) ?? null : null),
     [job, data.jobsMeta],
   );
+
+
 
   const onExportPdf = () => window.print();
 
@@ -111,11 +159,13 @@ function DashboardInner() {
 
       <FRHeader
         period={period} onPeriodChange={setPeriod}
-        job={job} onJobChange={setJob} jobs={data.jobs}
+        job={job} onJobChange={setJob} jobs={jobsFiltered}
+        projectStatus={projectStatus} onProjectStatusChange={setProjectStatus}
         customFrom={customFrom} customTo={customTo}
         onCustomFromChange={setCustomFrom} onCustomToChange={setCustomTo}
         onExportPdf={onExportPdf}
       />
+
 
       <div className="fr-print-only" style={{ padding: "16px 24px", borderBottom: "1px solid var(--fr-border)" }}>
         <div className="fr-heading" style={{ fontSize: 18, color: "var(--fr-navy)" }}>
@@ -160,7 +210,7 @@ function DashboardInner() {
             label={t("kpi_topay")}
             value={fmtCurrency(openPay)}
             tone="gold"
-            sub={`${payablesScope.length} ${t("invoices")}`}
+            sub={`${payableDocsScope.length} ${t("invoices")}`}
           />
           <KpiCard
             label={t("kpi_overdue")}
@@ -211,7 +261,7 @@ function DashboardInner() {
         {tab === "overview" && (
           <>
             <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-              <BudgetStatusList job={job} jobsMeta={data.jobsMeta} committed={data.committed} />
+              <BudgetStatusList job={job} jobsMeta={jobsMetaFiltered} committed={data.committed} />
               <div>
                 <MonthlySpendChart items={historyByJob} activeJob={activeJobMeta} />
                 {missingDate && (
@@ -222,7 +272,7 @@ function DashboardInner() {
               </div>
             </section>
             <section className="mt-4">
-              <StageDetailTable job={job} budgetLines={data.budgetLines} />
+              <StageDetailTable job={job} budgetLines={budgetLinesFiltered} />
             </section>
           </>
         )}
@@ -236,10 +286,10 @@ function DashboardInner() {
         {tab === "payables" && (
           <>
             <section className="mt-4">
-              <PayablesList items={data.payables} job={job} />
+              <PayablesList docs={payableDocsScope} job={job} />
             </section>
             <section className="mt-4">
-              <ContractsSection items={data.contractRows} job={job} />
+              <ContractsSection items={data.contractRows} job={job} allowedProjects={allowedProjects} />
             </section>
             <section className="mt-4">
               <ComplianceSection
@@ -250,8 +300,9 @@ function DashboardInner() {
               />
             </section>
             <section className="mt-4">
-              <EstimateVsBilledSection items={data.evbRows} job={job} />
+              <EstimateVsBilledSection items={data.evbRows} job={job} allowedProjects={allowedProjects} />
             </section>
+
           </>
         )}
 

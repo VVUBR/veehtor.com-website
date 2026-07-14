@@ -19,15 +19,27 @@ const Badge = ({ label, tone = "muted" }: { label: string; tone?: "muted" | "gol
   }}>{label}</span>
 );
 
-export default function EstimateVsBilledSection({ items, job }: { items: EstimateBilledRow[]; job: string }) {
+export default function EstimateVsBilledSection({
+  items, job, allowedProjects,
+}: {
+  items: EstimateBilledRow[];
+  job: string;
+  allowedProjects: Set<string> | null;
+}) {
   const { t } = useI18n();
   const [supplier, setSupplier] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<"active" | "inactive" | "all">("active");
 
   const scoped = useMemo(() => {
     let arr = job === "__ALL__" ? items : items.filter((r) => r.project === job);
+    if (allowedProjects) arr = arr.filter((r) => !r.project || allowedProjects.has(r.project));
     if (supplier) arr = arr.filter((r) => matchSupplier(r.vendor, r.vendor, supplier));
+    if (statusFilter !== "all") {
+      arr = arr.filter((r) => (statusFilter === "active" ? r.status === "Ativo" : r.status !== "Ativo"));
+    }
     return arr;
-  }, [items, job, supplier]);
+  }, [items, job, supplier, statusFilter, allowedProjects]);
+
 
   const rows = useMemo(() => {
     return [...scoped].sort((a, b) => {
@@ -50,7 +62,21 @@ export default function EstimateVsBilledSection({ items, job }: { items: Estimat
             ({t("filtered_meta", { n: rows.length, v: fmtCurrency(totalBilled) })})
           </span>
         </h3>
-        <SupplierSelect value={supplier} onChange={setSupplier} suppliers={supplierOptions} />
+        <div className="flex items-center gap-2">
+          <select
+            className="fr-select"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as "active" | "inactive" | "all")}
+            style={{ fontSize: 12, minWidth: 130 }}
+            aria-label={t("contract_status_filter")}
+          >
+            <option value="active">{t("contract_status_active")}</option>
+            <option value="inactive">{t("contract_status_inactive")}</option>
+            <option value="all">{t("contract_status_all")}</option>
+          </select>
+          <SupplierSelect value={supplier} onChange={setSupplier} suppliers={supplierOptions} />
+        </div>
+
       </div>
       <p className="fr-muted" style={{ fontSize: 12, marginBottom: 12 }}>{t("cap_evb")}</p>
       <div style={{ maxHeight: 420, overflowY: "auto", border: "1px solid var(--fr-border)", borderRadius: 8 }}>

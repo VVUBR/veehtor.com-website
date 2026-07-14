@@ -7,6 +7,8 @@ import {
   normalizeStatus,
   type HistoryItem,
   type PayableItem,
+  type PayableDoc,
+  type PayableLine,
   type UnassignedItem,
   type JobMeta,
   type BudgetLine,
@@ -18,8 +20,11 @@ import {
   type SubComplianceRow,
   type InsuranceRow,
   type W9Row,
+  type ProjectInfo,
+  type ProjectStatus,
   uniqueProjects,
 } from "../data";
+
 
 type WeeklyRow = {
   week_start?: string | null;
@@ -75,11 +80,17 @@ type InvoiceRow = {
   project_name?: string | null;
   material?: string | null;
   amount?: number | string | null;
+  quantity?: number | string | null;
+  unit_price?: number | string | null;
   invoice_date?: string | null;
   due_date?: string | null;
   document_type?: string | null;
   payment_status?: string | null;
   overdue?: boolean | null;
+  invoice_number?: string | null;
+  doc_key?: string | null;
+  doc_total?: number | string | null;
+  doc_due_date?: string | null;
 };
 type UnassignedRow = {
   invoice_id?: string;
@@ -102,7 +113,17 @@ type EvbRow = {
   difference?: number | string | null;
   pct_billed?: number | string | null;
   n_contracts?: number | string | null;
+  status?: string | null;
 };
+type ProjectRow = {
+  project?: string | null;
+  address?: string | null;
+  date_started?: string | null;
+  date_finished?: string | null;
+  status?: string | null;
+  budget_total?: number | string | null;
+};
+
 type HistoryRow = {
   invoice_id?: string | null;
   supplier?: string | null;
@@ -129,6 +150,7 @@ type ContractRaw = {
   review_status?: string | null;
   notes?: string | null;
   document_link?: string | null;
+  status?: string | null;
 };
 type ContractPaySumRow = {
   contract_id?: string | number;
@@ -142,6 +164,7 @@ type DisbursementRow = {
   order?: number | null;
   seq?: number | null;
 };
+
 
 const num = (v: unknown): number => {
   if (v == null || v === "") return 0;
@@ -164,6 +187,7 @@ async function loadAll() {
     subCompliance,
     insuranceRaw,
     w9Raw,
+    projectsView,
   ] = await Promise.all([
     fetchAll<BvaProjectRow>("v_budget_vs_actual_by_project").catch(() => []),
     fetchAll<BvaLineRow>("v_budget_vs_actual").catch(() => []),
@@ -178,7 +202,9 @@ async function loadAll() {
     fetchAll<Record<string, unknown>>("v_sub_compliance").catch(() => []),
     fetchAll<Record<string, unknown>>("insurance").catch(() => []),
     fetchAll<Record<string, unknown>>("w9").catch(() => []),
+    fetchAll<ProjectRow>("v_projects").catch(() => []),
   ]);
+
 
   // eslint-disable-next-line no-console
   console.info("[FR] fetch counts", {
@@ -227,10 +253,10 @@ async function loadAll() {
     };
   });
 
-  // -- Payables --
+  // -- Payables (line items, kept for legacy consumers) --
   const payables: PayableItem[] = invoices.map((r, i) => {
     const inv = parseSafeDate(r.invoice_date).date;
-    const due = parseSafeDate(r.due_date).date;
+    const due = parseSafeDate(r.due_date ?? r.doc_due_date).date;
     const overdue = !!r.overdue;
     const status: "Em atraso" | "A pagar" = overdue ? "Em atraso" : "A pagar";
     const canonical = r.supplier_canonical || r.supplier || "";
@@ -248,6 +274,44 @@ async function loadAll() {
       documentType: r.document_type || "",
     };
   });
+
+  // -- Payables grouped by document --
+  const payableDocsMap = new Map<string, PayableDoc>();
+  invoices.forEach((r, i) => {
+    const canonical = r.supplier_canonical || r.supplier || "";
+    const invoiceNumber = (r.invoice_number || "").trim();
+    const docKey = String(r.doc_key ?? invoiceNumber ?? r.invoice_id ?? `doc-${i}`);
+    const docDue = parseSafeDate(r.doc_due_date ?? r.due_date).date;
+    const line: PayableLine = {
+      id: String(r.invoice_id ?? `inv-${i}`),
+      material: r.material || "—",
+      quantity: r.quantity != null ? num(r.quantity) : null,
+      unitPrice: r.unit_price != null ? num(r.unit_price) : null,
+      amount: Math.abs(num(r.amount)),
+    };
+    const existing = payableDocsMap.get(docKey);
+    if (existing) {
+      existing.items.push(line);
+      // Overdue truthy if any line is overdue.
+      if (r.overdue) existing.overdue = true;
+    } else {
+      payableDocsMap.set(docKey, {
+        id: docKey,
+        invoiceNumber,
+        supplier: canonical || "—",
+        supplierCanonical: canonical,
+        job: r.project_name || "",
+        documentType: r.document_type || "",
+        invoiceDate: parseSafeDate(r.invoice_date).date,
+        dueDate: docDue,
+        docTotal: Math.abs(num(r.doc_total ?? r.amount)),
+        overdue: !!r.overdue,
+        items: [line],
+      });
+    }
+  });
+  const payableDocs: PayableDoc[] = [...payableDocsMap.values()];
+
 
   // -- Unassigned --
   const unassignedItems: UnassignedItem[] = unassigned.map((r, i) => {
@@ -282,6 +346,8 @@ async function loadAll() {
     const hasEstimate = r.estimate != null && String(r.estimate) !== "";
     const estimate = num(r.estimate);
     const billed = num(r.billed);
+    const rawStatus = (r.status || "").toString().trim();
+    const status: "Ativo" | "Inativo" = rawStatus === "Ativo" ? "Ativo" : "Inativo";
     return {
       vendor: r.vendor || "—",
       project: hasProject ? String(r.project) : "",
@@ -292,8 +358,10 @@ async function loadAll() {
       nContracts: r.n_contracts != null ? Number(r.n_contracts) : 1,
       hasProject,
       hasEstimate,
+      status,
     };
   });
+
 
   // Committed contracts aggregation
   const committed: CommittedContracts = {
@@ -368,8 +436,29 @@ async function loadAll() {
       documentLink: c.document_link || null,
       scheduleGap: gapByContract.get(cid) ?? null,
       installments: instByContract.get(cid) || [],
+      status: (c.status || "").toString().trim() || "Ativo",
     };
   });
+
+  // -- Projects (v_projects) --
+  const projects: ProjectInfo[] = projectsView
+    .filter((p) => p.project)
+    .map((p) => {
+      const rawStatus = (p.status || "").toString().trim();
+      const status: ProjectStatus =
+        rawStatus.toLowerCase().startsWith("conclu") ? "Concluida" : "Em andamento";
+      return {
+        project: String(p.project),
+        address: p.address || "",
+        dateStarted: parseSafeDate(p.date_started).date,
+        dateFinished: parseSafeDate(p.date_finished).date,
+        status,
+        budgetTotal: num(p.budget_total),
+      };
+    });
+  const projectStatusMap = new Map<string, ProjectStatus>();
+  for (const p of projects) projectStatusMap.set(p.project, p.status);
+
 
   const weeklyRows: WeeklyCostRow[] = weekly.map((r) => ({
     weekStart: parseSafeDate(r.week_start).date,
@@ -470,6 +559,7 @@ async function loadAll() {
     jobsMeta,
     budgetLines,
     payables,
+    payableDocs,
     unassignedItems,
     unassignedTotal,
     evbRows,
@@ -480,6 +570,8 @@ async function loadAll() {
     subCompliance: subCompliance_,
     insuranceBySub,
     w9BySub,
+    projects,
+    projectStatusMap,
   };
 }
 
@@ -487,17 +579,19 @@ type FRData = Awaited<ReturnType<typeof loadAll>>;
 type Ctx = { loading: boolean; error: Error | null; data: FRData };
 
 const empty: FRData = {
-  jobs: [], jobsMeta: [], budgetLines: [], payables: [], unassignedItems: [],
+  jobs: [], jobsMeta: [], budgetLines: [], payables: [], payableDocs: [], unassignedItems: [],
   unassignedTotal: 0, evbRows: [], historyItems: [], contractRows: [], weeklyRows: [],
   committed: { total: 0, byProject: new Map(), unassignedAmount: 0, unassignedCount: 0 },
   subCompliance: [], insuranceBySub: new Map(), w9BySub: new Map(),
+  projects: [], projectStatusMap: new Map(),
 };
+
 
 const FRDataContext = createContext<Ctx | null>(null);
 
 export function FRDataProvider({ children }: { children: ReactNode }) {
   const q = useQuery({
-    queryKey: ["fr-real-data-v4"],
+    queryKey: ["fr-real-data-v5"],
     queryFn: loadAll,
     staleTime: 5 * 60_000,
     retry: 1,
