@@ -1,5 +1,6 @@
 import { useI18n, type Lang } from "../lib/i18n";
-import { type PeriodKey } from "../data";
+import { type PeriodKey, type ProjectStatusFilter } from "../data";
+
 
 const PERIODS: { key: PeriodKey; labelKey: string }[] = [
   { key: "month", labelKey: "period_month" },
@@ -21,6 +22,7 @@ function toInputValue(d: Date | null): string {
 export default function FRHeader({
   period, onPeriodChange,
   job, onJobChange, jobs,
+  projectStatus, onProjectStatusChange,
   customFrom, customTo, onCustomFromChange, onCustomToChange,
   onExportPdf,
 }: {
@@ -29,12 +31,15 @@ export default function FRHeader({
   job: string;
   onJobChange: (j: string) => void;
   jobs: string[];
+  projectStatus: ProjectStatusFilter;
+  onProjectStatusChange: (s: ProjectStatusFilter) => void;
   customFrom: Date | null;
   customTo: Date | null;
   onCustomFromChange: (d: Date | null) => void;
   onCustomToChange: (d: Date | null) => void;
   onExportPdf: () => void;
 }) {
+
   const { t, lang, setLang } = useI18n();
 
   return (
