@@ -2,84 +2,84 @@ import { useMemo, useState, useEffect } from "react";
 import { useI18n, fmtCurrency } from "../lib/i18n";
 import type { BudgetLine } from "../data";
 
-function pctColor(pct: number) {
+function pctColor(pct: number, hasBudget: boolean) {
+  if (!hasBudget) return "var(--fr-muted)";
   if (pct > 100) return "var(--fr-red)";
   if (pct >= 90) return "var(--fr-gold)";
   if (pct > 0) return "var(--fr-green)";
   return "var(--fr-muted)";
 }
 
-type DisplayLine = {
-  phase: string;
-  description: string;
+type PhaseGroup = {
+  key: string;
+  label: string;
+  noBudgetLine: boolean; // phase is "(sem etapa)"
   budget: number;
   realizado: number;
   balance: number;
   pctConsumed: number;
-  noBudgetLine: boolean;
+  lines: BudgetLine[];
 };
 
 type ProjectGroup = {
-  key: string;           // job name or "" for sem-obra
-  label: string;         // display label
-  isUnassigned: boolean; // no job
+  key: string;
+  label: string;
+  isUnassigned: boolean;
   budget: number;
   realizado: number;
   balance: number;
   pctConsumed: number;
-  lines: DisplayLine[];
+  phases: PhaseGroup[];
 };
 
-function buildProjectGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
-  // Preserve first-seen phase order per project.
-  const phaseOrder = new Map<string, Map<string, number>>();
+function buildGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
+  const phaseOrderByProject = new Map<string, Map<string, number>>();
   const byProject = new Map<string, BudgetLine[]>();
   budgetLines.forEach((l) => {
     const key = l.job || "";
     if (!byProject.has(key)) {
       byProject.set(key, []);
-      phaseOrder.set(key, new Map());
+      phaseOrderByProject.set(key, new Map());
     }
     byProject.get(key)!.push(l);
-    const po = phaseOrder.get(key)!;
-    if (!po.has(l.phase)) po.set(l.phase, po.size);
+    const po = phaseOrderByProject.get(key)!;
+    const ph = l.phase || "__NO_BUDGET_LINE__";
+    if (!po.has(ph)) po.set(ph, po.size);
   });
 
   const groups: ProjectGroup[] = [];
   for (const [key, lines] of byProject.entries()) {
-    const po = phaseOrder.get(key)!;
-    const regular = lines.filter((l) => !l.noBudgetLine);
-    const noBL = lines.filter((l) => l.noBudgetLine);
+    const po = phaseOrderByProject.get(key)!;
+    // Group by phase (l.phase already normalized: "__NO_BUDGET_LINE__" for unclassified).
+    const byPhase = new Map<string, BudgetLine[]>();
+    for (const l of lines) {
+      const ph = l.phase || "__NO_BUDGET_LINE__";
+      if (!byPhase.has(ph)) byPhase.set(ph, []);
+      byPhase.get(ph)!.push(l);
+    }
 
-    regular.sort((a, b) => {
-      const ap = po.get(a.phase) ?? 999;
-      const bp = po.get(b.phase) ?? 999;
-      if (ap !== bp) return ap - bp;
-      return 0;
-    });
-
-    const display: DisplayLine[] = regular.map((l) => ({
-      phase: l.phase,
-      description: l.description,
-      budget: l.budget,
-      realizado: l.realizado,
-      balance: l.balance,
-      pctConsumed: l.pctConsumed,
-      noBudgetLine: false,
-    }));
-
-    if (noBL.length > 0) {
-      const rSum = noBL.reduce((s, l) => s + l.realizado, 0);
-      display.push({
-        phase: "",
-        description: "",
-        budget: 0,
-        realizado: rSum,
-        balance: -rSum,
-        pctConsumed: 0,
-        noBudgetLine: true,
+    const phases: PhaseGroup[] = [];
+    for (const [ph, phLines] of byPhase.entries()) {
+      const budget = phLines.reduce((s, l) => s + l.budget, 0);
+      const realizado = phLines.reduce((s, l) => s + l.realizado, 0);
+      const balance = budget - realizado;
+      const pct = budget > 0 ? (realizado / budget) * 100 : 0;
+      phases.push({
+        key: ph,
+        label: ph === "__NO_BUDGET_LINE__" ? "" : ph,
+        noBudgetLine: ph === "__NO_BUDGET_LINE__" || phLines.every((l) => l.noBudgetLine),
+        budget,
+        realizado,
+        balance,
+        pctConsumed: pct,
+        lines: phLines,
       });
     }
+    phases.sort((a, b) => {
+      // Push unclassified last, then follow first-seen order.
+      if (a.noBudgetLine !== b.noBudgetLine) return a.noBudgetLine ? 1 : -1;
+      return (po.get(a.key) ?? 999) - (po.get(b.key) ?? 999);
+    });
 
     const budget = lines.reduce((s, l) => s + l.budget, 0);
     const realizado = lines.reduce((s, l) => s + l.realizado, 0);
@@ -94,7 +94,7 @@ function buildProjectGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
       realizado,
       balance,
       pctConsumed: pct,
-      lines: display,
+      phases,
     });
   }
 
@@ -107,7 +107,7 @@ export default function StageDetailTable({ job, budgetLines }: { job: string; bu
   const { t } = useI18n();
   const isAll = job === "__ALL__";
 
-  const allGroups = useMemo(() => buildProjectGroups(budgetLines), [budgetLines]);
+  const allGroups = useMemo(() => buildGroups(budgetLines), [budgetLines]);
 
   const visibleGroups = useMemo(() => {
     if (isAll) return allGroups;
@@ -115,28 +115,38 @@ export default function StageDetailTable({ job, budgetLines }: { job: string; bu
     return allGroups.filter((g) => g.key === job);
   }, [allGroups, isAll, job]);
 
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [expandedProjects, setExpandedProjects] = useState<Record<string, boolean>>({});
+  const [expandedPhases, setExpandedPhases] = useState<Record<string, boolean>>({});
 
   // Auto-expand when a specific project is selected.
   useEffect(() => {
     if (!isAll) {
       const next: Record<string, boolean> = {};
       for (const g of visibleGroups) next[g.key] = true;
-      setExpanded(next);
+      setExpandedProjects(next);
     } else {
-      setExpanded({});
+      setExpandedProjects({});
+      setExpandedPhases({});
     }
   }, [job]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const expandableKeys = visibleGroups.filter((g) => g.lines.length > 0).map((g) => g.key);
-  const allExpanded = expandableKeys.length > 0 && expandableKeys.every((k) => expanded[k]);
+  const expandableProjectKeys = visibleGroups.filter((g) => g.phases.length > 0).map((g) => g.key);
+  const allExpanded =
+    expandableProjectKeys.length > 0 && expandableProjectKeys.every((k) => expandedProjects[k]);
 
   const toggleAll = () => {
-    if (allExpanded) setExpanded({});
-    else {
-      const next: Record<string, boolean> = {};
-      for (const k of expandableKeys) next[k] = true;
-      setExpanded(next);
+    if (allExpanded) {
+      setExpandedProjects({});
+      setExpandedPhases({});
+    } else {
+      const nextP: Record<string, boolean> = {};
+      const nextPh: Record<string, boolean> = {};
+      for (const g of visibleGroups) {
+        nextP[g.key] = true;
+        for (const ph of g.phases) nextPh[`${g.key}::${ph.key}`] = true;
+      }
+      setExpandedProjects(nextP);
+      setExpandedPhases(nextPh);
     }
   };
 
@@ -154,7 +164,7 @@ export default function StageDetailTable({ job, budgetLines }: { job: string; bu
             ({t("filtered_meta", { n: nRows, v: fmtCurrency(totalReal) })})
           </span>
         </h3>
-        {expandableKeys.length > 0 && (
+        {expandableProjectKeys.length > 0 && (
           <button
             type="button"
             className="fr-btn fr-print-hide"
@@ -179,15 +189,19 @@ export default function StageDetailTable({ job, budgetLines }: { job: string; bu
           </thead>
           <tbody>
             {visibleGroups.map((g) => {
-              const opened = !!expanded[g.key];
-              const canExpand = g.lines.length > 0;
+              const projOpen = !!expandedProjects[g.key];
+              const canExpandProj = g.phases.length > 0;
               return (
                 <FragmentRow key={g.key || "__sem_obra__"}>
+                  {/* Level 1: Project */}
                   <tr
-                    style={{ cursor: canExpand ? "pointer" : "default" }}
-                    onClick={() => canExpand && setExpanded((s) => ({ ...s, [g.key]: !s[g.key] }))}
+                    style={{ cursor: canExpandProj ? "pointer" : "default" }}
+                    onClick={() =>
+                      canExpandProj &&
+                      setExpandedProjects((s) => ({ ...s, [g.key]: !s[g.key] }))
+                    }
                   >
-                    <td>{canExpand ? (opened ? "▾" : "▸") : ""}</td>
+                    <td>{canExpandProj ? (projOpen ? "▾" : "▸") : ""}</td>
                     <td style={{ fontWeight: 700, color: g.isUnassigned ? "var(--fr-muted)" : "var(--fr-navy)" }}>
                       {g.isUnassigned ? `(${t("no_project")})` : g.label}
                     </td>
@@ -196,37 +210,81 @@ export default function StageDetailTable({ job, budgetLines }: { job: string; bu
                     <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", color: g.balance < 0 ? "var(--fr-red)" : "var(--fr-text)" }}>
                       {fmtCurrency(g.balance)}
                     </td>
-                    <td style={{ textAlign: "right", fontWeight: 700, color: pctColor(g.pctConsumed) }}>
+                    <td style={{ textAlign: "right", fontWeight: 700, color: pctColor(g.pctConsumed, g.budget > 0) }}>
                       {g.budget > 0 ? `${Math.round(g.pctConsumed)}%` : "—"}
                     </td>
                   </tr>
-                  {opened && g.lines.map((l, i) => (
-                    <tr key={`${g.key}-${i}`} style={{ background: "var(--fr-surface)" }}>
-                      <td></td>
-                      <td style={{ paddingLeft: 24, fontSize: 12 }}>
-                        {l.noBudgetLine ? (
-                          <span style={{ color: "var(--fr-muted)", fontStyle: "italic" }}>
-                            ({t("no_budget_line")})
-                          </span>
-                        ) : (
-                          <>
-                            <span style={{ fontWeight: 700, color: "var(--fr-navy)" }}>{l.phase}</span>
-                            {l.description && l.description !== l.phase && (
-                              <span style={{ color: "var(--fr-muted)" }}> · {l.description}</span>
-                            )}
-                          </>
-                        )}
-                      </td>
-                      <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", fontSize: 12 }}>{fmtCurrency(l.budget)}</td>
-                      <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", fontSize: 12 }}>{fmtCurrency(l.realizado)}</td>
-                      <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", fontSize: 12, color: l.balance < 0 ? "var(--fr-red)" : "var(--fr-text)" }}>
-                        {fmtCurrency(l.balance)}
-                      </td>
-                      <td style={{ textAlign: "right", fontSize: 12, color: pctColor(l.pctConsumed) }}>
-                        {l.budget > 0 ? `${Math.round(l.pctConsumed)}%` : "—"}
-                      </td>
-                    </tr>
-                  ))}
+
+                  {/* Level 2: Phase */}
+                  {projOpen &&
+                    g.phases.map((ph) => {
+                      const phKey = `${g.key}::${ph.key}`;
+                      const phOpen = !!expandedPhases[phKey];
+                      const canExpandPh = ph.lines.length > 0;
+                      return (
+                        <FragmentRow key={phKey}>
+                          <tr
+                            style={{ background: "var(--fr-surface)", cursor: canExpandPh ? "pointer" : "default" }}
+                            onClick={() =>
+                              canExpandPh && setExpandedPhases((s) => ({ ...s, [phKey]: !s[phKey] }))
+                            }
+                          >
+                            <td style={{ paddingLeft: 24 }}>
+                              {canExpandPh ? (phOpen ? "▾" : "▸") : ""}
+                            </td>
+                            <td style={{ paddingLeft: 32, fontSize: 12 }}>
+                              {ph.noBudgetLine ? (
+                                <span style={{ color: "var(--fr-muted)", fontStyle: "italic" }}>
+                                  ({t("no_phase")})
+                                </span>
+                              ) : (
+                                <span style={{ fontWeight: 700, color: "var(--fr-navy)" }}>{ph.label}</span>
+                              )}
+                            </td>
+                            <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", fontSize: 12 }}>
+                              {fmtCurrency(ph.budget)}
+                            </td>
+                            <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", fontSize: 12 }}>
+                              {fmtCurrency(ph.realizado)}
+                            </td>
+                            <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", fontSize: 12, color: ph.balance < 0 ? "var(--fr-red)" : "var(--fr-text)" }}>
+                              {fmtCurrency(ph.balance)}
+                            </td>
+                            <td style={{ textAlign: "right", fontSize: 12, fontWeight: 700, color: pctColor(ph.pctConsumed, ph.budget > 0) }}>
+                              {ph.budget > 0 ? `${Math.round(ph.pctConsumed)}%` : "—"}
+                            </td>
+                          </tr>
+
+                          {/* Level 3: Description */}
+                          {phOpen &&
+                            ph.lines.map((l, i) => {
+                              const noLine = l.noBudgetLine || !l.description;
+                              return (
+                                <tr key={`${phKey}-${i}`} style={{ background: "var(--fr-bg)" }}>
+                                  <td></td>
+                                  <td style={{ paddingLeft: 56, fontSize: 12 }}>
+                                    {noLine ? (
+                                      <span style={{ color: "var(--fr-muted)", fontStyle: "italic" }}>
+                                        ({t("no_budget_line")})
+                                      </span>
+                                    ) : (
+                                      <span style={{ color: "var(--fr-text)" }}>{l.description}</span>
+                                    )}
+                                  </td>
+                                  <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", fontSize: 12 }}>{fmtCurrency(l.budget)}</td>
+                                  <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", fontSize: 12 }}>{fmtCurrency(l.realizado)}</td>
+                                  <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", fontSize: 12, color: l.balance < 0 ? "var(--fr-red)" : "var(--fr-text)" }}>
+                                    {fmtCurrency(l.balance)}
+                                  </td>
+                                  <td style={{ textAlign: "right", fontSize: 12, color: pctColor(l.pctConsumed, l.budget > 0) }}>
+                                    {l.budget > 0 ? `${Math.round(l.pctConsumed)}%` : "—"}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                        </FragmentRow>
+                      );
+                    })}
                 </FragmentRow>
               );
             })}
