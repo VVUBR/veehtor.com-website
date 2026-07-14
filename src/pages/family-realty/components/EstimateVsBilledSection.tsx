@@ -19,15 +19,27 @@ const Badge = ({ label, tone = "muted" }: { label: string; tone?: "muted" | "gol
   }}>{label}</span>
 );
 
-export default function EstimateVsBilledSection({ items, job }: { items: EstimateBilledRow[]; job: string }) {
+export default function EstimateVsBilledSection({
+  items, job, allowedProjects,
+}: {
+  items: EstimateBilledRow[];
+  job: string;
+  allowedProjects: Set<string> | null;
+}) {
   const { t } = useI18n();
   const [supplier, setSupplier] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<"active" | "inactive" | "all">("active");
 
   const scoped = useMemo(() => {
     let arr = job === "__ALL__" ? items : items.filter((r) => r.project === job);
+    if (allowedProjects) arr = arr.filter((r) => !r.project || allowedProjects.has(r.project));
     if (supplier) arr = arr.filter((r) => matchSupplier(r.vendor, r.vendor, supplier));
+    if (statusFilter !== "all") {
+      arr = arr.filter((r) => (statusFilter === "active" ? r.status === "Ativo" : r.status !== "Ativo"));
+    }
     return arr;
-  }, [items, job, supplier]);
+  }, [items, job, supplier, statusFilter, allowedProjects]);
+
 
   const rows = useMemo(() => {
     return [...scoped].sort((a, b) => {

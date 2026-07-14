@@ -5,26 +5,42 @@ import type { ContractRow } from "../data";
 
 const PER_PAGE = 10;
 
-export default function ContractsSection({ items, job }: { items: ContractRow[]; job: string }) {
+export default function ContractsSection({
+  items, job, allowedProjects,
+}: {
+  items: ContractRow[];
+  job: string;
+  allowedProjects: Set<string> | null;
+}) {
   const { t, lang } = useI18n();
   const [supplier, setSupplier] = useState<string>("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [page, setPage] = useState(1);
-
+  const [statusFilter, setStatusFilter] = useState<"active" | "inactive" | "all">("active");
 
   const rows = useMemo(() => {
     let arr = items;
+    // Project-status scope
+    if (allowedProjects) {
+      arr = arr.filter((c) => !c.project || allowedProjects.has(c.project));
+    }
     if (job !== "__ALL__") arr = arr.filter((c) => c.project === job || (job === "__UNASSIGNED__" && !c.project));
     if (supplier) arr = arr.filter((c) => matchSupplier(c.vendor, "", supplier));
+    if (statusFilter !== "all") {
+      arr = arr.filter((c) => {
+        const isActive = (c.status || "").toLowerCase() === "ativo";
+        return statusFilter === "active" ? isActive : !isActive;
+      });
+    }
     return arr;
-  }, [items, job, supplier]);
+  }, [items, job, supplier, statusFilter, allowedProjects]);
 
   const supplierOptions = useMemo(() => items.map((c) => c.vendor), [items]);
 
   const totalValue = rows.reduce((s, r) => s + r.totalValue, 0);
   const totalInstallments = rows.reduce((s, r) => s + r.installments.length, 0);
   const totalPages = Math.max(1, Math.ceil(rows.length / PER_PAGE));
-  useEffect(() => { setPage(1); }, [job, supplier]);
+  useEffect(() => { setPage(1); }, [job, supplier, statusFilter]);
   const clampedPage = Math.min(page, totalPages);
   const pageRows = rows.slice((clampedPage - 1) * PER_PAGE, clampedPage * PER_PAGE);
 
@@ -35,8 +51,22 @@ export default function ContractsSection({ items, job }: { items: ContractRow[];
         <h3 className="fr-heading" style={{ fontSize: 16, color: "var(--fr-navy)", margin: 0 }}>
           {t("sec_contracts")} <span className="fr-muted" style={{ fontSize: 12, fontWeight: 400 }}>({rows.length} · {totalInstallments} {t("th_installments").toLowerCase()})</span>
         </h3>
-        <SupplierSelect value={supplier} onChange={setSupplier} suppliers={supplierOptions} />
+        <div className="flex items-center gap-2">
+          <select
+            className="fr-select"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as "active" | "inactive" | "all")}
+            style={{ fontSize: 12, minWidth: 130 }}
+            aria-label={t("contract_status_filter")}
+          >
+            <option value="active">{t("contract_status_active")}</option>
+            <option value="inactive">{t("contract_status_inactive")}</option>
+            <option value="all">{t("contract_status_all")}</option>
+          </select>
+          <SupplierSelect value={supplier} onChange={setSupplier} suppliers={supplierOptions} />
+        </div>
       </div>
+
       <div style={{ maxHeight: 520, overflowY: "auto", border: "1px solid var(--fr-border)", borderRadius: 8 }}>
         <div style={{ display: "grid", gap: 8, padding: 8 }}>
           {pageRows.map((c) => {
