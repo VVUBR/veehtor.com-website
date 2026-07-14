@@ -261,7 +261,7 @@ function DashboardInner() {
         {tab === "overview" && (
           <>
             <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-              <BudgetStatusList job={job} jobsMeta={data.jobsMeta} committed={data.committed} />
+              <BudgetStatusList job={job} jobsMeta={jobsMetaFiltered} committed={data.committed} />
               <div>
                 <MonthlySpendChart items={historyByJob} activeJob={activeJobMeta} />
                 {missingDate && (
@@ -272,7 +272,7 @@ function DashboardInner() {
               </div>
             </section>
             <section className="mt-4">
-              <StageDetailTable job={job} budgetLines={data.budgetLines} />
+              <StageDetailTable job={job} budgetLines={budgetLinesFiltered} />
             </section>
           </>
         )}
@@ -286,10 +286,10 @@ function DashboardInner() {
         {tab === "payables" && (
           <>
             <section className="mt-4">
-              <PayablesList items={data.payables} job={job} />
+              <PayablesList docs={payableDocsScope} job={job} />
             </section>
             <section className="mt-4">
-              <ContractsSection items={data.contractRows} job={job} />
+              <ContractsSection items={data.contractRows} job={job} allowedProjects={allowedProjects} />
             </section>
             <section className="mt-4">
               <ComplianceSection
@@ -300,8 +300,9 @@ function DashboardInner() {
               />
             </section>
             <section className="mt-4">
-              <EstimateVsBilledSection items={data.evbRows} job={job} />
+              <EstimateVsBilledSection items={data.evbRows} job={job} allowedProjects={allowedProjects} />
             </section>
+
           </>
         )}
 
