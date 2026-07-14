@@ -187,6 +187,7 @@ async function loadAll() {
     subCompliance,
     insuranceRaw,
     w9Raw,
+    projectsView,
   ] = await Promise.all([
     fetchAll<BvaProjectRow>("v_budget_vs_actual_by_project").catch(() => []),
     fetchAll<BvaLineRow>("v_budget_vs_actual").catch(() => []),
@@ -201,7 +202,9 @@ async function loadAll() {
     fetchAll<Record<string, unknown>>("v_sub_compliance").catch(() => []),
     fetchAll<Record<string, unknown>>("insurance").catch(() => []),
     fetchAll<Record<string, unknown>>("w9").catch(() => []),
+    fetchAll<ProjectRow>("v_projects").catch(() => []),
   ]);
+
 
   // eslint-disable-next-line no-console
   console.info("[FR] fetch counts", {
