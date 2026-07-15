@@ -272,7 +272,13 @@ function DashboardInner() {
               />
             </section>
             <section className="mt-4">
-              <EstimateVsBilledSection items={data.evbRows} job={job} allowedProjects={allowedProjects} />
+              <EstimateVsBilledSection
+                items={data.evbRows}
+                job={job}
+                allowedProjects={allowedProjects}
+                invoicePaidBySub={data.invoicePaidBySub}
+                paymentsBySub={data.paymentsBySub}
+              />
             </section>
           </>
         )}
