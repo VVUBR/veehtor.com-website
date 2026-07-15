@@ -46,6 +46,8 @@ export default function EstimateVsBilledSection({
   const [supplier, setSupplier] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<"active" | "inactive" | "all">("active");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  type SortKey = "estimate" | "billed" | "paid" | "openAmount" | "difference" | "pctBilled";
+  const [sort, setSort] = useState<{ key: SortKey; dir: "asc" | "desc" }>({ key: "openAmount", dir: "desc" });
 
   const scoped = useMemo(() => {
     let arr = job === "__ALL__" ? items : items.filter((r) => r.project === job);
@@ -58,13 +60,13 @@ export default function EstimateVsBilledSection({
   }, [items, job, supplier, statusFilter, allowedProjects]);
 
   const rows = useMemo(() => {
-    return [...scoped].sort((a, b) => {
-      const aMiss = !a.hasProject || !a.hasEstimate;
-      const bMiss = !b.hasProject || !b.hasEstimate;
-      if (aMiss !== bMiss) return aMiss ? -1 : 1;
-      return a.difference - b.difference;
-    });
-  }, [scoped]);
+    const dir = sort.dir === "asc" ? 1 : -1;
+    const getVal = (r: EstimateBilledRow): number => {
+      if (sort.key === "estimate") return r.hasEstimate ? r.estimate : -Infinity;
+      return r[sort.key] as number;
+    };
+    return [...scoped].sort((a, b) => (getVal(a) - getVal(b)) * dir);
+  }, [scoped, sort]);
 
   const totalBilled = rows.reduce((s, r) => s + r.billed, 0);
   const supplierOptions = useMemo(() => items.map((r) => r.vendor), [items]);
@@ -76,6 +78,19 @@ export default function EstimateVsBilledSection({
       return next;
     });
   };
+
+  const onSort = (key: SortKey) => {
+    setSort((prev) => prev.key === key ? { key, dir: prev.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" });
+  };
+  const sortIndicator = (key: SortKey) => sort.key === key ? (sort.dir === "asc" ? " ▲" : " ▼") : "";
+  const sortableTh = (key: SortKey, label: string) => (
+    <th
+      style={{ textAlign: "right", cursor: "pointer", userSelect: "none" }}
+      onClick={() => onSort(key)}
+    >
+      {label}{sortIndicator(key)}
+    </th>
+  );
 
   return (
     <div className="fr-card p-5">
@@ -109,19 +124,26 @@ export default function EstimateVsBilledSection({
               <th style={{ width: 28 }}></th>
               <th>{t("th_supplier")}</th>
               <th>{t("th_job")}</th>
-              <th style={{ textAlign: "right" }}>{t("th_estimate")}</th>
-              <th style={{ textAlign: "right" }}>{t("th_billed")}</th>
-              <th style={{ textAlign: "right" }}>{t("th_paid")}</th>
-              <th style={{ textAlign: "right" }}>{t("th_open")}</th>
-              <th style={{ textAlign: "right" }}>{t("th_diff")}</th>
-              <th style={{ textAlign: "right" }}>{t("th_pct_billed")}</th>
+              {sortableTh("estimate", t("th_estimate"))}
+              {sortableTh("billed", t("th_billed"))}
+              {sortableTh("paid", t("th_paid"))}
+              {sortableTh("openAmount", t("th_open"))}
+              {sortableTh("difference", t("th_diff"))}
+              {sortableTh("pctBilled", t("th_pct_billed"))}
             </tr>
           </thead>
           <tbody>
             {rows.map((r, i) => {
               const key = `${r.vendor}::${r.project}::${i}`;
               const isOpen = expanded.has(key);
-              const invoices = (invoicePaidBySub.get(r.vendor) || []);
+              const invoices = (invoicePaidBySub.get(r.vendor) || [])
+                .filter((iv) => !r.hasProject || !iv.project || iv.project === r.project)
+                .slice()
+                .sort((a, b) => {
+                  const at = a.docDate?.getTime() ?? Infinity;
+                  const bt = b.docDate?.getTime() ?? Infinity;
+                  return at - bt;
+                });
               const payments = (paymentsBySub.get(r.vendor) || []).filter(
                 (p) => !r.hasProject || !p.projectName || p.projectName === r.project,
               );
@@ -178,7 +200,18 @@ export default function EstimateVsBilledSection({
                               const isMarcar = iv.situacao.toLowerCase().startsWith("paga (marcar");
                               return (
                                 <div key={idx} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, padding: "3px 0", borderBottom: "1px solid var(--fr-border)" }}>
-                                  <span>{iv.invoiceNumber || <span className="fr-muted">{t("no_invoice_number")}</span>}</span>
+                                  <span>
+                                    {iv.invoiceNumber ? (
+                                      <>
+                                        {iv.invoiceNumber}
+                                        <span className="fr-muted" style={{ marginLeft: 6, fontSize: 11 }}>
+                                          {fmtDateLocale(iv.docDate, lang)}
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <span>{fmtDateLocale(iv.docDate, lang)}</span>
+                                    )}
+                                  </span>
                                   <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                     <span style={{ fontVariantNumeric: "tabular-nums" }}>{fmtCurrency(iv.docTotal)}</span>
                                     <Badge
@@ -208,7 +241,16 @@ export default function EstimateVsBilledSection({
                             {paidByStatus.map((iv, idx) => (
                               <div key={`s${idx}`} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, padding: "3px 0", borderBottom: "1px solid var(--fr-border)" }}>
                                 <span>
-                                  {iv.invoiceNumber || <span className="fr-muted">{t("no_invoice_number")}</span>}
+                                  {iv.invoiceNumber ? (
+                                    <>
+                                      {iv.invoiceNumber}
+                                      <span className="fr-muted" style={{ marginLeft: 6, fontSize: 11 }}>
+                                        {fmtDateLocale(iv.docDate, lang)}
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <span>{fmtDateLocale(iv.docDate, lang)}</span>
+                                  )}
                                   <Badge label={t("evb_recibo_auto")} tone="muted" />
                                 </span>
                                 <span style={{ fontVariantNumeric: "tabular-nums" }}>{fmtCurrency(iv.docTotal)}</span>
