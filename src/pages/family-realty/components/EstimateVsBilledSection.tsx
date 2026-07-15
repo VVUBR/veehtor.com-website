@@ -143,18 +143,19 @@ export default function EstimateVsBilledSection({
               const key = `${r.vendor}::${r.project}::${i}`;
               const isOpen = expanded.has(key);
               const invoices = (invoicePaidBySub.get(r.vendor) || [])
-                .filter((iv) => !r.hasProject || !iv.project || iv.project === r.project)
+                .filter((iv) => (iv.project || "") === (r.project || ""))
                 .slice()
-                .sort((a, b) => {
-                  const at = a.docDate?.getTime() ?? Infinity;
-                  const bt = b.docDate?.getTime() ?? Infinity;
-                  return at - bt;
-                });
+                .sort(byDocDateAsc);
               const payments = (paymentsBySub.get(r.vendor) || []).filter(
-                (p) => !r.hasProject || !p.projectName || p.projectName === r.project,
+                (p) => (p.projectName || "") === (r.project || ""),
+              );
+              const paidNumbers = new Set(
+                invoices
+                  .filter((iv) => iv.situacao.toLowerCase() === "paga" && iv.invoiceNumber)
+                  .map((iv) => iv.invoiceNumber as string),
               );
               const paidByStatus = invoices.filter((iv) => iv.situacao.toLowerCase() === "paga");
-              const paymentsWithInv = payments.filter((p) => p.invoiceNumber);
+              const paymentsWithInv = payments.filter((p) => p.invoiceNumber && !paidNumbers.has(p.invoiceNumber));
               const paymentsNoInv = payments.filter((p) => !p.invoiceNumber);
               const unlinkedSum = paymentsNoInv.reduce((s, p) => s + p.amount, 0);
 
