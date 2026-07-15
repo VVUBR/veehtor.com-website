@@ -134,6 +134,7 @@ const DICT: Record<string, { pt: string; en: string }> = {
     pt: "pagamentos já cobrem a nota, falta mudar o status para Paid na planilha",
     en: "payments already cover the invoice, status still needs to be set to Paid in the sheet",
   },
+  no_invoice_label: { pt: "(sem Nº invoice)", en: "(no invoice #)" },
   th_diff: { pt: "Diferença", en: "Difference" },
   th_pct_billed: { pt: "% billed", en: "% billed" },
   th_contact: { pt: "Contato", en: "Contact" },
