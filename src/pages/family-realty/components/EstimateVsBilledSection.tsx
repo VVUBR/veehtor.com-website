@@ -46,6 +46,8 @@ export default function EstimateVsBilledSection({
   const [supplier, setSupplier] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<"active" | "inactive" | "all">("active");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  type SortKey = "estimate" | "billed" | "paid" | "openAmount" | "difference" | "pctBilled";
+  const [sort, setSort] = useState<{ key: SortKey; dir: "asc" | "desc" }>({ key: "openAmount", dir: "desc" });
 
   const scoped = useMemo(() => {
     let arr = job === "__ALL__" ? items : items.filter((r) => r.project === job);
@@ -58,13 +60,13 @@ export default function EstimateVsBilledSection({
   }, [items, job, supplier, statusFilter, allowedProjects]);
 
   const rows = useMemo(() => {
-    return [...scoped].sort((a, b) => {
-      const aMiss = !a.hasProject || !a.hasEstimate;
-      const bMiss = !b.hasProject || !b.hasEstimate;
-      if (aMiss !== bMiss) return aMiss ? -1 : 1;
-      return a.difference - b.difference;
-    });
-  }, [scoped]);
+    const dir = sort.dir === "asc" ? 1 : -1;
+    const getVal = (r: EstimateBilledRow): number => {
+      if (sort.key === "estimate") return r.hasEstimate ? r.estimate : -Infinity;
+      return r[sort.key] as number;
+    };
+    return [...scoped].sort((a, b) => (getVal(a) - getVal(b)) * dir);
+  }, [scoped, sort]);
 
   const totalBilled = rows.reduce((s, r) => s + r.billed, 0);
   const supplierOptions = useMemo(() => items.map((r) => r.vendor), [items]);
@@ -76,6 +78,19 @@ export default function EstimateVsBilledSection({
       return next;
     });
   };
+
+  const onSort = (key: SortKey) => {
+    setSort((prev) => prev.key === key ? { key, dir: prev.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" });
+  };
+  const sortIndicator = (key: SortKey) => sort.key === key ? (sort.dir === "asc" ? " ▲" : " ▼") : "";
+  const sortableTh = (key: SortKey, label: string) => (
+    <th
+      style={{ textAlign: "right", cursor: "pointer", userSelect: "none" }}
+      onClick={() => onSort(key)}
+    >
+      {label}{sortIndicator(key)}
+    </th>
+  );
 
   return (
     <div className="fr-card p-5">
