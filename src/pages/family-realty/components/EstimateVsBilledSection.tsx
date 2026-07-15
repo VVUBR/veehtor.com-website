@@ -136,7 +136,14 @@ export default function EstimateVsBilledSection({
             {rows.map((r, i) => {
               const key = `${r.vendor}::${r.project}::${i}`;
               const isOpen = expanded.has(key);
-              const invoices = (invoicePaidBySub.get(r.vendor) || []);
+              const invoices = (invoicePaidBySub.get(r.vendor) || [])
+                .filter((iv) => !r.hasProject || !iv.project || iv.project === r.project)
+                .slice()
+                .sort((a, b) => {
+                  const at = a.docDate?.getTime() ?? Infinity;
+                  const bt = b.docDate?.getTime() ?? Infinity;
+                  return at - bt;
+                });
               const payments = (paymentsBySub.get(r.vendor) || []).filter(
                 (p) => !r.hasProject || !p.projectName || p.projectName === r.project,
               );
