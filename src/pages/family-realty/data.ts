@@ -127,6 +127,8 @@ export type EstimateBilledRow = {
   project: string;
   estimate: number;
   billed: number;
+  paid: number;
+  openAmount: number;
   difference: number;
   pctBilled: number;
   nContracts: number;
@@ -134,6 +136,29 @@ export type EstimateBilledRow = {
   hasEstimate: boolean;
   status: "Ativo" | "Inativo";
 };
+
+export type InvoicePaidRow = {
+  supplierCanonical: string;
+  invoiceNumber: string;
+  docTotal: number;
+  paymentStatus: string;
+  pagoManual: number;
+  pago: number;
+  situacao: string;
+};
+
+export type PaymentRow = {
+  paymentId: string;
+  paymentDate: Date | null;
+  supplierCanonical: string;
+  invoiceNumber: string | null;
+  projectName: string;
+  amount: number;
+  paymentMethod: string | null;
+  cardNumber: string | null;
+  notes: string | null;
+};
+
 
 export type Installment = {
   label: string;
