@@ -241,7 +241,16 @@ export default function EstimateVsBilledSection({
                             {paidByStatus.map((iv, idx) => (
                               <div key={`s${idx}`} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, padding: "3px 0", borderBottom: "1px solid var(--fr-border)" }}>
                                 <span>
-                                  {iv.invoiceNumber || <span className="fr-muted">{t("no_invoice_number")}</span>}
+                                  {iv.invoiceNumber ? (
+                                    <>
+                                      {iv.invoiceNumber}
+                                      <span className="fr-muted" style={{ marginLeft: 6, fontSize: 11 }}>
+                                        {fmtDateLocale(iv.docDate, lang)}
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <span>{fmtDateLocale(iv.docDate, lang)}</span>
+                                  )}
                                   <Badge label={t("evb_recibo_auto")} tone="muted" />
                                 </span>
                                 <span style={{ fontVariantNumeric: "tabular-nums" }}>{fmtCurrency(iv.docTotal)}</span>
