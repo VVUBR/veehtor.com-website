@@ -139,7 +139,9 @@ export type EstimateBilledRow = {
 
 export type InvoicePaidRow = {
   supplierCanonical: string;
-  invoiceNumber: string;
+  project: string;
+  invoiceNumber: string | null;
+  docDate: Date | null;
   docTotal: number;
   paymentStatus: string;
   pagoManual: number;
