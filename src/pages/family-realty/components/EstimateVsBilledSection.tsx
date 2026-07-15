@@ -216,7 +216,12 @@ export default function EstimateVsBilledSection({
                                         </span>
                                       </>
                                     ) : (
-                                      <span>{fmtDateLocale(iv.docDate, lang)}</span>
+                                      <>
+                                        <span className="fr-muted" style={{ fontSize: 11 }}>{t("no_invoice_label")}</span>
+                                        {iv.docDate && (
+                                          <span style={{ marginLeft: 6 }}>{fmtDateLocale(iv.docDate, lang)}</span>
+                                        )}
+                                      </>
                                     )}
                                   </span>
                                   <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
