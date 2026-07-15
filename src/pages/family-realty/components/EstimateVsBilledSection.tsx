@@ -261,7 +261,12 @@ export default function EstimateVsBilledSection({
                                       </span>
                                     </>
                                   ) : (
-                                    <span>{fmtDateLocale(iv.docDate, lang)}</span>
+                                    <>
+                                      <span className="fr-muted" style={{ fontSize: 11 }}>{t("no_invoice_label")}</span>
+                                      {iv.docDate && (
+                                        <span style={{ marginLeft: 6 }}>{fmtDateLocale(iv.docDate, lang)}</span>
+                                      )}
+                                    </>
                                   )}
                                   <Badge label={t("evb_recibo_auto")} tone="muted" />
                                 </span>
