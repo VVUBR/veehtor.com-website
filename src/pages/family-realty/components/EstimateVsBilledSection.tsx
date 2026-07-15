@@ -200,7 +200,18 @@ export default function EstimateVsBilledSection({
                               const isMarcar = iv.situacao.toLowerCase().startsWith("paga (marcar");
                               return (
                                 <div key={idx} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, padding: "3px 0", borderBottom: "1px solid var(--fr-border)" }}>
-                                  <span>{iv.invoiceNumber || <span className="fr-muted">{t("no_invoice_number")}</span>}</span>
+                                  <span>
+                                    {iv.invoiceNumber ? (
+                                      <>
+                                        {iv.invoiceNumber}
+                                        <span className="fr-muted" style={{ marginLeft: 6, fontSize: 11 }}>
+                                          {fmtDateLocale(iv.docDate, lang)}
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <span>{fmtDateLocale(iv.docDate, lang)}</span>
+                                    )}
+                                  </span>
                                   <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                     <span style={{ fontVariantNumeric: "tabular-nums" }}>{fmtCurrency(iv.docTotal)}</span>
                                     <Badge
