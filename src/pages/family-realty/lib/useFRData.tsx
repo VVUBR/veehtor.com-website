@@ -22,6 +22,8 @@ import {
   type W9Row,
   type ProjectInfo,
   type ProjectStatus,
+  type InvoicePaidRow,
+  type PaymentRow,
   uniqueProjects,
 } from "../data";
 
@@ -110,6 +112,8 @@ type EvbRow = {
   project?: string | null;
   estimate?: number | string | null;
   billed?: number | string | null;
+  paid?: number | string | null;
+  open_amount?: number | string | null;
   difference?: number | string | null;
   pct_billed?: number | string | null;
   n_contracts?: number | string | null;
@@ -346,6 +350,8 @@ async function loadAll() {
     const hasEstimate = r.estimate != null && String(r.estimate) !== "";
     const estimate = num(r.estimate);
     const billed = num(r.billed);
+    const paid = num(r.paid);
+    const openAmount = r.open_amount != null ? num(r.open_amount) : billed - paid;
     const rawStatus = (r.status || "").toString().trim();
     const status: "Ativo" | "Inativo" = rawStatus === "Ativo" ? "Ativo" : "Inativo";
     return {
@@ -353,6 +359,8 @@ async function loadAll() {
       project: hasProject ? String(r.project) : "",
       estimate,
       billed,
+      paid,
+      openAmount,
       difference: r.difference != null ? num(r.difference) : estimate - billed,
       pctBilled: r.pct_billed != null ? num(r.pct_billed) : estimate > 0 ? (billed / estimate) * 100 : 0,
       nContracts: r.n_contracts != null ? Number(r.n_contracts) : 1,
