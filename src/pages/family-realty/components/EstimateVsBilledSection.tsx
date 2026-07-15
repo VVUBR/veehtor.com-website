@@ -59,6 +59,12 @@ export default function EstimateVsBilledSection({
     return arr;
   }, [items, job, supplier, statusFilter, allowedProjects]);
 
+  const byDocDateAsc = (a: InvoicePaidRow, b: InvoicePaidRow) => {
+    const at = a.docDate?.getTime() ?? Infinity;
+    const bt = b.docDate?.getTime() ?? Infinity;
+    return at - bt;
+  };
+
   const rows = useMemo(() => {
     const dir = sort.dir === "asc" ? 1 : -1;
     const getVal = (r: EstimateBilledRow): number => {
