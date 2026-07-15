@@ -124,12 +124,12 @@ export default function EstimateVsBilledSection({
               <th style={{ width: 28 }}></th>
               <th>{t("th_supplier")}</th>
               <th>{t("th_job")}</th>
-              <th style={{ textAlign: "right" }}>{t("th_estimate")}</th>
-              <th style={{ textAlign: "right" }}>{t("th_billed")}</th>
-              <th style={{ textAlign: "right" }}>{t("th_paid")}</th>
-              <th style={{ textAlign: "right" }}>{t("th_open")}</th>
-              <th style={{ textAlign: "right" }}>{t("th_diff")}</th>
-              <th style={{ textAlign: "right" }}>{t("th_pct_billed")}</th>
+              {sortableTh("estimate", t("th_estimate"))}
+              {sortableTh("billed", t("th_billed"))}
+              {sortableTh("paid", t("th_paid"))}
+              {sortableTh("openAmount", t("th_open"))}
+              {sortableTh("difference", t("th_diff"))}
+              {sortableTh("pctBilled", t("th_pct_billed"))}
             </tr>
           </thead>
           <tbody>
