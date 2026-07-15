@@ -573,7 +573,9 @@ async function loadAll() {
     if (!canon) continue;
     const row: InvoicePaidRow = {
       supplierCanonical: canon,
-      invoiceNumber: str(r.invoice_number),
+      project: str(r.project),
+      invoiceNumber: strOrNull(r.invoice_number),
+      docDate: parseSafeDate(str(r.doc_date)).date,
       docTotal: num(r.doc_total),
       paymentStatus: str(r.payment_status),
       pagoManual: num(r.pago_manual),
