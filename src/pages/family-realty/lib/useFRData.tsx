@@ -192,6 +192,8 @@ async function loadAll() {
     insuranceRaw,
     w9Raw,
     projectsView,
+    invoicePaidRaw,
+    paymentsRaw,
   ] = await Promise.all([
     fetchAll<BvaProjectRow>("v_budget_vs_actual_by_project").catch(() => []),
     fetchAll<BvaLineRow>("v_budget_vs_actual").catch(() => []),
@@ -207,6 +209,8 @@ async function loadAll() {
     fetchAll<Record<string, unknown>>("insurance").catch(() => []),
     fetchAll<Record<string, unknown>>("w9").catch(() => []),
     fetchAll<ProjectRow>("v_projects").catch(() => []),
+    fetchAll<Record<string, unknown>>("v_invoice_paid").catch(() => []),
+    fetchAll<Record<string, unknown>>("payments").catch(() => []),
   ]);
 
 
@@ -562,6 +566,45 @@ async function loadAll() {
     arr.sort((a, b) => (b.signatureDate?.getTime() ?? 0) - (a.signatureDate?.getTime() ?? 0));
   }
 
+  // -- Invoice paid + payments (for EvB drill-down) --
+  const invoicePaidBySub = new Map<string, InvoicePaidRow[]>();
+  for (const r of invoicePaidRaw) {
+    const canon = str(r.supplier_canonical);
+    if (!canon) continue;
+    const row: InvoicePaidRow = {
+      supplierCanonical: canon,
+      invoiceNumber: str(r.invoice_number),
+      docTotal: num(r.doc_total),
+      paymentStatus: str(r.payment_status),
+      pagoManual: num(r.pago_manual),
+      pago: num(r.pago),
+      situacao: str(r.situacao),
+    };
+    const arr = invoicePaidBySub.get(canon) || [];
+    arr.push(row);
+    invoicePaidBySub.set(canon, arr);
+  }
+
+  const paymentsBySub = new Map<string, PaymentRow[]>();
+  for (const r of paymentsRaw) {
+    const canon = str(r.supplier_canonical);
+    if (!canon) continue;
+    const row: PaymentRow = {
+      paymentId: str(r.payment_id),
+      paymentDate: parseSafeDate(str(r.payment_date)).date,
+      supplierCanonical: canon,
+      invoiceNumber: strOrNull(r.invoice_number),
+      projectName: str(r.project_name),
+      amount: num(r.amount),
+      paymentMethod: strOrNull(r.payment_method),
+      cardNumber: strOrNull(r.card_number),
+      notes: strOrNull(r.notes),
+    };
+    const arr = paymentsBySub.get(canon) || [];
+    arr.push(row);
+    paymentsBySub.set(canon, arr);
+  }
+
   return {
     jobs,
     jobsMeta,
@@ -580,6 +623,8 @@ async function loadAll() {
     w9BySub,
     projects,
     projectStatusMap,
+    invoicePaidBySub,
+    paymentsBySub,
   };
 }
 
@@ -592,6 +637,7 @@ const empty: FRData = {
   committed: { total: 0, byProject: new Map(), unassignedAmount: 0, unassignedCount: 0 },
   subCompliance: [], insuranceBySub: new Map(), w9BySub: new Map(),
   projects: [], projectStatusMap: new Map(),
+  invoicePaidBySub: new Map(), paymentsBySub: new Map(),
 };
 
 
