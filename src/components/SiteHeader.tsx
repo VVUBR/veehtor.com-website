@@ -42,7 +42,7 @@ export default function SiteHeader() {
           {t.header.howItWorks}
         </button>
         <Link to="/case-studies" className="nav-link-style hidden md:inline-block">
-          Case Studies
+          {t.header.caseStudies}
         </Link>
         <button className="nav-link-style hidden md:inline-block" onClick={() => goToAnchor("pricing")}>
           {t.header.pricing}
