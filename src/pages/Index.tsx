@@ -219,7 +219,7 @@ export default function LandingPage() {
         </a>
         <nav style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
           <button className="nav-link-style hidden md:inline-block" onClick={() => scrollTo("process")}>{t.header.howItWorks}</button>
-          <Link to="/case-studies" className="nav-link-style hidden md:inline-block">Case Studies</Link>
+          <Link to="/case-studies" className="nav-link-style hidden md:inline-block">{t.header.caseStudies}</Link>
           <button className="nav-link-style hidden md:inline-block" onClick={() => scrollTo("pricing")}>{t.header.pricing}</button>
           <button className="nav-cta" onClick={() => scrollTo("contact")}>{t.header.getInTouch}</button>
           <LanguageSwitcher />
@@ -386,7 +386,7 @@ export default function LandingPage() {
           </div>
           <div style={{ textAlign: "center", marginTop: "3rem" }}>
             <Link to="/case-studies" className="btn-primary" style={{ display: "inline-block" }}>
-              <strong>See all case studies</strong> →
+              <strong>{t.caseStudies.seeAll}</strong> →
             </Link>
           </div>
         </div>
