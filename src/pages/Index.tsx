@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { Link, useLocation } from "react-router-dom";
 import vaiLogo from "@/assets/vai-logo-new.png";
 import { useLanguage } from "@/i18n/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -187,6 +188,19 @@ export default function LandingPage() {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Handle inbound `/#anchor` from other pages (e.g. Case Studies header links).
+  const location = useLocation();
+  useEffect(() => {
+    if (loading) return;
+    const hash = location.hash?.replace("#", "");
+    if (!hash) return;
+    // wait for layout after loader hides
+    const t = setTimeout(() => {
+      document.getElementById(hash)?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+    return () => clearTimeout(t);
+  }, [loading, location.hash]);
+
   return (
     <>
       {/* LOADER */}
@@ -205,6 +219,7 @@ export default function LandingPage() {
         </a>
         <nav style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
           <button className="nav-link-style hidden md:inline-block" onClick={() => scrollTo("process")}>{t.header.howItWorks}</button>
+          <Link to="/case-studies" className="nav-link-style hidden md:inline-block">Case Studies</Link>
           <button className="nav-link-style hidden md:inline-block" onClick={() => scrollTo("pricing")}>{t.header.pricing}</button>
           <button className="nav-cta" onClick={() => scrollTo("contact")}>{t.header.getInTouch}</button>
           <LanguageSwitcher />
@@ -368,6 +383,11 @@ export default function LandingPage() {
                 </div>
               </StaggerChild>
             ))}
+          </div>
+          <div style={{ textAlign: "center", marginTop: "3rem" }}>
+            <Link to="/case-studies" className="btn-primary" style={{ display: "inline-block" }}>
+              <strong>See all case studies</strong> →
+            </Link>
           </div>
         </div>
       </section>
