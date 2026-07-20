@@ -384,6 +384,11 @@ export default function LandingPage() {
               </StaggerChild>
             ))}
           </div>
+          <div style={{ textAlign: "center", marginTop: "3rem" }}>
+            <Link to="/case-studies" className="btn-primary" style={{ display: "inline-block" }}>
+              <strong>See all case studies</strong> →
+            </Link>
+          </div>
         </div>
       </section>
 
