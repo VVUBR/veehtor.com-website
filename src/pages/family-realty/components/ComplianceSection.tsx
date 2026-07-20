@@ -327,9 +327,10 @@ export default function ComplianceSection({ rows, insuranceBySub, w9BySub, job, 
         </span>
       </div>
 
-      <div style={{ border: "1px solid var(--fr-border)", borderRadius: 8, overflow: "hidden" }}>
+      <div style={{ maxHeight: 520, overflowY: "auto", border: "1px solid var(--fr-border)", borderRadius: 8 }}>
         <table className="fr-table" style={{ fontSize: 12 }}>
-          <thead>
+          <thead style={{ position: "sticky", top: 0, zIndex: 1 }}>
+
             <tr>
               <th style={{ cursor: "default" }}>Subcontractor</th>
               <th style={{ cursor: "default" }}>{t("compliance_active_projects")}</th>
@@ -353,16 +354,6 @@ export default function ComplianceSection({ rows, insuranceBySub, w9BySub, job, 
                 w9BySub.get(r.subcontractorCanonical) ||
                 w9BySub.get(r.subcontractor) ||
                 [];
-              if (typeof window !== "undefined" && r.subcontractor === "AMC Excavating LLC") {
-                // eslint-disable-next-line no-console
-                console.info("[FR compliance] AMC lookup", {
-                  canonical: r.subcontractorCanonical,
-                  insCount: insAll.length,
-                  w9Count: w9All.length,
-                  insSample: insAll[0],
-                  w9Sample: w9All[0],
-                });
-              }
 
               // Pick the most recent GL / WC row from the tables when available;
               // otherwise fall back to a synthesized row from v_sub_compliance so
