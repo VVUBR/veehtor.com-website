@@ -557,7 +557,7 @@ export const CASE_STUDIES: CaseStudy[] = [
   {
     slug: "robbin-receivables-cash",
     client: "Robbin Services",
-    sector: "Construction (USA)",
+    sector: "Construction",
     areas: ["Finance"],
     title: {
       en: "Robbin Services: invoices into QuickBooks, and overdue balances that stopped hiding",
