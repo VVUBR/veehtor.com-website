@@ -1,19 +1,11 @@
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react";
 import { track } from "@/lib/analytics";
 import { CALENDAR_URL, submitProcessMapping } from "@/lib/submitProcessMapping";
+import { useSiteContent } from "@/i18n/siteContent";
 
 export interface MapDialogHandle {
   open: (source: string, opener: HTMLElement | null) => void;
 }
-
-const IMPACTS = [
-  "Perda de receita",
-  "Custo ou retrabalho",
-  "Tempo do time",
-  "Atraso para o cliente",
-  "Risco ou erro",
-  "Ainda não sei medir",
-];
 
 const MapDialog = forwardRef<MapDialogHandle>((_props, ref) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -21,6 +13,7 @@ const MapDialog = forwardRef<MapDialogHandle>((_props, ref) => {
   const liveRef = useRef<HTMLParagraphElement>(null);
   const openerRef = useRef<HTMLElement | null>(null);
   const startedRef = useRef(false);
+  const S = useSiteContent().mapDialog;
 
   const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -103,7 +96,7 @@ const MapDialog = forwardRef<MapDialogHandle>((_props, ref) => {
 
     setInvalid(nextInvalid);
     if (Object.keys(nextInvalid).length) {
-      if (liveRef.current) liveRef.current.textContent = "Revise os campos destacados antes de enviar.";
+      if (liveRef.current) liveRef.current.textContent = S.liveInvalid;
       return { ok: false, focus: firstFocus };
     }
     return { ok: true };
@@ -127,15 +120,15 @@ const MapDialog = forwardRef<MapDialogHandle>((_props, ref) => {
       whatsapp: (form.querySelector("#f-whats") as HTMLInputElement).value.trim(),
     };
     setSubmitting(true);
-    if (liveRef.current) liveRef.current.textContent = "Enviando suas respostas.";
+    if (liveRef.current) liveRef.current.textContent = S.liveSending;
     const res = await submitProcessMapping(data);
     setSubmitting(false);
     if (res.ok) {
       track("form_submitted");
       setSent(true);
-      if (liveRef.current) liveRef.current.textContent = "Recebido. Agora escolha um horário de 30 minutos.";
+      if (liveRef.current) liveRef.current.textContent = S.liveReceived;
     } else if (liveRef.current) {
-      liveRef.current.textContent = "Não foi possível enviar. Seus dados foram preservados, tente novamente.";
+      liveRef.current.textContent = S.errNetwork;
     }
   };
 
@@ -150,76 +143,76 @@ const MapDialog = forwardRef<MapDialogHandle>((_props, ref) => {
       <div className="modal-in">
         <div className="modal-head">
           <div>
-            <h3 id="maptitle">Mapear meu processo</h3>
-            <p className="modal-sub">Conte onde a operação trava. A conversa já começa com contexto.</p>
+            <h3 id="maptitle">{S.title}</h3>
+            <p className="modal-sub">{S.subtitle}</p>
           </div>
-          <button className="x" type="button" aria-label="Fechar" onClick={closeDialog}>✕</button>
+          <button className="x" type="button" aria-label={S.close} onClick={closeDialog}>✕</button>
         </div>
 
         <p className="form-live" aria-live="polite" ref={liveRef} />
 
         <form className="map" ref={formRef} noValidate onSubmit={handleSubmit} onInput={handleInput}>
           <div className={`field${invalid.process ? " invalid" : ""}`}>
-            <label htmlFor="f-process">Qual processo está incomodando?</label>
+            <label htmlFor="f-process">{S.processLabel}</label>
             <textarea
               id="f-process"
               aria-describedby="e-process"
               aria-invalid={invalid.process ? "true" : "false"}
-              placeholder="Ex.: propostas levam cinco dias para sair e dependem de três planilhas."
+              placeholder={S.processPlaceholder}
             />
-            <p className="err" id="e-process">Descreva o processo para começarmos.</p>
+            <p className="err" id="e-process">{S.errProcess}</p>
           </div>
 
           <fieldset className={invalid.impacto ? "invalid" : ""} aria-describedby="e-impacto">
-            <legend>Qual impacto ele causa hoje?</legend>
+            <legend>{S.impactLegend}</legend>
             <div className="checks">
-              {IMPACTS.map((label) => (
-                <label key={label}>
-                  <input type="checkbox" name="impacto" value={label} /> {label}
+              {S.impacts.map((imp) => (
+                <label key={imp.value}>
+                  <input type="checkbox" name="impacto" value={imp.value} /> {imp.label}
                 </label>
               ))}
             </div>
-            <p className="err" id="e-impacto">Selecione ao menos um impacto.</p>
+            <p className="err" id="e-impacto">{S.errImpact}</p>
           </fieldset>
 
           <div className="field">
-            <span className="lbl">Seus dados</span>
+            <span className="lbl">{S.yourInfo}</span>
             <div className="grid2">
               <div className={`field${invalid.nome ? " invalid" : ""}`} style={{ margin: 0 }}>
-                <input id="f-nome" type="text" autoComplete="name" aria-describedby="e-nome" aria-invalid={invalid.nome ? "true" : "false"} placeholder="Nome" />
-                <p className="err" id="e-nome">Informe seu nome.</p>
+                <input id="f-nome" type="text" autoComplete="name" aria-describedby="e-nome" aria-invalid={invalid.nome ? "true" : "false"} placeholder={S.namePlaceholder} />
+                <p className="err" id="e-nome">{S.errName}</p>
               </div>
               <div className={`field${invalid.empresa ? " invalid" : ""}`} style={{ margin: 0 }}>
-                <input id="f-empresa" type="text" autoComplete="organization" aria-describedby="e-empresa" aria-invalid={invalid.empresa ? "true" : "false"} placeholder="Empresa" />
-                <p className="err" id="e-empresa">Informe a empresa.</p>
+                <input id="f-empresa" type="text" autoComplete="organization" aria-describedby="e-empresa" aria-invalid={invalid.empresa ? "true" : "false"} placeholder={S.companyPlaceholder} />
+                <p className="err" id="e-empresa">{S.errCompany}</p>
               </div>
               <div className={`field${invalid.email ? " invalid" : ""}`} style={{ margin: 0 }}>
-                <input id="f-email" type="email" autoComplete="email" aria-describedby="e-email" aria-invalid={invalid.email ? "true" : "false"} placeholder="E-mail" />
-                <p className="err" id="e-email">Informe um e-mail válido.</p>
+                <input id="f-email" type="email" autoComplete="email" aria-describedby="e-email" aria-invalid={invalid.email ? "true" : "false"} placeholder={S.emailPlaceholder} />
+                <p className="err" id="e-email">{S.errEmail}</p>
               </div>
               <div className="field" style={{ margin: 0 }}>
-                <input id="f-whats" type="tel" autoComplete="tel" placeholder="WhatsApp/telefone (opcional)" />
+                <input id="f-whats" type="tel" autoComplete="tel" placeholder={S.phonePlaceholder} />
               </div>
             </div>
           </div>
 
           <p className="consent">
-            Seus dados serão usados apenas para avaliar este processo e entrar em contato.{" "}
-            <a href="https://www.veehtor.com/privacy">Política de privacidade</a>
+            {S.consent}{" "}
+            <a href="/privacy">{S.consentLink}</a>
           </p>
 
           <div className="modal-foot">
             <button className="btn btn-primary" type="submit" disabled={submitting}>
-              {submitting ? "Enviando..." : "Analisar meu processo"}
+              {submitting ? S.submitting : S.submit}
             </button>
-            <span className="modal-micro">Sem apresentação genérica.</span>
+            <span className="modal-micro">{S.submitMicro}</span>
           </div>
         </form>
 
         <div className="success">
           <div className="ok" aria-hidden="true">✓</div>
-          <h4>Recebido.</h4>
-          <p>Agora escolha um horário de 30 minutos.</p>
+          <h4>{S.successTitle}</h4>
+          <p>{S.successBody}</p>
           <p>
             {CALENDAR_URL && (
               <a
@@ -229,7 +222,7 @@ const MapDialog = forwardRef<MapDialogHandle>((_props, ref) => {
                 rel="noopener noreferrer"
                 onClick={() => track("calendar_opened")}
               >
-                Escolher horário
+                {S.successCta}
               </a>
             )}
           </p>

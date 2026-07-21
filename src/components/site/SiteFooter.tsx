@@ -1,21 +1,10 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useSiteContent } from "@/i18n/siteContent";
 
-const S = {
-  tag: "Sistemas aplicados à operação.",
-  links: [
-    { label: "Cases", href: "/case-studies", external: false },
-    { label: "Sobre", href: "/#sobre", external: false },
-    { label: "LinkedIn", href: "https://www.linkedin.com/in/vitorungari/", external: true },
-    { label: "Privacidade", href: "https://www.veehtor.com/privacy", external: true },
-    { label: "Termos", href: "https://www.veehtor.com/terms", external: true },
-  ],
-  copy: "© 2026 Veehtor AI LLC",
-};
-
-/** Shared marketing-site footer. Same visual as the home footer. */
 export default function SiteFooter() {
   const location = useLocation();
   const navigate = useNavigate();
+  const S = useSiteContent();
 
   const handleAnchor = (href: string) => (e: React.MouseEvent) => {
     e.preventDefault();
@@ -27,23 +16,31 @@ export default function SiteFooter() {
     }
   };
 
+  const links = [
+    { label: S.footer.linkCases, href: "/case-studies", external: false, kind: "route" as const },
+    { label: S.footer.linkAbout, href: "/#sobre", external: false, kind: "anchor" as const },
+    { label: S.footer.linkLinkedIn, href: "https://www.linkedin.com/in/vitorungari/", external: true, kind: "ext" as const },
+    { label: S.footer.linkPrivacy, href: "/privacy", external: false, kind: "route" as const },
+    { label: S.footer.linkTerms, href: "/terms", external: false, kind: "route" as const },
+  ];
+
   return (
     <footer>
       <div className="foot-in">
         <div className="foot-brand">v<span className="dot">.</span>AI</div>
-        <div className="foot-tag">{S.tag}</div>
+        <div className="foot-tag">{S.footer.tag}</div>
         <div className="foot-links">
-          {S.links.map((l) =>
-            l.external ? (
+          {links.map((l) =>
+            l.kind === "ext" ? (
               <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer">{l.label}</a>
-            ) : l.href.includes("#") ? (
+            ) : l.kind === "anchor" ? (
               <a key={l.label} href={l.href} onClick={handleAnchor(l.href)}>{l.label}</a>
             ) : (
               <Link key={l.label} to={l.href}>{l.label}</Link>
             ),
           )}
         </div>
-        <div className="foot-copy">{S.copy}</div>
+        <div className="foot-copy">{S.footer.copy}</div>
       </div>
     </footer>
   );
