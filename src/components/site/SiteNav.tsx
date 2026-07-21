@@ -4,6 +4,7 @@ import { useMapDialog } from "@/components/site/MapDialogProvider";
 import { useHomeContent } from "@/i18n/homeContent";
 import { useSiteContent } from "@/i18n/siteContent";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { Logo } from "@/components/site/Logo";
 import { track } from "@/lib/analytics";
 
 export default function SiteNav() {
@@ -57,7 +58,7 @@ export default function SiteNav() {
     <header className={`nav${scrolled ? " scrolled" : ""}`} id="nav">
       <div className="nav-in">
         <Link className="logo" to="/" aria-label={C.nav.logoAria}>
-          v<span className="dot">.</span>AI
+          <Logo textColor="var(--ink)" />
         </Link>
         <nav className="links" aria-label={C.nav.mainAria}>
           <a className="navlink" href="/#oportunidades" onClick={handleAnchor("oportunidades")}>{C.nav.opportunities}</a>

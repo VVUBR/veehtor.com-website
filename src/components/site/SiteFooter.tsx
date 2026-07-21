@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Logo } from "@/components/site/Logo";
 import { useSiteContent } from "@/i18n/siteContent";
 
 export default function SiteFooter() {
@@ -27,7 +28,9 @@ export default function SiteFooter() {
   return (
     <footer>
       <div className="foot-in">
-        <div className="foot-brand">v<span className="dot">.</span>AI</div>
+        <Link className="foot-brand" to="/" aria-label="v.AI">
+          <Logo textColor="#fff" />
+        </Link>
         <div className="foot-tag">{S.footer.tag}</div>
         <div className="foot-links">
           {links.map((l) =>

@@ -1,22 +1,11 @@
-Plano final: conectar o formulário ao endpoint do Apps Script.
+Corrigir a renderização visual do logo "v.AI" no header para que apareça como um único elemento contíguo, sem espaços entre v, . e AI.
 
-### Endpoint
-`https://script.google.com/macros/s/AKfycbyK9drTn1ojx4NyPcyDWKJkbYrHUKrFJnpN2XOJYWhe9RDbDrSBXO_XfzA-xXUFIPxQ5g/exec`
+**Problema confirmado**: Em `src/components/site/SiteNav.tsx:59-61` o logo é um único `<Link>` com três filhos de texto/span: `v<span className="dot">.</span>AI`. Apesar de ser um único link, a separação em spans pode causar espaçamento visual ou dar a impressão de elementos clicáveis separados.
 
-### Mudanças
+**Mudança proposta**:
+1. Em `SiteNav.tsx`, envolver o texto "v.AI" em um `<span>` único dentro do `<Link className="logo">`, mantendo o ponto laranja via classe no span interno. Isso garante que o conjunto seja tratado como um bloco visual único.
+2. Ajustar o CSS em `src/styles/home.css` para garantir `white-space: nowrap` no logo e evitar quebra/entrelinha que possa parecer separação. Manter `letter-spacing: -0.06em` já existente.
 
-**1. `src/lib/submitProcessMapping.ts`** — reescrever para fazer POST real:
-- URL do Apps Script fixa como constante no arquivo (é pública mesmo).
-- `fetch` com `Content-Type: text/plain;charset=utf-8` para evitar preflight CORS (o Apps Script continua lendo o JSON via `e.postData.contents`).
-- Payload: `{ nome, empresa, email, telefone, processo, impactos }` — `impactos` como string única separada por vírgulas.
-- Retorna `{ ok: false }` em erro de rede/HTTP; mantém a mesma interface, então `MapDialog` não precisa mudar de forma nenhuma.
+**Escopo**: Apenas o componente `SiteNav.tsx` e o estilo `.home .logo` no `home.css`. Nenhuma outra alteração de funcionalidade.
 
-**2. `src/components/home/MapDialog.tsx`** — traduzir os impactos antes de enviar:
-- Hoje envia os `value` técnicos (`revenue_loss`, etc.). Passar a enviar os `label` do idioma atual (já disponíveis em `S.impacts` via `useSiteContent`), mapeando cada checkbox marcado para o `label` correspondente. Nada mais muda.
-
-### Fora do escopo
-- Sem Supabase, sem Edge Function, sem conector, sem `.env` novo.
-- Tratamento de erro já existente (`errNetwork`) continua cobrindo falhas.
-
-### Teste
-Após o build, abrir o modal no preview, enviar um teste e conferir a linha nova na planilha.
+**Validação**: Verificar no preview que o header exibe "v.AI" sem espaços visuais entre os caracteres e que o link continua navegando para `/`.
