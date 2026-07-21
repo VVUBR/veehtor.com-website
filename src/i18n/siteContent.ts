@@ -120,7 +120,7 @@ export interface SiteContentBundle {
     title: string;
     disclaimer: string;
     intro: string[];
-    sections: { title: string; blocks: (string | { subtitle: string; text?: string; list?: string[] })[] }[];
+    sections: { title: string; blocks: (string | { subtitle?: string; text?: string; list?: string[] })[] }[];
   };
   terms: {
     metaTitle: string;
