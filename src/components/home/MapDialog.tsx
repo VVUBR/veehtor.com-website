@@ -111,9 +111,15 @@ const MapDialog = forwardRef<MapDialogHandle>((_props, ref) => {
       return;
     }
     const form = formRef.current!;
+    const checkedValues = Array.from(
+      form.querySelectorAll<HTMLInputElement>("input[name='impacto']:checked")
+    ).map((c) => c.value);
+    const impactLabels = checkedValues.map(
+      (v) => S.impacts.find((i) => i.value === v)?.label ?? v
+    );
     const data = {
       processo: (form.querySelector("#f-process") as HTMLTextAreaElement).value.trim(),
-      impactos: Array.from(form.querySelectorAll<HTMLInputElement>("input[name='impacto']:checked")).map((c) => c.value),
+      impactos: impactLabels,
       nome: (form.querySelector("#f-nome") as HTMLInputElement).value.trim(),
       empresa: (form.querySelector("#f-empresa") as HTMLInputElement).value.trim(),
       email: (form.querySelector("#f-email") as HTMLInputElement).value.trim(),
