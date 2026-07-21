@@ -234,7 +234,7 @@
   border-top:1px solid rgba(255,255,255,.14);
   display:grid;grid-template-columns:190px minmax(0,1fr);gap:clamp(1.6rem,4vw,3rem);align-items:center;
 }
-.home .founder-photo{aspect-ratio:4/5;border-radius:14px;background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.14)}
+.home .founder-photo{aspect-ratio:4/5;width:100%;height:100%;object-fit:cover;border-radius:14px;border:1px solid rgba(255,255,255,.14)}
 .home .founder h3{font-size:1.32rem;font-weight:700;letter-spacing:-.015em;color:#fff}
 .home .founder p{margin-top:.65rem;color:#C9CED9;font-size:.97rem;max-width:36rem}
 .home .founder-quote{margin-top:1.1rem;font-size:1.2rem;font-weight:600;font-style:italic;letter-spacing:-.01em;color:var(--teal)}

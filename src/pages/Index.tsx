@@ -7,6 +7,7 @@ import { useMapDialog } from "@/components/site/MapDialogProvider";
 import { useReveal } from "@/hooks/useReveal";
 import { useHomeContent } from "@/i18n/homeContent";
 import { track } from "@/lib/analytics";
+import vitorAsset from "@/assets/vitor-ungari.jpg.asset.json";
 import "@/styles/home.css";
 
 function useCasesInView() {
@@ -187,7 +188,7 @@ export default function Index() {
               </div>
 
               <div className="founder reveal" id="sobre">
-                <div className="founder-photo" aria-hidden="true" />
+                <img className="founder-photo" src={vitorAsset.url} alt="Vitor Ungari" loading="lazy" />
                 <div>
                   <div className="eyebrow">{C.founder.eyebrow}</div>
                   <h3>{C.founder.h3}</h3>
