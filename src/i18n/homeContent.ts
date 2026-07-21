@@ -21,7 +21,7 @@ export const homeContent = {
     qual: "Para empresas com processos recorrentes, múltiplas pessoas envolvidas e impacto financeiro mensurável.",
     ctaPrimary: "Mapear meu processo",
     ctaSecondary: "Ver soluções entregues",
-    micro: "30 minutos. Você traz um processo real.\u00a0\nMergulhamos juntos na sua realidade.",
+    micro: "30 minutos. Direto no processo. Sem apresentação genérica.",
     legend: [
       { color: "#111828", label: "processo" },
       { color: "#F87316", label: "vazamento" },
@@ -43,12 +43,12 @@ export const homeContent = {
   },
   proof: {
     eyebrow: "RESULTADOS REAIS",
-    h2: "Sistemas em operação. Mudanças que aparecem no processo.",
+    h2: "Sistemas em operação.\u00a0\nMudanças que aparecem no processo.",
     sub: "Cada número abaixo vem de um sistema entregue para uma operação real.",
     stats: [
       { client: "D.CARVALHO - JOHN DEERE", num: "5 a 7 dias → minutos", label: "Tempo de decisão de crédito", badge: "operational" as const, badgeLabel: "Resultado operacional" },
       { client: "Robbin Services", num: "20% → 5%", label: "Participação de horas não faturáveis", badge: "measured" as const, badgeLabel: "Resultado medido" },
-      { client: "Complô", num: "1 dia → minutos", label: "Fechamento de folha semanal", badge: "operational" as const, badgeLabel: "Resultado operacional" },
+      { client: "CERVEJARIA COMPLÔ", num: "1 dia → minutos", label: "Fechamento de folha semanal", badge: "operational" as const, badgeLabel: "Resultado operacional" },
     ],
     note: "Cada case separa resultado medido, impacto estimado e escala de uso.",
     link: "Ver soluções entregues",
@@ -70,7 +70,7 @@ export const homeContent = {
         href: "/case-studies/dcarvalho-motor-credito",
       },
       {
-        client: "Complô",
+        client: "CERVEJARIA COMPLÔ",
         context: "FECHAMENTO DE FOLHA",
         h3: "Um dia inteiro de fechamento de folha agora leva minutos",
         desc: "Sistema interno consolida horas, insumos e taxas para gerar o fechamento sem planilha.",
