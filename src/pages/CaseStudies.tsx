@@ -171,9 +171,9 @@ export default function CaseStudies() {
       <main id="main">
         <section className="page-hero">
           <div className="wrap">
-            <div className="eyebrow reveal">Cases entregues</div>
+            <div className="eyebrow reveal"><b>SISTEMAS ENTREGUES</b></div>
             <h1 className="reveal">
-              10 sistemas em operação.<br />Resultados que aparecem no processo.
+              Sistemas em operação.<br />Resultados que aparecem no processo.
             </h1>
             <p className="lede reveal">
               Cada case informa o que foi resolvido, o que foi medido e a escala em que o
@@ -186,7 +186,7 @@ export default function CaseStudies() {
           <div className="wrap">
             <div className="reveal" style={{ marginBottom: "2rem", display: "grid", gap: "1.1rem" }}>
               <div>
-                <div style={filterLabel}>Setor de indústria</div>
+                <div style={filterLabel}>SETOR DE INDÚSTRIA</div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem" }}>
                   <button style={pill(sector === "All")} onClick={() => setSector("All")}>Todos</button>
                   {presentSectors.map((s) => (
@@ -197,7 +197,7 @@ export default function CaseStudies() {
                 </div>
               </div>
               <div>
-                <div style={filterLabel}>Área da empresa</div>
+                <div style={filterLabel}>ÁREA DA EMPRESA</div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem" }}>
                   <button style={pill(area === "All")} onClick={() => setArea("All")}>Todas</button>
                   {presentAreas.map((a) => (
