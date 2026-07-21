@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Logo } from "@/components/site/Logo";
 import { useSiteContent } from "@/i18n/siteContent";
 
 export default function SiteFooter() {
