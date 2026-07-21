@@ -39,7 +39,7 @@ export default function OpMap({ reducedOrSmall }: { reducedOrSmall: boolean }) {
 
       <g className="n-1 appear">
         <circle cx={52} cy={150} r={7} fill="#111828" />
-        <text className="nodelabel" x={52} y={178} textAnchor="middle">Solicitação entra</text>
+        <text className="nodelabel" x={62} y={178} textAnchor="middle">Solicitação entra</text>
       </g>
 
       <g className="n-2 appear">
