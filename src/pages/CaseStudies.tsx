@@ -171,7 +171,7 @@ export default function CaseStudies() {
       <main id="main">
         <section className="page-hero">
           <div className="wrap">
-            <div className="eyebrow reveal">CASES ENTREGUES</div>
+            <div className="eyebrow reveal"><b>SISTEMAS ENTREGUES</b></div>
             <h1 className="reveal">
               Sistemas em operação.<br />Resultados que aparecem no processo.
             </h1>
