@@ -674,3 +674,91 @@ export const CASE_STUDIES: CaseStudy[] = [
     },
   },
 ];
+
+/* ============================================================
+ * Approved proof classification (see Regras de prova).
+ * Kept as lookups so the case objects above stay untouched.
+ * ============================================================ */
+
+/** Card-level status per case, drives badge + listing order. */
+export const CASE_STATUS: Record<string, ProofClass> = {
+  "dcarvalho-credit-scoring": "operational",
+  "complo-time-tracking": "measured",
+  "complo-ai-checklists": "system",
+  "complo-ai-dashboard": "system",
+  "complo-customer-voice": "system",
+  "phomenta-linkedin-leads": "operational",
+  "phomenta-grant-prospecting": "operational",
+  "robbin-payroll": "measured",
+  "robbin-receivables-cash": "estimated",
+  "robbin-field-productivity": "measured",
+};
+
+/** Per-metric classification, index-aligned with case.metrics. */
+export const CASE_METRIC_PROOFS: Record<string, [ProofClass, ProofClass, ProofClass]> = {
+  "dcarvalho-credit-scoring":   ["operational", "scale",       "scale"],
+  "complo-time-tracking":       ["estimated",   "scale",       "operational"],
+  "complo-ai-checklists":       ["scale",       "system",      "operational"],
+  "complo-ai-dashboard":        ["scale",       "measured",    "system"],
+  "complo-customer-voice":      ["scale",       "system",      "operational"],
+  "phomenta-linkedin-leads":    ["operational", "estimated",   "operational"],
+  "phomenta-grant-prospecting": ["operational", "operational", "estimated"],
+  "robbin-payroll":             ["estimated",   "scale",       "operational"],
+  "robbin-receivables-cash":    ["estimated",   "estimated",   "scale"],
+  "robbin-field-productivity":  ["measured",    "operational", "estimated"],
+};
+
+/** Honesty note per case, rendered when present. */
+export const CASE_HONESTY: Record<string, LS> = {
+  "dcarvalho-credit-scoring": {
+    en: "The final approval remains human. The system delivers a recommendation; the committee decides.",
+    pt: "A aprovação final continua humana. O sistema entrega recomendação; o comitê decide.",
+  },
+  "complo-ai-checklists": {
+    en: "The AI scores; corrective action stays human.",
+    pt: "A IA nota; a ação corretiva continua humana.",
+  },
+  "robbin-receivables-cash": {
+    en: "Cash gain estimated from average payment terms; not audited.",
+    pt: "Ganho de caixa estimado a partir de prazo médio; não auditado.",
+  },
+  "robbin-field-productivity": {
+    en: "Capacity freed up; not realized savings.",
+    pt: "Capacidade liberada; não é economia realizada.",
+  },
+};
+
+/** Listing sort order: measured → operational → system → estimated. */
+const STATUS_RANK: Record<ProofClass, number> = {
+  measured: 0,
+  operational: 1,
+  system: 2,
+  estimated: 3,
+  scale: 4,
+};
+
+export const getStatus = (c: CaseStudy): ProofClass =>
+  c.status ?? CASE_STATUS[c.slug] ?? "system";
+
+export const getMetricProof = (c: CaseStudy, i: number): ProofClass => {
+  const m = c.metrics[i];
+  if (m.proof) return m.proof;
+  const arr = CASE_METRIC_PROOFS[c.slug];
+  return arr?.[i] ?? "scale";
+};
+
+export const getHonesty = (c: CaseStudy): LS | undefined =>
+  c.honesty ?? CASE_HONESTY[c.slug];
+
+export const sortedCases = (list: CaseStudy[] = CASE_STUDIES): CaseStudy[] =>
+  [...list].sort((a, b) => STATUS_RANK[getStatus(a)] - STATUS_RANK[getStatus(b)]);
+
+/** Localized labels for proof badges. */
+export const PROOF_LABELS: Record<ProofClass, LS> = {
+  measured: { en: "Measured result", pt: "Resultado medido" },
+  operational: { en: "Operational result", pt: "Resultado operacional" },
+  system: { en: "System in operation", pt: "Sistema em operação" },
+  estimated: { en: "Estimated impact", pt: "Impacto estimado" },
+  scale: { en: "Scale", pt: "Escala" },
+};
+
