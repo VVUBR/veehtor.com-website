@@ -18,11 +18,12 @@
   --font-mono:'DM Mono',ui-monospace,'SF Mono',Menlo,monospace;
   --maxw:1220px;
 
-  --t-flow:.35s; --t-n1:.35s; --t-n2:.75s; --t-n3:1.15s;
-  --t-leak:1.5s; --t-pulse:1.55s;
-  --t-vai:2.6s;
-  --t-fix:3.2s; --t-n4:4s;
-  --t-chip:4.3s; --t-dim:4.3s;
+  --t-flow:.35s; --t-n1:.35s; --t-n2:.70s; --t-n3:1.05s;
+  --t-leak:1.45s; --t-pulse:1.50s;
+  --t-anno-in:1.60s;
+  --t-vai:2.50s;
+  --t-fix:3.10s; --t-n4:3.85s;
+  --t-chip:4.15s; --t-dim:4.15s;
 
   font-family:var(--font-sans);
   background:var(--paper);
