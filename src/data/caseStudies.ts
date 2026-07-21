@@ -615,7 +615,7 @@ export const CASE_STUDIES: CaseStudy[] = [
   {
     slug: "robbin-field-productivity",
     client: "Robbin Services",
-    sector: "Construction (USA)",
+    sector: "Construction",
     areas: ["Operations"],
     title: {
       en: "Robbin Services: non-billable hours cut from up to 18% to under 5%",
