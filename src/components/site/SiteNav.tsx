@@ -58,7 +58,7 @@ export default function SiteNav() {
     <header className={`nav${scrolled ? " scrolled" : ""}`} id="nav">
       <div className="nav-in">
         <Link className="logo" to="/" aria-label={C.nav.logoAria}>
-          <span className="logo-mark">v<span className="dot">.</span>AI</span>
+          <Logo textColor="var(--ink)" />
         </Link>
         <nav className="links" aria-label={C.nav.mainAria}>
           <a className="navlink" href="/#oportunidades" onClick={handleAnchor("oportunidades")}>{C.nav.opportunities}</a>
