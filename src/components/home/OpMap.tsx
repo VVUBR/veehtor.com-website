@@ -84,16 +84,23 @@ export default function OpMap({ reducedOrSmall }: { reducedOrSmall: boolean }) {
         strokeLinecap="round"
       />
 
+      <defs>
+        <clipPath id="vaiLogoClip">
+          <circle cx={421} cy={226} r={38} />
+        </clipPath>
+      </defs>
+
       <g className="vai appear">
         <circle className="logo-halo" cx={421} cy={226} r={42} fill="#E6E7E9" opacity={0.98} />
         <image
           className="brand-logo"
-          x={385}
-          y={190}
-          width={72}
-          height={72}
-          preserveAspectRatio="xMidYMid meet"
+          x={389}
+          y={194}
+          width={64}
+          height={64}
+          preserveAspectRatio="xMidYMid slice"
           href={vaiMark}
+          clipPath="url(#vaiLogoClip)"
         />
       </g>
 
