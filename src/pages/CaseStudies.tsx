@@ -186,7 +186,7 @@ export default function CaseStudies() {
           <div className="wrap">
             <div className="reveal" style={{ marginBottom: "2rem", display: "grid", gap: "1.1rem" }}>
               <div>
-                <div style={filterLabel}>Setor de indústria</div>
+                <div style={filterLabel}>SETOR DE INDÚSTRIA</div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem" }}>
                   <button style={pill(sector === "All")} onClick={() => setSector("All")}>Todos</button>
                   {presentSectors.map((s) => (
