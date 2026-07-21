@@ -285,7 +285,7 @@ export default function Index() {
           <section aria-label={C.rules.eyebrow}>
             <div className="wrap">
               <div className="sec-head reveal">
-                <div className="eyebrow">{C.rules.eyebrow}</div>
+                <div className="eyebrow"><b><u>{C.rules.eyebrow}</u></b></div>
                 <h2>{C.rules.h2}</h2>
               </div>
               <div className="rules-grid">
