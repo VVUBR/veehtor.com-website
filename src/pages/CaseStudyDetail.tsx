@@ -5,9 +5,9 @@ import SiteFooter from "@/components/site/SiteFooter";
 import { useMapDialog } from "@/components/site/MapDialogProvider";
 import { useReveal } from "@/hooks/useReveal";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useSiteContent } from "@/i18n/siteContent";
 import { track } from "@/lib/analytics";
 import {
-  CASE_STUDIES,
   SECTOR_LABELS,
   AREA_LABELS,
   PROOF_LABELS,
@@ -56,6 +56,7 @@ export default function CaseStudyDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { language } = useLanguage();
   const { open: openMap } = useMapDialog();
+  const UI = useSiteContent().caseDetailUI;
   useReveal();
 
   const ordered = useMemo(() => sortedCases(), []);
@@ -70,9 +71,9 @@ export default function CaseStudyDetail() {
       setMeta(title, pick(study.seoDescription, language), study.slug);
       track("case_detail_viewed", { slug: study.slug });
     } else {
-      document.title = "Case não encontrado | Veehtor AI";
+      document.title = UI.notFoundMetaTitle;
     }
-  }, [study, language]);
+  }, [study, language, UI.notFoundMetaTitle]);
 
   if (!study) {
     return (
@@ -81,9 +82,9 @@ export default function CaseStudyDetail() {
         <main>
           <section className="page-hero">
             <div className="wrap">
-              <h1>Case não encontrado</h1>
+              <h1>{UI.notFoundTitle}</h1>
               <p className="lede">
-                <Link to="/case-studies">Voltar para cases entregues</Link>
+                <Link to="/case-studies">{UI.backToList}</Link>
               </p>
             </div>
           </section>
@@ -99,15 +100,14 @@ export default function CaseStudyDetail() {
 
   return (
     <div className="home">
-      <a className="skip" href="#main">Pular para o conteúdo</a>
+      <a className="skip" href="#main">{UI.backToList}</a>
       <SiteNav />
 
       <main id="main">
-        {/* HERO */}
         <section className="detail-hero page-hero">
           <div className="wrap">
-            <nav className="crumb" aria-label="Breadcrumb">
-              <Link to="/case-studies">Cases</Link>
+            <nav className="crumb" aria-label={UI.breadcrumbAria}>
+              <Link to="/case-studies">{UI.breadcrumbRoot}</Link>
               <span aria-hidden>/</span>
               <span>{study.client}</span>
             </nav>
@@ -141,24 +141,23 @@ export default function CaseStudyDetail() {
           </div>
         </section>
 
-        {/* NARRATIVE */}
         <section className="narrative">
           <div className="wrap">
             <div className="n-block reveal">
-              <div className="eyebrow">Contexto e gargalo</div>
-              <h2>O que estava travando</h2>
+              <div className="eyebrow">{UI.contextEyebrow}</div>
+              <h2>{UI.contextH2}</h2>
               <p>{pick(study.challenge, language)}</p>
             </div>
 
             <div className="n-block reveal">
-              <div className="eyebrow">O que construímos</div>
-              <h2>O sistema</h2>
+              <div className="eyebrow">{UI.solutionEyebrow}</div>
+              <h2>{UI.solutionH2}</h2>
               <p>{pick(study.solution, language)}</p>
             </div>
 
             <div className="n-block reveal">
-              <div className="eyebrow">O que mudou</div>
-              <h2>Antes e depois</h2>
+              <div className="eyebrow">{UI.resultEyebrow}</div>
+              <h2>{UI.resultH2}</h2>
               <p>{pick(study.result, language)}</p>
               <div className="beforeafter">
                 {study.metrics.map((m, i) => {
@@ -177,27 +176,27 @@ export default function CaseStudyDetail() {
             </div>
 
             <div className="n-block reveal">
-              <div className="eyebrow">Escala e operação</div>
-              <h2>Onde o sistema roda</h2>
+              <div className="eyebrow">{UI.scaleEyebrow}</div>
+              <h2>{UI.scaleH2}</h2>
               <dl className="scale-grid">
                 <div>
-                  <dt>Setor</dt>
+                  <dt>{UI.scaleSector}</dt>
                   <dd>{pick(scale.sector, language)}</dd>
                 </div>
                 {scale.size && (
                   <div>
-                    <dt>Porte</dt>
+                    <dt>{UI.scaleSize}</dt>
                     <dd>{pick(scale.size, language)}</dd>
                   </div>
                 )}
                 {scale.scale && (
                   <div>
-                    <dt>Escala</dt>
+                    <dt>{UI.scaleScale}</dt>
                     <dd>{pick(scale.scale, language)}</dd>
                   </div>
                 )}
                 <div>
-                  <dt>Áreas</dt>
+                  <dt>{UI.scaleAreas}</dt>
                   <dd>{study.areas.map((a) => pick(AREA_LABELS[a], language)).join(" · ")}</dd>
                 </div>
               </dl>
@@ -206,7 +205,7 @@ export default function CaseStudyDetail() {
             {honesty && (
               <div className="n-block reveal">
                 <div className="honesty">
-                  <strong>Nota de honestidade</strong>
+                  <strong>{UI.honestyLabel}</strong>
                   {pick(honesty, language)}
                 </div>
               </div>
@@ -214,7 +213,6 @@ export default function CaseStudyDetail() {
           </div>
         </section>
 
-        {/* NEXT CASE */}
         {next && (
           <section className="next-case">
             <div className="wrap">
@@ -224,7 +222,7 @@ export default function CaseStudyDetail() {
                 onClick={() => track("case_next_clicked", { from: study.slug, to: next.slug })}
               >
                 <div>
-                  <div className="nc-left">Próximo case</div>
+                  <div className="nc-left">{UI.nextCase}</div>
                   <div className="nc-title">{pick(next.title, language)}</div>
                 </div>
                 <span className="arr" aria-hidden>→</span>
@@ -233,21 +231,18 @@ export default function CaseStudyDetail() {
           </section>
         )}
 
-        {/* FINAL CTA */}
         <section className="dark">
           <div className="wrap closing">
-            <div className="eyebrow reveal">Próximo passo</div>
+            <div className="eyebrow reveal">{UI.closingEyebrow}</div>
             <h2 className="reveal">
-              Qual processo da sua operação<br />custa mais do que deveria?
+              {UI.closingH2a}<br />{UI.closingH2b}
             </h2>
-            <p className="reveal">
-              30 minutos. Direto no processo. Sem apresentação genérica.
-            </p>
+            <p className="reveal">{UI.closingBody}</p>
             <button
               className="btn btn-primary reveal"
               onClick={(e) => openMap(`case-detail:${study.slug}`, e.currentTarget)}
             >
-              Mapear meu processo →
+              {UI.closingCta}
             </button>
           </div>
         </section>

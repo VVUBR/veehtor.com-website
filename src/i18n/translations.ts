@@ -2,8 +2,9 @@ export type Language = "en" | "pt";
 
 const en = {
   meta: {
-    title: "AI that pays for itself.",
-    description: "AI that pays for itself.",
+    title: "Automation and AI agents with measurable impact | v.AI",
+    description:
+      "We map the processes that drain revenue, margin and team hours. We ship automations, internal systems and AI agents with a baseline, a pilot and a measured result.",
   },
   loader: {
     brand: "veehtor AI",
@@ -271,8 +272,9 @@ const en = {
 
 const pt: typeof en = {
   meta: {
-    title: "IA que se paga sozinha.",
-    description: "IA que se paga sozinha.",
+    title: "Automação e agentes de IA com impacto mensurável | v.AI",
+    description:
+      "Mapeamos processos que drenam receita, margem e horas do time. Construímos automações, sistemas internos e agentes de IA com baseline, piloto e medição de resultado.",
   },
   loader: {
     brand: "veehtor AI",

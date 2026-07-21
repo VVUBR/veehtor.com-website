@@ -91,7 +91,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const t = translations[language];
     document.title = t.meta.title;
     setMetaDescription(t.meta.description);
-    document.documentElement.lang = language === "pt" ? "pt-BR" : "en";
+    document.documentElement.lang = language === "pt" ? "pt-BR" : "en-US";
   }, [language]);
 
   if (!langReady) {

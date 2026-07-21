@@ -5,7 +5,7 @@ import SiteNav from "@/components/site/SiteNav";
 import SiteFooter from "@/components/site/SiteFooter";
 import { useMapDialog } from "@/components/site/MapDialogProvider";
 import { useReveal } from "@/hooks/useReveal";
-import { homeContent as C } from "@/i18n/homeContent";
+import { useHomeContent } from "@/i18n/homeContent";
 import { track } from "@/lib/analytics";
 import "@/styles/home.css";
 
@@ -34,6 +34,7 @@ export default function Index() {
   const location = useLocation();
   const navigate = useNavigate();
   const { open: openDialog } = useMapDialog();
+  const C = useHomeContent();
 
   const reducedOrSmall = useMemo(() => {
     if (typeof window === "undefined") return true;
@@ -46,7 +47,6 @@ export default function Index() {
   useReveal(".home");
   useCasesInView();
 
-  // Handle incoming #anchor from other routes (e.g. /#sobre)
   useEffect(() => {
     if (location.hash) {
       const id = location.hash.slice(1);
@@ -77,7 +77,6 @@ export default function Index() {
       <SiteNav />
 
       <main id="main">
-        {/* HERO */}
         <section className="hero">
           <div className="wrap">
             <div className="hero-grid">
@@ -98,7 +97,7 @@ export default function Index() {
                 <div className="opmap-zone">
                   <OpMap reducedOrSmall={reducedOrSmall} />
                 </div>
-                <div className="map-mini-legend" aria-label="Legenda do mapa">
+                <div className="map-mini-legend" aria-label={C.hero.legendAria}>
                   {C.hero.legend.map((l, i) => (
                     <span key={l.label}>
                       {i > 0 && <span className="sep">·</span>}
@@ -114,7 +113,6 @@ export default function Index() {
           </div>
         </section>
 
-        {/* VALS */}
         <section id="oportunidades" style={{ paddingTop: "1rem" }} aria-label={C.vals.eyebrow}>
           <div className="wrap">
             <div className="sec-head reveal">
@@ -134,7 +132,6 @@ export default function Index() {
           </div>
         </section>
 
-        {/* PROOF */}
         <section aria-label={C.proof.eyebrow}>
           <div className="wrap">
             <div className="sec-head reveal">
@@ -165,7 +162,6 @@ export default function Index() {
           </div>
         </section>
 
-        {/* CASES */}
         <div className="zone-white">
           <section id="cases" aria-label={C.cases.eyebrow}>
             <div className="wrap">
@@ -194,7 +190,7 @@ export default function Index() {
                       data-client={c.client}
                       onClick={() => track("case_clicked", { client: c.client, slug: c.href.split("/").pop() })}
                     >
-                      Ver detalhes <span className="arr">→</span>
+                      {C.cases.detailsCta} <span className="arr">→</span>
                     </Link>
                   </article>
                 ))}
@@ -208,7 +204,6 @@ export default function Index() {
           </section>
         </div>
 
-        {/* DARK */}
         <div className="dark">
           <section aria-label={C.rules.eyebrow}>
             <div className="wrap">
@@ -242,7 +237,7 @@ export default function Index() {
             </div>
           </section>
 
-          <section className="closing" aria-label="Contato">
+          <section className="closing" aria-label={C.closing.contactAria}>
             <div className="wrap">
               <div className="reveal">
                 <h2>{C.closing.h2}</h2>
@@ -251,7 +246,7 @@ export default function Index() {
                 <div className="closing-micro">{C.closing.micro}</div>
               </div>
               <div className="agora reveal" aria-hidden="true">
-                Agora v<span className="dot">.</span>AI.
+                {C.closing.agora.replace(/v\.AI\.?$/, "")}v<span className="dot">.</span>AI.
               </div>
             </div>
           </section>

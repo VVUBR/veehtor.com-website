@@ -1,31 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useMapDialog } from "@/components/site/MapDialogProvider";
+import { useHomeContent } from "@/i18n/homeContent";
+import { useSiteContent } from "@/i18n/siteContent";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { track } from "@/lib/analytics";
 
-// Structured strings — kept local so a future i18n layer can lift them.
-const S = {
-  opportunities: "Oportunidades",
-  cases: "Cases",
-  about: "Sobre",
-  cta: "Mapear meu processo",
-  logoAria: "v.AI",
-  mainAria: "Navegação principal",
-  openMenu: "Abrir menu",
-  closeMenu: "Fechar menu",
-};
-
-/**
- * Shared marketing-site navigation. Sticky, same visual as the home nav.
- * Anchor links (#oportunidades, #sobre) scroll on `/` and navigate to
- * `/#anchor` from any other route. `/case-studies` is a real link.
- */
 export default function SiteNav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { open } = useMapDialog();
+  const C = useHomeContent();
+  const S = useSiteContent();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -68,19 +56,22 @@ export default function SiteNav() {
   return (
     <header className={`nav${scrolled ? " scrolled" : ""}`} id="nav">
       <div className="nav-in">
-        <Link className="logo" to="/" aria-label={S.logoAria}>
+        <Link className="logo" to="/" aria-label={C.nav.logoAria}>
           v<span className="dot">.</span>AI
         </Link>
-        <nav className="links" aria-label={S.mainAria}>
-          <a className="navlink" href="/#oportunidades" onClick={handleAnchor("oportunidades")}>{S.opportunities}</a>
-          <a className="navlink" href="/case-studies" onClick={handleCases("nav")}>{S.cases}</a>
-          <a className="navlink" href="/#sobre" onClick={handleAnchor("sobre")}>{S.about}</a>
-          <button className="btn btn-primary btn-sm nav-cta-desktop" onClick={openMap("nav")}>{S.cta}</button>
+        <nav className="links" aria-label={C.nav.mainAria}>
+          <a className="navlink" href="/#oportunidades" onClick={handleAnchor("oportunidades")}>{C.nav.opportunities}</a>
+          <a className="navlink" href="/case-studies" onClick={handleCases("nav")}>{C.nav.cases}</a>
+          <a className="navlink" href="/#sobre" onClick={handleAnchor("sobre")}>{C.nav.about}</a>
+          <button className="btn btn-primary btn-sm nav-cta-desktop" onClick={openMap("nav")}>{C.nav.cta}</button>
         </nav>
+        <div className="lang-switcher-wrap" style={{ display: "flex", alignItems: "center", marginLeft: 8 }}>
+          <LanguageSwitcher />
+        </div>
         <button
           className="menu-btn"
           aria-expanded={menuOpen}
-          aria-label={menuOpen ? S.closeMenu : S.openMenu}
+          aria-label={menuOpen ? C.nav.closeMenu : C.nav.openMenu}
           aria-controls="site-mobile-menu"
           onClick={() => setMenuOpen((v) => !v)}
         >
@@ -88,10 +79,10 @@ export default function SiteNav() {
         </button>
       </div>
       <div className={`mobile-nav${menuOpen ? " open" : ""}`} id="site-mobile-menu">
-        <a href="/#oportunidades" onClick={handleAnchor("oportunidades")}>{S.opportunities}</a>
-        <a href="/case-studies" onClick={handleCases("nav-mobile")}>{S.cases}</a>
-        <a href="/#sobre" onClick={handleAnchor("sobre")}>{S.about}</a>
-        <button className="btn btn-primary" onClick={openMap("nav-mobile")}>{S.cta}</button>
+        <a href="/#oportunidades" onClick={handleAnchor("oportunidades")}>{C.nav.opportunities}</a>
+        <a href="/case-studies" onClick={handleCases("nav-mobile")}>{C.nav.cases}</a>
+        <a href="/#sobre" onClick={handleAnchor("sobre")}>{C.nav.about}</a>
+        <button className="btn btn-primary" onClick={openMap("nav-mobile")}>{C.nav.cta}</button>
       </div>
     </header>
   );
