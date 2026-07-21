@@ -328,6 +328,6 @@
   .home .reveal{opacity:1;transform:none;transition:none}
   .home .play .p-main,.home .play .p-fix,.home .play .n-1,.home .play .n-2,.home .play .n-3,.home .play .n-4,
   .home .play .vai,.home .play .brand-logo,.home .play .leak,.home .play .leak-dot,.home .play .chip-final,
-  .home .play .leak-group{animation:none}
+  .home .play .leak-group,.home .play .anno-only{animation:none}
   .home .btn,.home .scard{transition:none}
 }
