@@ -35,45 +35,6 @@ export default function Index() {
   const navigate = useNavigate();
   const { open: openDialog } = useMapDialog();
 
-function useCasesInView() {
-  useEffect(() => {
-    if (!("IntersectionObserver" in window)) return;
-    const sec = document.getElementById("cases");
-    if (!sec) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            track("cases_section_viewed");
-            io.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0.25 },
-    );
-    io.observe(sec);
-    return () => io.disconnect();
-  }, []);
-}
-
-function useScrolled() {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-  return scrolled;
-}
-
-export default function Index() {
-  const dialogRef = useRef<MapDialogHandle>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const scrolled = useScrolled();
-  const location = useLocation();
-  const navigate = useNavigate();
-
   const reducedOrSmall = useMemo(() => {
     if (typeof window === "undefined") return true;
     return (
@@ -82,18 +43,8 @@ export default function Index() {
     );
   }, []);
 
-  useReveal();
+  useReveal(".home");
   useCasesInView();
-
-  // Close mobile menu on Escape
-  useEffect(() => {
-    if (!menuOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMenuOpen(false);
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [menuOpen]);
 
   // Handle incoming #anchor from other routes (e.g. /#sobre)
   useEffect(() => {
@@ -107,21 +58,13 @@ export default function Index() {
 
   const openMap = (source: string) => (e: React.MouseEvent<HTMLButtonElement>) => {
     if (source === "hero") track("hero_primary_cta_clicked");
-    dialogRef.current?.open(source, e.currentTarget);
-    setMenuOpen(false);
+    openDialog(source, e.currentTarget);
   };
 
-  const scrollTo = (id: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-    setMenuOpen(false);
-  };
-
-  const goCases = (from: "hero" | "nav" | "more") => (e: React.MouseEvent) => {
+  const goCases = (from: "hero" | "more") => (e: React.MouseEvent) => {
     e.preventDefault();
     if (from === "hero") track("hero_cases_clicked");
     if (from === "more") track("all_cases_clicked");
-    setMenuOpen(false);
     navigate("/case-studies");
   };
 
@@ -131,33 +74,7 @@ export default function Index() {
     <div className={`home ${heroCopyClass}`}>
       <a className="skip" href="#main">{C.nav.skip}</a>
 
-      <header className={`nav${scrolled ? " scrolled" : ""}`} id="nav">
-        <div className="nav-in">
-          <Link className="logo" to="/" aria-label={C.nav.logoAria}>
-            v<span className="dot">.</span>AI
-          </Link>
-          <nav className="links" aria-label={C.nav.mainAria}>
-            <a className="navlink" href="#oportunidades" onClick={scrollTo("oportunidades")}>{C.nav.opportunities}</a>
-            <a className="navlink" href="/case-studies" onClick={goCases("nav")}>{C.nav.cases}</a>
-            <a className="navlink" href="#sobre" onClick={scrollTo("sobre")}>{C.nav.about}</a>
-            <button className="btn btn-primary btn-sm nav-cta-desktop" onClick={openMap("nav")}>{C.nav.cta}</button>
-          </nav>
-          <button
-            className="menu-btn"
-            aria-expanded={menuOpen}
-            aria-label={menuOpen ? C.nav.closeMenu : C.nav.openMenu}
-            onClick={() => setMenuOpen((v) => !v)}
-          >
-            <span /><span />
-          </button>
-        </div>
-        <div className={`mobile-nav${menuOpen ? " open" : ""}`} id="mobileMenu">
-          <a href="#oportunidades" onClick={scrollTo("oportunidades")}>{C.nav.opportunities}</a>
-          <a href="/case-studies" onClick={goCases("nav")}>{C.nav.cases}</a>
-          <a href="#sobre" onClick={scrollTo("sobre")}>{C.nav.about}</a>
-          <button className="btn btn-primary" onClick={openMap("nav-mobile")}>{C.nav.cta}</button>
-        </div>
-      </header>
+      <SiteNav />
 
       <main id="main">
         {/* HERO */}
@@ -236,7 +153,11 @@ export default function Index() {
               ))}
             </div>
             <div className="proof-foot reveal">
-              <a className="proof-link all-cases" href="/case-studies" onClick={goCases("more")}>
+              <a
+                className="proof-link all-cases"
+                href="/case-studies"
+                onClick={goCases("more")}
+              >
                 {C.proof.link} <span className="arr">→</span>
               </a>
               <span className="proof-note">{C.proof.note}</span>
@@ -271,7 +192,7 @@ export default function Index() {
                       className="case-cta"
                       to={c.href}
                       data-client={c.client}
-                      onClick={() => track("case_clicked", { client: c.client })}
+                      onClick={() => track("case_clicked", { client: c.client, slug: c.href.split("/").pop() })}
                     >
                       Ver detalhes <span className="arr">→</span>
                     </Link>
@@ -279,7 +200,9 @@ export default function Index() {
                 ))}
               </div>
               <div className="cases-more reveal">
-                <a className="btn btn-ghost all-cases" href="/case-studies" onClick={goCases("more")}>{C.cases.more}</a>
+                <a className="btn btn-ghost all-cases" href="/case-studies" onClick={goCases("more")}>
+                  {C.cases.more}
+                </a>
               </div>
             </div>
           </section>
@@ -333,28 +256,9 @@ export default function Index() {
             </div>
           </section>
 
-          <footer>
-            <div className="foot-in">
-              <div className="foot-brand">v<span className="dot">.</span>AI</div>
-              <div className="foot-tag">{C.footer.tag}</div>
-              <div className="foot-links">
-                {C.footer.links.map((l) =>
-                  l.external ? (
-                    <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer">{l.label}</a>
-                  ) : l.href.startsWith("#") ? (
-                    <a key={l.label} href={l.href} onClick={scrollTo(l.href.slice(1))}>{l.label}</a>
-                  ) : (
-                    <Link key={l.label} to={l.href}>{l.label}</Link>
-                  ),
-                )}
-              </div>
-              <div className="foot-copy">{C.footer.copy}</div>
-            </div>
-          </footer>
+          <SiteFooter />
         </div>
       </main>
-
-      <MapDialog ref={dialogRef} />
     </div>
   );
 }
