@@ -78,92 +78,94 @@ export default function Index() {
 
       <main id="main">
         <div className="zone-white">
-          <section className="hero">
-            <div className="wrap">
-              <div className="hero-grid">
-                <div className="hero-copy">
-                  <h1>
-                    {C.hero.h1a}<br />{C.hero.h1b}
-                  </h1>
-                  <p className="hero-body">{C.hero.body}</p>
-                  <p className="hero-qual">{C.hero.qual}</p>
-                  <div className="hero-ctas">
-                    <button className="btn btn-primary" onClick={openMap("hero")}>{C.hero.ctaPrimary}</button>
-                    <a className="btn btn-ghost" href="/case-studies" onClick={goCases("hero")}>{C.hero.ctaSecondary}</a>
-                  </div>
-                  <p className="hero-micro">{C.hero.micro}</p>
+        <section className="hero">
+          <div className="wrap">
+            <div className="hero-grid">
+              <div className="hero-copy">
+                <h1>
+                  {C.hero.h1a}<br />{C.hero.h1b}
+                </h1>
+                <p className="hero-body">{C.hero.body}</p>
+                <p className="hero-qual">{C.hero.qual}</p>
+                <div className="hero-ctas">
+                  <button className="btn btn-primary" onClick={openMap("hero")}>{C.hero.ctaPrimary}</button>
+                  <a className="btn btn-ghost" href="/case-studies" onClick={goCases("hero")}>{C.hero.ctaSecondary}</a>
                 </div>
+                <p className="hero-micro">{C.hero.micro}</p>
+              </div>
 
-                <div className="opmap-wrap">
-                  <div className="opmap-zone">
-                    <OpMap reducedOrSmall={reducedOrSmall} />
-                  </div>
-                  <div className="map-mini-legend" aria-label={C.hero.legendAria}>
-                    {C.hero.legend.map((l, i) => (
-                      <span key={l.label}>
-                        {i > 0 && <span className="sep">·</span>}
-                        <span>
-                          <i style={{ background: l.color }} />
-                          {l.label}
-                        </span>
+              <div className="opmap-wrap">
+                <div className="opmap-zone">
+                  <OpMap reducedOrSmall={reducedOrSmall} />
+                </div>
+                <div className="map-mini-legend" aria-label={C.hero.legendAria}>
+                  {C.hero.legend.map((l, i) => (
+                    <span key={l.label}>
+                      {i > 0 && <span className="sep">·</span>}
+                      <span>
+                        <i style={{ background: l.color }} />
+                        {l.label}
                       </span>
-                    ))}
-                  </div>
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>
-          </section>
+          </div>
+        </section>
 
-          <section aria-label={C.proof.eyebrow}>
-            <div className="wrap">
-              <div className="sec-head reveal">
-                <div className="eyebrow">{C.proof.eyebrow}</div>
-                <h2>{C.proof.h2}</h2>
-                <p className="sec-sub">{C.proof.sub}</p>
-              </div>
-              <div className="proof-strip reveal">
-                {C.proof.stats.map((s) => (
-                  <div className="stat" key={s.client}>
-                    <div className="stat-client">{s.client}</div>
-                    <div className="stat-num">{s.num}</div>
-                    <div className="stat-label">{s.label}</div>
-                    <span className={`badge b-${s.badge}`}>{s.badgeLabel}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="proof-foot reveal">
-                <a
-                  className="proof-link all-cases"
-                  href="/case-studies"
-                  onClick={goCases("more")}
-                >
-                  {C.proof.link} <span className="arr">→</span>
-                </a>
-                <span className="proof-note">{C.proof.note}</span>
-              </div>
+        <section id="oportunidades" style={{ paddingTop: "1rem" }} aria-label={C.vals.eyebrow}>
+          <div className="wrap">
+            <div className="sec-head reveal">
+              <div className="eyebrow">{C.vals.eyebrow}</div>
+              <h2>{C.vals.h2}</h2>
+              <p className="sec-sub">{C.vals.sub}</p>
             </div>
-          </section>
+            <div className="vals reveal">
+              {C.vals.items.map((v) => (
+                <div className="val" key={v.title}>
+                  <h3>{v.title}</h3>
+                  <p>{v.body}</p>
+                  <div className="vm">{v.metric}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
         </div>
 
-        <div className="dark">
-          <section id="oportunidades" style={{ paddingTop: "1rem" }} aria-label={C.vals.eyebrow}>
-            <div className="wrap">
-              <div className="sec-head reveal">
-                <div className="eyebrow">{C.vals.eyebrow}</div>
-                <h2>{C.vals.h2}</h2>
-                <p className="sec-sub">{C.vals.sub}</p>
-              </div>
-              <div className="vals reveal">
-                {C.vals.items.map((v) => (
-                  <div className="val" key={v.title}>
-                    <h3>{v.title}</h3>
-                    <p>{v.body}</p>
-                    <div className="vm">{v.metric}</div>
-                  </div>
-                ))}
-              </div>
+        <section aria-label={C.proof.eyebrow}>
+          <div className="wrap">
+            <div className="sec-head reveal">
+              <div className="eyebrow">{C.proof.eyebrow}</div>
+              <h2>{C.proof.h2}</h2>
+              <p className="sec-sub">{C.proof.sub}</p>
             </div>
-          </section>
+            <div className="proof-strip reveal">
+              {C.proof.stats.map((s) => (
+                <div className="stat" key={s.client}>
+                  <div className="stat-client">{s.client}</div>
+                  <div className="stat-num">{s.num}</div>
+                  <div className="stat-label">{s.label}</div>
+                  <span className={`badge b-${s.badge}`}>{s.badgeLabel}</span>
+                </div>
+              ))}
+            </div>
+            <div className="proof-foot reveal">
+              <a
+                className="proof-link all-cases"
+                href="/case-studies"
+                onClick={goCases("more")}
+              >
+                {C.proof.link} <span className="arr">→</span>
+              </a>
+              <span className="proof-note">{C.proof.note}</span>
+            </div>
+          </div>
+        </section>
+
+
+        <div className="dark">
           <section aria-label={C.rules.eyebrow}>
             <div className="wrap">
               <div className="sec-head reveal">
