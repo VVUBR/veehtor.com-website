@@ -45,6 +45,7 @@
   font-family:var(--font-mono);font-size:.72rem;letter-spacing:.16em;
   text-transform:uppercase;color:var(--muted);margin-bottom:1rem;
 }
+.home h1,.home h2,.home h3{font-family:'DM Sans',var(--font-sans);font-weight:700}
 .home h2{font-size:clamp(1.65rem,3vw,2.4rem);letter-spacing:-.02em;line-height:1.12;font-weight:700;color:var(--ink)}
 .home .sec-head{margin-bottom:2.2rem;max-width:44rem}
 .home .sec-sub{margin-top:.9rem;color:#33394A;font-size:1rem;max-width:38rem}
@@ -85,7 +86,7 @@
 .home header.nav{position:sticky;top:0;z-index:50;transition:background .25s,border-color .25s;border-bottom:1px solid transparent}
 .home header.nav.scrolled{background:rgba(230,231,233,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line-soft)}
 .home .nav-in{max-width:var(--maxw);margin:0 auto;padding:.85rem clamp(1.15rem,4vw,2.5rem);display:flex;align-items:center;justify-content:space-between;gap:1rem}
-.home .logo{font-weight:700;font-size:1.35rem;letter-spacing:-.02em;text-decoration:none;color:var(--ink)}
+.home .logo{font-weight:700;font-size:1.15rem;text-decoration:none;color:var(--ink);letter-spacing:0}
 .home .logo .dot{color:var(--orange)}
 .home nav.links{display:flex;align-items:center;gap:1.5rem}
 .home nav.links a.navlink{text-decoration:none;font-size:.92rem;font-weight:500;color:var(--ink);opacity:.82;transition:opacity .15s;background:none;border:none;cursor:pointer;font-family:inherit}
@@ -138,6 +139,8 @@
 .home .leaklabel{font-family:var(--font-mono);font-size:11px;fill:var(--orange-dark);font-weight:500}
 .home .chiplabel{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.08em;fill:var(--green-dark);font-weight:500}
 .home .annolabel{font-family:var(--font-mono);font-size:10.5px;fill:var(--orange-dark);font-weight:500;opacity:0}
+.home .interlabel{font-family:var(--font-mono);font-size:10.5px;fill:var(--teal-dark);font-weight:500}
+.home .resultlabel{font-family:var(--font-mono);font-size:10.5px;fill:var(--green-dark);font-weight:500}
 .home .play .anno-only{animation:home-fadein .4s ease var(--t-anno-in) forwards}
 .home .done .annolabel{opacity:1}
 .home .logo-halo{filter:drop-shadow(0 8px 13px rgba(3,6,25,.10))}

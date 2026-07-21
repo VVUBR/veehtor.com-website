@@ -14,11 +14,11 @@ export const homeContent = {
     skip: "Ir para o conteúdo",
   },
   hero: {
-    h1a: "Automação e agentes de IA",
-    h1b: "com impacto mensurável.",
+    h1a: "A IA sai do palco.",
+    h1b: "Entra na operação.",
     body:
-      "Se um processo drena receita, margem ou horas do time, ele vira sistema.\u00a0\nAutomação, ferramenta interna ou agente de IA.\nEscolhemos com o time do cliente o que gera mais valor no menor prazo.",
-    qual: "Trabalhamos com empresas de 10 a 500 pessoas onde o processo já existe e precisa virar um sistema inteligente.",
+      "Automação, sistemas internos e agentes de IA com impacto mensurável.\n\nSe um processo drena receita, margem ou horas do time, ele vira sistema. Construímos a menor solução capaz de corrigir o gargalo e provar valor.",
+    qual: "Para empresas com processos recorrentes, múltiplas pessoas envolvidas e impacto financeiro mensurável.",
     ctaPrimary: "Mapear meu processo",
     ctaSecondary: "Ver soluções entregues",
     micro: "30 minutos. Você traz um processo real.\u00a0\nMergulhamos juntos na sua realidade.",
@@ -31,7 +31,7 @@ export const homeContent = {
   },
   vals: {
     eyebrow: "ONDE ENCONTRAMOS VALOR",
-    h2: "Dinheiro costuma escapar antes de aparecer nos relatórios da empresa.",
+    h2: "O vazamento começa no processo. O relatório só mostra depois.",
     sub:
       "Mapeamos processos que afetam receita, margem, capacidade e risco.\u00a0\nA solução pode ser uma automação simples, um sistema interno, um agente de IA ou uma combinação dos três.",
     items: [
@@ -50,7 +50,7 @@ export const homeContent = {
       { client: "Robbin Services", num: "20% → 5%", label: "Participação de horas não faturáveis", badge: "measured" as const, badgeLabel: "Resultado medido" },
       { client: "Complô", num: "1 dia → minutos", label: "Fechamento de folha semanal", badge: "operational" as const, badgeLabel: "Resultado operacional" },
     ],
-    note: "Números vindos de operações reais. Sem projeções nem receita de cliente.",
+    note: "Cada case separa resultado medido, impacto estimado e escala de uso.",
     link: "Ver soluções entregues",
   },
   cases: {
@@ -99,24 +99,24 @@ export const homeContent = {
     h2: "Sem teatro. Na prática.",
     items: [
       "Se uma automação simples resolve, não usamos IA.",
-      "Trabalhamos com métricas de negócio e na mesma língua do cliente.",
+      "Falamos em receita, custo, tempo e risco. Não em tecnologia pela tecnologia.",
       "Não ampliamos um projeto que ainda não provou valor.",
     ],
-    phrase: "Promessa não entra na planilha (resultado entra)",
+    phrase: "Promessa não entra na planilha. Resultado entra",
   },
   founder: {
     eyebrow: "QUEM CONSTRÓI",
-    h3: "Por trás da v.AI tem o Vitor.",
+    h3: "Por trás da v.AI está o Vitor.",
     body:
-      "Eu entro para entender como o negócio funciona de verdade, não como aparece no organograma. Mapeio o processo, encontro o gargalo, desenho o sistema e trabalho com o time até a solução virar rotina.",
-    quote: "\"Se uma planilha resolve, eu não vou te vender nada de IA\"",
+      "Entro para entender como a operação funciona de verdade, não como aparece no organograma. Mapeio o processo, encontro o gargalo e trabalho com o time até o sistema virar rotina.",
+    quote: "\"Se uma planilha resolve, eu não vou te vender um agente.\"",
   },
   closing: {
-    h2: "Tem um processo que custa mais do que deveria?",
+    h2: "Qual processo da sua operação custa mais do que deveria?",
     body:
-      "Mostre o fluxo.\u00a0\nA gente identifica onde está o gargalo, qual número precisa mudar e se IA realmente faz sentido.",
+      "Mostre o fluxo. Identificamos onde está o gargalo, qual número precisa mudar e se realmente vale construir alguma coisa.",
     cta: "Mapear meu processo",
-    micro: "30 minutos.\u00a0\nDireto no seu processo.\u00a0\nSem solução genérica.",
+    micro: "30 minutos. Direto no processo. Sem apresentação genérica.",
   },
   footer: {
     tag: "Sistemas aplicados à operação.",

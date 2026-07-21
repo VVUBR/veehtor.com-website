@@ -135,7 +135,7 @@ export default function Index() {
             <a className="navlink" href="#oportunidades" onClick={scrollTo("oportunidades")}>{C.nav.opportunities}</a>
             <a className="navlink" href="/case-studies" onClick={goCases("nav")}>{C.nav.cases}</a>
             <a className="navlink" href="#sobre" onClick={scrollTo("sobre")}>{C.nav.about}</a>
-            <button className="btn btn-ink btn-sm nav-cta-desktop" onClick={openMap("nav")}>{C.nav.cta}</button>
+            <button className="btn btn-primary btn-sm nav-cta-desktop" onClick={openMap("nav")}>{C.nav.cta}</button>
           </nav>
           <button
             className="menu-btn"
@@ -150,7 +150,7 @@ export default function Index() {
           <a href="#oportunidades" onClick={scrollTo("oportunidades")}>{C.nav.opportunities}</a>
           <a href="/case-studies" onClick={goCases("nav")}>{C.nav.cases}</a>
           <a href="#sobre" onClick={scrollTo("sobre")}>{C.nav.about}</a>
-          <button className="btn btn-ink" onClick={openMap("nav-mobile")}>{C.nav.cta}</button>
+          <button className="btn btn-primary" onClick={openMap("nav-mobile")}>{C.nav.cta}</button>
         </div>
       </header>
 
