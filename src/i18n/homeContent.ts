@@ -67,7 +67,7 @@ export const homeContent = {
         metricLabel: "Tempo de decisão",
         badge: "operational" as const,
         badgeLabel: "Resultado operacional",
-        href: "/case-studies/dcarvalho-motor-credito",
+        href: "/case-studies/dcarvalho-credit-scoring",
       },
       {
         client: "CERVEJARIA COMPLÔ",
@@ -78,7 +78,7 @@ export const homeContent = {
         metricLabel: "Ciclo de fechamento semanal",
         badge: "operational" as const,
         badgeLabel: "Resultado operacional",
-        href: "/case-studies/complo-fechamento-folha",
+        href: "/case-studies/complo-time-tracking",
       },
       {
         client: "Robbin Services",
@@ -89,7 +89,7 @@ export const homeContent = {
         metricLabel: "Horas não faturáveis",
         badge: "measured" as const,
         badgeLabel: "Resultado medido",
-        href: "/case-studies/robbin-services-operacao",
+        href: "/case-studies/robbin-field-productivity",
       },
     ],
     more: "Ver todos os cases",
