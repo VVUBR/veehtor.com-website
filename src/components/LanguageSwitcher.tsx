@@ -35,13 +35,14 @@ export default function LanguageSwitcher() {
     background: "transparent",
     border: "none",
     cursor: "pointer",
-    opacity: active ? 1 : 0.5,
-    transition: "opacity 0.2s",
+    opacity: active ? 1 : 0.55,
+    transition: "opacity 0.15s, box-shadow 0.15s",
     borderRadius: 4,
     outline: "none",
-    boxShadow: active ? "0 0 0 1px rgba(255,255,255,0.6)" : "none",
+    boxShadow: active ? "0 0 0 1.5px currentColor" : "none",
     display: "flex",
     alignItems: "center",
+    color: "var(--ink, #111828)",
   });
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
