@@ -87,8 +87,8 @@
 .home header.nav.scrolled{background:rgba(230,231,233,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line-soft)}
 .home .nav-in{max-width:var(--maxw);margin:0 auto;padding:.85rem clamp(1.15rem,4vw,2.5rem);display:flex;align-items:center;justify-content:space-between;gap:1rem}
 .home .logo{font-family:var(--font-sans);font-weight:700;font-size:1.15rem;text-decoration:none;color:var(--ink);letter-spacing:-0.06em;white-space:nowrap;display:inline-flex;align-items:baseline;gap:0}
-.home .logo-mark{display:inline-flex;align-items:baseline;gap:0}
-.home .logo .dot{color:var(--orange)}
+.home .logo-mark{display:inline-flex;align-items:baseline;gap:0;font-weight:700}
+.home .logo .dot{color:var(--orange);font-weight:700}
 .home nav.links{display:flex;align-items:center;gap:1.5rem}
 .home nav.links a.navlink{text-decoration:none;font-size:.92rem;font-weight:500;color:var(--ink);opacity:.82;transition:opacity .15s;background:none;border:none;cursor:pointer;font-family:inherit}
 .home nav.links a.navlink:hover{opacity:1}
