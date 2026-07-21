@@ -498,7 +498,7 @@ export const CASE_STUDIES: CaseStudy[] = [
   {
     slug: "robbin-payroll",
     client: "Robbin Services",
-    sector: "Construction (USA)",
+    sector: "Construction",
     areas: ["Human Resources"],
     title: {
       en: "Robbin Services: payroll from timecards to payment, calculated automatically",
