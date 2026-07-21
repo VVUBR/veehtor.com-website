@@ -129,7 +129,7 @@ const pt: HomeContentBundle = {
   },
   vals: {
     eyebrow: "ONDE ENCONTRAMOS VALOR",
-    h2: "O vazamento começa no processo.\u00a0\nO relatório só mostra depois.",
+    h2: "O vazamento começa no processo.\nO relatório só mostra depois.",
     sub:
       "Mapeamos processos que afetam receita, margem, capacidade e risco.\u00a0\nA solução pode ser uma automação simples, um sistema interno, um agente de IA ou uma combinação dos três.",
     items: [
@@ -141,7 +141,7 @@ const pt: HomeContentBundle = {
   },
   proof: {
     eyebrow: "RESULTADOS REAIS",
-    h2: "Sistemas em operação.\u00a0\u00a0\nMudanças que aparecem no processo.",
+    h2: "Sistemas em operação.\nMudanças que aparecem no processo.",
     sub: "Cada número abaixo vem de um sistema entregue para uma operação real.",
     stats: [
       { client: "D.CARVALHO - JOHN DEERE", num: "5 a 7 dias → minutos", label: "Tempo de decisão de crédito", badge: "operational", badgeLabel: "Resultado operacional" },
@@ -258,7 +258,7 @@ const en: HomeContentBundle = {
   },
   vals: {
     eyebrow: "WHERE WE FIND VALUE",
-    h2: "The leak starts in the process.\u00a0\nThe report only shows it later.",
+    h2: "The leak starts in the process.\nThe report only shows it later.",
     sub:
       "We map processes that hit revenue, margin, capacity and risk.\u00a0\nThe answer can be a simple automation, an internal system, an AI agent, or a combination of the three.",
     items: [
@@ -270,7 +270,7 @@ const en: HomeContentBundle = {
   },
   proof: {
     eyebrow: "REAL RESULTS",
-    h2: "Systems in operation.\u00a0\u00a0\nChanges that show up in the process.",
+    h2: "Systems in operation.\nChanges that show up in the process.",
     sub: "Every number below comes from a system shipped into a real operation.",
     stats: [
       { client: "D.CARVALHO - JOHN DEERE", num: "5 to 7 days → minutes", label: "Credit decision turnaround", badge: "operational", badgeLabel: "Operational result" },
