@@ -1,34 +1,39 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import OpMap, { HOME_STACK_BREAKPOINT } from "@/components/home/OpMap";
-import MapDialog, { type MapDialogHandle } from "@/components/home/MapDialog";
+import SiteNav from "@/components/site/SiteNav";
+import SiteFooter from "@/components/site/SiteFooter";
+import { useMapDialog } from "@/components/site/MapDialogProvider";
+import { useReveal } from "@/hooks/useReveal";
 import { homeContent as C } from "@/i18n/homeContent";
 import { track } from "@/lib/analytics";
 import "@/styles/home.css";
 
-function useReveal() {
+function useCasesInView() {
   useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const els = document.querySelectorAll<HTMLElement>(".home .reveal");
-    if (reduced || !("IntersectionObserver" in window)) {
-      els.forEach((el) => el.classList.add("in"));
-      return;
-    }
+    if (!("IntersectionObserver" in window)) return;
+    const sec = document.getElementById("cases");
+    if (!sec) return;
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
-            e.target.classList.add("in");
+            track("cases_section_viewed");
             io.unobserve(e.target);
           }
         });
       },
-      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
+      { threshold: 0.25 },
     );
-    els.forEach((el) => io.observe(el));
+    io.observe(sec);
     return () => io.disconnect();
   }, []);
 }
+
+export default function Index() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { open: openDialog } = useMapDialog();
 
 function useCasesInView() {
   useEffect(() => {
