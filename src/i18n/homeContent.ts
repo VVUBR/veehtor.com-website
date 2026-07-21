@@ -207,7 +207,7 @@ const pt: HomeContentBundle = {
     eyebrow: "QUEM CONSTRÓI",
     h3: "Por trás da v.AI está o Vitor.",
     body:
-      "Entro para entender como a operação funciona de verdade, não como aparece no organograma. Mapeio o processo, encontro o gargalo e trabalho com o time até o sistema virar rotina.",
+      "Começo pedindo para alguém me mostrar como o trabalho acontece hoje. Onde a planilha entra, quem precisa cobrar quem e em qual etapa o cliente começa a esperar, onde trava. A tecnologia vem depois.",
     quote: "\"Se uma planilha resolve, eu não vou te vender um agente.\"",
   },
   closing: {
