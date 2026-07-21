@@ -52,14 +52,6 @@ export default function OpMap({ reducedOrSmall }: { reducedOrSmall: boolean }) {
         <text className="nodelabel" x={352} y={178} textAnchor="middle">Aprovação</text>
       </g>
 
-      <g className="anno">
-        <text className="annolabel anno-only" x={204} y={82} textAnchor="middle">
-          espera: 18h
-        </text>
-        <text className="annolabel anno-only" x={204} y={70} textAnchor="middle">
-          trabalho parado
-        </text>
-      </g>
 
       <g className="leak-group">
         <g className="leak appear">
