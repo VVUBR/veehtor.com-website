@@ -4,23 +4,19 @@ import vaiMark from "@/assets/vai-mark.png";
 // Same breakpoint used by the CSS (@media max-width: 980px stacks the hero).
 export const HOME_STACK_BREAKPOINT = 980;
 
-export default function OpMap() {
+export default function OpMap({ reducedOrSmall }: { reducedOrSmall: boolean }) {
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const small = window.matchMedia(`(max-width: ${HOME_STACK_BREAKPOINT}px)`).matches;
-    if (reduced || small) {
+    if (reducedOrSmall) {
       svg.classList.add("done");
-      document.body.dataset.homeCopy = "still";
     } else {
-      document.body.dataset.homeCopy = "play";
       const t = window.setTimeout(() => svg.classList.add("play"), 250);
       return () => window.clearTimeout(t);
     }
-  }, []);
+  }, [reducedOrSmall]);
 
   return (
     <svg
