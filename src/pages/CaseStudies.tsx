@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import SiteNav from "@/components/site/SiteNav";
 import SiteFooter from "@/components/site/SiteFooter";
@@ -17,6 +17,8 @@ import {
   getMetricProof,
   type CaseStudy,
   type ProofClass,
+  type Sector,
+  type Area,
 } from "@/data/caseStudies";
 import "@/styles/home.css";
 
