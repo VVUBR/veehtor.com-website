@@ -42,10 +42,28 @@ export const AREA_LABELS: Record<Area, LS> = {
   "Technology": { en: "Technology", pt: "Tecnologia" },
 };
 
+/**
+ * Proof classification. Governs badge color/label rules across the site.
+ *  - measured    (verde)   RESULTADO MEDIDO
+ *  - operational (teal)    RESULTADO OPERACIONAL
+ *  - system      (teal)    SISTEMA EM OPERAÇÃO
+ *  - estimated   (laranja) IMPACTO ESTIMADO
+ *  - scale       (cinza)   ESCALA / COBERTURA / VOLUME
+ * Never use `measured` for projection, coverage, volume, availability.
+ */
+export type ProofClass =
+  | "measured"
+  | "operational"
+  | "system"
+  | "estimated"
+  | "scale";
+
 export interface Metric {
   value: LS;
   label: LS;
   estimated?: boolean;
+  /** Proof classification for this specific metric. Optional until authored per case. */
+  proof?: ProofClass;
 }
 
 export interface AboutClient {
@@ -70,6 +88,10 @@ export interface CaseStudy {
   seoDescription: LS;
   /** Hidden until a real, approved client quote is added. */
   quote?: { text: LS; author: string };
+  /** Case-level proof status. Drives card badge and listing order. Optional until authored. */
+  status?: ProofClass;
+  /** Honesty note (e.g. "aprovação final continua humana"). Rendered when present. */
+  honesty?: LS;
 }
 
 export const ALL_AREAS: Area[] = [
