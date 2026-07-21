@@ -39,22 +39,25 @@ export default function OpMap({ reducedOrSmall }: { reducedOrSmall: boolean }) {
 
       <g className="n-1 appear">
         <circle cx={52} cy={150} r={7} fill="#111828" />
-        <text className="nodelabel" x={52} y={178} textAnchor="middle">Lead entra</text>
+        <text className="nodelabel" x={52} y={178} textAnchor="middle">Solicitação entra</text>
       </g>
 
       <g className="n-2 appear">
         <circle cx={204} cy={122} r={7} fill="#111828" />
-        <text className="nodelabel" x={204} y={100} textAnchor="middle">Resposta</text>
+        <text className="nodelabel" x={204} y={100} textAnchor="middle">Análise</text>
       </g>
 
       <g className="n-3 appear">
         <circle cx={352} cy={150} r={7} fill="#111828" />
-        <text className="nodelabel" x={352} y={178} textAnchor="middle">Follow-up</text>
+        <text className="nodelabel" x={352} y={178} textAnchor="middle">Aprovação</text>
       </g>
 
       <g className="anno">
-        <text className="annolabel anno-only" x={204} y={78} textAnchor="middle">
+        <text className="annolabel anno-only" x={204} y={82} textAnchor="middle">
           espera: 18h
+        </text>
+        <text className="annolabel anno-only" x={204} y={70} textAnchor="middle">
+          trabalho parado
         </text>
       </g>
 
@@ -69,7 +72,8 @@ export default function OpMap({ reducedOrSmall }: { reducedOrSmall: boolean }) {
             strokeLinecap="round"
           />
           <circle cx={426} cy={326} r={5.5} fill="none" stroke="#F87316" strokeWidth={2} />
-          <text className="leaklabel" x={440} y={330}>receita escapa</text>
+          <text className="leaklabel" x={440} y={326}>espera: 18h</text>
+          <text className="leaklabel" x={440} y={340}>trabalho parado</text>
         </g>
         <circle className="leak-dot appear" cx={356} cy={156} r={6} fill="#F87316" />
       </g>
@@ -104,9 +108,13 @@ export default function OpMap({ reducedOrSmall }: { reducedOrSmall: boolean }) {
         />
       </g>
 
+      <text className="interlabel" x={421} y={286} textAnchor="middle">dados organizados</text>
+      <text className="interlabel" x={421} y={299} textAnchor="middle">exceção enviada ao responsável</text>
+
       <g className="n-4 appear">
         <circle cx={492} cy={128} r={7.5} fill="#111828" stroke="#15B7A8" strokeWidth={3} />
-        <text className="nodelabel" x={492} y={106} textAnchor="middle">Reunião</text>
+        <text className="nodelabel" x={492} y={106} textAnchor="middle">Execução</text>
+        <text className="resultlabel" x={492} y={92} textAnchor="middle">resposta: 11 min</text>
       </g>
 
       <g className="chip-final appear">
