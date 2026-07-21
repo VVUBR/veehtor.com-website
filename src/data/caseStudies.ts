@@ -4,7 +4,7 @@ export type Sector =
   | "Agribusiness"
   | "Food & Beverage"
   | "Nonprofit"
-  | "Construction (USA)";
+  | "Construction";
 
 export type Area =
   | "Sales"
@@ -27,7 +27,7 @@ export const SECTOR_LABELS: Record<Sector, LS> = {
   "Agribusiness": { en: "Agribusiness", pt: "Agronegócio" },
   "Food & Beverage": { en: "Food & Beverage", pt: "Alimentos e bebidas" },
   "Nonprofit": { en: "Nonprofit", pt: "Terceiro setor" },
-  "Construction (USA)": { en: "Construction (USA)", pt: "Construção (EUA)" },
+  "Construction": { en: "Construction", pt: "Construção" },
 };
 
 export const AREA_LABELS: Record<Area, LS> = {
@@ -498,7 +498,7 @@ export const CASE_STUDIES: CaseStudy[] = [
   {
     slug: "robbin-payroll",
     client: "Robbin Services",
-    sector: "Construction (USA)",
+    sector: "Construction",
     areas: ["Human Resources"],
     title: {
       en: "Robbin Services: payroll from timecards to payment, calculated automatically",
@@ -557,7 +557,7 @@ export const CASE_STUDIES: CaseStudy[] = [
   {
     slug: "robbin-receivables-cash",
     client: "Robbin Services",
-    sector: "Construction (USA)",
+    sector: "Construction",
     areas: ["Finance"],
     title: {
       en: "Robbin Services: invoices into QuickBooks, and overdue balances that stopped hiding",
@@ -615,7 +615,7 @@ export const CASE_STUDIES: CaseStudy[] = [
   {
     slug: "robbin-field-productivity",
     client: "Robbin Services",
-    sector: "Construction (USA)",
+    sector: "Construction",
     areas: ["Operations"],
     title: {
       en: "Robbin Services: non-billable hours cut from up to 18% to under 5%",
