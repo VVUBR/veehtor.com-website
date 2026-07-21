@@ -4,6 +4,7 @@ import { useMapDialog } from "@/components/site/MapDialogProvider";
 import { useHomeContent } from "@/i18n/homeContent";
 import { useSiteContent } from "@/i18n/siteContent";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { Logo } from "@/components/site/Logo";
 import { track } from "@/lib/analytics";
 
 export default function SiteNav() {
