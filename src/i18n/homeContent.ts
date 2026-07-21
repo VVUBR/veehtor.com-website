@@ -17,11 +17,11 @@ export const homeContent = {
     h1a: "Automação e agentes de IA",
     h1b: "com impacto mensurável.",
     body:
-      "Se um processo drena receita, margem ou horas do time, ele vira sistema. Automação, ferramenta interna ou agente de IA. Escolhemos com o time do cliente o que gera mais valor no menor prazo.",
-    qual: "Trabalhamos com empresas de 10 a 500 pessoas onde o processo já existe e precisa virar sistema.",
+      "Se um processo drena receita, margem ou horas do time, ele vira sistema.\u00a0\nAutomação, ferramenta interna ou agente de IA.\nEscolhemos com o time do cliente o que gera mais valor no menor prazo.",
+    qual: "Trabalhamos com empresas de 10 a 500 pessoas onde o processo já existe e precisa virar um sistema inteligente.",
     ctaPrimary: "Mapear meu processo",
     ctaSecondary: "Ver soluções entregues",
-    micro: "30 minutos. Você traz um processo real. Mergulhamos juntos na sua realidade.",
+    micro: "30 minutos. Você traz um processo real.\u00a0\nMergulhamos juntos na sua realidade.",
     legend: [
       { color: "#111828", label: "processo" },
       { color: "#F87316", label: "vazamento" },
@@ -30,10 +30,10 @@ export const homeContent = {
     ],
   },
   vals: {
-    eyebrow: "Onde encontramos valor",
+    eyebrow: "ONDE ENCONTRAMOS VALOR",
     h2: "Dinheiro costuma escapar antes de aparecer nos relatórios da empresa.",
     sub:
-      "Mapeamos processos que afetam receita, margem, capacidade e risco. A solução pode ser uma automação simples, um sistema interno, um agente de IA ou uma combinação dos três.",
+      "Mapeamos processos que afetam receita, margem, capacidade e risco.\u00a0\nA solução pode ser uma automação simples, um sistema interno, um agente de IA ou uma combinação dos três.",
     items: [
       { title: "Gerar receita", body: "Leads, follow-up, reativação e vendas.", metric: "Conversão, receita recuperada e velocidade de resposta" },
       { title: "Proteger margem", body: "Erros, retrabalho e horas não faturáveis.", metric: "Custo por processo, margem e capacidade faturável" },
@@ -42,28 +42,28 @@ export const homeContent = {
     ],
   },
   proof: {
-    eyebrow: "Resultados reais",
+    eyebrow: "RESULTADOS REAIS",
     h2: "Sistemas em operação. Mudanças que aparecem no processo.",
     sub: "Cada número abaixo vem de um sistema entregue para uma operação real.",
     stats: [
-      { client: "D.Carvalho", num: "5 a 7 dias → minutos", label: "Tempo de decisão de crédito", badge: "operational" as const, badgeLabel: "Resultado operacional" },
-      { client: "Robbin Services", num: "18,2% → menos de 5%", label: "Participação de horas não faturáveis", badge: "measured" as const, badgeLabel: "Resultado medido" },
+      { client: "D.CARVALHO - JOHN DEERE", num: "5 a 7 dias → minutos", label: "Tempo de decisão de crédito", badge: "operational" as const, badgeLabel: "Resultado operacional" },
+      { client: "Robbin Services", num: "20% → 5%", label: "Participação de horas não faturáveis", badge: "measured" as const, badgeLabel: "Resultado medido" },
       { client: "Complô", num: "1 dia → minutos", label: "Fechamento de folha semanal", badge: "operational" as const, badgeLabel: "Resultado operacional" },
     ],
     note: "Números vindos de operações reais. Sem projeções nem receita de cliente.",
     link: "Ver soluções entregues",
   },
   cases: {
-    eyebrow: "Como aparece na prática",
+    eyebrow: "COMO APARECE NA PRÁTICA",
     h2: "Problemas diferentes. Sistemas construídos em torno da operação real.",
-    sub: "Cada card é um sistema que já vive na operação do cliente.",
+    sub: "Cada card é uma solução que já vive na operação do cliente.",
     items: [
       {
-        client: "D.Carvalho",
+        client: "D.CARVALHO - JOHN DEERE",
         context: "Crédito B2B",
         h3: "Decisões de crédito que levavam 5 a 7 dias agora saem em minutos",
         desc: "Motor de crédito integrado a score do Serasa e regras internas do time comercial.",
-        metric: "5-7 dias → minutos",
+        metric: "5 a 7 dias → minutos",
         metricLabel: "Tempo de decisão",
         badge: "operational" as const,
         badgeLabel: "Resultado operacional",
@@ -71,7 +71,7 @@ export const homeContent = {
       },
       {
         client: "Complô",
-        context: "Fechamento de folha",
+        context: "FECHAMENTO DE FOLHA",
         h3: "Um dia inteiro de fechamento de folha agora leva minutos",
         desc: "Sistema interno consolida horas, insumos e taxas para gerar o fechamento sem planilha.",
         metric: "1 dia → minutos",
@@ -85,7 +85,7 @@ export const homeContent = {
         context: "Operações de campo",
         h3: "Horas não faturáveis caíram de até 18,2% para menos de 5%",
         desc: "Dashboard operacional cruza apontamento, ordens e SLA em tempo real.",
-        metric: "18,2% → <5%",
+        metric: "20% → 5%",
         metricLabel: "Horas não faturáveis",
         badge: "measured" as const,
         badgeLabel: "Resultado medido",
@@ -95,7 +95,7 @@ export const homeContent = {
     more: "Ver todos os cases",
   },
   rules: {
-    eyebrow: "Regras da casa",
+    eyebrow: "REGRAS DA CASA",
     h2: "Sem teatro. Na prática.",
     items: [
       "Se uma automação simples resolve, não usamos IA.",
@@ -105,18 +105,18 @@ export const homeContent = {
     phrase: "Promessa não entra na planilha (resultado entra)",
   },
   founder: {
-    eyebrow: "Quem constrói",
+    eyebrow: "QUEM CONSTRÓI",
     h3: "Por trás da v.AI tem o Vitor.",
     body:
       "Eu entro para entender como o negócio funciona de verdade, não como aparece no organograma. Mapeio o processo, encontro o gargalo, desenho o sistema e trabalho com o time até a solução virar rotina.",
-    quote: "\"Se uma planilha resolve, eu não vou te vender um agente.\"",
+    quote: "\"Se uma planilha resolve, eu não vou te vender nada de IA\"",
   },
   closing: {
     h2: "Tem um processo que custa mais do que deveria?",
     body:
-      "Mostre o fluxo. A gente identifica onde está o gargalo, qual número precisa mudar e se IA realmente faz sentido.",
+      "Mostre o fluxo.\u00a0\nA gente identifica onde está o gargalo, qual número precisa mudar e se IA realmente faz sentido.",
     cta: "Mapear meu processo",
-    micro: "30 minutos. Direto no seu processo. Sem apresentação genérica.",
+    micro: "30 minutos.\u00a0\nDireto no seu processo.\u00a0\nSem solução genérica.",
   },
   footer: {
     tag: "Sistemas aplicados à operação.",
