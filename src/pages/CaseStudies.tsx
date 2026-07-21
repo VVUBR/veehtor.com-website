@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import SiteNav from "@/components/site/SiteNav";
 import SiteFooter from "@/components/site/SiteFooter";
@@ -17,6 +17,8 @@ import {
   getMetricProof,
   type CaseStudy,
   type ProofClass,
+  type Sector,
+  type Area,
 } from "@/data/caseStudies";
 import "@/styles/home.css";
 
@@ -97,7 +99,32 @@ export default function CaseStudies() {
   const { open: openMap } = useMapDialog();
   useReveal();
 
-  const cases = useMemo(() => sortedCases(), []);
+  const [sector, setSector] = useState<Sector | "All">("All");
+  const [area, setArea] = useState<Area | "All">("All");
+
+  const allSorted = useMemo(() => sortedCases(), []);
+
+  const presentSectors = useMemo(() => {
+    const s = new Set<Sector>();
+    allSorted.forEach((c) => s.add(c.sector));
+    return Array.from(s);
+  }, [allSorted]);
+
+  const presentAreas = useMemo(() => {
+    const s = new Set<Area>();
+    allSorted.forEach((c) => c.areas.forEach((a) => s.add(a)));
+    return Array.from(s);
+  }, [allSorted]);
+
+  const cases = useMemo(
+    () =>
+      allSorted.filter((c) => {
+        if (sector !== "All" && c.sector !== sector) return false;
+        if (area !== "All" && !c.areas.includes(area)) return false;
+        return true;
+      }),
+    [allSorted, sector, area],
+  );
 
   useEffect(() => {
     setMeta(
@@ -105,8 +132,36 @@ export default function CaseStudies() {
       "10 sistemas em operação com resultados que aparecem no processo. Casos de crédito, folha, checklists por IA e prospecção.",
     );
     window.scrollTo(0, 0);
-    track("case_list_viewed", { count: cases.length });
-  }, [cases.length]);
+    track("case_list_viewed", { count: allSorted.length });
+  }, [allSorted.length]);
+
+  useEffect(() => {
+    if (sector !== "All" || area !== "All") {
+      track("case_filter_changed", { sector, area, count: cases.length });
+    }
+  }, [sector, area, cases.length]);
+
+  const pill = (active: boolean): React.CSSProperties => ({
+    padding: ".4rem .85rem",
+    borderRadius: 999,
+    fontFamily: "var(--font-sans)",
+    fontSize: ".85rem",
+    fontWeight: 600,
+    border: `1px solid ${active ? "var(--ink)" : "var(--line)"}`,
+    background: active ? "var(--ink)" : "transparent",
+    color: active ? "#fff" : "var(--ink)",
+    cursor: "pointer",
+    transition: "all .15s",
+  });
+
+  const filterLabel: React.CSSProperties = {
+    fontFamily: "var(--font-mono)",
+    fontSize: ".68rem",
+    letterSpacing: ".1em",
+    textTransform: "uppercase",
+    color: "var(--muted)",
+    marginBottom: ".5rem",
+  };
 
   return (
     <div className="home">
@@ -129,13 +184,49 @@ export default function CaseStudies() {
 
         <section className="zone-white">
           <div className="wrap">
-            <div className="cases-list">
-              {cases.map((c) => (
-                <CaseCard key={c.slug} c={c} lang={language} />
-              ))}
+            <div className="reveal" style={{ marginBottom: "2rem", display: "grid", gap: "1.1rem" }}>
+              <div>
+                <div style={filterLabel}>Setor de indústria</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem" }}>
+                  <button style={pill(sector === "All")} onClick={() => setSector("All")}>Todos</button>
+                  {presentSectors.map((s) => (
+                    <button key={s} style={pill(sector === s)} onClick={() => setSector(s)}>
+                      {pick(SECTOR_LABELS[s], language)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div style={filterLabel}>Área da empresa</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem" }}>
+                  <button style={pill(area === "All")} onClick={() => setArea("All")}>Todas</button>
+                  {presentAreas.map((a) => (
+                    <button key={a} style={pill(area === a)} onClick={() => setArea(a)}>
+                      {pick(AREA_LABELS[a], language)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: ".72rem", color: "var(--muted)" }}>
+                {cases.length} de {allSorted.length} cases
+              </div>
             </div>
+
+            {cases.length > 0 ? (
+              <div className="cases-list">
+                {cases.map((c) => (
+                  <CaseCard key={c.slug} c={c} lang={language} />
+                ))}
+              </div>
+            ) : (
+              <p style={{ fontFamily: "var(--font-mono)", fontSize: ".85rem", color: "var(--muted)", padding: "2rem 0" }}>
+                Nenhum case com essa combinação de setor e área.
+              </p>
+            )}
           </div>
         </section>
+
+
 
         <section className="dark">
           <div className="wrap closing">
