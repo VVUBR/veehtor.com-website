@@ -77,6 +77,7 @@ export default function Index() {
       <SiteNav />
 
       <main id="main">
+        <div className="zone-white">
         <section className="hero">
           <div className="wrap">
             <div className="hero-grid">
@@ -131,6 +132,7 @@ export default function Index() {
             </div>
           </div>
         </section>
+        </div>
 
         <section aria-label={C.proof.eyebrow}>
           <div className="wrap">
@@ -162,47 +164,6 @@ export default function Index() {
           </div>
         </section>
 
-        <div className="zone-white">
-          <section id="cases" aria-label={C.cases.eyebrow}>
-            <div className="wrap">
-              <div className="sec-head reveal">
-                <div className="eyebrow">{C.cases.eyebrow}</div>
-                <h2>{C.cases.h2}</h2>
-                <p className="sec-sub">{C.cases.sub}</p>
-              </div>
-              <div className="cases3">
-                {C.cases.items.map((c) => (
-                  <article className="scard reveal" key={c.client + c.h3}>
-                    <div>
-                      <div className="case-context">{c.context}</div>
-                      <div className="case-client">{c.client}</div>
-                    </div>
-                    <h3>{c.h3}</h3>
-                    <p className="desc">{c.desc}</p>
-                    <div className="m">
-                      <div className="m-value">{c.metric}</div>
-                      <div className="m-label">{c.metricLabel}</div>
-                    </div>
-                    <span className={`badge b-${c.badge}`}>{c.badgeLabel}</span>
-                    <Link
-                      className="case-cta"
-                      to={c.href}
-                      data-client={c.client}
-                      onClick={() => track("case_clicked", { client: c.client, slug: c.href.split("/").pop() })}
-                    >
-                      {C.cases.detailsCta} <span className="arr">→</span>
-                    </Link>
-                  </article>
-                ))}
-              </div>
-              <div className="cases-more reveal">
-                <a className="btn btn-ghost all-cases" href="/case-studies" onClick={goCases("more")}>
-                  {C.cases.more}
-                </a>
-              </div>
-            </div>
-          </section>
-        </div>
 
         <div className="dark">
           <section aria-label={C.rules.eyebrow}>
