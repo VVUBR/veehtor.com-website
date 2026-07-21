@@ -18,11 +18,12 @@
   --font-mono:'DM Mono',ui-monospace,'SF Mono',Menlo,monospace;
   --maxw:1220px;
 
-  --t-flow:.35s; --t-n1:.35s; --t-n2:.75s; --t-n3:1.15s;
-  --t-leak:1.5s; --t-pulse:1.55s;
-  --t-vai:2.6s;
-  --t-fix:3.2s; --t-n4:4s;
-  --t-chip:4.3s; --t-dim:4.3s;
+  --t-flow:.35s; --t-n1:.35s; --t-n2:.70s; --t-n3:1.05s;
+  --t-leak:1.45s; --t-pulse:1.50s;
+  --t-anno-in:1.60s;
+  --t-vai:2.50s;
+  --t-fix:3.10s; --t-n4:3.85s;
+  --t-chip:4.15s; --t-dim:4.15s;
 
   font-family:var(--font-sans);
   background:var(--paper);
@@ -136,6 +137,9 @@
 .home .nodelabel{font-family:var(--font-mono);font-size:11px;fill:#414658}
 .home .leaklabel{font-family:var(--font-mono);font-size:11px;fill:var(--orange-dark);font-weight:500}
 .home .chiplabel{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.08em;fill:var(--green-dark);font-weight:500}
+.home .annolabel{font-family:var(--font-mono);font-size:10.5px;fill:var(--orange-dark);font-weight:500;opacity:0}
+.home .play .anno-only{animation:home-fadein .4s ease var(--t-anno-in) forwards}
+.home .done .annolabel{opacity:1}
 .home .logo-halo{filter:drop-shadow(0 8px 13px rgba(3,6,25,.10))}
 
 .home .draw{stroke-dasharray:1;stroke-dashoffset:1}
@@ -324,6 +328,6 @@
   .home .reveal{opacity:1;transform:none;transition:none}
   .home .play .p-main,.home .play .p-fix,.home .play .n-1,.home .play .n-2,.home .play .n-3,.home .play .n-4,
   .home .play .vai,.home .play .brand-logo,.home .play .leak,.home .play .leak-dot,.home .play .chip-final,
-  .home .play .leak-group{animation:none}
+  .home .play .leak-group,.home .play .anno-only{animation:none}
   .home .btn,.home .scard{transition:none}
 }
