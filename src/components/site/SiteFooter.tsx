@@ -28,7 +28,9 @@ export default function SiteFooter() {
   return (
     <footer>
       <div className="foot-in">
-        <div className="foot-brand">v<span className="dot">.</span>AI</div>
+        <Link className="foot-brand" to="/" aria-label={S.footer.logoAria || "v.AI"}>
+          <Logo textColor="#fff" />
+        </Link>
         <div className="foot-tag">{S.footer.tag}</div>
         <div className="foot-links">
           {links.map((l) =>
