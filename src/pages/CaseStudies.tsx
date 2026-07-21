@@ -197,7 +197,7 @@ export default function CaseStudies() {
                 </div>
               </div>
               <div>
-                <div style={filterLabel}>Área da empresa</div>
+                <div style={filterLabel}>ÁREA DA EMPRESA</div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem" }}>
                   <button style={pill(area === "All")} onClick={() => setArea("All")}>Todas</button>
                   {presentAreas.map((a) => (
