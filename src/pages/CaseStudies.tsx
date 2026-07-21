@@ -5,9 +5,9 @@ import SiteFooter from "@/components/site/SiteFooter";
 import { useMapDialog } from "@/components/site/MapDialogProvider";
 import { useReveal } from "@/hooks/useReveal";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useSiteContent } from "@/i18n/siteContent";
 import { track } from "@/lib/analytics";
 import {
-  CASE_STUDIES,
   SECTOR_LABELS,
   AREA_LABELS,
   PROOF_LABELS,
@@ -54,7 +54,7 @@ function setMeta(title: string, description: string) {
   canon.setAttribute("href", "/case-studies");
 }
 
-function CaseCard({ c, lang }: { c: CaseStudy; lang: "en" | "pt" }) {
+function CaseCard({ c, lang, cardCta }: { c: CaseStudy; lang: "en" | "pt"; cardCta: string }) {
   const status = getStatus(c);
   const showMetrics = c.metrics.slice(0, 2);
   return (
@@ -87,7 +87,7 @@ function CaseCard({ c, lang }: { c: CaseStudy; lang: "en" | "pt" }) {
         </div>
         <span className={`badge ${badgeClass[status]}`}>{pick(PROOF_LABELS[status], lang)}</span>
         <span className="case-cta">
-          Ver sistema e resultados <span className="arr">→</span>
+          {cardCta} <span className="arr">→</span>
         </span>
       </article>
     </Link>
@@ -97,6 +97,7 @@ function CaseCard({ c, lang }: { c: CaseStudy; lang: "en" | "pt" }) {
 export default function CaseStudies() {
   const { language } = useLanguage();
   const { open: openMap } = useMapDialog();
+  const UI = useSiteContent().caseStudiesUI;
   useReveal();
 
   const [sector, setSector] = useState<Sector | "All">("All");
@@ -127,13 +128,10 @@ export default function CaseStudies() {
   );
 
   useEffect(() => {
-    setMeta(
-      "Cases entregues | Veehtor AI",
-      "10 sistemas em operação com resultados que aparecem no processo. Casos de crédito, folha, checklists por IA e prospecção.",
-    );
+    setMeta(UI.metaTitle, UI.metaDescription);
     window.scrollTo(0, 0);
     track("case_list_viewed", { count: allSorted.length });
-  }, [allSorted.length]);
+  }, [allSorted.length, UI.metaTitle, UI.metaDescription]);
 
   useEffect(() => {
     if (sector !== "All" || area !== "All") {
@@ -165,20 +163,17 @@ export default function CaseStudies() {
 
   return (
     <div className="home">
-      <a className="skip" href="#main">Pular para o conteúdo</a>
+      <a className="skip" href="#main">{UI.skip}</a>
       <SiteNav />
 
       <main id="main">
         <section className="page-hero">
           <div className="wrap">
-            <div className="eyebrow reveal"><b>SISTEMAS ENTREGUES</b></div>
+            <div className="eyebrow reveal"><b>{UI.eyebrow}</b></div>
             <h1 className="reveal">
-              Sistemas em operação.<br />Resultados que aparecem no processo.
+              {UI.h1a}<br />{UI.h1b}
             </h1>
-            <p className="lede reveal">
-              Cada case informa o que foi resolvido, o que foi medido e a escala em que o
-              sistema opera.
-            </p>
+            <p className="lede reveal">{UI.lede}</p>
           </div>
         </section>
 
@@ -186,9 +181,9 @@ export default function CaseStudies() {
           <div className="wrap">
             <div className="reveal" style={{ marginBottom: "2rem", display: "grid", gap: "1.1rem" }}>
               <div>
-                <div style={filterLabel}>SETOR DE INDÚSTRIA</div>
+                <div style={filterLabel}>{UI.filterSector}</div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem" }}>
-                  <button style={pill(sector === "All")} onClick={() => setSector("All")}>Todos</button>
+                  <button style={pill(sector === "All")} onClick={() => setSector("All")}>{UI.allSectors}</button>
                   {presentSectors.map((s) => (
                     <button key={s} style={pill(sector === s)} onClick={() => setSector(s)}>
                       {pick(SECTOR_LABELS[s], language)}
@@ -197,9 +192,9 @@ export default function CaseStudies() {
                 </div>
               </div>
               <div>
-                <div style={filterLabel}>ÁREA DA EMPRESA</div>
+                <div style={filterLabel}>{UI.filterArea}</div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem" }}>
-                  <button style={pill(area === "All")} onClick={() => setArea("All")}>Todas</button>
+                  <button style={pill(area === "All")} onClick={() => setArea("All")}>{UI.allAreas}</button>
                   {presentAreas.map((a) => (
                     <button key={a} style={pill(area === a)} onClick={() => setArea(a)}>
                       {pick(AREA_LABELS[a], language)}
@@ -208,40 +203,36 @@ export default function CaseStudies() {
                 </div>
               </div>
               <div style={{ fontFamily: "var(--font-mono)", fontSize: ".72rem", color: "var(--muted)" }}>
-                {cases.length} de {allSorted.length} cases
+                {UI.counter(cases.length, allSorted.length)}
               </div>
             </div>
 
             {cases.length > 0 ? (
               <div className="cases-list">
                 {cases.map((c) => (
-                  <CaseCard key={c.slug} c={c} lang={language} />
+                  <CaseCard key={c.slug} c={c} lang={language} cardCta={UI.cardCta} />
                 ))}
               </div>
             ) : (
               <p style={{ fontFamily: "var(--font-mono)", fontSize: ".85rem", color: "var(--muted)", padding: "2rem 0" }}>
-                Nenhum case com essa combinação de setor e área.
+                {UI.empty}
               </p>
             )}
           </div>
         </section>
 
-
-
         <section className="dark">
           <div className="wrap closing">
-            <div className="eyebrow reveal">Próximo passo</div>
+            <div className="eyebrow reveal">{UI.closingEyebrow}</div>
             <h2 className="reveal">
-              Qual processo da sua operação<br />custa mais do que deveria?
+              {UI.closingH2a}<br />{UI.closingH2b}
             </h2>
-            <p className="reveal">
-              30 minutos. Direto no processo. Sem apresentação genérica.
-            </p>
+            <p className="reveal">{UI.closingBody}</p>
             <button
               className="btn btn-primary reveal"
               onClick={(e) => openMap("cases-list-closing", e.currentTarget)}
             >
-              Mapear meu processo →
+              {UI.closingCta}
             </button>
           </div>
         </section>
