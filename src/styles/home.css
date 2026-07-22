@@ -190,6 +190,8 @@
 .home .stat-num{margin-top:.55rem;font-size:clamp(1.7rem,2.9vw,2.5rem);font-weight:700;letter-spacing:-.025em;line-height:1.1;color:var(--ink)}
 .home .stat-label{margin-top:.5rem;font-size:.9rem;color:#33394A}
 .home .stat .badge{margin-top:.85rem}
+.home .stat-impact{margin-top:.9rem;font-size:.82rem;line-height:1.45;color:var(--muted)}
+.home .stat-impact + .badge{margin-top:.45rem}
 .home .proof-foot{margin-top:1.5rem;display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 2rem}
 .home .proof-link{display:inline-flex;gap:.45rem;font-weight:600;font-size:.95rem;color:var(--ink);text-decoration:none}
 .home .proof-link:hover .arr{transform:translateX(4px)}
