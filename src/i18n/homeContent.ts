@@ -276,8 +276,8 @@ const en: HomeContentBundle = {
     sub: "Every number below comes from a system shipped into a real operation.",
     stats: [
       { client: "D.CARVALHO - JOHN DEERE", num: "5 to 7 days → minutes", label: "Credit decision turnaround", badge: "operational", badgeLabel: "Operational result" },
-      { client: "Robbin Services", num: "20% → 5%", label: "Share of non-billable hours", badge: "measured", badgeLabel: "Measured result" },
-      { client: "CERVEJARIA COMPLÔ", num: "1 day → minutes", label: "Weekly payroll close", badge: "operational", badgeLabel: "Operational result" },
+      { client: "Robbin Services", num: "20% → 5%", label: "Share of non-billable hours", badge: "measured", badgeLabel: "Measured result", impact: "up to US$ 26,000/year in payroll converted into billable capacity", impactBadgeLabel: "Estimated impact" },
+      { client: "CERVEJARIA COMPLÔ", num: "1 day → minutes", label: "Weekly payroll close", badge: "operational", badgeLabel: "Operational result", impact: "US$ 6,000/year of management time recovered", impactBadgeLabel: "Estimated impact" },
     ],
     note: "Every case separates measured result, estimated impact and scale of use.",
     link: "See delivered solutions",
