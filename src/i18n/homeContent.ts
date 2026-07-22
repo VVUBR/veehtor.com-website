@@ -147,8 +147,8 @@ const pt: HomeContentBundle = {
     sub: "Cada número abaixo vem de um sistema entregue para uma operação real.",
     stats: [
       { client: "D.CARVALHO - JOHN DEERE", num: "5 a 7 dias → minutos", label: "Tempo de decisão de crédito", badge: "operational", badgeLabel: "Resultado operacional" },
-      { client: "Robbin Services", num: "20% → 5%", label: "Participação de horas não faturáveis", badge: "measured", badgeLabel: "Resultado medido" },
-      { client: "CERVEJARIA COMPLÔ", num: "1 dia → minutos", label: "Fechamento de folha semanal", badge: "operational", badgeLabel: "Resultado operacional" },
+      { client: "Robbin Services", num: "20% → 5%", label: "Participação de horas não faturáveis", badge: "measured", badgeLabel: "Resultado medido", impact: "até US$ 26.000/ano em folha convertida em capacidade faturável", impactBadgeLabel: "Impacto estimado" },
+      { client: "CERVEJARIA COMPLÔ", num: "1 dia → minutos", label: "Fechamento de folha semanal", badge: "operational", badgeLabel: "Resultado operacional", impact: "US$ 6.000/ano de tempo de gestão recuperado", impactBadgeLabel: "Impacto estimado" },
     ],
     note: "Cada case separa resultado medido, impacto estimado e escala de uso.",
     link: "Ver soluções entregues",
