@@ -147,8 +147,8 @@ const pt: HomeContentBundle = {
     sub: "Cada número abaixo vem de um sistema entregue para uma operação real.",
     stats: [
       { client: "D.CARVALHO - JOHN DEERE", num: "5 a 7 dias → minutos", label: "Tempo de decisão de crédito", badge: "operational", badgeLabel: "Resultado operacional" },
-      { client: "Robbin Services", num: "20% → 5%", label: "Participação de horas não faturáveis", badge: "measured", badgeLabel: "Resultado medido", impact: "até US$ 26.000/ano em folha convertida em capacidade faturável", impactBadgeLabel: "Impacto estimado" },
-      { client: "CERVEJARIA COMPLÔ", num: "1 dia → minutos", label: "Fechamento de folha semanal", badge: "operational", badgeLabel: "Resultado operacional", impact: "US$ 6.000/ano de tempo de gestão recuperado", impactBadgeLabel: "Impacto estimado" },
+      { client: "Robbin Services", num: "20% → 5%", label: "Participação de horas não faturáveis", badge: "operational", badgeLabel: "Resultado operacional" },
+      { client: "CERVEJARIA COMPLÔ", num: "1 dia → minutos", label: "Fechamento de folha semanal", badge: "operational", badgeLabel: "Resultado operacional" },
     ],
     note: "Cada case separa resultado medido, impacto estimado e escala de uso.",
     link: "Ver soluções entregues",
@@ -276,8 +276,8 @@ const en: HomeContentBundle = {
     sub: "Every number below comes from a system shipped into a real operation.",
     stats: [
       { client: "D.CARVALHO - JOHN DEERE", num: "5 to 7 days → minutes", label: "Credit decision turnaround", badge: "operational", badgeLabel: "Operational result" },
-      { client: "Robbin Services", num: "20% → 5%", label: "Share of non-billable hours", badge: "measured", badgeLabel: "Measured result", impact: "up to US$ 26,000/year in payroll converted into billable capacity", impactBadgeLabel: "Estimated impact" },
-      { client: "CERVEJARIA COMPLÔ", num: "1 day → minutes", label: "Weekly payroll close", badge: "operational", badgeLabel: "Operational result", impact: "US$ 6,000/year of management time recovered", impactBadgeLabel: "Estimated impact" },
+      { client: "Robbin Services", num: "20% → 5%", label: "Share of non-billable hours", badge: "operational", badgeLabel: "Operational result" },
+      { client: "CERVEJARIA COMPLÔ", num: "1 day → minutes", label: "Weekly payroll close", badge: "operational", badgeLabel: "Operational result" },
     ],
     note: "Every case separates measured result, estimated impact and scale of use.",
     link: "See delivered solutions",
