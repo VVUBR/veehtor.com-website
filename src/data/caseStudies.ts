@@ -118,7 +118,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     },
     summary: {
       en: "How a John Deere dealership network replaced gut-feel credit decisions with its own AI credit-scoring system.",
-      pt: "Como uma rede de concessionárias John Deere trocou decisões de crédito no feeling por um sistema próprio de scoring com IA.",
+      pt: "Como uma rede de concessionárias John Deere aprimorou as decisões de crédito com base em dados comportamentais e nas características de seus clientes, por meio de um sistema próprio de scoring com IA.",
     },
     metrics: [
       {
