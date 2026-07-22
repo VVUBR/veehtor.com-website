@@ -118,7 +118,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     },
     summary: {
       en: "How a John Deere dealership network replaced gut-feel credit decisions with its own AI credit-scoring system.",
-      pt: "Como uma rede de concessionárias John Deere aprimorou as decisões de crédito com base em dados comportamentais e nas características de seus clientes, por meio de um sistema próprio de scoring com IA.",
+      pt: "Como uma rede de concessionárias John Deere aprimorou as decisões de crédito com base nos dados de comportamento e características de seus clientes, por meio de um sistema próprio de scoring com IA.",
     },
     metrics: [
       {
@@ -136,7 +136,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     ],
     challenge: {
       en: "The group makes daily credit decisions on deals that reach millions of dollars. A clean record at the credit bureau did not mean a good payer: many customers with spotless external reputations paid late and renegotiated internally. Every decision was close to a bet, and wrong bets hit the company's cash.",
-      pt: "O grupo toma decisões de crédito diárias em negócios que chegam a milhões de dólares. Uma ficha limpa no birô não significava bom pagador: muitos clientes com reputação externa impecável pagavam atrasado e renegociavam internamente. Cada decisão era quase uma aposta, e as apostas erradas mexiam no caixa da empresa.",
+      pt: "O grupo toma decisões de crédito diárias em negócios que chegam a milhões de dólares. Uma ficha limpa no Serasa não significava, necessariamente, bom pagador: muitos clientes com reputação externa impecável pagavam em atraso e renegociavam internamente. Cada decisão errada aqui acarreta risco para o caixa da empresa.",
     },
     solution: {
       en: "We built the company its own credit-analysis system. It learns from each customer's real purchase and payment behavior, then crosses that with external signals: commodity prices, regional weather, interest rates, government farm-credit policy. Every customer gets a score from 0 to 1,000, and an AI credit-analyst agent trained on the company's own policies delivers a ready recommendation of limit, rate, and down payment.",
