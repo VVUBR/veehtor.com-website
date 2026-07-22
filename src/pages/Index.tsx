@@ -150,10 +150,7 @@ export default function Index() {
                   <div className="stat-label">{s.label}</div>
                   <span className={`badge b-${s.badge}`}>{s.badgeLabel}</span>
                   {s.impact && (
-                    <>
-                      <div className="stat-impact">{s.impact}</div>
-                      <span className="badge b-estimated">{s.impactBadgeLabel}</span>
-                    </>
+                    <div className="stat-impact">{s.impact}</div>
                   )}
                 </div>
               ))}

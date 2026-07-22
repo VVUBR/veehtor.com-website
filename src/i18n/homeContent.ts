@@ -10,7 +10,6 @@ type Stat = {
   badge: "measured" | "operational" | "system" | "estimated";
   badgeLabel: string;
   impact?: string;
-  impactBadgeLabel?: string;
 };
 
 type CaseItem = {
