@@ -103,7 +103,7 @@ function DashboardInner() {
   );
   const totalBudget = jobsScope.reduce((s, j) => s + j.budget, 0);
   const jobsRealizado = jobsScope.reduce((s, j) => s + j.realizado, 0);
-  const totalRealizado = jobsRealizado + (job === "__ALL__" ? data.unassignedTotal : 0);
+  const totalRealizado = jobsRealizado + (job === "__ALL__" && unassignedCounts ? data.unassignedTotal : 0);
   const pct = totalBudget > 0 ? (totalRealizado / totalBudget) * 100 : 0;
   const realizadoTone = pct > 100 ? "red" : pct >= 90 ? "gold" : "green";
   const activeCount = jobsScope.filter((j) => j.active).length;
