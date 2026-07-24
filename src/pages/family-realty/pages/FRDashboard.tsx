@@ -195,7 +195,7 @@ function DashboardInner() {
             value={fmtCurrency(totalRealizado)}
             tone={realizadoTone as "red" | "gold" | "green"}
             sub={totalBudget > 0
-              ? (job === "__ALL__" && data.unassignedTotal > 0
+              ? (job === "__ALL__" && unassignedCounts && data.unassignedTotal > 0
                   ? `${Math.round(pct)}% ${t("of_budget")} · ${t("includes_unassigned", { v: fmtCurrency(data.unassignedTotal) })}`
                   : `${Math.round(pct)}% ${t("of_budget")}`)
               : undefined}
