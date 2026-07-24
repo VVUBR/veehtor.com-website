@@ -50,8 +50,8 @@ function DashboardInner() {
   }, []);
 
   // Allowed projects by projectStatus filter. Projects with no status entry (unknown) treated as active.
-  // CRITICAL: unassigned rows (empty/null project name) must NEVER be hidden by this filter — the
-  // inAllowed() helper below always returns true for empty names.
+  // Unassigned rows (empty/null project name) count as "Em andamento": included under "active" and "all",
+  // excluded under "finished". Governed by unassignedCounts below and applied via inAllowed().
   const allowedProjects = useMemo(() => {
     if (projectStatus === "all") return null;
     const set = new Set<string>();
@@ -65,8 +65,10 @@ function DashboardInner() {
     return set;
   }, [projectStatus, data.projects, data.jobsMeta, data.projectStatusMap]);
 
-  // Unassigned rows (empty name) are always allowed — treated as 'Em andamento', never as 'Concluída'.
-  const inAllowed = (name: string) => !name || allowedProjects == null || allowedProjects.has(name);
+  const unassignedCounts = projectStatus !== "finished";
+
+  const inAllowed = (name: string) =>
+    !name ? unassignedCounts : (allowedProjects == null || allowedProjects.has(name));
 
   useEffect(() => {
     if (job !== "__ALL__" && job !== "__UNASSIGNED__" && allowedProjects && !allowedProjects.has(job)) {
