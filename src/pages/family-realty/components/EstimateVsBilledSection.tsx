@@ -183,7 +183,7 @@ export default function EstimateVsBilledSection({
                     <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", color: "var(--fr-muted)" }}>
                       {fmtCurrency(r.openAmount)}
                     </td>
-                    <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", color: diffColor(r.difference, r.billed), fontWeight: 700 }}>
+                    <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", color: diffColor(r.estimate, r.billed, r.hasEstimate), fontWeight: 700 }}>
                       {r.hasEstimate ? fmtCurrency(r.difference) : "—"}
                     </td>
                     <td style={{ textAlign: "right" }}>{r.hasEstimate && r.estimate > 0 ? `${Math.round(r.pctBilled)}%` : "—"}</td>
