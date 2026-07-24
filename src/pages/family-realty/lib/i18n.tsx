@@ -196,7 +196,7 @@ const DICT: Record<string, { pt: string; en: string }> = {
 
   // committed KPI
   kpi_committed: { pt: "Comprometido em contratos", en: "Committed in contracts" },
-  kpi_committed_sub: { pt: "assinado, ainda não faturado", en: "signed, not yet billed" },
+  kpi_committed_sub: { pt: "assinado, ainda não cobrado", en: "signed, not yet billed" },
   budget_projection: { pt: "Projeção", en: "Projection" },
   budget_committed_remaining: { pt: "Comprometido restante", en: "Committed remaining" },
   committed_no_project: { pt: "Comprometido sem obra definida: {v} ({n} contratos)", en: "Committed with no job assigned: {v} ({n} contracts)" },

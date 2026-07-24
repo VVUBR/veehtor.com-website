@@ -50,8 +50,8 @@ function DashboardInner() {
   }, []);
 
   // Allowed projects by projectStatus filter. Projects with no status entry (unknown) treated as active.
-  // CRITICAL: unassigned rows (empty/null project name) must NEVER be hidden by this filter — the
-  // inAllowed() helper below always returns true for empty names.
+  // Unassigned rows (empty/null project name) count as "Em andamento": included under "active" and "all",
+  // excluded under "finished". Governed by unassignedCounts below and applied via inAllowed().
   const allowedProjects = useMemo(() => {
     if (projectStatus === "all") return null;
     const set = new Set<string>();
@@ -65,8 +65,10 @@ function DashboardInner() {
     return set;
   }, [projectStatus, data.projects, data.jobsMeta, data.projectStatusMap]);
 
-  // Unassigned rows (empty name) are always allowed — treated as 'Em andamento', never as 'Concluída'.
-  const inAllowed = (name: string) => !name || allowedProjects == null || allowedProjects.has(name);
+  const unassignedCounts = projectStatus !== "finished";
+
+  const inAllowed = (name: string) =>
+    !name ? unassignedCounts : (allowedProjects == null || allowedProjects.has(name));
 
   useEffect(() => {
     if (job !== "__ALL__" && job !== "__UNASSIGNED__" && allowedProjects && !allowedProjects.has(job)) {
@@ -101,7 +103,7 @@ function DashboardInner() {
   );
   const totalBudget = jobsScope.reduce((s, j) => s + j.budget, 0);
   const jobsRealizado = jobsScope.reduce((s, j) => s + j.realizado, 0);
-  const totalRealizado = jobsRealizado + (job === "__ALL__" ? data.unassignedTotal : 0);
+  const totalRealizado = jobsRealizado + (job === "__ALL__" && unassignedCounts ? data.unassignedTotal : 0);
   const pct = totalBudget > 0 ? (totalRealizado / totalBudget) * 100 : 0;
   const realizadoTone = pct > 100 ? "red" : pct >= 90 ? "gold" : "green";
   const activeCount = jobsScope.filter((j) => j.active).length;
@@ -129,13 +131,13 @@ function DashboardInner() {
     for (const [name, amt] of data.committed.byProject) {
       if (inAllowed(name)) sum += amt;
     }
-    return sum + data.committed.unassignedAmount;
-  }, [job, data.committed, allowedProjects]);
+    return sum + (unassignedCounts ? data.committed.unassignedAmount : 0);
+  }, [job, data.committed, allowedProjects, unassignedCounts]);
 
   const committedUnassigned = data.committed.unassignedAmount;
   const openPayUnassigned = payableDocsScope.filter((p) => !p.job).reduce((s, p) => s + p.docTotal, 0);
   const overdueUnassigned = overduePay.filter((p) => !p.job).reduce((s, p) => s + p.docTotal, 0);
-  const isAll = job === "__ALL__";
+  const isAll = job === "__ALL__" && unassignedCounts;
   const withUnassigned = (base: string | undefined, v: number) => {
     if (!isAll || v <= 0) return base;
     const note = t("includes_unassigned", { v: fmtCurrency(v) });
@@ -193,7 +195,7 @@ function DashboardInner() {
             value={fmtCurrency(totalRealizado)}
             tone={realizadoTone as "red" | "gold" | "green"}
             sub={totalBudget > 0
-              ? (job === "__ALL__" && data.unassignedTotal > 0
+              ? (job === "__ALL__" && unassignedCounts && data.unassignedTotal > 0
                   ? `${Math.round(pct)}% ${t("of_budget")} · ${t("includes_unassigned", { v: fmtCurrency(data.unassignedTotal) })}`
                   : `${Math.round(pct)}% ${t("of_budget")}`)
               : undefined}

@@ -3,10 +3,10 @@ import { useI18n, fmtCurrency, fmtDateLocale } from "../lib/i18n";
 import SupplierSelect, { matchSupplier } from "./SupplierSelect";
 import type { EstimateBilledRow, InvoicePaidRow, PaymentRow } from "../data";
 
-function diffColor(diff: number, billed: number) {
-  if (billed === 0) return "var(--fr-muted)";
-  if (Math.abs(diff) < 1) return "var(--fr-green)";
-  if (diff < 0) return "var(--fr-red)"; // billed > estimate
+function diffColor(estimate: number, billed: number, hasEstimate: boolean) {
+  if (!hasEstimate) return "var(--fr-muted)";
+  if (Math.abs(billed - estimate) < 1) return "var(--fr-green)";
+  if (billed > estimate) return "var(--fr-red)";
   return "var(--fr-text)";
 }
 
@@ -183,7 +183,7 @@ export default function EstimateVsBilledSection({
                     <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", color: "var(--fr-muted)" }}>
                       {fmtCurrency(r.openAmount)}
                     </td>
-                    <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", color: diffColor(r.difference, r.billed), fontWeight: 700 }}>
+                    <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", color: diffColor(r.estimate, r.billed, r.hasEstimate), fontWeight: 700 }}>
                       {r.hasEstimate ? fmtCurrency(r.difference) : "—"}
                     </td>
                     <td style={{ textAlign: "right" }}>{r.hasEstimate && r.estimate > 0 ? `${Math.round(r.pctBilled)}%` : "—"}</td>
