@@ -200,20 +200,20 @@ function DashboardInner() {
           />
           <KpiCard
             label={t("kpi_committed")}
-            value={fmtCurrency(data.committed.total)}
-            sub={t("kpi_committed_sub")}
+            value={fmtCurrency(committedScoped)}
+            sub={withUnassigned(t("kpi_committed_sub"), committedUnassigned)}
           />
           <KpiCard
             label={t("kpi_topay")}
             value={fmtCurrency(openPay)}
             tone="gold"
-            sub={`${payableDocsScope.length} ${t("invoices")}`}
+            sub={withUnassigned(`${payableDocsScope.length} ${t("invoices")}`, openPayUnassigned)}
           />
           <KpiCard
             label={t("kpi_overdue")}
             value={fmtCurrency(overdueSum)}
             tone={overduePay.length > 0 ? "red" : "default"}
-            sub={`${overduePay.length} ${t("overdue_invoices")}`}
+            sub={withUnassigned(`${overduePay.length} ${t("overdue_invoices")}`, overdueUnassigned)}
           />
           <KpiCard
             label={t("kpi_unassigned")}
