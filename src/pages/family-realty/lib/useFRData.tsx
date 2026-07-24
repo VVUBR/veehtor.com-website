@@ -383,6 +383,7 @@ async function loadAll() {
     unassignedCount: 0,
   };
   for (const row of evbRows) {
+    if (row.status !== "Ativo") continue;
     if (!row.hasEstimate) continue;
     const remain = Math.max(row.estimate - row.billed, 0);
     if (remain <= 0) continue;

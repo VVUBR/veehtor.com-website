@@ -122,6 +122,27 @@ function DashboardInner() {
     [job, data.jobsMeta],
   );
 
+  const committedScoped = useMemo(() => {
+    if (job === "__UNASSIGNED__") return data.committed.unassignedAmount;
+    if (job !== "__ALL__") return data.committed.byProject.get(job) ?? 0;
+    let sum = 0;
+    for (const [name, amt] of data.committed.byProject) {
+      if (inAllowed(name)) sum += amt;
+    }
+    return sum + data.committed.unassignedAmount;
+  }, [job, data.committed, allowedProjects]);
+
+  const committedUnassigned = data.committed.unassignedAmount;
+  const openPayUnassigned = payableDocsScope.filter((p) => !p.job).reduce((s, p) => s + p.docTotal, 0);
+  const overdueUnassigned = overduePay.filter((p) => !p.job).reduce((s, p) => s + p.docTotal, 0);
+  const isAll = job === "__ALL__";
+  const withUnassigned = (base: string | undefined, v: number) => {
+    if (!isAll || v <= 0) return base;
+    const note = t("includes_unassigned", { v: fmtCurrency(v) });
+    return base ? `${base} · ${note}` : note;
+  };
+
+
   const onExportPdf = () => window.print();
 
   return (
@@ -179,20 +200,20 @@ function DashboardInner() {
           />
           <KpiCard
             label={t("kpi_committed")}
-            value={fmtCurrency(data.committed.total)}
-            sub={t("kpi_committed_sub")}
+            value={fmtCurrency(committedScoped)}
+            sub={withUnassigned(t("kpi_committed_sub"), committedUnassigned)}
           />
           <KpiCard
             label={t("kpi_topay")}
             value={fmtCurrency(openPay)}
             tone="gold"
-            sub={`${payableDocsScope.length} ${t("invoices")}`}
+            sub={withUnassigned(`${payableDocsScope.length} ${t("invoices")}`, openPayUnassigned)}
           />
           <KpiCard
             label={t("kpi_overdue")}
             value={fmtCurrency(overdueSum)}
             tone={overduePay.length > 0 ? "red" : "default"}
-            sub={`${overduePay.length} ${t("overdue_invoices")}`}
+            sub={withUnassigned(`${overduePay.length} ${t("overdue_invoices")}`, overdueUnassigned)}
           />
           <KpiCard
             label={t("kpi_unassigned")}
