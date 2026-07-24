@@ -122,6 +122,27 @@ function DashboardInner() {
     [job, data.jobsMeta],
   );
 
+  const committedScoped = useMemo(() => {
+    if (job === "__UNASSIGNED__") return data.committed.unassignedAmount;
+    if (job !== "__ALL__") return data.committed.byProject.get(job) ?? 0;
+    let sum = 0;
+    for (const [name, amt] of data.committed.byProject) {
+      if (inAllowed(name)) sum += amt;
+    }
+    return sum + data.committed.unassignedAmount;
+  }, [job, data.committed, allowedProjects]);
+
+  const committedUnassigned = data.committed.unassignedAmount;
+  const openPayUnassigned = payableDocsScope.filter((p) => !p.job).reduce((s, p) => s + p.docTotal, 0);
+  const overdueUnassigned = overduePay.filter((p) => !p.job).reduce((s, p) => s + p.docTotal, 0);
+  const isAll = job === "__ALL__";
+  const withUnassigned = (base: string | undefined, v: number) => {
+    if (!isAll || v <= 0) return base;
+    const note = t("includes_unassigned", { v: fmtCurrency(v) });
+    return base ? `${base} · ${note}` : note;
+  };
+
+
   const onExportPdf = () => window.print();
 
   return (
