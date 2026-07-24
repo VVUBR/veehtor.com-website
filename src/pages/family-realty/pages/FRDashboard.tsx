@@ -131,13 +131,13 @@ function DashboardInner() {
     for (const [name, amt] of data.committed.byProject) {
       if (inAllowed(name)) sum += amt;
     }
-    return sum + data.committed.unassignedAmount;
-  }, [job, data.committed, allowedProjects]);
+    return sum + (unassignedCounts ? data.committed.unassignedAmount : 0);
+  }, [job, data.committed, allowedProjects, unassignedCounts]);
 
   const committedUnassigned = data.committed.unassignedAmount;
   const openPayUnassigned = payableDocsScope.filter((p) => !p.job).reduce((s, p) => s + p.docTotal, 0);
   const overdueUnassigned = overduePay.filter((p) => !p.job).reduce((s, p) => s + p.docTotal, 0);
-  const isAll = job === "__ALL__";
+  const isAll = job === "__ALL__" && unassignedCounts;
   const withUnassigned = (base: string | undefined, v: number) => {
     if (!isAll || v <= 0) return base;
     const note = t("includes_unassigned", { v: fmtCurrency(v) });
