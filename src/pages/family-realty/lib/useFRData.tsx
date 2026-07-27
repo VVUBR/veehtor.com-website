@@ -644,6 +644,7 @@ async function loadAll() {
     projectStatusMap,
     invoicePaidBySub,
     paymentsBySub,
+    bankFeeByProject,
   };
 }
 
@@ -657,6 +658,7 @@ const empty: FRData = {
   subCompliance: [], insuranceBySub: new Map(), w9BySub: new Map(),
   projects: [], projectStatusMap: new Map(),
   invoicePaidBySub: new Map(), paymentsBySub: new Map(),
+  bankFeeByProject: new Map(),
 };
 
 
