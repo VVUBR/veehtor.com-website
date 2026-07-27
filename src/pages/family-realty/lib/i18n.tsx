@@ -56,7 +56,9 @@ const DICT: Record<string, { pt: string; en: string }> = {
   // KPIs
   kpi_budget_total: { pt: "Budget total", en: "Total budget" },
   kpi_budget_job: { pt: "Budget da obra", en: "Job budget" },
-  kpi_realizado: { pt: "Realizado", en: "Incurred" },
+  kpi_realizado: { pt: "Realizado obra", en: "Construction actual" },
+  kpi_bank_fee: { pt: "Bank Fee", en: "Bank Fee" },
+  kpi_bank_fee_sub: { pt: "mortgage e seguro", en: "mortgage and insurance" },
   kpi_topay: { pt: "A pagar (em aberto)", en: "To pay (open)" },
   kpi_overdue: { pt: "Em atraso", en: "Overdue" },
   kpi_unassigned: { pt: "A classificar", en: "Unassigned" },
