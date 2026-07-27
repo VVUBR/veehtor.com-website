@@ -22,7 +22,7 @@ export default function BudgetStatusList({
 }) {
   const { t, lang } = useI18n();
   const scope = job === "__ALL__" ? jobsMeta : jobsMeta.filter((j) => j.name === job);
-  const rows = [...scope].sort((a, b) => b.pctConsumed - a.pctConsumed);
+  const rows = [...scope].sort((a, b) => b.pctConsumedObra - a.pctConsumedObra);
 
   return (
     <div className="fr-card p-5 h-full">
