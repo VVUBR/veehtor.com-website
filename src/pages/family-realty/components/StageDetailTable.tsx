@@ -27,10 +27,13 @@ type ProjectGroup = {
   isUnassigned: boolean;
   budget: number;
   realizado: number;
+  realizadoObra: number;
   balance: number;
   pctConsumed: number;
   phases: PhaseGroup[];
 };
+
+const BANK_FEE = "Bank Fee";
 
 function buildGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
   const phaseOrderByProject = new Map<string, Map<string, number>>();
@@ -50,7 +53,6 @@ function buildGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
   const groups: ProjectGroup[] = [];
   for (const [key, lines] of byProject.entries()) {
     const po = phaseOrderByProject.get(key)!;
-    // Group by phase (l.phase already normalized: "__NO_BUDGET_LINE__" for unclassified).
     const byPhase = new Map<string, BudgetLine[]>();
     for (const l of lines) {
       const ph = l.phase || "__NO_BUDGET_LINE__";
@@ -62,8 +64,9 @@ function buildGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
     for (const [ph, phLines] of byPhase.entries()) {
       const budget = phLines.reduce((s, l) => s + l.budget, 0);
       const realizado = phLines.reduce((s, l) => s + l.realizado, 0);
-      const balance = budget - realizado;
-      const pct = budget > 0 ? (realizado / budget) * 100 : 0;
+      const isBankFee = ph === BANK_FEE;
+      const balance = isBankFee ? 0 : budget - realizado;
+      const pct = isBankFee ? 0 : budget > 0 ? (realizado / budget) * 100 : 0;
       phases.push({
         key: ph,
         label: ph === "__NO_BUDGET_LINE__" ? "" : ph,
@@ -76,15 +79,15 @@ function buildGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
       });
     }
     phases.sort((a, b) => {
-      // Push unclassified last, then follow first-seen order.
       if (a.noBudgetLine !== b.noBudgetLine) return a.noBudgetLine ? 1 : -1;
       return (po.get(a.key) ?? 999) - (po.get(b.key) ?? 999);
     });
 
     const budget = lines.reduce((s, l) => s + l.budget, 0);
     const realizado = lines.reduce((s, l) => s + l.realizado, 0);
-    const balance = budget - realizado;
-    const pct = budget > 0 ? (realizado / budget) * 100 : 0;
+    const realizadoObra = lines.filter((l) => l.phase !== BANK_FEE).reduce((s, l) => s + l.realizado, 0);
+    const balance = budget - realizadoObra;
+    const pct = budget > 0 ? (realizadoObra / budget) * 100 : 0;
 
     groups.push({
       key,
@@ -92,6 +95,7 @@ function buildGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
       isUnassigned: key === "",
       budget,
       realizado,
+      realizadoObra,
       balance,
       pctConsumed: pct,
       phases,
