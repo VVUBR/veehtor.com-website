@@ -221,29 +221,6 @@ async function loadAll() {
     w9: w9Raw.length,
   });
 
-  // -- Jobs --
-  const jobsMeta: JobMeta[] = bvaProject
-    .filter((r) => r.project)
-    .map((r) => {
-      const ds = parseSafeDate(r.date_started).date;
-      const df = parseSafeDate(r.date_finished).date;
-      const budget = num(r.budget);
-      const realizado = num(r.realizado);
-      return {
-        name: String(r.project),
-        budget,
-        realizado,
-        balance: r.balance != null ? num(r.balance) : budget - realizado,
-        pctConsumed: r.pct_consumed != null ? num(r.pct_consumed) : budget > 0 ? (realizado / budget) * 100 : 0,
-        dateStarted: ds,
-        dateFinished: df,
-        active: !df,
-      };
-    })
-    .sort((a, b) => b.pctConsumed - a.pctConsumed);
-
-  const jobs = jobsMeta.map((j) => j.name);
-
   // -- Budget lines --
   const budgetLines: BudgetLine[] = bvaLine.map((r) => {
     const phase = (r.phase || "").trim();
@@ -260,6 +237,45 @@ async function loadAll() {
       noBudgetLine: noBL,
     };
   });
+
+  // -- Bank Fee per project (derived from line view) --
+  const BANK_FEE_PHASE = "Bank Fee";
+  const bankFeeByProject = new Map<string, number>();
+  for (const r of bvaLine) {
+    if ((r.phase || "").trim() !== BANK_FEE_PHASE) continue;
+    const p = String(r.project || "");
+    bankFeeByProject.set(p, (bankFeeByProject.get(p) || 0) + num(r.realizado));
+  }
+
+  // -- Jobs --
+  const jobsMeta: JobMeta[] = bvaProject
+    .filter((r) => r.project)
+    .map((r) => {
+      const ds = parseSafeDate(r.date_started).date;
+      const df = parseSafeDate(r.date_finished).date;
+      const budget = num(r.budget);
+      const realizado = num(r.realizado);
+      const name = String(r.project);
+      const bankFee = bankFeeByProject.get(name) ?? 0;
+      const realizadoObra = realizado - bankFee;
+      return {
+        name,
+        budget,
+        realizado,
+        balance: r.balance != null ? num(r.balance) : budget - realizado,
+        pctConsumed: r.pct_consumed != null ? num(r.pct_consumed) : budget > 0 ? (realizado / budget) * 100 : 0,
+        bankFee,
+        realizadoObra,
+        balanceObra: budget - realizadoObra,
+        pctConsumedObra: budget > 0 ? (realizadoObra / budget) * 100 : 0,
+        dateStarted: ds,
+        dateFinished: df,
+        active: !df,
+      };
+    })
+    .sort((a, b) => b.pctConsumed - a.pctConsumed);
+
+  const jobs = jobsMeta.map((j) => j.name);
 
   // -- Payables (line items, kept for legacy consumers) --
   const payables: PayableItem[] = invoices.map((r, i) => {
@@ -628,6 +644,7 @@ async function loadAll() {
     projectStatusMap,
     invoicePaidBySub,
     paymentsBySub,
+    bankFeeByProject,
   };
 }
 
@@ -641,6 +658,7 @@ const empty: FRData = {
   subCompliance: [], insuranceBySub: new Map(), w9BySub: new Map(),
   projects: [], projectStatusMap: new Map(),
   invoicePaidBySub: new Map(), paymentsBySub: new Map(),
+  bankFeeByProject: new Map(),
 };
 
 

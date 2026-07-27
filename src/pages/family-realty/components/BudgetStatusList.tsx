@@ -22,7 +22,7 @@ export default function BudgetStatusList({
 }) {
   const { t, lang } = useI18n();
   const scope = job === "__ALL__" ? jobsMeta : jobsMeta.filter((j) => j.name === job);
-  const rows = [...scope].sort((a, b) => b.pctConsumed - a.pctConsumed);
+  const rows = [...scope].sort((a, b) => b.pctConsumedObra - a.pctConsumedObra);
 
   return (
     <div className="fr-card p-5 h-full">
@@ -32,24 +32,24 @@ export default function BudgetStatusList({
 
       <div className="flex flex-col gap-4">
         {rows.map((r) => {
-          const st = statusFor(r.pctConsumed, t);
+          const st = statusFor(r.pctConsumedObra, t);
           const committedRemain = committed?.byProject.get(r.name) ?? 0;
-          const projection = r.realizado + committedRemain;
+          const projection = r.realizadoObra + committedRemain;
           const denom = Math.max(r.budget, projection, 1);
-          const realPctVisual = Math.min((r.realizado / denom) * 100, 100);
+          const realPctVisual = Math.min((r.realizadoObra / denom) * 100, 100);
           const commPctVisual = Math.min((committedRemain / denom) * 100, 100 - realPctVisual);
-          const over = Math.max(r.pctConsumed - 100, 0);
+          const over = Math.max(r.pctConsumedObra - 100, 0);
           const endDate = r.dateFinished || today0();
           const months = r.dateStarted ? monthsBetween(r.dateStarted, endDate) : 0;
-          const burn = months > 0 ? r.realizado / months : 0;
+          const burn = months > 0 ? r.realizadoObra / months : 0;
           const pctProjection = r.budget > 0 ? (projection / r.budget) * 100 : 0;
 
           const tooltip = [
             `${t("th_budget")}: ${fmtCurrency(r.budget)}`,
-            `${t("th_realizado")}: ${fmtCurrency(r.realizado)}`,
+            `${t("th_realizado")}: ${fmtCurrency(r.realizadoObra)}`,
             `${t("budget_committed_remaining")}: ${fmtCurrency(committedRemain)}`,
             `${t("budget_projection")}: ${fmtCurrency(projection)} (${Math.round(pctProjection)}%)`,
-            `${Math.round(r.pctConsumed)}% ${t("of_budget")}`,
+            `${Math.round(r.pctConsumedObra)}% ${t("of_budget")}`,
           ].join("\n");
 
           return (
@@ -95,8 +95,8 @@ export default function BudgetStatusList({
                   fontFamily: "Roboto", fontWeight: 900, fontSize: 15, color: st.color,
                   fontVariantNumeric: "tabular-nums",
                   position: "relative", zIndex: 2, background: "var(--fr-bg)", paddingLeft: 4,
-                }} title={`${fmtCurrency(r.realizado)} / ${fmtCurrency(r.budget)}`}>
-                  {`${Math.round(r.pctConsumed)}%`}
+                }} title={`${fmtCurrency(r.realizadoObra)} / ${fmtCurrency(r.budget)}`}>
+                  {`${Math.round(r.pctConsumedObra)}%`}
                 </div>
                 <div style={{ width: 150, minWidth: 150, flexShrink: 0, textAlign: "right", fontSize: 12, fontWeight: 700, color: st.color, position: "relative", zIndex: 2, background: "var(--fr-bg)" }}>
                   {st.label}

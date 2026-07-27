@@ -101,9 +101,12 @@ function DashboardInner() {
     () => (job === "__ALL__" ? jobsMetaFiltered : jobsMetaFiltered.filter((j) => j.name === job)),
     [job, jobsMetaFiltered],
   );
+  const unassignedObra = data.unassignedItems.filter((i) => i.phase !== "Bank Fee").reduce((s, i) => s + i.amount, 0);
+  const unassignedBankFee = data.unassignedItems.filter((i) => i.phase === "Bank Fee").reduce((s, i) => s + i.amount, 0);
   const totalBudget = jobsScope.reduce((s, j) => s + j.budget, 0);
-  const jobsRealizado = jobsScope.reduce((s, j) => s + j.realizado, 0);
-  const totalRealizado = jobsRealizado + (job === "__ALL__" && unassignedCounts ? data.unassignedTotal : 0);
+  const jobsRealizado = jobsScope.reduce((s, j) => s + j.realizadoObra, 0);
+  const totalRealizado = jobsRealizado + (job === "__ALL__" && unassignedCounts ? unassignedObra : 0);
+  const bankFeeScoped = jobsScope.reduce((s, j) => s + j.bankFee, 0) + (job === "__ALL__" && unassignedCounts ? unassignedBankFee : 0);
   const pct = totalBudget > 0 ? (totalRealizado / totalBudget) * 100 : 0;
   const realizadoTone = pct > 100 ? "red" : pct >= 90 ? "gold" : "green";
   const activeCount = jobsScope.filter((j) => j.active).length;
@@ -184,7 +187,7 @@ function DashboardInner() {
           </div>
         )}
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
           <KpiCard
             label={job === "__ALL__" ? t("kpi_budget_total") : t("kpi_budget_job")}
             value={fmtCurrency(totalBudget)}
@@ -195,10 +198,15 @@ function DashboardInner() {
             value={fmtCurrency(totalRealizado)}
             tone={realizadoTone as "red" | "gold" | "green"}
             sub={totalBudget > 0
-              ? (job === "__ALL__" && unassignedCounts && data.unassignedTotal > 0
-                  ? `${Math.round(pct)}% ${t("of_budget")} · ${t("includes_unassigned", { v: fmtCurrency(data.unassignedTotal) })}`
+              ? (job === "__ALL__" && unassignedCounts && unassignedObra > 0
+                  ? `${Math.round(pct)}% ${t("of_budget")} · ${t("includes_unassigned", { v: fmtCurrency(unassignedObra) })}`
                   : `${Math.round(pct)}% ${t("of_budget")}`)
               : undefined}
+          />
+          <KpiCard
+            label={t("kpi_bank_fee")}
+            value={fmtCurrency(bankFeeScoped)}
+            sub={t("kpi_bank_fee_sub")}
           />
           <KpiCard
             label={t("kpi_committed")}

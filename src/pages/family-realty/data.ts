@@ -96,6 +96,10 @@ export type JobMeta = {
   realizado: number;
   balance: number;
   pctConsumed: number;
+  bankFee: number;
+  realizadoObra: number;
+  balanceObra: number;
+  pctConsumedObra: number;
   dateStarted: Date | null;
   dateFinished: Date | null;
   active: boolean;

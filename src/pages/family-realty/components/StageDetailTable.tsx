@@ -27,10 +27,13 @@ type ProjectGroup = {
   isUnassigned: boolean;
   budget: number;
   realizado: number;
+  realizadoObra: number;
   balance: number;
   pctConsumed: number;
   phases: PhaseGroup[];
 };
+
+const BANK_FEE = "Bank Fee";
 
 function buildGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
   const phaseOrderByProject = new Map<string, Map<string, number>>();
@@ -50,7 +53,6 @@ function buildGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
   const groups: ProjectGroup[] = [];
   for (const [key, lines] of byProject.entries()) {
     const po = phaseOrderByProject.get(key)!;
-    // Group by phase (l.phase already normalized: "__NO_BUDGET_LINE__" for unclassified).
     const byPhase = new Map<string, BudgetLine[]>();
     for (const l of lines) {
       const ph = l.phase || "__NO_BUDGET_LINE__";
@@ -62,8 +64,9 @@ function buildGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
     for (const [ph, phLines] of byPhase.entries()) {
       const budget = phLines.reduce((s, l) => s + l.budget, 0);
       const realizado = phLines.reduce((s, l) => s + l.realizado, 0);
-      const balance = budget - realizado;
-      const pct = budget > 0 ? (realizado / budget) * 100 : 0;
+      const isBankFee = ph === BANK_FEE;
+      const balance = isBankFee ? 0 : budget - realizado;
+      const pct = isBankFee ? 0 : budget > 0 ? (realizado / budget) * 100 : 0;
       phases.push({
         key: ph,
         label: ph === "__NO_BUDGET_LINE__" ? "" : ph,
@@ -76,15 +79,15 @@ function buildGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
       });
     }
     phases.sort((a, b) => {
-      // Push unclassified last, then follow first-seen order.
       if (a.noBudgetLine !== b.noBudgetLine) return a.noBudgetLine ? 1 : -1;
       return (po.get(a.key) ?? 999) - (po.get(b.key) ?? 999);
     });
 
     const budget = lines.reduce((s, l) => s + l.budget, 0);
     const realizado = lines.reduce((s, l) => s + l.realizado, 0);
-    const balance = budget - realizado;
-    const pct = budget > 0 ? (realizado / budget) * 100 : 0;
+    const realizadoObra = lines.filter((l) => l.phase !== BANK_FEE).reduce((s, l) => s + l.realizado, 0);
+    const balance = budget - realizadoObra;
+    const pct = budget > 0 ? (realizadoObra / budget) * 100 : 0;
 
     groups.push({
       key,
@@ -92,6 +95,7 @@ function buildGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
       isUnassigned: key === "",
       budget,
       realizado,
+      realizadoObra,
       balance,
       pctConsumed: pct,
       phases,
@@ -152,7 +156,8 @@ export default function StageDetailTable({ job, budgetLines }: { job: string; bu
 
   const totalBudget = visibleGroups.reduce((s, g) => s + g.budget, 0);
   const totalReal = visibleGroups.reduce((s, g) => s + g.realizado, 0);
-  const totalBal = totalBudget - totalReal;
+  const totalRealObra = visibleGroups.reduce((s, g) => s + g.realizadoObra, 0);
+  const totalBal = totalBudget - totalRealObra;
   const nRows = visibleGroups.length;
 
   return (
@@ -259,6 +264,7 @@ export default function StageDetailTable({ job, budgetLines }: { job: string; bu
                           {phOpen &&
                             ph.lines.map((l, i) => {
                               const noLine = l.noBudgetLine || !l.description;
+                              const isBankFee = l.phase === BANK_FEE;
                               return (
                                 <tr key={`${phKey}-${i}`} style={{ background: "var(--fr-bg)" }}>
                                   <td></td>
@@ -273,11 +279,11 @@ export default function StageDetailTable({ job, budgetLines }: { job: string; bu
                                   </td>
                                   <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", fontSize: 12 }}>{fmtCurrency(l.budget)}</td>
                                   <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", fontSize: 12 }}>{fmtCurrency(l.realizado)}</td>
-                                  <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", fontSize: 12, color: l.balance < 0 ? "var(--fr-red)" : "var(--fr-text)" }}>
-                                    {fmtCurrency(l.balance)}
+                                  <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", fontSize: 12, color: (isBankFee ? 0 : l.balance) < 0 ? "var(--fr-red)" : "var(--fr-text)" }}>
+                                    {isBankFee ? fmtCurrency(0) : fmtCurrency(l.balance)}
                                   </td>
-                                  <td style={{ textAlign: "right", fontSize: 12, color: pctColor(l.pctConsumed, l.budget > 0) }}>
-                                    {l.budget > 0 ? `${Math.round(l.pctConsumed)}%` : "—"}
+                                  <td style={{ textAlign: "right", fontSize: 12, color: pctColor(l.pctConsumed, !isBankFee && l.budget > 0) }}>
+                                    {isBankFee ? "—" : (l.budget > 0 ? `${Math.round(l.pctConsumed)}%` : "—")}
                                   </td>
                                 </tr>
                               );
