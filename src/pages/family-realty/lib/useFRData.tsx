@@ -290,7 +290,7 @@ async function loadAll() {
       supplierCanonical: canonical,
       job: r.project_name || "",
       material: r.material || "—",
-      amount: Math.abs(num(r.amount)),
+      amount: num(r.amount),
       invoiceDate: inv,
       dueDate: due,
       status,
