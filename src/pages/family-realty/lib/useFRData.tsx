@@ -311,7 +311,7 @@ async function loadAll() {
       material: r.material || "—",
       quantity: r.quantity != null ? num(r.quantity) : null,
       unitPrice: r.unit_price != null ? num(r.unit_price) : null,
-      amount: Math.abs(num(r.amount)),
+      amount: num(r.amount),
     };
     const existing = payableDocsMap.get(docKey);
     if (existing) {
