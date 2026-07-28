@@ -109,12 +109,12 @@ export const ALL_AREAS: Area[] = [
 export const CASE_STUDIES: CaseStudy[] = [
   {
     slug: "dcarvalho-credit-scoring",
-    client: "D.Carvalho (John Deere dealership network)",
+    client: "John Deere dealership network",
     sector: "Agribusiness",
     areas: ["Finance"],
     title: {
-      en: "D.Carvalho: credit decisions that took 5 to 7 days now take minutes",
-      pt: "D.Carvalho: decisões de crédito que levavam 5 a 7 dias agora saem em minutos",
+      en: "Credit decisions that took 5 to 7 days now take minutes",
+      pt: "Decisões de crédito que levavam 5 a 7 dias agora saem em minutos",
     },
     summary: {
       en: "How a John Deere dealership network replaced gut-feel credit decisions with its own AI credit-scoring system.",
