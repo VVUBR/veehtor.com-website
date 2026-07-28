@@ -129,7 +129,7 @@ export default function CostTable({ items }: { items: HistoryItem[] }) {
                   <td>{it.supplier}</td>
                   <td>{it.type === "Material" ? t("type_supplier") : it.type === "Subcontractor" ? t("type_subcontractor") : "—"}</td>
                   <td>{it.stage}</td>
-                  <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{fmtCurrency(it.amount)}</td>
+                  <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", color: it.amount < 0 ? "var(--fr-red)" : undefined }}>{fmtCurrency(it.amount)}</td>
                   <td>
                     <span className={
                       displayStatus === "Pago" ? "fr-dot fr-dot-green" :
