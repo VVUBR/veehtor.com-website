@@ -290,7 +290,7 @@ async function loadAll() {
       supplierCanonical: canonical,
       job: r.project_name || "",
       material: r.material || "—",
-      amount: Math.abs(num(r.amount)),
+      amount: num(r.amount),
       invoiceDate: inv,
       dueDate: due,
       status,
@@ -311,7 +311,7 @@ async function loadAll() {
       material: r.material || "—",
       quantity: r.quantity != null ? num(r.quantity) : null,
       unitPrice: r.unit_price != null ? num(r.unit_price) : null,
-      amount: Math.abs(num(r.amount)),
+      amount: num(r.amount),
     };
     const existing = payableDocsMap.get(docKey);
     if (existing) {
@@ -328,7 +328,7 @@ async function loadAll() {
         documentType: r.document_type || "",
         invoiceDate: parseSafeDate(r.invoice_date).date,
         dueDate: docDue,
-        docTotal: Math.abs(num(r.doc_total ?? r.amount)),
+        docTotal: num(r.doc_total ?? r.amount),
         overdue: !!r.overdue,
         items: [line],
       });
@@ -349,7 +349,7 @@ async function loadAll() {
       supplier: canonical || "—",
       supplierCanonical: canonical,
       material: r.material || "—",
-      amount: Math.abs(num(r.amount)),
+      amount: num(r.amount),
       documentType: r.document_type || "",
       suggestion: r.address_pointer && r.address_pointer.startsWith("Sugestão IA:")
         ? r.address_pointer.replace(/^Sugestão IA:\s*/, "")
@@ -426,7 +426,7 @@ async function loadAll() {
       supplierCanonical: canonical,
       type: normalizeType(r.type),
       stage: r.phase || "—",
-      amount: Math.abs(num(r.amount)),
+      amount: num(r.amount),
       status: normalizeStatus(r.payment_status, due),
       dueDate: due,
       paymentStatusRaw: (r.payment_status || "").trim(),

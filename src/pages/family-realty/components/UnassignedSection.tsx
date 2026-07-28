@@ -52,7 +52,7 @@ export default function UnassignedSection({ items }: { items: UnassignedItem[] }
                 <td>{fmtDateLocale(i.date, lang)}</td>
                 <td>{i.supplier}</td>
                 <td>{i.material}</td>
-                <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{fmtCurrency(i.amount)}</td>
+                <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", color: i.amount < 0 ? "var(--fr-red)" : undefined }}>{fmtCurrency(i.amount)}</td>
                 <td style={{ fontSize: 12 }}>
                   {i.missingProject && <Chip label={t("chip_missing_project")} />}
                   {i.missingPhase && <Chip label={t("chip_missing_phase")} />}
