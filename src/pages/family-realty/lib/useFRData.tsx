@@ -426,7 +426,7 @@ async function loadAll() {
       supplierCanonical: canonical,
       type: normalizeType(r.type),
       stage: r.phase || "—",
-      amount: Math.abs(num(r.amount)),
+      amount: num(r.amount),
       status: normalizeStatus(r.payment_status, due),
       dueDate: due,
       paymentStatusRaw: (r.payment_status || "").trim(),
