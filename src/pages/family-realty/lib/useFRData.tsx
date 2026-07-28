@@ -349,7 +349,7 @@ async function loadAll() {
       supplier: canonical || "—",
       supplierCanonical: canonical,
       material: r.material || "—",
-      amount: Math.abs(num(r.amount)),
+      amount: num(r.amount),
       documentType: r.document_type || "",
       suggestion: r.address_pointer && r.address_pointer.startsWith("Sugestão IA:")
         ? r.address_pointer.replace(/^Sugestão IA:\s*/, "")
