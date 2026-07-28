@@ -328,7 +328,7 @@ async function loadAll() {
         documentType: r.document_type || "",
         invoiceDate: parseSafeDate(r.invoice_date).date,
         dueDate: docDue,
-        docTotal: Math.abs(num(r.doc_total ?? r.amount)),
+        docTotal: num(r.doc_total ?? r.amount),
         overdue: !!r.overdue,
         items: [line],
       });
