@@ -652,6 +652,7 @@ async function loadAll() {
     invoicePaidBySub,
     paymentsBySub,
     bankFeeByProject,
+    postSaleByProject,
   };
 }
 
