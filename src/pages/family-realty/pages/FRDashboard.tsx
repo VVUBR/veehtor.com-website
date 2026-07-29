@@ -16,6 +16,7 @@ import { useFRAuth } from "../auth/FRAuthProvider";
 import { FRDataProvider, useFRData } from "../lib/useFRData";
 import { useI18n, fmtCurrency } from "../lib/i18n";
 import { type ProjectStatusFilter } from "../data";
+import { BANK_FEE_PHASE, POST_SALE_PHASE, isOutOfBudget } from "../lib/phases";
 
 type TabKey = "overview" | "weekly" | "payables" | "ledger";
 const TAB_KEYS: TabKey[] = ["overview", "weekly", "payables", "ledger"];
