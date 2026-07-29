@@ -65,7 +65,7 @@ function buildGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
     for (const [ph, phLines] of byPhase.entries()) {
       const budget = phLines.reduce((s, l) => s + l.budget, 0);
       const realizado = phLines.reduce((s, l) => s + l.realizado, 0);
-      const isBankFee = ph === BANK_FEE;
+      const isBankFee = isOutOfBudget(ph);
       const balance = isBankFee ? 0 : budget - realizado;
       const pct = isBankFee ? 0 : budget > 0 ? (realizado / budget) * 100 : 0;
       phases.push({
