@@ -34,7 +34,7 @@ type ProjectGroup = {
   phases: PhaseGroup[];
 };
 
-const BANK_FEE = "Bank Fee";
+
 
 function buildGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
   const phaseOrderByProject = new Map<string, Map<string, number>>();
