@@ -190,7 +190,7 @@ function DashboardInner() {
           </div>
         )}
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
+        <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-4">
           <KpiCard
             label={job === "__ALL__" ? t("kpi_budget_total") : t("kpi_budget_job")}
             value={fmtCurrency(totalBudget)}
@@ -211,6 +211,13 @@ function DashboardInner() {
             value={fmtCurrency(bankFeeScoped)}
             sub={t("kpi_bank_fee_sub")}
           />
+          {postSaleScoped > 0 && (
+            <KpiCard
+              label={t("kpi_post_sale")}
+              value={fmtCurrency(postSaleScoped)}
+              sub={t("kpi_post_sale_sub")}
+            />
+          )}
           <KpiCard
             label={t("kpi_committed")}
             value={fmtCurrency(committedScoped)}
