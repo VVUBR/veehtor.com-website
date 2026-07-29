@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useI18n, fmtCurrency } from "../lib/i18n";
 import type { BudgetLine } from "../data";
+import { isOutOfBudget } from "../lib/phases";
 
 function pctColor(pct: number, hasBudget: boolean) {
   if (!hasBudget) return "var(--fr-muted)";
