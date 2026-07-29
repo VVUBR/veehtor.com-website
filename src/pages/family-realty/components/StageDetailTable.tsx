@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useI18n, fmtCurrency } from "../lib/i18n";
 import type { BudgetLine } from "../data";
+import { isOutOfBudget } from "../lib/phases";
 
 function pctColor(pct: number, hasBudget: boolean) {
   if (!hasBudget) return "var(--fr-muted)";
@@ -33,7 +34,7 @@ type ProjectGroup = {
   phases: PhaseGroup[];
 };
 
-const BANK_FEE = "Bank Fee";
+
 
 function buildGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
   const phaseOrderByProject = new Map<string, Map<string, number>>();
@@ -64,7 +65,7 @@ function buildGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
     for (const [ph, phLines] of byPhase.entries()) {
       const budget = phLines.reduce((s, l) => s + l.budget, 0);
       const realizado = phLines.reduce((s, l) => s + l.realizado, 0);
-      const isBankFee = ph === BANK_FEE;
+      const isBankFee = isOutOfBudget(ph);
       const balance = isBankFee ? 0 : budget - realizado;
       const pct = isBankFee ? 0 : budget > 0 ? (realizado / budget) * 100 : 0;
       phases.push({
@@ -85,7 +86,7 @@ function buildGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
 
     const budget = lines.reduce((s, l) => s + l.budget, 0);
     const realizado = lines.reduce((s, l) => s + l.realizado, 0);
-    const realizadoObra = lines.filter((l) => l.phase !== BANK_FEE).reduce((s, l) => s + l.realizado, 0);
+    const realizadoObra = lines.filter((l) => !isOutOfBudget(l.phase)).reduce((s, l) => s + l.realizado, 0);
     const balance = budget - realizadoObra;
     const pct = budget > 0 ? (realizadoObra / budget) * 100 : 0;
 
@@ -264,7 +265,7 @@ export default function StageDetailTable({ job, budgetLines }: { job: string; bu
                           {phOpen &&
                             ph.lines.map((l, i) => {
                               const noLine = l.noBudgetLine || !l.description;
-                              const isBankFee = l.phase === BANK_FEE;
+                              const isBankFee = isOutOfBudget(l.phase);
                               return (
                                 <tr key={`${phKey}-${i}`} style={{ background: "var(--fr-bg)" }}>
                                   <td></td>

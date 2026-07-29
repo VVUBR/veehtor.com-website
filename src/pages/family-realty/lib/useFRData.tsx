@@ -26,6 +26,7 @@ import {
   type PaymentRow,
   uniqueProjects,
 } from "../data";
+import { BANK_FEE_PHASE, POST_SALE_PHASE } from "./phases";
 
 
 type WeeklyRow = {
@@ -238,13 +239,17 @@ async function loadAll() {
     };
   });
 
-  // -- Bank Fee per project (derived from line view) --
-  const BANK_FEE_PHASE = "Bank Fee";
+  // -- Bank Fee / Post-Sale per project (derived from line view) --
   const bankFeeByProject = new Map<string, number>();
+  const postSaleByProject = new Map<string, number>();
   for (const r of bvaLine) {
-    if ((r.phase || "").trim() !== BANK_FEE_PHASE) continue;
+    const phase = (r.phase || "").trim();
     const p = String(r.project || "");
-    bankFeeByProject.set(p, (bankFeeByProject.get(p) || 0) + num(r.realizado));
+    if (phase === BANK_FEE_PHASE) {
+      bankFeeByProject.set(p, (bankFeeByProject.get(p) || 0) + num(r.realizado));
+    } else if (phase === POST_SALE_PHASE) {
+      postSaleByProject.set(p, (postSaleByProject.get(p) || 0) + num(r.realizado));
+    }
   }
 
   // -- Jobs --
@@ -257,7 +262,8 @@ async function loadAll() {
       const realizado = num(r.realizado);
       const name = String(r.project);
       const bankFee = bankFeeByProject.get(name) ?? 0;
-      const realizadoObra = realizado - bankFee;
+      const postSale = postSaleByProject.get(name) ?? 0;
+      const realizadoObra = realizado - bankFee - postSale;
       return {
         name,
         budget,
@@ -265,6 +271,7 @@ async function loadAll() {
         balance: r.balance != null ? num(r.balance) : budget - realizado,
         pctConsumed: r.pct_consumed != null ? num(r.pct_consumed) : budget > 0 ? (realizado / budget) * 100 : 0,
         bankFee,
+        postSale,
         realizadoObra,
         balanceObra: budget - realizadoObra,
         pctConsumedObra: budget > 0 ? (realizadoObra / budget) * 100 : 0,
@@ -645,6 +652,7 @@ async function loadAll() {
     invoicePaidBySub,
     paymentsBySub,
     bankFeeByProject,
+    postSaleByProject,
   };
 }
 
@@ -659,6 +667,7 @@ const empty: FRData = {
   projects: [], projectStatusMap: new Map(),
   invoicePaidBySub: new Map(), paymentsBySub: new Map(),
   bankFeeByProject: new Map(),
+  postSaleByProject: new Map(),
 };
 
 

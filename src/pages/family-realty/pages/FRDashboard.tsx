@@ -16,6 +16,7 @@ import { useFRAuth } from "../auth/FRAuthProvider";
 import { FRDataProvider, useFRData } from "../lib/useFRData";
 import { useI18n, fmtCurrency } from "../lib/i18n";
 import { type ProjectStatusFilter } from "../data";
+import { BANK_FEE_PHASE, POST_SALE_PHASE, isOutOfBudget } from "../lib/phases";
 
 type TabKey = "overview" | "weekly" | "payables" | "ledger";
 const TAB_KEYS: TabKey[] = ["overview", "weekly", "payables", "ledger"];
@@ -101,12 +102,14 @@ function DashboardInner() {
     () => (job === "__ALL__" ? jobsMetaFiltered : jobsMetaFiltered.filter((j) => j.name === job)),
     [job, jobsMetaFiltered],
   );
-  const unassignedObra = data.unassignedItems.filter((i) => i.phase !== "Bank Fee").reduce((s, i) => s + i.amount, 0);
-  const unassignedBankFee = data.unassignedItems.filter((i) => i.phase === "Bank Fee").reduce((s, i) => s + i.amount, 0);
+  const unassignedObra = data.unassignedItems.filter((i) => !isOutOfBudget(i.phase)).reduce((s, i) => s + i.amount, 0);
+  const unassignedBankFee = data.unassignedItems.filter((i) => i.phase === BANK_FEE_PHASE).reduce((s, i) => s + i.amount, 0);
+  const unassignedPostSale = data.unassignedItems.filter((i) => i.phase === POST_SALE_PHASE).reduce((s, i) => s + i.amount, 0);
   const totalBudget = jobsScope.reduce((s, j) => s + j.budget, 0);
   const jobsRealizado = jobsScope.reduce((s, j) => s + j.realizadoObra, 0);
   const totalRealizado = jobsRealizado + (job === "__ALL__" && unassignedCounts ? unassignedObra : 0);
   const bankFeeScoped = jobsScope.reduce((s, j) => s + j.bankFee, 0) + (job === "__ALL__" && unassignedCounts ? unassignedBankFee : 0);
+  const postSaleScoped = jobsScope.reduce((s, j) => s + j.postSale, 0) + (job === "__ALL__" && unassignedCounts ? unassignedPostSale : 0);
   const pct = totalBudget > 0 ? (totalRealizado / totalBudget) * 100 : 0;
   const realizadoTone = pct > 100 ? "red" : pct >= 90 ? "gold" : "green";
   const activeCount = jobsScope.filter((j) => j.active).length;
@@ -187,7 +190,7 @@ function DashboardInner() {
           </div>
         )}
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
+        <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-4">
           <KpiCard
             label={job === "__ALL__" ? t("kpi_budget_total") : t("kpi_budget_job")}
             value={fmtCurrency(totalBudget)}
@@ -208,6 +211,13 @@ function DashboardInner() {
             value={fmtCurrency(bankFeeScoped)}
             sub={t("kpi_bank_fee_sub")}
           />
+          {postSaleScoped > 0 && (
+            <KpiCard
+              label={t("kpi_post_sale")}
+              value={fmtCurrency(postSaleScoped)}
+              sub={t("kpi_post_sale_sub")}
+            />
+          )}
           <KpiCard
             label={t("kpi_committed")}
             value={fmtCurrency(committedScoped)}
