@@ -86,7 +86,7 @@ function buildGroups(budgetLines: BudgetLine[]): ProjectGroup[] {
 
     const budget = lines.reduce((s, l) => s + l.budget, 0);
     const realizado = lines.reduce((s, l) => s + l.realizado, 0);
-    const realizadoObra = lines.filter((l) => l.phase !== BANK_FEE).reduce((s, l) => s + l.realizado, 0);
+    const realizadoObra = lines.filter((l) => !isOutOfBudget(l.phase)).reduce((s, l) => s + l.realizado, 0);
     const balance = budget - realizadoObra;
     const pct = budget > 0 ? (realizadoObra / budget) * 100 : 0;
 
