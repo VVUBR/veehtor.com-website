@@ -97,6 +97,7 @@ export type JobMeta = {
   balance: number;
   pctConsumed: number;
   bankFee: number;
+  postSale: number;
   realizadoObra: number;
   balanceObra: number;
   pctConsumedObra: number;
