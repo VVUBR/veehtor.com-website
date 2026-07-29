@@ -265,7 +265,7 @@ export default function StageDetailTable({ job, budgetLines }: { job: string; bu
                           {phOpen &&
                             ph.lines.map((l, i) => {
                               const noLine = l.noBudgetLine || !l.description;
-                              const isBankFee = l.phase === BANK_FEE;
+                              const isBankFee = isOutOfBudget(l.phase);
                               return (
                                 <tr key={`${phKey}-${i}`} style={{ background: "var(--fr-bg)" }}>
                                   <td></td>
