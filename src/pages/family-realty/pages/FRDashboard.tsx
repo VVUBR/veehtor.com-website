@@ -102,12 +102,14 @@ function DashboardInner() {
     () => (job === "__ALL__" ? jobsMetaFiltered : jobsMetaFiltered.filter((j) => j.name === job)),
     [job, jobsMetaFiltered],
   );
-  const unassignedObra = data.unassignedItems.filter((i) => i.phase !== "Bank Fee").reduce((s, i) => s + i.amount, 0);
-  const unassignedBankFee = data.unassignedItems.filter((i) => i.phase === "Bank Fee").reduce((s, i) => s + i.amount, 0);
+  const unassignedObra = data.unassignedItems.filter((i) => !isOutOfBudget(i.phase)).reduce((s, i) => s + i.amount, 0);
+  const unassignedBankFee = data.unassignedItems.filter((i) => i.phase === BANK_FEE_PHASE).reduce((s, i) => s + i.amount, 0);
+  const unassignedPostSale = data.unassignedItems.filter((i) => i.phase === POST_SALE_PHASE).reduce((s, i) => s + i.amount, 0);
   const totalBudget = jobsScope.reduce((s, j) => s + j.budget, 0);
   const jobsRealizado = jobsScope.reduce((s, j) => s + j.realizadoObra, 0);
   const totalRealizado = jobsRealizado + (job === "__ALL__" && unassignedCounts ? unassignedObra : 0);
   const bankFeeScoped = jobsScope.reduce((s, j) => s + j.bankFee, 0) + (job === "__ALL__" && unassignedCounts ? unassignedBankFee : 0);
+  const postSaleScoped = jobsScope.reduce((s, j) => s + j.postSale, 0) + (job === "__ALL__" && unassignedCounts ? unassignedPostSale : 0);
   const pct = totalBudget > 0 ? (totalRealizado / totalBudget) * 100 : 0;
   const realizadoTone = pct > 100 ? "red" : pct >= 90 ? "gold" : "green";
   const activeCount = jobsScope.filter((j) => j.active).length;
