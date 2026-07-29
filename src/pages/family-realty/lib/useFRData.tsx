@@ -667,6 +667,7 @@ const empty: FRData = {
   projects: [], projectStatusMap: new Map(),
   invoicePaidBySub: new Map(), paymentsBySub: new Map(),
   bankFeeByProject: new Map(),
+  postSaleByProject: new Map(),
 };
 
 
