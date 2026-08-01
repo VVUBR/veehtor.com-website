@@ -27,6 +27,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <PageViewTracker />
         <MapDialogProvider>
           <Routes>
             <Route path="/" element={<Index />} />
