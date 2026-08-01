@@ -10,7 +10,7 @@ export function usePageViews(): void {
       try {
         if (typeof window.gtag === "function") {
           window.gtag("event", "page_view", {
-            page_path: location.pathname + location.search + location.hash,
+            page_path: location.pathname + location.search,
             page_location: window.location.href,
             page_title: document.title,
           });
@@ -20,10 +20,11 @@ export function usePageViews(): void {
       }
     }, 50);
     return () => window.clearTimeout(id);
-  }, [location.pathname, location.search, location.hash]);
+  }, [location.pathname, location.search]);
 }
 
 export default function PageViewTracker(): null {
   usePageViews();
   return null;
 }
+
