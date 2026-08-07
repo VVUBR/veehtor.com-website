@@ -8,8 +8,8 @@ export interface MapDialogHandle {
 }
 
 const WA_NUMBER = "5511973022058";
-const SMS_NUMBER = "+17815449279";
-const SMS_DISPLAY = "(781) 544-9279";
+const SMS_NUMBER = "+17816559279";
+const SMS_DISPLAY = "(781) 655-9279";
 const LEAD_MAILTO = "vitor@veehtor.com";
 
 type Market = "br" | "us";
