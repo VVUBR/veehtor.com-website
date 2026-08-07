@@ -222,8 +222,8 @@ const pt: HomeContentBundle = {
     eyebrow: "RAIO-X DA OPERAÇÃO",
     h2: "Onde sua empresa está perdendo dinheiro?",
     body: "Descubra quais processos estão consumindo tempo, margem ou receita.",
-    cta: "Fazer meu Raio-X →",
-    heroCta: "Fazer o Raio-X da operação →",
+    cta: "Fazer meu Raio-X",
+    heroCta: "Fazer o Raio-X da operação",
   },
   closing: {
     h2: "Qual processo da sua operação custa mais do que deveria?",
@@ -358,8 +358,8 @@ const en: HomeContentBundle = {
     eyebrow: "OPERATIONS X-RAY",
     h2: "Where is your business leaking money?",
     body: "Find which processes may be costing you time, margin, or revenue.",
-    cta: "Run my Operations X-Ray →",
-    heroCta: "Run the Operations X-Ray →",
+    cta: "Run my Operations X-Ray",
+    heroCta: "Run the Operations X-Ray",
   },
   closing: {
     h2: "Which process in your operation costs more than it should?",
