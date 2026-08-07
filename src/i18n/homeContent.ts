@@ -246,7 +246,7 @@ const en: HomeContentBundle = {
     opportunities: "Opportunities",
     cases: "Cases",
     about: "About",
-    cta: "Review my process →",
+    cta: "Review my process",
     logoAria: "v.AI",
     mainAria: "Main navigation",
     openMenu: "Open menu",
@@ -259,7 +259,7 @@ const en: HomeContentBundle = {
     body:
       "Automation, internal systems and AI agents with measurable impact.\n\nWhen a process drains revenue, margin or team hours, we turn it into a system. We build the smallest solution that can fix the bottleneck and prove its value.",
     qual: "Built for companies with recurring processes, multiple people involved and measurable financial impact.",
-    ctaPrimary: "Review my process →",
+    ctaPrimary: "Review my process\u00a0",
     ctaSecondary: "See delivered solutions",
     micro: "30 minutes. Straight into the process. No generic pitch.",
     mapAria: "A sales flow map where a revenue leak is identified and closed by v.AI.",
@@ -365,7 +365,7 @@ const en: HomeContentBundle = {
     h2: "Which process in your operation costs more than it should?",
     body:
       "Show us the flow. We identify where the bottleneck is, which number needs to move, and whether it's actually worth building anything.",
-    cta: "Review my process →",
+    cta: "Review my process\u00a0",
     micro: "30 minutes. Straight into the process. No generic pitch.",
     contactAria: "Contact",
     agora: "Now, v.AI.",
