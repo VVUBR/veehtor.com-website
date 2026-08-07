@@ -18,6 +18,7 @@ import Adcole from "./pages/Adcole";
 import Cervejarias from "./pages/Cervejarias";
 import CaseStudies from "./pages/CaseStudies";
 import CaseStudyDetail from "./pages/CaseStudyDetail";
+import RaioX from "./pages/RaioX";
 
 const queryClient = new QueryClient();
 
