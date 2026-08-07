@@ -83,6 +83,13 @@ export interface HomeContentBundle {
     body: string;
     quote: string;
   };
+  xray: {
+    eyebrow: string;
+    h2: string;
+    body: string;
+    cta: string;
+    heroCta: string;
+  };
   closing: {
     h2: string;
     body: string;
@@ -210,6 +217,13 @@ const pt: HomeContentBundle = {
     body:
       "Começo pedindo para alguém me mostrar como o trabalho acontece hoje. Onde a planilha entra, quem precisa cobrar quem e em qual etapa o cliente começa a esperar, onde trava. A tecnologia vem depois.",
     quote: "\"Se uma planilha resolve, eu não vou te vender um agente.\"",
+  },
+  xray: {
+    eyebrow: "RAIO-X DA OPERAÇÃO",
+    h2: "Onde sua empresa está perdendo dinheiro?",
+    body: "Descubra quais processos estão consumindo tempo, margem ou receita.",
+    cta: "Fazer meu Raio-X →",
+    heroCta: "Fazer o Raio-X da operação →",
   },
   closing: {
     h2: "Qual processo da sua operação custa mais do que deveria?",
@@ -339,6 +353,13 @@ const en: HomeContentBundle = {
     body:
       "I get in to understand how the operation actually works, not how it looks on the org chart. I map the process, find the bottleneck and work with the team until the system becomes routine.",
     quote: "\"If a spreadsheet solves it, I'm not going to sell you an agent.\"",
+  },
+  xray: {
+    eyebrow: "OPERATIONS X-RAY",
+    h2: "Where is your business leaking money?",
+    body: "Find which processes may be costing you time, margin, or revenue.",
+    cta: "Run my Operations X-Ray →",
+    heroCta: "Run the Operations X-Ray →",
   },
   closing: {
     h2: "Which process in your operation costs more than it should?",

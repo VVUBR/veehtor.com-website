@@ -9,6 +9,7 @@ import { useHomeContent } from "@/i18n/homeContent";
 import { track } from "@/lib/analytics";
 import vitorAsset from "@/assets/vitor-ungari.jpg.asset.json";
 import "@/styles/home.css";
+import "@/styles/raiox.css";
 
 function useCasesInView() {
   useEffect(() => {
@@ -92,7 +93,11 @@ export default function Index() {
                   <button className="btn btn-primary" onClick={openMap("hero")}>{C.hero.ctaPrimary}</button>
                   <a className="btn btn-ghost" href="/case-studies" onClick={goCases("hero")}>{C.hero.ctaSecondary}</a>
                 </div>
-                <p className="hero-micro">{C.hero.micro}</p>
+                <p className="hero-micro">
+                  {C.hero.micro}
+                  <br />
+                  <Link to="/raio-x" style={{ textDecoration: "underline", textUnderlineOffset: "3px" }}>{C.xray.heroCta}</Link>
+                </p>
               </div>
 
               <div className="opmap-wrap">
@@ -164,6 +169,19 @@ export default function Index() {
                 {C.proof.link} <span className="arr">→</span>
               </a>
               <span className="proof-note">{C.proof.note}</span>
+            </div>
+          </div>
+        </section>
+
+        <section aria-label={C.xray.eyebrow} style={{ paddingTop: 0 }}>
+          <div className="wrap">
+            <div className="xray-band reveal">
+              <div>
+                <div className="eyebrow">{C.xray.eyebrow}</div>
+                <h2>{C.xray.h2}</h2>
+                <p>{C.xray.body}</p>
+              </div>
+              <Link className="btn btn-ink" to="/raio-x">{C.xray.cta}</Link>
             </div>
           </div>
         </section>
