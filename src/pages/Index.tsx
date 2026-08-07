@@ -92,7 +92,11 @@ export default function Index() {
                   <button className="btn btn-primary" onClick={openMap("hero")}>{C.hero.ctaPrimary}</button>
                   <a className="btn btn-ghost" href="/case-studies" onClick={goCases("hero")}>{C.hero.ctaSecondary}</a>
                 </div>
-                <p className="hero-micro">{C.hero.micro}</p>
+                <p className="hero-micro">
+                  {C.hero.micro}
+                  <br />
+                  <Link to="/raio-x" style={{ textDecoration: "underline", textUnderlineOffset: "3px" }}>{C.xray.heroCta}</Link>
+                </p>
               </div>
 
               <div className="opmap-wrap">
