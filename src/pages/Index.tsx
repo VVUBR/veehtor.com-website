@@ -172,6 +172,19 @@ export default function Index() {
           </div>
         </section>
 
+        <section aria-label={C.xray.eyebrow} style={{ paddingTop: 0 }}>
+          <div className="wrap">
+            <div className="xray-band reveal">
+              <div>
+                <div className="eyebrow">{C.xray.eyebrow}</div>
+                <h2>{C.xray.h2}</h2>
+                <p>{C.xray.body}</p>
+              </div>
+              <Link className="btn btn-ink" to="/raio-x">{C.xray.cta}</Link>
+            </div>
+          </div>
+        </section>
+
 
         <div className="dark">
           <section aria-label={C.rules.eyebrow}>
