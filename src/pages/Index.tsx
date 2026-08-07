@@ -9,6 +9,7 @@ import { useHomeContent } from "@/i18n/homeContent";
 import { track } from "@/lib/analytics";
 import vitorAsset from "@/assets/vitor-ungari.jpg.asset.json";
 import "@/styles/home.css";
+import "@/styles/raiox.css";
 
 function useCasesInView() {
   useEffect(() => {
