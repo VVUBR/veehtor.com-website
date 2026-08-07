@@ -14,6 +14,68 @@ export type Database = {
   }
   public: {
     Tables: {
+      process_lead_events: {
+        Row: {
+          created_at: string
+          event: string
+          id: string
+          lead_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event: string
+          id?: string
+          lead_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event?: string
+          id?: string
+          lead_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "process_lead_events_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "process_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      process_leads: {
+        Row: {
+          company: string | null
+          contact: string | null
+          created_at: string
+          id: string
+          impact: string | null
+          market: string
+          name: string | null
+          process: string | null
+        }
+        Insert: {
+          company?: string | null
+          contact?: string | null
+          created_at?: string
+          id?: string
+          impact?: string | null
+          market: string
+          name?: string | null
+          process?: string | null
+        }
+        Update: {
+          company?: string | null
+          contact?: string | null
+          created_at?: string
+          id?: string
+          impact?: string | null
+          market?: string
+          name?: string | null
+          process?: string | null
+        }
+        Relationships: []
+      }
       raiox_leads: {
         Row: {
           area: string | null
