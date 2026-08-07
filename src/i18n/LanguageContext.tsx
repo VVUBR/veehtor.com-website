@@ -89,7 +89,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const t = translations[language];
-    document.title = t.meta.title;
+    const onRaioX = typeof window !== "undefined" && window.location.pathname.startsWith("/raio-x");
+    if (onRaioX) {
+      document.title = language === "pt" ? "Veehtor AI · Raio-X da Operação" : "Veehtor AI · Operations X-Ray";
+    } else {
+      document.title = t.meta.title;
+    }
     setMetaDescription(t.meta.description);
     document.documentElement.lang = language === "pt" ? "pt-BR" : "en-US";
   }, [language]);
