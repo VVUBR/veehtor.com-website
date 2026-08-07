@@ -1,0 +1,1 @@
+DELETE FROM public.process_leads WHERE process = 'TESTE notificacao';
