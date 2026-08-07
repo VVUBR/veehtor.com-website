@@ -218,6 +218,13 @@ const pt: HomeContentBundle = {
       "Começo pedindo para alguém me mostrar como o trabalho acontece hoje. Onde a planilha entra, quem precisa cobrar quem e em qual etapa o cliente começa a esperar, onde trava. A tecnologia vem depois.",
     quote: "\"Se uma planilha resolve, eu não vou te vender um agente.\"",
   },
+  xray: {
+    eyebrow: "RAIO-X DA OPERAÇÃO",
+    h2: "Onde sua empresa está perdendo dinheiro?",
+    body: "Descubra quais processos estão consumindo tempo, margem ou receita.",
+    cta: "Fazer meu Raio-X →",
+    heroCta: "Fazer o Raio-X da operação →",
+  },
   closing: {
     h2: "Qual processo da sua operação custa mais do que deveria?",
     body:
