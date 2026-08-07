@@ -110,7 +110,7 @@ const pt: HomeContentBundle = {
     opportunities: "Oportunidades",
     cases: "Cases",
     about: "Sobre",
-    cta: "Analisar meu processo →",
+    cta: "Analisar meu processo",
     logoAria: "v.AI",
     mainAria: "Navegação principal",
     openMenu: "Abrir menu",
@@ -123,7 +123,7 @@ const pt: HomeContentBundle = {
     body:
       "Automação, sistemas internos e agentes de IA com impacto mensurável.\n\nSe um processo drena receita, margem ou horas do time, ele vira sistema. Construímos a menor solução capaz de corrigir o gargalo e provar valor.",
     qual: "Para empresas com processos recorrentes, múltiplas pessoas envolvidas e impacto financeiro mensurável.",
-    ctaPrimary: "Analisar meu processo →",
+    ctaPrimary: "Analisar meu processo",
     ctaSecondary: "Ver soluções entregues",
     micro: "30 minutos. Direto no processo. Sem apresentação genérica.",
     mapAria: "Mapa de um fluxo de vendas em que um vazamento de receita é identificado e fechado pela v.AI.",
@@ -229,7 +229,7 @@ const pt: HomeContentBundle = {
     h2: "Qual processo da sua operação custa mais do que deveria?",
     body:
       "Mostre o fluxo. Identificamos onde está o gargalo, qual número precisa mudar e se realmente vale construir alguma coisa.",
-    cta: "Analisar meu processo →",
+    cta: "Analisar meu processo",
     micro: "30 minutos. Direto no processo. Sem apresentação genérica.",
     contactAria: "Contato",
     agora: "Agora v.AI.",
