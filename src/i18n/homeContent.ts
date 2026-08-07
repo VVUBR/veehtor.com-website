@@ -354,6 +354,13 @@ const en: HomeContentBundle = {
       "I get in to understand how the operation actually works, not how it looks on the org chart. I map the process, find the bottleneck and work with the team until the system becomes routine.",
     quote: "\"If a spreadsheet solves it, I'm not going to sell you an agent.\"",
   },
+  xray: {
+    eyebrow: "OPERATIONS X-RAY",
+    h2: "Where is your business leaking money?",
+    body: "Find which processes may be costing you time, margin, or revenue.",
+    cta: "Run my Operations X-Ray →",
+    heroCta: "Run the Operations X-Ray →",
+  },
   closing: {
     h2: "Which process in your operation costs more than it should?",
     body:
