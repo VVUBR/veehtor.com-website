@@ -83,6 +83,13 @@ export interface HomeContentBundle {
     body: string;
     quote: string;
   };
+  xray: {
+    eyebrow: string;
+    h2: string;
+    body: string;
+    cta: string;
+    heroCta: string;
+  };
   closing: {
     h2: string;
     body: string;
