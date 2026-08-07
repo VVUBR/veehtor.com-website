@@ -214,7 +214,7 @@ const pt: SiteContentBundle = {
     closingH2a: "Qual processo da sua operação",
     closingH2b: "custa mais do que deveria?",
     closingBody: "30 minutos. Direto no processo. Sem apresentação genérica.",
-    closingCta: "Analisar meu processo →",
+    closingCta: "Analisar meu processo",
   },
   caseDetailUI: {
     breadcrumbRoot: "Cases",
@@ -240,7 +240,7 @@ const pt: SiteContentBundle = {
     closingH2a: "Qual processo da sua operação",
     closingH2b: "custa mais do que deveria?",
     closingBody: "30 minutos. Direto no processo. Sem apresentação genérica.",
-    closingCta: "Analisar meu processo →",
+    closingCta: "Analisar meu processo",
   },
   notFound: {
     metaTitle: "Página não encontrada | Veehtor AI",
