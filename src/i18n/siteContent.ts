@@ -214,7 +214,7 @@ const pt: SiteContentBundle = {
     closingH2a: "Qual processo da sua operação",
     closingH2b: "custa mais do que deveria?",
     closingBody: "30 minutos. Direto no processo. Sem apresentação genérica.",
-    closingCta: "Mapear meu processo →",
+    closingCta: "Analisar meu processo →",
   },
   caseDetailUI: {
     breadcrumbRoot: "Cases",
@@ -240,7 +240,7 @@ const pt: SiteContentBundle = {
     closingH2a: "Qual processo da sua operação",
     closingH2b: "custa mais do que deveria?",
     closingBody: "30 minutos. Direto no processo. Sem apresentação genérica.",
-    closingCta: "Mapear meu processo →",
+    closingCta: "Analisar meu processo →",
   },
   notFound: {
     metaTitle: "Página não encontrada | Veehtor AI",
@@ -587,8 +587,8 @@ const en: SiteContentBundle = {
     closingEyebrow: "Next step",
     closingH2a: "Which process in your operation",
     closingH2b: "costs more than it should?",
-    closingBody: "30 minutes. Straight to the process. No generic pitch.",
-    closingCta: "Map my process →",
+    closingBody: "30 minutes. Straight into the process. No generic pitch.",
+    closingCta: "Review my process →",
   },
   caseDetailUI: {
     breadcrumbRoot: "Cases",
@@ -613,8 +613,8 @@ const en: SiteContentBundle = {
     closingEyebrow: "Next step",
     closingH2a: "Which process in your operation",
     closingH2b: "costs more than it should?",
-    closingBody: "30 minutes. Straight to the process. No generic pitch.",
-    closingCta: "Map my process →",
+    closingBody: "30 minutes. Straight into the process. No generic pitch.",
+    closingCta: "Review my process →",
   },
   notFound: {
     metaTitle: "Page not found | Veehtor AI",

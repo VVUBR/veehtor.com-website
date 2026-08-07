@@ -110,7 +110,7 @@ const pt: HomeContentBundle = {
     opportunities: "Oportunidades",
     cases: "Cases",
     about: "Sobre",
-    cta: "Mapear meu processo",
+    cta: "Analisar meu processo →",
     logoAria: "v.AI",
     mainAria: "Navegação principal",
     openMenu: "Abrir menu",
@@ -123,7 +123,7 @@ const pt: HomeContentBundle = {
     body:
       "Automação, sistemas internos e agentes de IA com impacto mensurável.\n\nSe um processo drena receita, margem ou horas do time, ele vira sistema. Construímos a menor solução capaz de corrigir o gargalo e provar valor.",
     qual: "Para empresas com processos recorrentes, múltiplas pessoas envolvidas e impacto financeiro mensurável.",
-    ctaPrimary: "Mapear meu processo",
+    ctaPrimary: "Analisar meu processo →",
     ctaSecondary: "Ver soluções entregues",
     micro: "30 minutos. Direto no processo. Sem apresentação genérica.",
     mapAria: "Mapa de um fluxo de vendas em que um vazamento de receita é identificado e fechado pela v.AI.",
@@ -229,7 +229,7 @@ const pt: HomeContentBundle = {
     h2: "Qual processo da sua operação custa mais do que deveria?",
     body:
       "Mostre o fluxo. Identificamos onde está o gargalo, qual número precisa mudar e se realmente vale construir alguma coisa.",
-    cta: "Mapear meu processo",
+    cta: "Analisar meu processo →",
     micro: "30 minutos. Direto no processo. Sem apresentação genérica.",
     contactAria: "Contato",
     agora: "Agora v.AI.",
@@ -246,7 +246,7 @@ const en: HomeContentBundle = {
     opportunities: "Opportunities",
     cases: "Cases",
     about: "About",
-    cta: "Map my process",
+    cta: "Review my process →",
     logoAria: "v.AI",
     mainAria: "Main navigation",
     openMenu: "Open menu",
@@ -259,9 +259,9 @@ const en: HomeContentBundle = {
     body:
       "Automation, internal systems and AI agents with measurable impact.\n\nWhen a process drains revenue, margin or team hours, we turn it into a system. We build the smallest solution that can fix the bottleneck and prove its value.",
     qual: "Built for companies with recurring processes, multiple people involved and measurable financial impact.",
-    ctaPrimary: "Map my process",
+    ctaPrimary: "Review my process →",
     ctaSecondary: "See delivered solutions",
-    micro: "30 minutes. Straight to the process. No generic pitch.",
+    micro: "30 minutes. Straight into the process. No generic pitch.",
     mapAria: "A sales flow map where a revenue leak is identified and closed by v.AI.",
     legend: [
       { color: "#111828", label: "process" },
@@ -365,8 +365,8 @@ const en: HomeContentBundle = {
     h2: "Which process in your operation costs more than it should?",
     body:
       "Show us the flow. We identify where the bottleneck is, which number needs to move, and whether it's actually worth building anything.",
-    cta: "Map my process",
-    micro: "30 minutes. Straight to the process. No generic pitch.",
+    cta: "Review my process →",
+    micro: "30 minutes. Straight into the process. No generic pitch.",
     contactAria: "Contact",
     agora: "Now, v.AI.",
   },
