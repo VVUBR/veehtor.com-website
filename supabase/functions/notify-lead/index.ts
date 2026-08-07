@@ -1,27 +1,22 @@
 // notify-lead
 //
 // Triggered by a database webhook AFTER INSERT on public.raiox_leads and
-// public.process_leads. Sends an internal notification email for every new
-// lead, plus an English auto-reply for X-Ray leads that chose followup = 'email'.
+// public.process_leads. Sends a single internal notification email to
+// vitor@veehtor.com for every new lead.
 //
 // MANUAL SETUP STILL REQUIRED BY THE PROJECT OWNER:
 //   1. Create an API key in Resend and save it as the secret RESEND_API_KEY.
-//   2. Verify the domain veehtor.com in Resend and set the secret NOTIFY_FROM
-//      (e.g. "Veehtor AI <leads@veehtor.com>") so the auto-reply to the lead
-//      can be delivered. Without a verified domain, Resend only delivers to
-//      the account owner from onboarding@resend.dev.
 //
-// TODO (future): for followup = 'text' leads we intentionally do NOT send an
-// automated SMS. Commercial SMS in the US requires A2P 10DLC registration.
-// At the current volume the team replies manually from the internal alert.
-// Twilio would be the natural evolution once 10DLC is registered.
+// OPTIONAL: verify the domain veehtor.com in Resend and set the secret
+// NOTIFY_FROM (e.g. "Veehtor AI <leads@veehtor.com>") to replace the
+// default onboarding@resend.dev sender. Without a verified domain, Resend
+// only delivers to the account owner from onboarding@resend.dev.
 
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
 const NOTIFY_FROM = Deno.env.get('NOTIFY_FROM') ?? 'onboarding@resend.dev'
 const INTERNAL_TO = 'vitor@veehtor.com'
-const CALENDAR_LINK = 'https://cal.com/veehtorai'
 
 type Row = Record<string, unknown>
 
