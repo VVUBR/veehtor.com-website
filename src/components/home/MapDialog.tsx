@@ -208,7 +208,11 @@ const MapDialog = forwardRef<MapDialogHandle>((_props, ref) => {
     setSubmitting(true);
     if (liveRef.current) liveRef.current.textContent = S.liveSending;
 
+    const newId = (typeof crypto !== "undefined" && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : String(Date.now());
     const payload = {
+      id: newId,
       market,
       process: process.trim(),
       impact,
@@ -217,11 +221,7 @@ const MapDialog = forwardRef<MapDialogHandle>((_props, ref) => {
       contact: c,
     };
 
-    const { data, error } = await supabase
-      .from("process_leads")
-      .insert(payload)
-      .select("id")
-      .maybeSingle();
+    const { error } = await supabase.from("process_leads").insert(payload);
 
     if (error) {
       const body = [
@@ -240,8 +240,8 @@ const MapDialog = forwardRef<MapDialogHandle>((_props, ref) => {
       } catch {
         /* nunca bloquear a confirmação */
       }
-    } else if (data?.id) {
-      setLeadId(data.id);
+    } else {
+      setLeadId(newId);
     }
 
     track("form_submitted", { market });
