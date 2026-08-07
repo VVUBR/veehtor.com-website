@@ -14,7 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      raiox_leads: {
+        Row: {
+          area: string | null
+          contact: string | null
+          created_at: string
+          followup: string | null
+          id: string
+          impact: string | null
+          market: string | null
+          name: string | null
+          priority: string | null
+          situation: string | null
+          size: string | null
+        }
+        Insert: {
+          area?: string | null
+          contact?: string | null
+          created_at?: string
+          followup?: string | null
+          id?: string
+          impact?: string | null
+          market?: string | null
+          name?: string | null
+          priority?: string | null
+          situation?: string | null
+          size?: string | null
+        }
+        Update: {
+          area?: string | null
+          contact?: string | null
+          created_at?: string
+          followup?: string | null
+          id?: string
+          impact?: string | null
+          market?: string | null
+          name?: string | null
+          priority?: string | null
+          situation?: string | null
+          size?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
