@@ -81,32 +81,6 @@ function buildInternal(table: string, row: Row) {
   return { subject, body }
 }
 
-function buildAutoReply(row: Row) {
-  const summary: Array<[string, string | null]> = [
-    ['Team size', val(row.size)],
-    ['Area', val(row.area)],
-    ['Situation', val(row.situation)],
-    ['Estimated impact', val(row.impact)],
-    ['Priority', val(row.priority)],
-  ].filter(([, v]) => v !== null) as Array<[string, string | null]>
-
-  const text = [
-    val(row.name) ? `Hi ${val(row.name)},` : 'Hi,',
-    '',
-    'We received your Operations X-Ray. Here is what you submitted:',
-    '',
-    ...summary.map(([k, v]) => `${k}: ${v}`),
-    '',
-    'Our team will review it and get back to you within one business day.',
-    '',
-    `Prefer to talk sooner? Grab 30 minutes: ${CALENDAR_LINK}`,
-    '',
-    'Veehtor AI · veehtor.com',
-  ].join('\n')
-
-  return { subject: 'Your Operations X-Ray', text }
-}
-
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -135,17 +109,6 @@ Deno.serve(async (req) => {
 
     const { subject, body } = buildInternal(table, row)
     await sendEmail(INTERNAL_TO, subject, body)
-
-    if (table === 'raiox_leads' && String(row.followup ?? '') === 'email') {
-      const contact = val(row.contact)
-      if (contact && contact.includes('@')) {
-        const reply = buildAutoReply(row)
-        // Fails silently (logged) when the domain is not yet verified in Resend.
-        await sendEmail(contact, reply.subject, reply.text)
-      } else {
-        console.log('notify-lead: followup=email but contact is not an email address')
-      }
-    }
 
     return json({ ok: true })
   } catch (e) {
