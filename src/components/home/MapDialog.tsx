@@ -7,10 +7,9 @@ export interface MapDialogHandle {
   open: (source: string, opener: HTMLElement | null) => void;
 }
 
-const CALENDAR_LINK = "https://cal.com/veehtorai";
 const WA_NUMBER = "5511973022058";
-const SMS_NUMBER = "+17816559279";
-const SMS_DISPLAY = "+1 (781) 655-9279";
+const SMS_NUMBER = "+17815449279";
+const SMS_DISPLAY = "(781) 544-9279";
 const LEAD_MAILTO = "vitor@veehtor.com";
 
 type Market = "br" | "us";
@@ -50,7 +49,6 @@ const COPY = {
     successBody: "Nosso time vai revisar o processo e entrar em contato com você.",
     successAsk: "Quer falar agora?",
     ctaNow: "Continuar no WhatsApp →",
-    ctaSchedule: "Agendar 30 minutos →",
     smsHint: "",
   },
   us: {
@@ -87,7 +85,6 @@ const COPY = {
     successBody: "Our team will review your process and follow up.",
     successAsk: "Want to keep the conversation going now?",
     ctaNow: "Text us →",
-    ctaSchedule: "Schedule 30 minutes →",
     smsHint: "Text us at",
   },
 } as const;
@@ -180,7 +177,7 @@ const MapDialog = forwardRef<MapDialogHandle>((_props, ref) => {
     }
   };
 
-  const logEvent = (event: "whatsapp" | "text" | "schedule") => {
+  const logEvent = (event: "whatsapp" | "text") => {
     track("accelerator_clicked", { event, market });
     if (!leadId) return;
     void supabase.from("process_lead_events").insert({ lead_id: leadId, event });
@@ -263,7 +260,7 @@ const MapDialog = forwardRef<MapDialogHandle>((_props, ref) => {
         "Gostaria de conversar sobre ele.",
       ].join("\n"),
     );
-  const smsBody = `Hi! I just submitted a process for review on the Veehtor site. Process: ${summary}. Impact: ${impact ?? ""}. I'd like to talk about it.`;
+  const smsBody = "Hi Vitor, I want to know where to best apply AI in my business";
   const smsHref = `sms:${SMS_NUMBER}?&body=${encodeURIComponent(smsBody)}`;
   const mobile = isMobileDevice();
 
@@ -406,15 +403,6 @@ const MapDialog = forwardRef<MapDialogHandle>((_props, ref) => {
                 {S.smsHint} {SMS_DISPLAY}
               </a>
             )}
-            <a
-              className="btn btn-outline"
-              href={CALENDAR_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => logEvent("schedule")}
-            >
-              {S.ctaSchedule}
-            </a>
           </div>
         </div>
       </div>
