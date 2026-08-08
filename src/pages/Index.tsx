@@ -96,7 +96,7 @@ export default function Index() {
                 <p className="hero-micro">
                   {C.hero.micro}
                   <br />
-                  <Link to="/raio-x" style={{ textDecoration: "underline", textUnderlineOffset: "3px" }}>{C.xray.heroCta}</Link>
+                  <Link to="/raio-x" style={{ textDecoration: "underline", textUnderlineOffset: "3px" }}><b>{C.xray.heroCta}</b></Link>
                 </p>
               </div>
 
