@@ -451,13 +451,6 @@ export default function RaioX() {
                   </button>
                 ))}
               </div>
-              {porte === "a20" && (
-                <div className="note">
-                  <b>{t.noteb}</b>
-                  <span>{t.notes}</span>
-                  <i>{t.notei}</i>
-                </div>
-              )}
             </div>
 
             <div className="qblock">
@@ -583,7 +576,7 @@ export default function RaioX() {
                   </div>
 
                   <div className="cta">
-                    <div className="cta-title">{porte === "a20" ? t.ctaTitleA20 : t.ctaTitle}</div>
+                    <div className="cta-title">{t.ctaTitle}</div>
 
                     {mkt === "br" ? (
                       <div>
