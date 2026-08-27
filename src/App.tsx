@@ -14,7 +14,6 @@ import Complo from "./pages/Complo";
 import ScoreDeCredito from "./pages/ScoreDeCredito";
 import PodunkAnnies from "./pages/PodunkAnnies";
 import FamilyRealty from "./pages/family-realty";
-import Adcole from "./pages/Adcole";
 import Cervejarias from "./pages/Cervejarias";
 import CaseStudies from "./pages/CaseStudies";
 import CaseStudyDetail from "./pages/CaseStudyDetail";
@@ -39,7 +38,6 @@ const App = () => (
             <Route path="/PodunkAnnies" element={<PodunkAnnies />} />
 
             <Route path="/family-realty/*" element={<FamilyRealty />} />
-            <Route path="/adcole" element={<Adcole />} />
             <Route path="/cervejarias" element={<Cervejarias />} />
             <Route path="/case-studies" element={<CaseStudies />} />
             <Route path="/raio-x" element={<RaioX />} />
