@@ -14,6 +14,7 @@ import Complo from "./pages/Complo";
 import ScoreDeCredito from "./pages/ScoreDeCredito";
 import PodunkAnnies from "./pages/PodunkAnnies";
 import FamilyRealty from "./pages/family-realty";
+import Cervejarias from "./pages/Cervejarias";
 import CaseStudies from "./pages/CaseStudies";
 import CaseStudyDetail from "./pages/CaseStudyDetail";
 import RaioX from "./pages/RaioX";
