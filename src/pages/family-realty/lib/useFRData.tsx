@@ -196,6 +196,7 @@ async function loadAll() {
     projectsView,
     invoicePaidRaw,
     paymentsRaw,
+    profitRaw,
   ] = await Promise.all([
     fetchAll<BvaProjectRow>("v_budget_vs_actual_by_project").catch(() => []),
     fetchAll<BvaLineRow>("v_budget_vs_actual").catch(() => []),
@@ -213,6 +214,7 @@ async function loadAll() {
     fetchAll<ProjectRow>("v_projects").catch(() => []),
     fetchAll<Record<string, unknown>>("v_invoice_paid").catch(() => []),
     fetchAll<Record<string, unknown>>("payments").catch(() => []),
+    fetchAll<Record<string, unknown>>("v_project_profit").catch(() => []),
   ]);
 
 
