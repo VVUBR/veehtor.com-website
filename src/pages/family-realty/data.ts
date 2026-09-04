@@ -189,6 +189,39 @@ export type ContractRow = {
 };
 
 
+export type ProfitRow = {
+  project: string;
+  obraRealizado: number;
+  comprometido: number;
+  budgetAGastar: number;
+  obraProjetada: number;
+  bankFee: number;
+  acquisitionCost: number;
+  custoTotal: number;
+  totalSqft: number | null;
+  custoObraSqft: number | null;
+  custoTotalSqft: number | null;
+  expectedSalePrice: number | null;
+  actualSalePrice: number | null;
+  precoVenda: number | null;
+  precoSqft: number | null;
+  commissionPct: number | null;
+  comissao: number | null;
+  sellingCosts: number | null;
+  custosVendaTotal: number | null;
+  receitaLiquida: number | null;
+  lucro: number | null;
+  margemLiquidaPct: number | null;
+  roiPct: number | null;
+  investorCapital: number | null;
+  investorProfitPct: number | null;
+  lucroInvestidor: number | null;
+  roiInvestidorPct: number | null;
+  retornoAnualInvestidorPct: number | null;
+  monthsToSale: number | null;
+  notes: string | null;
+};
+
 export type CommittedContracts = {
   total: number;
   byProject: Map<string, number>;
