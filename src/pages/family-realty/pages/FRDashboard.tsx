@@ -343,6 +343,12 @@ function DashboardInner() {
             </section>
           </>
         )}
+
+        {tab === "profit" && (
+          <section className="mt-4">
+            <ProfitSection job={job} profitByProject={profitFiltered} />
+          </section>
+        )}
       </main>
     </div>
   );
