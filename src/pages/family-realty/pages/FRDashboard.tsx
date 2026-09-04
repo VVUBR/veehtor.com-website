@@ -131,6 +131,14 @@ function DashboardInner() {
     [job, data.jobsMeta],
   );
 
+  const profitFiltered = useMemo(() => {
+    const m = new Map<string, ProfitRow>();
+    for (const [name, row] of data.profitByProject) {
+      if (inAllowed(name)) m.set(name, row);
+    }
+    return m;
+  }, [data.profitByProject, allowedProjects]);
+
   const committedScoped = useMemo(() => {
     if (job === "__UNASSIGNED__") return data.committed.unassignedAmount;
     if (job !== "__ALL__") return data.committed.byProject.get(job) ?? 0;
