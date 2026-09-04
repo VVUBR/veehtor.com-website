@@ -24,6 +24,7 @@ import {
   type ProjectStatus,
   type InvoicePaidRow,
   type PaymentRow,
+  type ProfitRow,
   uniqueProjects,
 } from "../data";
 import { BANK_FEE_PHASE, POST_SALE_PHASE } from "./phases";
