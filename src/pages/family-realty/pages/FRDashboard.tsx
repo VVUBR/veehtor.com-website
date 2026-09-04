@@ -12,14 +12,15 @@ import ComplianceSection from "../components/ComplianceSection";
 import EstimateVsBilledSection from "../components/EstimateVsBilledSection";
 import UnassignedSection from "../components/UnassignedSection";
 import WeeklySummarySection from "../components/WeeklySummarySection";
+import ProfitSection from "../components/ProfitSection";
 import { useFRAuth } from "../auth/FRAuthProvider";
 import { FRDataProvider, useFRData } from "../lib/useFRData";
 import { useI18n, fmtCurrency } from "../lib/i18n";
-import { type ProjectStatusFilter } from "../data";
+import { type ProjectStatusFilter, type ProfitRow } from "../data";
 import { BANK_FEE_PHASE, POST_SALE_PHASE, isOutOfBudget } from "../lib/phases";
 
-type TabKey = "overview" | "weekly" | "payables" | "ledger";
-const TAB_KEYS: TabKey[] = ["overview", "weekly", "payables", "ledger"];
+type TabKey = "overview" | "weekly" | "payables" | "ledger" | "profit";
+const TAB_KEYS: TabKey[] = ["overview", "weekly", "payables", "ledger", "profit"];
 
 function readTabFromHash(): TabKey {
   if (typeof window === "undefined") return "overview";
@@ -129,6 +130,14 @@ function DashboardInner() {
     () => (job !== "__ALL__" ? data.jobsMeta.find((j) => j.name === job) ?? null : null),
     [job, data.jobsMeta],
   );
+
+  const profitFiltered = useMemo(() => {
+    const m = new Map<string, ProfitRow>();
+    for (const [name, row] of data.profitByProject) {
+      if (inAllowed(name)) m.set(name, row);
+    }
+    return m;
+  }, [data.profitByProject, allowedProjects]);
 
   const committedScoped = useMemo(() => {
     if (job === "__UNASSIGNED__") return data.committed.unassignedAmount;
@@ -333,6 +342,12 @@ function DashboardInner() {
               <CostTable items={historyByJob} />
             </section>
           </>
+        )}
+
+        {tab === "profit" && (
+          <section className="mt-4">
+            <ProfitSection job={job} profitByProject={profitFiltered} />
+          </section>
         )}
       </main>
     </div>
