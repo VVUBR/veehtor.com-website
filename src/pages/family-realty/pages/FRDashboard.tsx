@@ -12,14 +12,15 @@ import ComplianceSection from "../components/ComplianceSection";
 import EstimateVsBilledSection from "../components/EstimateVsBilledSection";
 import UnassignedSection from "../components/UnassignedSection";
 import WeeklySummarySection from "../components/WeeklySummarySection";
+import ProfitSection from "../components/ProfitSection";
 import { useFRAuth } from "../auth/FRAuthProvider";
 import { FRDataProvider, useFRData } from "../lib/useFRData";
 import { useI18n, fmtCurrency } from "../lib/i18n";
-import { type ProjectStatusFilter } from "../data";
+import { type ProjectStatusFilter, type ProfitRow } from "../data";
 import { BANK_FEE_PHASE, POST_SALE_PHASE, isOutOfBudget } from "../lib/phases";
 
-type TabKey = "overview" | "weekly" | "payables" | "ledger";
-const TAB_KEYS: TabKey[] = ["overview", "weekly", "payables", "ledger"];
+type TabKey = "overview" | "weekly" | "payables" | "ledger" | "profit";
+const TAB_KEYS: TabKey[] = ["overview", "weekly", "payables", "ledger", "profit"];
 
 function readTabFromHash(): TabKey {
   if (typeof window === "undefined") return "overview";
