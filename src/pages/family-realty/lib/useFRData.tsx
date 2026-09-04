@@ -634,6 +634,50 @@ async function loadAll() {
     paymentsBySub.set(canon, arr);
   }
 
+  // -- Profit by project (v_project_profit) --
+  const numOrNull = (v: unknown): number | null => {
+    if (v == null || v === "") return null;
+    const n = typeof v === "number" ? v : Number(v);
+    return isNaN(n) ? null : n;
+  };
+  const profitByProject = new Map<string, ProfitRow>();
+  for (const r of profitRaw) {
+    const project = str(r.project).trim();
+    if (!project) continue;
+    profitByProject.set(project, {
+      project,
+      obraRealizado: num(r.obra_realizado),
+      comprometido: num(r.comprometido),
+      budgetAGastar: num(r.budget_a_gastar),
+      obraProjetada: num(r.obra_projetada),
+      bankFee: num(r.bank_fee),
+      acquisitionCost: num(r.acquisition_cost),
+      custoTotal: num(r.custo_total),
+      totalSqft: numOrNull(r.total_sqft),
+      custoObraSqft: numOrNull(r.custo_obra_sqft),
+      custoTotalSqft: numOrNull(r.custo_total_sqft),
+      expectedSalePrice: numOrNull(r.expected_sale_price),
+      actualSalePrice: numOrNull(r.actual_sale_price),
+      precoVenda: numOrNull(r.preco_venda),
+      precoSqft: numOrNull(r.preco_sqft),
+      commissionPct: numOrNull(r.commission_pct),
+      comissao: numOrNull(r.comissao),
+      sellingCosts: numOrNull(r.selling_costs),
+      custosVendaTotal: numOrNull(r.custos_venda_total),
+      receitaLiquida: numOrNull(r.receita_liquida),
+      lucro: numOrNull(r.lucro),
+      margemLiquidaPct: numOrNull(r.margem_liquida_pct),
+      roiPct: numOrNull(r.roi_pct),
+      investorCapital: numOrNull(r.investor_capital),
+      investorProfitPct: numOrNull(r.investor_profit_pct),
+      lucroInvestidor: numOrNull(r.lucro_investidor),
+      roiInvestidorPct: numOrNull(r.roi_investidor_pct),
+      retornoAnualInvestidorPct: numOrNull(r.retorno_anual_investidor_pct),
+      monthsToSale: numOrNull(r.months_to_sale),
+      notes: strOrNull(r.notes),
+    });
+  }
+
   return {
     jobs,
     jobsMeta,
@@ -656,6 +700,7 @@ async function loadAll() {
     paymentsBySub,
     bankFeeByProject,
     postSaleByProject,
+    profitByProject,
   };
 }
 
@@ -671,6 +716,7 @@ const empty: FRData = {
   invoicePaidBySub: new Map(), paymentsBySub: new Map(),
   bankFeeByProject: new Map(),
   postSaleByProject: new Map(),
+  profitByProject: new Map(),
 };
 
 
