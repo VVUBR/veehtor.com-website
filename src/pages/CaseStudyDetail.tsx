@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import SiteNav from "@/components/site/SiteNav";
 import SiteFooter from "@/components/site/SiteFooter";
 import { useMapDialog } from "@/components/site/MapDialogProvider";
@@ -13,9 +13,10 @@ import {
   PROOF_LABELS,
   pick,
   sortedCases,
-  getStatus,
-  getMetricProof,
-  getHonesty,
+  bySlug,
+  byLegacySlug,
+  siblingCases,
+  getClientName,
   type ProofClass,
 } from "@/data/caseStudies";
 import "@/styles/home.css";
@@ -28,8 +29,11 @@ const badgeClass: Record<ProofClass, string> = {
   scale: "b-scale",
 };
 
-function setMeta(title: string, description: string, slug: string) {
+const SITE = "https://www.veehtor.com";
+
+function setMeta(title: string, description: string, slug: string, jsonLd: object) {
   document.title = title;
+  const url = `${SITE}/case-studies/${slug}`;
   const setOrCreate = (name: string, content: string, isProp = false) => {
     const attr = isProp ? "property" : "name";
     let el = document.querySelector(`meta[${attr}="${name}"]`);
@@ -43,39 +47,77 @@ function setMeta(title: string, description: string, slug: string) {
   setOrCreate("description", description);
   setOrCreate("og:title", title, true);
   setOrCreate("og:description", description, true);
+  setOrCreate("og:type", "article", true);
+  setOrCreate("og:url", url, true);
+  setOrCreate("twitter:title", title);
+  setOrCreate("twitter:description", description);
+
   let canon = document.querySelector('link[rel="canonical"]');
   if (!canon) {
     canon = document.createElement("link");
     canon.setAttribute("rel", "canonical");
     document.head.appendChild(canon);
   }
-  canon.setAttribute("href", `/case-studies/${slug}`);
+  canon.setAttribute("href", url);
+
+  let ld = document.getElementById("case-jsonld");
+  if (!ld) {
+    ld = document.createElement("script");
+    ld.setAttribute("type", "application/ld+json");
+    ld.id = "case-jsonld";
+    document.head.appendChild(ld);
+  }
+  ld.textContent = JSON.stringify(jsonLd);
 }
 
 export default function CaseStudyDetail() {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { language } = useLanguage();
   const { open: openMap } = useMapDialog();
   const UI = useSiteContent().caseDetailUI;
   useReveal();
 
   const ordered = useMemo(() => sortedCases(), []);
-  const idx = useMemo(() => ordered.findIndex((c) => c.slug === slug), [ordered, slug]);
-  const study = idx >= 0 ? ordered[idx] : undefined;
+  const study = bySlug(slug);
+  const legacy = study ? undefined : byLegacySlug(slug);
+
+  // Legacy address: single hop to the new address, preserving query and hash.
+  useEffect(() => {
+    if (!study && legacy) {
+      navigate(`/case-studies/${legacy.slug}${location.search}${location.hash}`, { replace: true });
+    }
+  }, [study, legacy, navigate, location.search, location.hash]);
+
+  const idx = study ? ordered.findIndex((c) => c.id === study.id) : -1;
   const next = idx >= 0 ? ordered[(idx + 1) % ordered.length] : undefined;
+  const siblings = study ? siblingCases(study) : [];
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-    if (study) {
-      const title = `${pick(study.title, language)} — ${study.client} | Veehtor AI`;
-      setMeta(title, pick(study.seoDescription, language), study.slug);
-      track("case_detail_viewed", { slug: study.slug });
-    } else {
-      document.title = UI.notFoundMetaTitle;
+    if (!study) {
+      if (!legacy) document.title = UI.notFoundMetaTitle;
+      return;
     }
-  }, [study, language, UI.notFoundMetaTitle]);
+    window.scrollTo(0, 0);
+    const title = `${pick(study.title, language)} | Veehtor AI`;
+    const description = pick(study.seoDescription, language);
+    setMeta(title, description, study.slug, {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: pick(study.title, language),
+      description,
+      inLanguage: language === "pt" ? "pt-BR" : "en-US",
+      mainEntityOfPage: `${SITE}/case-studies/${study.slug}`,
+      author: { "@type": "Organization", name: "Veehtor AI" },
+      publisher: { "@type": "Organization", name: "Veehtor AI" },
+      about: pick(getClientName(study), language),
+    });
+    track("case_detail_viewed", { case_id: study.id, slug: study.slug, lang: language });
+  }, [study, legacy, language, UI.notFoundMetaTitle]);
 
   if (!study) {
+    if (legacy) return null;
     return (
       <div className="home">
         <SiteNav />
@@ -94,9 +136,8 @@ export default function CaseStudyDetail() {
     );
   }
 
-  const status = getStatus(study);
-  const honesty = getHonesty(study);
-  const scale = study.aboutClient;
+  const client = pick(getClientName(study), language);
+  const metrics = study.metrics ?? [];
 
   return (
     <div className="home">
@@ -109,105 +150,102 @@ export default function CaseStudyDetail() {
             <nav className="crumb" aria-label={UI.breadcrumbAria}>
               <Link to="/case-studies">{UI.breadcrumbRoot}</Link>
               <span aria-hidden>/</span>
-              <span>{study.client}</span>
+              <span>{client}</span>
             </nav>
             <div className="eyebrow reveal" style={{ color: "rgba(255,255,255,.55)" }}>
               {pick(SECTOR_LABELS[study.sector], language)}
-              {study.areas[0] && <> · {pick(AREA_LABELS[study.areas[0]], language)}</>}
+              {study.areas.map((a) => (
+                <span key={a}> · {pick(AREA_LABELS[a], language)}</span>
+              ))}
             </div>
             <h1 className="reveal">{pick(study.title, language)}</h1>
-            <div className="client reveal">{study.client}</div>
+            <div className="client reveal">{client}</div>
             <p className="lede reveal">{pick(study.summary, language)}</p>
-            <div className="reveal" style={{ marginTop: "1rem" }}>
-              <span className={`badge ${badgeClass[status]}`}>
-                {pick(PROOF_LABELS[status], language)}
-              </span>
-            </div>
 
-            <div className="top-metrics reveal">
-              {study.metrics.map((m, i) => {
-                const proof = getMetricProof(study, i);
-                return (
+            {metrics.length > 0 && (
+              <div className="top-metrics reveal">
+                {metrics.map((m, i) => (
                   <div className="m" key={i}>
                     <div className="m-value">{pick(m.value, language)}</div>
                     <div className="m-label">{pick(m.label, language)}</div>
-                    <span className={`badge ${badgeClass[proof]}`}>
-                      {pick(PROOF_LABELS[proof], language)}
+                    <span className={`badge ${badgeClass[m.proof]}`}>
+                      {pick(PROOF_LABELS[m.proof], language)}
                     </span>
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
         <section className="narrative">
           <div className="wrap">
             <div className="n-block reveal">
-              <div className="eyebrow">{UI.contextEyebrow}</div>
-              <h2>{UI.contextH2}</h2>
-              <p>{pick(study.challenge, language)}</p>
+              <h2>{UI.highlightsH2}</h2>
+              <ul className="case-highlights">
+                {study.highlights.map((h, i) => (
+                  <li key={i}>{pick(h, language)}</li>
+                ))}
+              </ul>
             </div>
 
             <div className="n-block reveal">
-              <div className="eyebrow">{UI.solutionEyebrow}</div>
-              <h2>{UI.solutionH2}</h2>
-              <p>{pick(study.solution, language)}</p>
+              <div className="eyebrow">{UI.bottleneckEyebrow}</div>
+              <h2>{UI.bottleneckH2}</h2>
+              <p>{pick(study.bottleneck, language)}</p>
             </div>
 
             <div className="n-block reveal">
-              <div className="eyebrow">{UI.resultEyebrow}</div>
-              <h2>{UI.resultH2}</h2>
-              <p>{pick(study.result, language)}</p>
-              <div className="beforeafter">
-                {study.metrics.map((m, i) => {
-                  const proof = getMetricProof(study, i);
-                  return (
-                    <div className="ba-cell" key={i}>
-                      <div className="m-value">{pick(m.value, language)}</div>
-                      <div className="m-label">{pick(m.label, language)}</div>
-                      <span className={`badge ${badgeClass[proof]}`}>
-                        {pick(PROOF_LABELS[proof], language)}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
+              <div className="eyebrow">{UI.implementedEyebrow}</div>
+              <h2>{UI.implementedH2}</h2>
+              <p>{pick(study.implemented, language)}</p>
             </div>
 
             <div className="n-block reveal">
-              <div className="eyebrow">{UI.scaleEyebrow}</div>
-              <h2>{UI.scaleH2}</h2>
-              <dl className="scale-grid">
-                <div>
-                  <dt>{UI.scaleSector}</dt>
-                  <dd>{pick(scale.sector, language)}</dd>
-                </div>
-                {scale.size && (
-                  <div>
-                    <dt>{UI.scaleSize}</dt>
-                    <dd>{pick(scale.size, language)}</dd>
-                  </div>
-                )}
-                {scale.scale && (
-                  <div>
-                    <dt>{UI.scaleScale}</dt>
-                    <dd>{pick(scale.scale, language)}</dd>
-                  </div>
-                )}
-                <div>
-                  <dt>{UI.scaleAreas}</dt>
-                  <dd>{study.areas.map((a) => pick(AREA_LABELS[a], language)).join(" · ")}</dd>
-                </div>
-              </dl>
+              <div className="eyebrow">{UI.changedEyebrow}</div>
+              <h2>{UI.changedH2}</h2>
+              <p>{pick(study.changed, language)}</p>
             </div>
 
-            {honesty && (
+            {study.measurement && (
               <div className="n-block reveal">
-                <div className="honesty">
-                  <strong>{UI.honestyLabel}</strong>
-                  {pick(honesty, language)}
-                </div>
+                <h2>{UI.measurementH2}</h2>
+                <p>{pick(study.measurement, language)}</p>
+              </div>
+            )}
+
+            <div className="n-block reveal">
+              <div className="eyebrow">{UI.ctaEyebrow}</div>
+              <p>{pick(study.cta, language)}</p>
+              <button
+                className="btn btn-ink"
+                onClick={(e) => openMap(`case-detail:${study.id}`, e.currentTarget)}
+              >
+                {UI.ctaButton}
+              </button>
+            </div>
+
+            {siblings.length > 0 && (
+              <div className="n-block reveal">
+                <h2>{UI.siblingsH2}</h2>
+                <ul className="sibling-list">
+                  {siblings.map((s) => (
+                    <li key={s.id}>
+                      <Link
+                        to={`/case-studies/${s.slug}`}
+                        onClick={() =>
+                          track("case_sibling_clicked", {
+                            from: study.id,
+                            to: s.id,
+                            lang: language,
+                          })
+                        }
+                      >
+                        {pick(s.title, language)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
           </div>
@@ -219,7 +257,9 @@ export default function CaseStudyDetail() {
               <Link
                 to={`/case-studies/${next.slug}`}
                 className="nc"
-                onClick={() => track("case_next_clicked", { from: study.slug, to: next.slug })}
+                onClick={() =>
+                  track("case_next_clicked", { from: study.id, to: next.id, lang: language })
+                }
               >
                 <div>
                   <div className="nc-left">{UI.nextCase}</div>
@@ -234,13 +274,11 @@ export default function CaseStudyDetail() {
         <section className="dark">
           <div className="wrap closing">
             <div className="eyebrow reveal">{UI.closingEyebrow}</div>
-            <h2 className="reveal">
-              {UI.closingH2a}<br />{UI.closingH2b}
-            </h2>
+            <h2 className="reveal">{UI.closingH2}</h2>
             <p className="reveal">{UI.closingBody}</p>
             <button
               className="btn btn-primary reveal"
-              onClick={(e) => openMap(`case-detail:${study.slug}`, e.currentTarget)}
+              onClick={(e) => openMap(`case-detail-closing:${study.id}`, e.currentTarget)}
             >
               {UI.closingCta}
             </button>
