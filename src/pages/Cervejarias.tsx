@@ -559,6 +559,7 @@ export default function Cervejarias() {
         <ChamadaFinal />
       </main>
       <Footer />
+      <WhatsAppFloatingButton />
     </div>
   );
 }
