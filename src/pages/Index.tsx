@@ -6,6 +6,8 @@ import SiteFooter from "@/components/site/SiteFooter";
 import { useMapDialog } from "@/components/site/MapDialogProvider";
 import { useReveal } from "@/hooks/useReveal";
 import { useHomeContent } from "@/i18n/homeContent";
+import { useLanguage } from "@/i18n/LanguageContext";
+import { featuredCases, getClientName, pick } from "@/data/caseStudies";
 import { track } from "@/lib/analytics";
 import vitorAsset from "@/assets/vitor-ungari.jpg.asset.json";
 import "@/styles/home.css";
@@ -148,16 +150,22 @@ export default function Index() {
               <p className="sec-sub">{C.proof.sub}</p>
             </div>
             <div className="proof-strip reveal">
-              {C.proof.stats.map((s) => (
-                <div className="stat" key={s.client}>
-                  <div className="stat-client">{s.client}</div>
-                  <div className="stat-num">{s.num}</div>
-                  <div className="stat-label">{s.label}</div>
-                  <span className={`badge b-${s.badge}`}>{s.badgeLabel}</span>
-                  {s.impact && (
-                    <div className="stat-impact">{s.impact}</div>
-                  )}
-                </div>
+              {featured.map((c) => (
+                <Link
+                  className="stat"
+                  key={c.id}
+                  to={`/case-studies/${c.slug}`}
+                  style={{ textDecoration: "none", display: "block" }}
+                  onClick={() =>
+                    track("case_clicked", { case_id: c.id, slug: c.slug, lang: language, from: "home" })
+                  }
+                >
+                  <div className="stat-client">{pick(getClientName(c), language)}</div>
+                  <div className="stat-label" style={{ marginTop: ".6rem", fontWeight: 600 }}>
+                    {pick(c.homeCard ?? c.title, language)}
+                  </div>
+                  <div className="stat-impact">{pick(c.highlights[0], language)}</div>
+                </Link>
               ))}
             </div>
             <div className="proof-foot reveal">
