@@ -125,13 +125,13 @@ function Hero() {
             className="text-[32px] sm:text-[40px] md:text-[56px] lg:text-[60px] leading-[1.08]"
             style={{ ...display, color: "#FFFFFF", maxWidth: "20ch" }}
           >
-            Sua cervejaria não precisa de mais uma ferramenta solta. Precisa perder menos tempo, dinheiro e controle.
+            Sua cervejaria precisa perder menos tempo, dinheiro e controle.
           </h1>
           <p
             className="mt-7 text-[17px] md:text-[19px] leading-[1.6]"
             style={{ ...body, color: "rgba(255,255,255,0.82)", maxWidth: "68ch" }}
           >
-            Você já tentou. Trocou de PDV, montou planilha, comprou automação, colocou alguém do time para cuidar. E na sexta-feira o gerente continua fechando a folha na mão. A gente ataca sua rotina prioritária, coloca a solução dentro das ferramentas que a casa já usa, e mede o antes e o depois. Em 21 dias.
+            Você já tentou várias ferramentas. Trocou de PDV, montou planilha, comprou automação, colocou alguém do time para cuidar. E na sexta-feira o gerente continua fechando a folha na mão. A gente ataca sua rotina prioritária, coloca a solução dentro das ferramentas que a casa já usa, e mede o antes e o depois. Em 21 dias.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
             <ScrollButton>Quero falar sobre a rotina que está travando</ScrollButton>
@@ -144,7 +144,7 @@ function Hero() {
             </a>
           </div>
           <p className="mt-6 text-[14px]" style={{ ...body, color: "rgba(255,255,255,0.55)" }}>
-            Não é apresentação de inteligência artificial. A conversa começa pela rotina.
+            Focamos nossa conversa nas rotinas da sua operação.
           </p>
         </div>
         <div className="w-full max-w-md justify-self-center md:justify-self-end">
@@ -180,7 +180,7 @@ function Problema() {
       <div className="max-w-6xl mx-auto">
         <Kicker onLight>A realidade da operação</Kicker>
         <H2 onLight>
-          Assumimos que você entende de cerveja, e muito. O problema acontece antes e depois de servir a cerveja.
+          Assumimos que você entende de cerveja, e muito.{"\n"}O problema acontece antes e depois de servir a cerveja.
         </H2>
         <div className="mt-10 grid md:grid-cols-3 gap-6">
           {cards.map((c) => (
@@ -271,7 +271,10 @@ function Prova() {
               A rede operava com dezenas de freelancers por semana, checklist de abertura e fechamento no papel, sem foto e sem prova de que foi feito, e venda espalhada entre o sistema de pedidos, a maquininha e a planilha. O fechamento da folha de freela tomava um dia todo do gerente por semana.
             </p>
             <p className="text-[17px] md:text-[19px] leading-[1.6]" style={{ ...body, color: "#3A3F4C", maxWidth: "68ch" }}>
-              Hoje o freela bate ponto pelo celular dentro da unidade com geolocalização, o checklist sai com foto conferida contra o padrão da casa, o pagamento é calculado e enviado por WhatsApp, E a gestão tem um HUB de Inteligência completo da cervejaria, incluindo um painel único com venda, cliente, produto, equipe e avaliação, com um resumo semanal que indica o que olhar primeiro.
+              Hoje o freela bate ponto pelo celular dentro da unidade com geolocalização, o checklist sai com foto conferida contra o padrão da casa, o pagamento é calculado e enviado por WhatsApp. 
+
+
+Além disso, a gestão conta com um HUB de Inteligência completo da cervejaria, com um painel único de vendas, clientes, produtos, equipe e avaliações, além de um resumo semanal que indica o que olhar primeiro.
             </p>
           </div>
           <div className="w-full">
@@ -299,12 +302,13 @@ function Prova() {
             De 1 dia para 15 min por semana
           </div>
           <p className="mt-4 text-[13px] leading-[1.5]" style={{ ...body, color: "#5B6070", maxWidth: "68ch" }}>
-            Resultado medido na rotina de fechamento da folha. Os demais ganhos desta operação não foram medidos e não são apresentados aqui como resultado.
+            Resultado medido na rotina de fechamento da folha. 
+Os demais ganhos desta operação não foram medidos e não são apresentados aqui como resultado.
           </p>
         </div>
 
         <p className="mt-10 text-[17px] md:text-[19px] leading-[1.6]" style={{ ...body, color: "#3A3F4C", maxWidth: "68ch" }}>
-          Essa rede não comprou tudo isso de uma vez. Foi uma frente por vez, cada uma funcionando e aprovada antes de a próxima começar. É exatamente assim que a gente trabalha.
+          Essa rede não comprou tudo isso de uma vez. Foi uma frente por vez, cada uma funcionando e aprovada antes da próxima começar. É exatamente assim que a gente trabalha.
         </p>
       </div>
     </section>
