@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -10,7 +10,10 @@ import complotap from "@/assets/complo-tap.jpg.asset.json";
 import comploGarden from "@/assets/complo-garden.jpg.asset.json";
 import vitorPhoto from "@/assets/vitor-ungari.jpg.asset.json";
 
-const WHATSAPP_NUMBER = "5511973022058";
+const WHATSAPP_NUMBER = "17816559279";
+const WHATSAPP_TEXT =
+  "Olá, Vitor. Vi a página para cervejarias e quero falar sobre a rotina que está travando a minha operação.";
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_TEXT)}`;
 
 const NAVY = "#111828";
 const TEAL = "#15B7A8";
@@ -62,31 +65,19 @@ function H2({ children, onLight = false }: { children: React.ReactNode; onLight?
 
 
 
-function ScrollButton({
-  children,
-  variant = "solid",
-  className = "",
-}: {
-  children: React.ReactNode;
-  variant?: "solid" | "ghost";
-  className?: string;
-}) {
-  const solid: React.CSSProperties = { background: TEAL, color: NAVY };
-  const ghost: React.CSSProperties = {
-    background: "transparent",
-    color: "#FFFFFF",
-    border: "1px solid rgba(255,255,255,0.35)",
-  };
+function WhatsAppFloatingButton() {
   return (
     <a
-      href="#conversa"
-      className={
-        "inline-flex items-center justify-center rounded-full px-6 py-3.5 text-[16px] transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111828] " +
-        className
-      }
-      style={{ ...body, fontWeight: 600, ...(variant === "solid" ? solid : ghost) }}
+      href={WHATSAPP_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Falar no WhatsApp"
+      className="fixed bottom-5 right-5 z-50 flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-transform hover:scale-[1.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111828]"
+      style={{ background: "#25D366" }}
     >
-      {children}
+      <svg viewBox="0 0 24 24" fill="#FFFFFF" className="w-7 h-7" aria-hidden="true">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.379-5.03c0-5.459 4.418-9.88 9.877-9.88 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c0 5.46-4.421 9.88-9.88 9.88" />
+      </svg>
     </a>
   );
 }
@@ -104,7 +95,9 @@ function Header() {
           <Logo textColor="#FFFFFF" className="h-6 w-auto" />
         </a>
         <a
-          href="#conversa"
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
           className="rounded-full px-4 py-2 text-[14px] transition-transform hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111828]"
           style={{ ...body, fontWeight: 600, background: TEAL, color: NAVY }}
         >
@@ -134,7 +127,15 @@ function Hero() {
             Você já tentou várias ferramentas. Trocou de PDV, montou planilha, comprou automação, colocou alguém do time para cuidar. E na sexta-feira o gerente continua fechando a folha na mão. A gente ataca sua rotina prioritária, coloca a solução dentro das ferramentas que a casa já usa, e mede o antes e o depois. Em 21 dias.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
-            <ScrollButton>Quero falar sobre a rotina que está travando</ScrollButton>
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center rounded-full px-6 py-3.5 text-[16px] transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111828]"
+              style={{ ...body, fontWeight: 600, background: TEAL, color: NAVY }}
+            >
+              Quero falar sobre a rotina que está travando
+            </a>
             <a
               href="#case"
               className="inline-flex items-center rounded-full px-5 py-3.5 text-[15px] transition-colors hover:text-white"
@@ -487,124 +488,24 @@ function Faq() {
   );
 }
 
-const FIELDS = [
-  { name: "nome", label: "Nome", type: "input" as const },
-  { name: "cervejaria", label: "Nome da cervejaria", type: "input" as const },
-  { name: "unidades", label: "Quantas unidades", type: "input" as const },
-  { name: "whatsapp", label: "WhatsApp", type: "input" as const },
-  { name: "rotina", label: "Qual rotina está travando", type: "textarea" as const },
-  { name: "tentativas", label: "O que você já tentou para resolver", type: "textarea" as const },
-];
-
-function buildWhatsAppUrl(values: Record<string, string>) {
-  const text = [
-    "Olá, Vitor. Quero falar sobre a rotina que está travando na minha operação.",
-    "",
-    `Nome: ${values.nome}`,
-    `Cervejaria: ${values.cervejaria}`,
-    `Unidades: ${values.unidades}`,
-    `WhatsApp: ${values.whatsapp}`,
-    `Rotina que está travando: ${values.rotina}`,
-    `O que já tentei: ${values.tentativas}`,
-  ].join("\n");
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-}
 
 function ChamadaFinal() {
-  const [values, setValues] = useState<Record<string, string>>({});
-  const [sent, setSent] = useState(false);
-  const [url, setUrl] = useState("");
-
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const link = buildWhatsAppUrl(values);
-    setUrl(link);
-    setSent(true);
-    window.open(link, "_blank", "noopener,noreferrer");
-  };
-
   return (
     <section id="conversa" className="px-6 py-20 md:py-28 scroll-mt-16" style={{ background: NAVY }}>
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-3xl mx-auto text-center">
         <H2>Vamos falar da SUA OPERAÇÃO, não de inteligência artificial.</H2>
         <p className="text-[17px] md:text-[19px] leading-[1.6]" style={{ ...body, color: "rgba(255,255,255,0.82)", maxWidth: "68ch" }}>
           A conversa começa por uma rotina: qual é a que mais consome tempo, dinheiro ou controle na sua casa hoje.
         </p>
-
-        {sent ? (
-          <div className="mt-10 rounded-2xl p-8" style={{ background: "rgba(255,255,255,0.06)" }}>
-            <p className="text-[19px] md:text-[22px]" style={{ ...display, color: "#FFFFFF" }}>
-              Recebemos suas respostas. Obrigado.
-            </p>
-            <p className="mt-3 text-[17px] leading-[1.6]" style={{ ...body, color: "rgba(255,255,255,0.82)" }}>
-              Quer adiantar? Chama no WhatsApp.
-            </p>
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center justify-center rounded-full px-6 py-3.5 text-[16px]"
-              style={{ ...body, fontWeight: 600, background: TEAL, color: NAVY }}
-            >
-              Chamar no WhatsApp
-            </a>
-          </div>
-        ) : (
-          <form onSubmit={onSubmit} className="mt-10 grid sm:grid-cols-2 gap-5">
-            {FIELDS.map((f) => (
-              <div key={f.name} className={f.type === "textarea" ? "sm:col-span-2" : ""}>
-                <label
-                  htmlFor={f.name}
-                  className="block mb-2 text-[14px]"
-                  style={{ ...body, color: "rgba(255,255,255,0.7)" }}
-                >
-                  {f.label}
-                </label>
-                {f.type === "input" ? (
-                  <input
-                    id={f.name}
-                    name={f.name}
-                    required
-                    value={values[f.name] || ""}
-                    onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}
-                    className="w-full rounded-xl px-4 py-3 text-[17px] outline-none focus:ring-2"
-                    style={{
-                      ...body,
-                      background: "rgba(255,255,255,0.06)",
-                      color: "#FFFFFF",
-                      border: "1px solid rgba(255,255,255,0.18)",
-                    }}
-                  />
-                ) : (
-                  <textarea
-                    id={f.name}
-                    name={f.name}
-                    required
-                    rows={2}
-                    value={values[f.name] || ""}
-                    onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}
-                    className="w-full rounded-xl px-4 py-3 text-[17px] outline-none focus:ring-2"
-                    style={{
-                      ...body,
-                      background: "rgba(255,255,255,0.06)",
-                      color: "#FFFFFF",
-                      border: "1px solid rgba(255,255,255,0.18)",
-                    }}
-                  />
-                )}
-              </div>
-            ))}
-            <div className="sm:col-span-2">
-              <button
-                type="submit"
-                className="inline-flex items-center justify-center rounded-full px-8 py-3.5 text-[16px] transition-transform hover:scale-[1.02]"
-                style={{ ...body, fontWeight: 600, background: ORANGE, color: "#FFFFFF" }}
-              >
-                Enviar
-              </button>
-            </div>
-          </form>
-        )}
+        <a
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-10 inline-flex items-center justify-center rounded-full px-8 py-4 text-[17px] transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111828]"
+          style={{ ...body, fontWeight: 600, background: TEAL, color: NAVY }}
+        >
+          Falar sobre minha operação
+        </a>
       </div>
     </section>
   );
@@ -658,6 +559,7 @@ export default function Cervejarias() {
         <ChamadaFinal />
       </main>
       <Footer />
+      <WhatsAppFloatingButton />
     </div>
   );
 }
