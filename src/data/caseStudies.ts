@@ -104,6 +104,8 @@ export interface CaseStudy {
   sector: Sector;
   areas: Area[];
   title: LS;
+  /** Optional shorter title used on the home page card. */
+  homeCard?: LS;
   summary: LS;
   bottleneck: LS;
   implemented: LS;
