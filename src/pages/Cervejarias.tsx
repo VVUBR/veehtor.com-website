@@ -502,100 +502,22 @@ function Faq() {
 
 
 function ChamadaFinal() {
-  const [values, setValues] = useState<Record<string, string>>({});
-  const [sent, setSent] = useState(false);
-  const [url, setUrl] = useState("");
-
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const link = buildWhatsAppUrl(values);
-    setUrl(link);
-    setSent(true);
-    window.open(link, "_blank", "noopener,noreferrer");
-  };
-
   return (
     <section id="conversa" className="px-6 py-20 md:py-28 scroll-mt-16" style={{ background: NAVY }}>
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-3xl mx-auto text-center">
         <H2>Vamos falar da SUA OPERAÇÃO, não de inteligência artificial.</H2>
         <p className="text-[17px] md:text-[19px] leading-[1.6]" style={{ ...body, color: "rgba(255,255,255,0.82)", maxWidth: "68ch" }}>
           A conversa começa por uma rotina: qual é a que mais consome tempo, dinheiro ou controle na sua casa hoje.
         </p>
-
-        {sent ? (
-          <div className="mt-10 rounded-2xl p-8" style={{ background: "rgba(255,255,255,0.06)" }}>
-            <p className="text-[19px] md:text-[22px]" style={{ ...display, color: "#FFFFFF" }}>
-              Recebemos suas respostas. Obrigado.
-            </p>
-            <p className="mt-3 text-[17px] leading-[1.6]" style={{ ...body, color: "rgba(255,255,255,0.82)" }}>
-              Quer adiantar? Chama no WhatsApp.
-            </p>
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center justify-center rounded-full px-6 py-3.5 text-[16px]"
-              style={{ ...body, fontWeight: 600, background: TEAL, color: NAVY }}
-            >
-              Chamar no WhatsApp
-            </a>
-          </div>
-        ) : (
-          <form onSubmit={onSubmit} className="mt-10 grid sm:grid-cols-2 gap-5">
-            {FIELDS.map((f) => (
-              <div key={f.name} className={f.type === "textarea" ? "sm:col-span-2" : ""}>
-                <label
-                  htmlFor={f.name}
-                  className="block mb-2 text-[14px]"
-                  style={{ ...body, color: "rgba(255,255,255,0.7)" }}
-                >
-                  {f.label}
-                </label>
-                {f.type === "input" ? (
-                  <input
-                    id={f.name}
-                    name={f.name}
-                    required
-                    value={values[f.name] || ""}
-                    onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}
-                    className="w-full rounded-xl px-4 py-3 text-[17px] outline-none focus:ring-2"
-                    style={{
-                      ...body,
-                      background: "rgba(255,255,255,0.06)",
-                      color: "#FFFFFF",
-                      border: "1px solid rgba(255,255,255,0.18)",
-                    }}
-                  />
-                ) : (
-                  <textarea
-                    id={f.name}
-                    name={f.name}
-                    required
-                    rows={2}
-                    value={values[f.name] || ""}
-                    onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}
-                    className="w-full rounded-xl px-4 py-3 text-[17px] outline-none focus:ring-2"
-                    style={{
-                      ...body,
-                      background: "rgba(255,255,255,0.06)",
-                      color: "#FFFFFF",
-                      border: "1px solid rgba(255,255,255,0.18)",
-                    }}
-                  />
-                )}
-              </div>
-            ))}
-            <div className="sm:col-span-2">
-              <button
-                type="submit"
-                className="inline-flex items-center justify-center rounded-full px-8 py-3.5 text-[16px] transition-transform hover:scale-[1.02]"
-                style={{ ...body, fontWeight: 600, background: ORANGE, color: "#FFFFFF" }}
-              >
-                Enviar
-              </button>
-            </div>
-          </form>
-        )}
+        <a
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-10 inline-flex items-center justify-center rounded-full px-8 py-4 text-[17px] transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111828]"
+          style={{ ...body, fontWeight: 600, background: TEAL, color: NAVY }}
+        >
+          Falar sobre minha operação
+        </a>
       </div>
     </section>
   );
