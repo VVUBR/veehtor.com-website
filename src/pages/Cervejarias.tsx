@@ -9,7 +9,6 @@ import { Logo } from "@/components/site/Logo";
 import complotap from "@/assets/complo-tap.jpg.asset.json";
 import comploGarden from "@/assets/complo-garden.jpg.asset.json";
 import vitorPhoto from "@/assets/vitor-ungari.jpg.asset.json";
-import vitorPhoto from "@/assets/vitor-ungari.jpg.asset.json";
 
 const WHATSAPP_NUMBER = "5511973022058";
 
