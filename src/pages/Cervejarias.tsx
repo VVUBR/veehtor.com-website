@@ -139,7 +139,15 @@ function Hero() {
             Você já tentou várias ferramentas. Trocou de PDV, montou planilha, comprou automação, colocou alguém do time para cuidar. E na sexta-feira o gerente continua fechando a folha na mão. A gente ataca sua rotina prioritária, coloca a solução dentro das ferramentas que a casa já usa, e mede o antes e o depois. Em 21 dias.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
-            <ScrollButton>Quero falar sobre a rotina que está travando</ScrollButton>
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center rounded-full px-6 py-3.5 text-[16px] transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111828]"
+              style={{ ...body, fontWeight: 600, background: TEAL, color: NAVY }}
+            >
+              Quero falar sobre a rotina que está travando
+            </a>
             <a
               href="#case"
               className="inline-flex items-center rounded-full px-5 py-3.5 text-[15px] transition-colors hover:text-white"
