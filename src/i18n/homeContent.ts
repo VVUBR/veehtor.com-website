@@ -59,17 +59,8 @@ export interface HomeContentBundle {
     eyebrow: string;
     h2: string;
     sub: string;
-    stats: Stat[];
     note: string;
     link: string;
-  };
-  cases: {
-    eyebrow: string;
-    h2: string;
-    sub: string;
-    items: CaseItem[];
-    more: string;
-    detailsCta: string;
   };
   rules: {
     eyebrow: string;
