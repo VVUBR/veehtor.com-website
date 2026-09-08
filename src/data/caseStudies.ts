@@ -62,7 +62,7 @@ export const CLIENTS: Record<ClientId, LS> = {
     en: "Nonprofit support organization",
   },
   brewery: {
-    pt: "Cervejaria com vários pontos de venda",
+    pt: "Cervejaria com diversos pontos de venda",
     en: "Multi-location brewery",
   },
 };
