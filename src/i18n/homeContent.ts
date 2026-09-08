@@ -3,26 +3,6 @@
 
 import { useLanguage } from "@/i18n/LanguageContext";
 
-type Stat = {
-  client: string;
-  num: string;
-  label: string;
-  badge: "measured" | "operational" | "system" | "estimated";
-  badgeLabel: string;
-  impact?: string;
-};
-
-type CaseItem = {
-  client: string;
-  context: string;
-  h3: string;
-  desc: string;
-  metric: string;
-  metricLabel: string;
-  badge: "measured" | "operational" | "system" | "estimated";
-  badgeLabel: string;
-  href: string;
-};
 
 export interface HomeContentBundle {
   meta: { title: string; description: string };
@@ -59,17 +39,8 @@ export interface HomeContentBundle {
     eyebrow: string;
     h2: string;
     sub: string;
-    stats: Stat[];
     note: string;
     link: string;
-  };
-  cases: {
-    eyebrow: string;
-    h2: string;
-    sub: string;
-    items: CaseItem[];
-    more: string;
-    detailsCta: string;
   };
   rules: {
     eyebrow: string;
@@ -148,58 +119,11 @@ const pt: HomeContentBundle = {
     ],
   },
   proof: {
-    eyebrow: "RESULTADOS REAIS",
-    h2: "Sistemas em operação.\nMudanças que aparecem no processo.",
-    sub: "Cada número abaixo vem de um sistema entregue para uma operação real.",
-    stats: [
-      { client: "D.CARVALHO - JOHN DEERE", num: "5 a 7 dias → minutos", label: "Tempo de decisão de crédito", badge: "operational", badgeLabel: "Resultado operacional" },
-      { client: "Robbin Services", num: "20% → 5%", label: "Participação de horas não faturáveis", badge: "operational", badgeLabel: "Resultado operacional", impact: "até US$ 26.000/ano em folha convertida em capacidade faturável" },
-      { client: "CERVEJARIA COMPLÔ", num: "1 dia → minutos", label: "Fechamento de folha semanal", badge: "operational", badgeLabel: "Resultado operacional", impact: "US$ 6.000/ano de tempo de gestão recuperado" },
-    ],
-    note: "Cada case separa resultado medido, impacto estimado e escala de uso.",
-    link: "Ver soluções entregues",
-  },
-  cases: {
-    eyebrow: "COMO APARECE NA PRÁTICA",
-    h2: "Problemas diferentes. Sistemas construídos em torno da operação real.",
-    sub: "Cada card é uma solução que já vive na operação do cliente.",
-    items: [
-      {
-        client: "D.CARVALHO - JOHN DEERE",
-        context: "Crédito B2B",
-        h3: "Decisões de crédito que levavam 5 a 7 dias agora saem em minutos",
-        desc: "Motor de crédito integrado a score do Serasa e regras internas do time comercial.",
-        metric: "5 a 7 dias → minutos",
-        metricLabel: "Tempo de decisão",
-        badge: "operational",
-        badgeLabel: "Resultado operacional",
-        href: "/case-studies/dcarvalho-credit-scoring",
-      },
-      {
-        client: "CERVEJARIA COMPLÔ",
-        context: "FECHAMENTO DE FOLHA",
-        h3: "Um dia inteiro de fechamento de folha agora leva minutos",
-        desc: "Sistema interno consolida horas, insumos e taxas para gerar o fechamento sem planilha.",
-        metric: "1 dia → minutos",
-        metricLabel: "Ciclo de fechamento semanal",
-        badge: "operational",
-        badgeLabel: "Resultado operacional",
-        href: "/case-studies/complo-time-tracking",
-      },
-      {
-        client: "Robbin Services",
-        context: "Operações de campo",
-        h3: "Horas não faturáveis caíram de até 18,2% para menos de 5%",
-        desc: "Dashboard operacional cruza apontamento, ordens e SLA em tempo real.",
-        metric: "20% → 5%",
-        metricLabel: "Horas não faturáveis",
-        badge: "measured",
-        badgeLabel: "Resultado medido",
-        href: "/case-studies/robbin-field-productivity",
-      },
-    ],
-    more: "Ver todos os cases",
-    detailsCta: "Ver detalhes",
+    eyebrow: "CASES DE IMPLEMENTAÇÃO",
+    h2: "Menos gargalos.\nMais capacidade para operar.",
+    sub: "Análise de crédito, equipes em campo, prospecção e gestão de várias unidades.",
+    note: "Veja o processo que mudou, como a solução entrou na rotina e o que foi observado em cada implementação.",
+    link: "Ver os cases de implementação",
   },
   rules: {
     eyebrow: "REGRAS DA CASA",
@@ -284,58 +208,11 @@ const en: HomeContentBundle = {
     ],
   },
   proof: {
-    eyebrow: "REAL RESULTS",
-    h2: "Systems in operation.\nChanges that show up in the process.",
-    sub: "Every number below comes from a system shipped into a real operation.",
-    stats: [
-      { client: "D.CARVALHO - JOHN DEERE", num: "5 to 7 days → minutes", label: "Credit decision turnaround", badge: "operational", badgeLabel: "Operational result" },
-      { client: "Robbin Services", num: "20% → 5%", label: "Share of non-billable hours", badge: "operational", badgeLabel: "Operational result", impact: "up to US$ 26,000/year in payroll converted into billable capacity" },
-      { client: "CERVEJARIA COMPLÔ", num: "1 day → minutes", label: "Weekly payroll close", badge: "operational", badgeLabel: "Operational result", impact: "US$ 6,000/year of management time recovered" },
-    ],
-    note: "Every case separates measured result, estimated impact and scale of use.",
-    link: "See delivered solutions",
-  },
-  cases: {
-    eyebrow: "HOW IT SHOWS UP IN PRACTICE",
-    h2: "Different problems. Systems built around the real operation.",
-    sub: "Every card is a solution already running inside the client's operation.",
-    items: [
-      {
-        client: "D.CARVALHO - JOHN DEERE",
-        context: "B2B credit",
-        h3: "Credit decisions that used to take 5 to 7 days now clear in minutes",
-        desc: "A credit engine wired into Serasa scores and the sales team's own internal rules.",
-        metric: "5 to 7 days → minutes",
-        metricLabel: "Decision turnaround",
-        badge: "operational",
-        badgeLabel: "Operational result",
-        href: "/case-studies/dcarvalho-credit-scoring",
-      },
-      {
-        client: "CERVEJARIA COMPLÔ",
-        context: "PAYROLL CLOSE",
-        h3: "A full day of weekly payroll now takes minutes",
-        desc: "An internal system that consolidates hours, inputs and fees and closes the week without a spreadsheet.",
-        metric: "1 day → minutes",
-        metricLabel: "Weekly close cycle",
-        badge: "operational",
-        badgeLabel: "Operational result",
-        href: "/case-studies/complo-time-tracking",
-      },
-      {
-        client: "Robbin Services",
-        context: "Field operations",
-        h3: "Non-billable hours dropped from up to 18.2% to under 5%",
-        desc: "An operational dashboard that ties time entries, work orders and SLAs together in real time.",
-        metric: "20% → 5%",
-        metricLabel: "Non-billable hours",
-        badge: "measured",
-        badgeLabel: "Measured result",
-        href: "/case-studies/robbin-field-productivity",
-      },
-    ],
-    more: "See all cases",
-    detailsCta: "See details",
+    eyebrow: "IMPLEMENTATION CASE STUDIES",
+    h2: "Fewer bottlenecks.\nMore operating capacity.",
+    sub: "Credit analysis, field operations, outreach, and management across locations.",
+    note: "See the process that changed, how the system fits into daily work, and what each implementation showed.",
+    link: "See the implementation case studies",
   },
   rules: {
     eyebrow: "HOUSE RULES",

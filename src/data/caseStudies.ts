@@ -43,13 +43,40 @@ export const AREA_LABELS: Record<Area, LS> = {
 };
 
 /**
- * Proof classification. Governs badge color/label rules across the site.
- *  - measured    (verde)   RESULTADO MEDIDO
- *  - operational (teal)    RESULTADO OPERACIONAL
- *  - system      (teal)    SISTEMA EM OPERAÇÃO
- *  - estimated   (laranja) IMPACTO ESTIMADO
- *  - scale       (cinza)   ESCALA / COBERTURA / VOLUME
- * Never use `measured` for projection, coverage, volume, availability.
+ * Anonymized client identity. Four organizations, ten implementations.
+ * Client ids are neutral and never carry a real client name.
+ */
+export type ClientId = "agri-dealership" | "electrical" | "nonprofit" | "brewery";
+
+export const CLIENTS: Record<ClientId, LS> = {
+  "agri-dealership": {
+    pt: "Rede de concessionárias de máquinas agrícolas",
+    en: "Agricultural equipment dealership network",
+  },
+  electrical: {
+    pt: "Empresa de serviços elétricos nos EUA",
+    en: "US electrical contractor",
+  },
+  nonprofit: {
+    pt: "Instituto de apoio a organizações sociais",
+    en: "Nonprofit support organization",
+  },
+  brewery: {
+    pt: "Cervejaria com diversos pontos de venda",
+    en: "Multi-location brewery",
+  },
+};
+
+/**
+ * Proof classification for a documented metric.
+ *  - measured    RESULTADO MEDIDO
+ *  - operational RESULTADO OPERACIONAL
+ *  - system      SISTEMA EM OPERAÇÃO
+ *  - estimated   IMPACTO ESTIMADO
+ *  - scale       ESCALA / COBERTURA / VOLUME
+ * Never use `measured` for projection, coverage, volume or availability.
+ * A metric only ships when its evidence record is confirmed by the owner
+ * (see docs/case-metrics-matrix.md); nothing is promoted automatically.
  */
 export type ProofClass =
   | "measured"
@@ -61,37 +88,39 @@ export type ProofClass =
 export interface Metric {
   value: LS;
   label: LS;
-  estimated?: boolean;
-  /** Proof classification for this specific metric. Optional until authored per case. */
-  proof?: ProofClass;
-}
-
-export interface AboutClient {
-  sector: LS;
-  size?: LS;
-  scale?: LS;
+  proof: ProofClass;
 }
 
 export interface CaseStudy {
+  /** Stable, neutral analytics/reference id. Independent of the slug. */
+  id: string;
+  /** Public address segment under /case-studies/. */
   slug: string;
-  /** Client name is a proper noun; not localized. */
-  client: string;
+  /** Previous addresses kept for compatibility only. */
+  legacySlugs: string[];
+  clientId: ClientId;
+  /** Editorial order, identical in both languages. */
+  order: number;
   sector: Sector;
   areas: Area[];
   title: LS;
+  /** Optional shorter title used on the home page card. */
+  homeCard?: LS;
   summary: LS;
-  metrics: [Metric, Metric, Metric];
-  challenge: LS;
-  solution: LS;
-  result: LS;
-  aboutClient: AboutClient;
+  bottleneck: LS;
+  implemented: LS;
+  changed: LS;
+  /** Up to two qualitative highlights. */
+  highlights: LS[];
+  /** Case-specific CTA question. */
+  cta: LS;
+  /** Only metrics with a confirmed evidence record. Empty by default. */
+  metrics?: Metric[];
+  /** "Como medimos" / "Measurement scope". Only when there is real content. */
+  measurement?: LS;
   seoDescription: LS;
-  /** Hidden until a real, approved client quote is added. */
-  quote?: { text: LS; author: string };
-  /** Case-level proof status. Drives card badge and listing order. Optional until authored. */
-  status?: ProofClass;
-  /** Honesty note (e.g. "aprovação final continua humana"). Rendered when present. */
-  honesty?: LS;
+  /** Short variant reused on the home page. Same record, no separate copy. */
+  home?: { context: LS; short: LS };
 }
 
 export const ALL_AREAS: Area[] = [
@@ -108,652 +137,515 @@ export const ALL_AREAS: Area[] = [
 
 export const CASE_STUDIES: CaseStudy[] = [
   {
-    slug: "dcarvalho-credit-scoring",
-    client: "John Deere dealership network",
+    id: "credit-analysis",
+    slug: "agricultural-equipment-credit-analysis",
+    legacySlugs: ["dcarvalho-credit-scoring"],
+    clientId: "agri-dealership",
+    order: 1,
     sector: "Agribusiness",
     areas: ["Finance"],
     title: {
-      en: "Credit decisions that took 5 to 7 days now take minutes",
-      pt: "Decisões de crédito que levavam 5 a 7 dias agora saem em minutos",
+      pt: "Análise de crédito com histórico do cliente e recomendação para o comitê",
+      en: "Credit analysis grounded in customer history, ready for committee review",
     },
     summary: {
-      en: "How a John Deere dealership network replaced gut-feel credit decisions with its own AI credit-scoring system.",
-      pt: "Como uma rede de concessionárias John Deere aprimorou as decisões de crédito com base nos dados de comportamento e características de seus clientes, por meio de um sistema próprio de scoring com IA.",
+      pt: "Uma rede de máquinas agrícolas reuniu comportamento de pagamento, dados externos e políticas internas em um sistema que prepara recomendações de crédito. A aprovação continua com o comitê.",
+      en: "An agricultural equipment network brought payment history, external data, and internal policies into a system that prepares credit recommendations. The committee retains final approval.",
     },
-    metrics: [
+    bottleneck: {
+      pt: "A rede precisava analisar clientes considerando mais do que a consulta a uma base externa. O histórico de compras, atrasos e renegociações dentro da própria empresa também era relevante para avaliar uma nova operação.",
+      en: "The network needed to assess customers using more than an external credit check. Purchase history, late payments, and renegotiations within the business also mattered when evaluating a new transaction.",
+    },
+    implemented: {
+      pt: "A Veehtor construiu um sistema que reúne esses dados e os cruza com sinais do contexto agrícola. A partir das políticas da empresa, o sistema prepara uma recomendação de limite, taxa e entrada para avaliação do comitê.",
+      en: "Veehtor built a system that brings these records together with signals from the agricultural market. It uses company policies to prepare a recommended credit limit, rate, and down payment for committee review.",
+    },
+    changed: {
+      pt: "O comitê passou a receber uma recomendação estruturada, apoiada no histórico do cliente e nos critérios da empresa. O sistema organiza a análise que sustenta a decisão; a aprovação final permanece humana.",
+      en: "The committee now receives a structured recommendation informed by customer history and company criteria. The system organizes the analysis supporting the decision; final approval remains with the committee.",
+    },
+    highlights: [
       {
-        value: { en: "5-7 days to minutes", pt: "5-7 dias para minutos" },
-        label: { en: "Credit decision time", pt: "Tempo de decisão de crédito" },
+        pt: "Histórico de pagamento e critérios internos reunidos.",
+        en: "Payment history and internal criteria brought together.",
       },
       {
-        value: { en: "8 of 10", pt: "8 de 10" },
-        label: { en: "Dealerships running the system", pt: "Concessionárias rodando o sistema" },
-      },
-      {
-        value: { en: "~4,000", pt: "~4.000" },
-        label: { en: "Customers scored", pt: "Clientes pontuados" },
+        pt: "Recomendação estruturada para o comitê.",
+        en: "Structured recommendations for committee review.",
       },
     ],
-    challenge: {
-      en: "The group makes daily credit decisions on deals that reach millions of dollars. A clean record at the credit bureau did not mean a good payer: many customers with spotless external reputations paid late and renegotiated internally. Every decision was close to a bet, and wrong bets hit the company's cash.",
-      pt: "O grupo toma decisões de crédito diárias em negócios que chegam a milhões de dólares. Uma ficha limpa no Serasa não significava, necessariamente, bom pagador: muitos clientes com reputação externa impecável pagavam em atraso e renegociavam internamente. Cada decisão errada aqui acarreta risco para o caixa da empresa.",
-    },
-    solution: {
-      en: "We built the company its own credit-analysis system. It learns from each customer's real purchase and payment behavior, then crosses that with external signals: commodity prices, regional weather, interest rates, government farm-credit policy. Every customer gets a score from 0 to 1,000, and an AI credit-analyst agent trained on the company's own policies delivers a ready recommendation of limit, rate, and down payment.",
-      pt: "Construímos para a empresa um sistema próprio de análise de crédito. Ele aprende com o comportamento real de compra e pagamento de cada cliente e cruza isso com sinais externos: preços de commodities, clima regional, taxas de juros, política de crédito rural do governo. Cada cliente recebe uma nota de 0 a 1.000, e um agente de IA analista de crédito, treinado nas políticas da empresa, entrega uma recomendação pronta de limite, taxa e entrada.",
-    },
-    result: {
-      en: "Decisions made in the dark on partial data are now informed decisions with real visibility of each customer's risk. Analysis that could take weeks takes minutes, cash planning got sharper, and a one-off project became an ongoing partnership with new AI projects being built together.",
-      pt: "Decisões tomadas no escuro com dados parciais agora são decisões informadas, com visibilidade real do risco de cada cliente. Análises que podiam levar semanas saem em minutos, o planejamento de caixa ficou mais preciso, e um projeto pontual virou uma parceria contínua com novos projetos de IA sendo construídos juntos.",
-    },
-    aboutClient: {
-      sector: {
-        en: "Farm equipment dealerships (John Deere)",
-        pt: "Concessionárias de máquinas agrícolas (John Deere)",
-      },
-      size: {
-        en: "10 dealerships, ~500 employees",
-        pt: "10 concessionárias, ~500 funcionários",
-      },
-      scale: {
-        en: "~4,000 active customers",
-        pt: "~4.000 clientes ativos",
-      },
+    cta: {
+      pt: "A análise de crédito está segurando propostas na sua operação? Converse com a Veehtor sobre essa rotina.",
+      en: "Is credit analysis holding up proposals? Talk to Veehtor about the workflow.",
     },
     seoDescription: {
-      en: "A John Deere dealership network replaced gut-feel credit calls with an AI credit-scoring system: decisions in minutes, ~4,000 customers scored, deployed at 8 of 10 dealerships.",
-      pt: "Uma rede de concessionárias John Deere trocou decisões de crédito no feeling por um sistema de scoring com IA: decisões em minutos, ~4.000 clientes pontuados, ativo em 8 de 10 concessionárias.",
+      pt: "Uma rede de concessionárias de máquinas agrícolas reuniu comportamento de pagamento, dados externos e políticas internas em um sistema que prepara recomendações de crédito para o comitê.",
+      en: "An agricultural equipment dealership network brought payment history, external data, and internal policies into a system that prepares credit recommendations for committee review.",
+    },
+    home: {
+      context: { pt: "Crédito B2B", en: "B2B credit" },
+      short: {
+        pt: "Histórico de pagamento, dados externos e políticas internas reunidos em uma recomendação de crédito para o comitê.",
+        en: "Payment history, external data, and internal policies brought together into a credit recommendation for the committee.",
+      },
     },
   },
   {
-    slug: "complo-time-tracking",
-    client: "Cervejaria Complô",
-    sector: "Food & Beverage",
-    areas: ["Human Resources"],
-    title: {
-      en: "Complô: a full day of payroll closing now takes minutes",
-      pt: "Complô: um dia inteiro de fechamento de folha agora leva minutos",
-    },
-    summary: {
-      en: "How a brewery hiring up to 40 freelancers a week replaced manual time tracking with geolocated clock-in and automatic payment.",
-      pt: "Como uma cervejaria que contrata até 40 freelancers por semana trocou o controle de horas manual por bater ponto com geolocalização e pagamento automático.",
-    },
-    metrics: [
-      {
-        value: { en: "~R$30,000/year", pt: "~R$ 30.000/ano" },
-        label: { en: "Management time recovered", pt: "Tempo de gestão recuperado" },
-        estimated: true,
-      },
-      {
-        value: { en: "30-40", pt: "30-40" },
-        label: { en: "Freelancers paid per week", pt: "Freelancers pagos por semana" },
-      },
-      {
-        value: { en: "1 day to minutes", pt: "1 dia para minutos" },
-        label: { en: "Weekly payroll closing", pt: "Fechamento semanal da folha" },
-      },
-    ],
-    challenge: {
-      en: "Across eight locations, freelancer hours were tracked by hand. The manager lost every Monday closing what each person was owed, with no proof of who worked when, and hour disputes could turn into labor claims.",
-      pt: "Em oito unidades, as horas dos freelancers eram controladas no braço. O gerente perdia toda segunda-feira fechando quanto cada um tinha a receber, sem prova de quem trabalhou quando, e disputas de horas podiam virar reclamação trabalhista.",
-    },
-    solution: {
-      en: "We built an app where each freelancer clocks in and out on their own phone, with geolocation confirming they are at the venue. Forgotten clock-outs close automatically and alert the manager. Every Monday the payment calculation arrives ready on WhatsApp: hours worked, amount owed, and each person's payment key.",
-      pt: "Construímos um app onde cada freelancer bate o ponto no próprio celular, com geolocalização confirmando que está na unidade. Batidas esquecidas se encerram sozinhas e alertam o gerente. Toda segunda-feira o cálculo de pagamento chega pronto no WhatsApp: horas trabalhadas, valor devido e a chave de pagamento de cada um.",
-    },
-    result: {
-      en: "Monday closing went from a full day to minutes, paid hours now match worked hours, and the company's exposure to hour disputes dropped. This was module one of a platform that kept growing.",
-      pt: "O fechamento de segunda passou de um dia inteiro para minutos, as horas pagas agora batem com as horas trabalhadas, e a exposição da empresa a disputas de horas caiu. Esse foi o módulo um de uma plataforma que continuou crescendo.",
-    },
-    aboutClient: {
-      sector: {
-        en: "Brewery with its own production plus bars and restaurants",
-        pt: "Cervejaria com produção própria mais bares e restaurantes",
-      },
-      size: { en: "8 active locations", pt: "8 unidades ativas" },
-      scale: { en: "30-40 freelancers per week", pt: "30-40 freelancers por semana" },
-    },
-    seoDescription: {
-      en: "A brewery with 8 locations replaced manual timecards with geolocated clock-in and automatic payroll. Monday closing went from a full day to minutes.",
-      pt: "Uma cervejaria com 8 unidades trocou controle de horas manual por ponto com geolocalização e folha automática. O fechamento de segunda passou de um dia inteiro para minutos.",
-    },
-  },
-  {
-    slug: "complo-ai-checklists",
-    client: "Cervejaria Complô",
-    sector: "Food & Beverage",
+    id: "field-productivity",
+    slug: "electrical-contractor-field-productivity",
+    legacySlugs: ["robbin-field-productivity"],
+    clientId: "electrical",
+    order: 2,
+    sector: "Construction",
     areas: ["Operations"],
     title: {
-      en: "Complô: AI now verifies opening and closing at all eight locations",
-      pt: "Complô: uma IA agora verifica abertura e fechamento nas oito unidades",
+      pt: "Menos tempo em deslocamentos e compras. Mais capacidade em campo.",
+      en: "Less time on travel and supply runs. More field capacity.",
     },
     summary: {
-      en: "Photo-verified digital checklists, scored by AI, catch problems at opening instead of on a packed Saturday night.",
-      pt: "Checklists digitais com foto, avaliados por IA, pegam problemas na abertura em vez de num sábado à noite lotado.",
+      pt: "Separar horas de serviço, deslocamento e compra de material mostrou onde a equipe perdia capacidade. Os dados passaram a orientar compras, preparação de materiais e rotas.",
+      en: "Separating job time, travel, and supply runs revealed where paid hours were going. The data then informed purchasing, material preparation, and routing.",
     },
-    metrics: [
+    bottleneck: {
+      pt: "Parte das horas pagas era consumida por deslocamentos não planejados e idas à loja de material. Sem separar esses tempos, a gestão não conseguia enxergar com clareza quanto da semana estava disponível para executar serviços.",
+      en: "Unplanned travel and supply-store visits consumed part of the crew's paid week. Without separate time categories, management could not clearly see how much capacity remained for delivering jobs.",
+    },
+    implemented: {
+      pt: "A partir dos registros de jornada, a Veehtor ajudou a transformar a medição em rotina: compras consolidadas, conferência de materiais antes da saída, roteamento por região e acompanhamento semanal do tempo não faturável.",
+      en: "Using time records, Veehtor helped turn measurement into an operating routine: consolidated purchasing, material checks before departure, routing by area, and weekly tracking of non-billable time.",
+    },
+    changed: {
+      pt: "A gestão passou a enxergar a distribuição das horas pagas e a usar essa informação no planejamento das equipes. A combinação de medição e mudanças na rotina liberou capacidade para execução de serviços.",
+      en: "Management gained visibility into the distribution of paid hours and used it to plan field work. Measurement and changes to daily routines together released capacity for service delivery.",
+    },
+    highlights: [
       {
-        value: { en: "8", pt: "8" },
-        label: { en: "Locations standardized", pt: "Unidades padronizadas" },
+        pt: "Tempo não faturável acompanhado por semana.",
+        en: "Weekly visibility into non-billable time.",
       },
       {
-        value: { en: "1 to 5", pt: "1 a 5" },
-        label: { en: "AI score on every photo check", pt: "Nota da IA em cada foto" },
-      },
-      {
-        value: { en: "Same morning", pt: "Na mesma manhã" },
-        label: {
-          en: "When issues get caught and fixed",
-          pt: "Quando os problemas são pegos e resolvidos",
-        },
+        pt: "Compras, materiais e rotas organizados a partir dos dados.",
+        en: "Purchasing, materials, and routes planned using operating data.",
       },
     ],
-    challenge: {
-      en: "Every location depends on an opening and closing routine that cannot fail: restock the taps, check the nitrogen pressure, clean the bathrooms. Nothing guaranteed it was actually done. Failures surfaced at the worst moment, with a full house, and ended up as negative Google reviews.",
-      pt: "Cada unidade depende de uma rotina de abertura e fechamento que não pode falhar: reabastecer as torneiras, checar a pressão do nitrogênio, limpar os banheiros. Nada garantia que era feito de verdade. As falhas apareciam no pior momento, com casa cheia, e viravam avaliação negativa no Google.",
-    },
-    solution: {
-      en: "Staff follow a digital checklist in the app. For critical items they submit a photo, and an AI scores it from 1 to 5. A low score alerts the manager immediately, photo attached, before customers notice. Top-scored photos become the reference standard, and every check is logged.",
-      pt: "A equipe segue um checklist digital no app. Nos itens críticos, manda uma foto, e a IA dá uma nota de 1 a 5. Nota baixa alerta o gerente na hora, com foto anexada, antes de o cliente notar. As fotos com nota alta viram referência de padrão, e cada checagem fica registrada.",
-    },
-    result: {
-      en: "The routine stopped depending on memory. Problems are caught at opening and fixed the same morning, and the company has a full audit history of every opening and closing at every location.",
-      pt: "A rotina deixou de depender de memória. Os problemas são pegos na abertura e resolvidos na mesma manhã, e a empresa tem um histórico completo de auditoria de cada abertura e fechamento de cada unidade.",
-    },
-    aboutClient: {
-      sector: {
-        en: "Brewery with its own production plus bars and restaurants",
-        pt: "Cervejaria com produção própria mais bares e restaurantes",
-      },
-      size: { en: "8 active locations", pt: "8 unidades ativas" },
-      scale: { en: "30-40 freelancers per week", pt: "30-40 freelancers por semana" },
+    cta: {
+      pt: "Sua equipe perde capacidade entre deslocamentos, compras e execução? Converse com a Veehtor sobre como medir essa rotina.",
+      en: "Is your crew losing capacity between travel, purchasing, and delivery? Talk to Veehtor about measuring that workflow.",
     },
     seoDescription: {
-      en: "Photo-verified digital checklists scored by AI catch opening and closing failures the same morning across all eight Complô locations.",
-      pt: "Checklists digitais com foto avaliados por IA pegam falhas de abertura e fechamento na mesma manhã nas oito unidades da Complô.",
+      pt: "Uma empresa de serviços elétricos nos EUA separou horas de serviço, deslocamento e compra de material e passou a organizar compras, materiais e rotas a partir desses dados.",
+      en: "A US electrical contractor separated job time, travel, and supply runs, then used that data to organize purchasing, materials, and routing.",
+    },
+    home: {
+      context: { pt: "Operações de campo", en: "Field operations" },
+      short: {
+        pt: "Horas de serviço, deslocamento e compra de material separadas para orientar compras, materiais e rotas.",
+        en: "Job time, travel, and supply runs separated to guide purchasing, materials, and routing.",
+      },
     },
   },
   {
-    slug: "complo-ai-dashboard",
-    client: "Cervejaria Complô",
-    sector: "Food & Beverage",
-    areas: ["Finance", "Operations"],
-    title: {
-      en: "Complô: an AI analyst watching every location, 24/7",
-      pt: "Complô: um analista de IA olhando todas as unidades, 24/7",
-    },
-    summary: {
-      en: "One real-time dashboard unified systems that did not talk to each other, with an AI that explains what is happening and what to do.",
-      pt: "Um dashboard em tempo real unificou sistemas que não conversavam, com uma IA que explica o que está acontecendo e o que fazer.",
-    },
-    metrics: [
-      {
-        value: { en: "All locations", pt: "Todas as unidades" },
-        label: { en: "One real-time panel", pt: "Um painel em tempo real" },
-      },
-      {
-        value: { en: "74%", pt: "74%" },
-        label: {
-          en: "Of revenue found concentrated on weekends",
-          pt: "Da receita concentrada nos fins de semana",
-        },
-      },
-      {
-        value: { en: "24/7", pt: "24/7" },
-        label: { en: "AI analysis on live data", pt: "Análise de IA sobre dados ao vivo" },
-      },
-    ],
-    challenge: {
-      en: "Sales, orders, and cost data lived in systems that did not talk to each other: digital menu, POS, spreadsheets. Understanding why sales dropped in a week meant consolidating everything by hand, so it almost never happened, and decisions ran on gut feel.",
-      pt: "Dados de vendas, pedidos e custos viviam em sistemas que não conversavam: cardápio digital, POS, planilhas. Entender por que as vendas caíram na semana significava consolidar tudo no braço, então quase nunca era feito, e as decisões saíam no feeling.",
-    },
-    solution: {
-      en: "We built one dashboard that unifies all systems in real time. On top of the numbers, an AI explains what is happening and suggests what to do, like an analyst working around the clock: it flagged that 74% of revenue concentrates on weekends, so weekday staffing can run leaner, and it warns when freelancer cost runs above what that week's sales justify.",
-      pt: "Construímos um dashboard que unifica todos os sistemas em tempo real. Em cima dos números, uma IA explica o que está acontecendo e sugere o que fazer, como um analista trabalhando dia e noite: ela mostrou que 74% da receita se concentra nos fins de semana, então a equipe nos dias de semana pode ser mais enxuta, e alerta quando o custo com freelancer sobe acima do que a venda da semana justifica.",
-    },
-    result: {
-      en: "Each manager opens the panel and sees their location; the owners see the whole picture. Correction stopped waiting for month-end close: managers act while the result can still change.",
-      pt: "Cada gerente abre o painel e vê sua unidade; os sócios veem o quadro inteiro. A correção deixou de esperar o fechamento do mês: os gerentes agem enquanto o resultado ainda pode mudar.",
-    },
-    aboutClient: {
-      sector: {
-        en: "Brewery with its own production plus bars and restaurants",
-        pt: "Cervejaria com produção própria mais bares e restaurantes",
-      },
-      size: { en: "8 active locations", pt: "8 unidades ativas" },
-      scale: { en: "30-40 freelancers per week", pt: "30-40 freelancers por semana" },
-    },
-    seoDescription: {
-      en: "One real-time dashboard unified Complô's disconnected systems, with an AI analyst explaining what's happening and what to do 24/7.",
-      pt: "Um dashboard em tempo real unificou os sistemas desconectados da Complô, com uma IA analista explicando o que está acontecendo e o que fazer 24/7.",
-    },
-  },
-  {
-    slug: "complo-customer-voice",
-    client: "Cervejaria Complô",
-    sector: "Food & Beverage",
-    areas: ["Customer Relations"],
-    title: {
-      en: "Complô: Google reviews turned into a weekly action list",
-      pt: "Complô: avaliações do Google viraram uma lista de ação semanal",
-    },
-    summary: {
-      en: "Every Monday, the week's reviews arrive collected, prioritized, and answerable from the same dashboard managers already use.",
-      pt: "Toda segunda-feira, as avaliações da semana chegam coletadas, priorizadas e prontas para responder no mesmo dashboard que os gerentes já usam.",
-    },
-    metrics: [
-      {
-        value: { en: "100%", pt: "100%" },
-        label: {
-          en: "Of weekly reviews collected automatically",
-          pt: "Das avaliações semanais coletadas automaticamente",
-        },
-      },
-      {
-        value: { en: "Monday", pt: "Segunda-feira" },
-        label: {
-          en: "Weekly cadence, right after the busy weekend",
-          pt: "Cadência semanal, logo depois do fim de semana cheio",
-        },
-      },
-      {
-        value: { en: "Week over week", pt: "Semana a semana" },
-        label: { en: "Complaint trends tracked", pt: "Tendências de reclamação acompanhadas" },
-      },
-    ],
-    challenge: {
-      en: "Reviews were read one by one, so it was hard to see which complaints repeated week after week, and the company reacted late to what customers were saying.",
-      pt: "As avaliações eram lidas uma a uma, então era difícil ver quais reclamações se repetiam semana após semana, e a empresa reagia tarde ao que os clientes estavam dizendo.",
-    },
-    solution: {
-      en: "Every Monday the system collects the week's Google reviews into the dashboard, organizes them by rating, automatically surfaces what needs attention first (complaints, unanswered comments), and lets the manager reply from there.",
-      pt: "Toda segunda-feira o sistema coleta as avaliações do Google da semana no dashboard, organiza por nota, destaca automaticamente o que precisa de atenção primeiro (reclamações, comentários sem resposta) e deixa o gerente responder dali mesmo.",
-    },
-    result: {
-      en: "It went from \"I hear it's bad\" to \"I can see on the panel what is bad, and where.\" Managers prioritize the real issue, and the company tracks whether a fix actually made the complaint drop.",
-      pt: "Passou de \"ouvi dizer que está ruim\" para \"consigo ver no painel o que está ruim e onde\". Os gerentes priorizam o problema real, e a empresa acompanha se a correção fez a reclamação de fato cair.",
-    },
-    aboutClient: {
-      sector: {
-        en: "Brewery with its own production plus bars and restaurants",
-        pt: "Cervejaria com produção própria mais bares e restaurantes",
-      },
-      size: { en: "8 active locations", pt: "8 unidades ativas" },
-      scale: { en: "30-40 freelancers per week", pt: "30-40 freelancers por semana" },
-    },
-    seoDescription: {
-      en: "Google reviews collected every Monday and turned into a prioritized action list Complô managers act on from their existing dashboard.",
-      pt: "Avaliações do Google coletadas toda segunda e transformadas em uma lista de ação priorizada que os gerentes da Complô resolvem no dashboard que já usam.",
-    },
-  },
-  {
-    slug: "phomenta-linkedin-leads",
-    client: "Instituto Phomenta",
+    id: "grant-screening",
+    slug: "nonprofit-grant-screening",
+    legacySlugs: ["phomenta-grant-prospecting"],
+    clientId: "nonprofit",
+    order: 3,
     sector: "Nonprofit",
     areas: ["Sales"],
     title: {
-      en: "Phomenta: qualified LinkedIn leads with messages ready to send",
-      pt: "Phomenta: leads qualificados no LinkedIn com mensagens prontas para enviar",
+      pt: "Critérios de edital transformados em uma seleção rastreável de organizações",
+      en: "Grant criteria turned into a traceable shortlist of organizations",
     },
     summary: {
-      en: "An AI workflow finds the right people at target companies, validates fit, and writes personalized outreach, leaving only the sending to humans.",
-      pt: "Um fluxo de IA encontra as pessoas certas nas empresas-alvo, valida o fit e escreve a abordagem personalizada, deixando só o envio para o humano.",
+      pt: "Uma base pública nacional passou a ser filtrada pelos critérios de cada seleção. A equipe recebe organizações compatíveis com as regras aplicadas e a justificativa da triagem.",
+      en: "A national public database is filtered against the criteria of each selection process. The team receives matching organizations and the rationale behind the screening.",
     },
-    metrics: [
+    bottleneck: {
+      pt: "A cada edital, a equipe precisava buscar organizações compatíveis com requisitos como localização, natureza jurídica e área de atuação. Repetir a leitura manual dos registros limitava a capacidade de preparar a seleção dentro do prazo.",
+      en: "Each grant required the team to identify organizations that matched requirements such as location, legal status, and area of work. Repeated manual review limited how quickly the team could prepare a shortlist.",
+    },
+    implemented: {
+      pt: "A Veehtor construiu um fluxo que aplica filtros objetivos à base e registra os critérios usados. A IA entra depois da triagem para preparar abordagens personalizadas às organizações selecionadas.",
+      en: "Veehtor built a workflow that applies objective filters and records the criteria used. AI then prepares personalized outreach for organizations that pass the screening.",
+    },
+    changed: {
+      pt: "A equipe passou a trabalhar com uma lista filtrada e com os critérios de seleção registrados. A saída apoia a revisão e o contato com as organizações; a elegibilidade final e a concessão do recurso dependem do processo do edital.",
+      en: "The team now works from a filtered list with documented selection criteria. The output supports review and outreach; final eligibility and funding decisions remain part of the grant process.",
+    },
+    highlights: [
+      { pt: "Triagem por critérios definidos.", en: "Screening against defined criteria." },
       {
-        value: { en: "15-20 min to seconds", pt: "15-20 min para segundos" },
-        label: { en: "Research and validation per lead", pt: "Pesquisa e validação por lead" },
-      },
-      {
-        value: { en: "~80%", pt: "~80%" },
-        label: { en: "Of prospecting time eliminated", pt: "Do tempo de prospecção eliminado" },
-        estimated: true,
-      },
-      {
-        value: { en: "100%", pt: "100%" },
-        label: { en: "Of leads validated for role and fit", pt: "Dos leads validados por cargo e fit" },
+        pt: "Justificativas disponíveis para revisão.",
+        en: "Selection rationale available for review.",
       },
     ],
-    challenge: {
-      en: "Finding the right contact at each target company, checking their role and fit, and writing a personalized message took 15 to 20 minutes of research per lead, plus another 10 minutes of writing. Outreach capacity was capped by the team's hours.",
-      pt: "Achar o contato certo em cada empresa-alvo, checar cargo e fit, e escrever uma mensagem personalizada levava de 15 a 20 minutos de pesquisa por lead, mais uns 10 minutos de escrita. A capacidade de prospecção era limitada pelas horas do time.",
-    },
-    solution: {
-      en: "From the target-company base, an automated workflow finds profiles, validates the company, seniority, and fit with social-impact themes, and creates the lead in the CRM. An AI agent then writes a synergy summary plus a personalized connection invite and a follow-up message for each lead. The team reviews and sends manually, keeping compliance and the human touch: the machine does the grunt work, the person does the relationship.",
-      pt: "A partir da base de empresas-alvo, um fluxo automatizado encontra perfis, valida a empresa, a senioridade e o fit com temas de impacto social, e cria o lead no CRM. Depois, um agente de IA escreve um resumo de sinergia mais um convite de conexão personalizado e uma mensagem de follow-up para cada lead. O time revisa e envia manualmente, mantendo compliance e o toque humano: a máquina faz o operacional, a pessoa faz o relacionamento.",
-    },
-    result: {
-      en: "Research and validation per lead dropped from 15-20 minutes to seconds, personalized copy from ~10 minutes to seconds, cutting overall prospecting time by roughly 80%. No more generic copy-paste: every lead gets an approach based on their own corporate context, and the team's hours moved from hunting names and titles to conversations and closing.",
-      pt: "A pesquisa e validação por lead caiu de 15-20 minutos para segundos, o copy personalizado de ~10 minutos para segundos, cortando o tempo total de prospecção em cerca de 80%. Acabou o copia e cola genérico: cada lead recebe uma abordagem baseada no próprio contexto corporativo, e as horas do time saíram de caçar nomes e cargos para conversas e fechamento.",
-    },
-    aboutClient: {
-      sector: {
-        en: "Nonprofit support institute (trains and connects NGOs and companies)",
-        pt: "Instituto de apoio a organizações sem fins lucrativos (treina e conecta ONGs e empresas)",
-      },
-      scale: { en: "National outreach operation", pt: "Operação nacional de outreach" },
+    cta: {
+      pt: "Sua equipe precisa conferir muitos registros contra critérios específicos? Converse com a Veehtor sobre essa triagem.",
+      en: "Does your team need to check large numbers of records against specific criteria? Talk to Veehtor about that workflow.",
     },
     seoDescription: {
-      en: "An AI workflow finds and validates LinkedIn leads for Phomenta and writes personalized outreach in seconds, cutting prospecting time by roughly 80%.",
-      pt: "Um fluxo de IA encontra e valida leads no LinkedIn para a Phomenta e escreve abordagem personalizada em segundos, cortando o tempo de prospecção em cerca de 80%.",
+      pt: "Um instituto de apoio a organizações sociais passou a filtrar uma base pública nacional pelos critérios de cada edital, com as justificativas da triagem registradas para revisão.",
+      en: "A nonprofit support organization filters a national public database against each grant's criteria, with screening rationale recorded for review.",
+    },
+    home: {
+      context: { pt: "Triagem para editais", en: "Grant screening" },
+      short: {
+        pt: "Critérios de edital aplicados a uma base pública nacional, com justificativas registradas para revisão.",
+        en: "Grant criteria applied to a national public database, with rationale recorded for review.",
+      },
     },
   },
   {
-    slug: "phomenta-grant-prospecting",
-    client: "Instituto Phomenta",
+    id: "outreach-research",
+    slug: "nonprofit-outreach-research",
+    legacySlugs: ["phomenta-linkedin-leads"],
+    clientId: "nonprofit",
+    order: 4,
     sector: "Nonprofit",
     areas: ["Sales"],
     title: {
-      en: "Phomenta: a national nonprofit database filtered for one grant in hours",
-      pt: "Phomenta: uma base nacional de ONGs filtrada para um edital em horas",
+      pt: "Pesquisa e abordagem comercial preparadas antes da revisão do time",
+      en: "Contact research and outreach drafts prepared for team review",
     },
     summary: {
-      en: "A rules-based engine reads a grant's criteria and filters a national public database down to the organizations that can actually win it.",
-      pt: "Um motor de regras lê os critérios do edital e filtra uma base pública nacional até as organizações que realmente podem ganhar.",
+      pt: "Um fluxo pesquisa contatos nas empresas-alvo, confere cargo e aderência aos critérios e prepara mensagens personalizadas. A equipe revisa o material e conduz o contato.",
+      en: "A workflow researches contacts at target companies, checks role and fit against defined criteria, and prepares personalized messages. The team reviews the output and manages outreach.",
     },
-    metrics: [
+    bottleneck: {
+      pt: "Encontrar a pessoa adequada em cada empresa exigia pesquisar perfil, cargo e relação com temas de impacto social. Depois, ainda era necessário escrever uma mensagem conectada ao contexto daquela empresa.",
+      en: "Finding the right person at each company required checking their profile, role, and connection to social-impact themes. The team then had to write an outreach message grounded in that company's context.",
+    },
+    implemented: {
+      pt: "A Veehtor construiu um fluxo que parte da lista de empresas-alvo, pesquisa os perfis, aplica os critérios de seleção e cria os registros no CRM. A IA prepara um resumo de afinidade, um convite de conexão e uma mensagem de acompanhamento para revisão humana.",
+      en: "Veehtor built a workflow that starts with target accounts, researches profiles, applies selection criteria, and creates CRM records. AI prepares a fit summary, a connection invitation, and a follow-up draft for human review.",
+    },
+    changed: {
+      pt: "A pesquisa e a preparação inicial das mensagens passaram a ser feitas pelo fluxo. A equipe recebe o material para revisar e usa esse ponto de partida para conduzir as conversas e desenvolver relacionamentos.",
+      en: "Research and initial message preparation now run through the workflow. The team receives material to review and uses it as a starting point for conversations and relationship development.",
+    },
+    highlights: [
       {
-        value: { en: "Thousands in minutes", pt: "Milhares em minutos" },
-        label: {
-          en: "Organizations screened (manual pace was hundreds per week)",
-          pt: "Organizações triadas (o ritmo manual era centenas por semana)",
-        },
+        pt: "Contatos pesquisados segundo critérios definidos.",
+        en: "Contacts researched against defined criteria.",
       },
       {
-        value: { en: "Hours, not weeks", pt: "Horas, não semanas" },
-        label: { en: "To respond to a new grant", pt: "Para responder a um novo edital" },
-      },
-      {
-        value: { en: "~US$20", pt: "~US$ 20" },
-        label: {
-          en: "Total processing cost for a real grant",
-          pt: "Custo total de processamento de um edital real",
-        },
+        pt: "Mensagens preparadas para revisão humana.",
+        en: "Outreach drafts prepared for human review.",
       },
     ],
-    challenge: {
-      en: "For each new grant, finding which nonprofits fit the eligibility criteria meant manually screening a national database of hundreds of thousands of organizations: legal status, category, region, social focus. Weeks of work for every grant cycle, and running AI over the whole database would cost thousands of dollars.",
-      pt: "Para cada novo edital, encontrar quais ONGs se encaixavam nos critérios de elegibilidade significava triar manualmente uma base nacional com centenas de milhares de organizações: natureza jurídica, categoria, região, foco social. Semanas de trabalho a cada ciclo de edital, e rodar IA sobre a base inteira custaria milhares de dólares.",
-    },
-    solution: {
-      en: "We built a hybrid pipeline: code where speed and cost matter, AI where context matters. A rules engine reads the grant's criteria and filters the database deterministically: legal-nature codes, exclusion rules, a 0-4 territorial-vulnerability score built from address markers, a 0-4 social-area score, and a strict municipality filter. Only the approved organizations reach the AI, which writes personalized outreach for each one.",
-      pt: "Construímos um pipeline híbrido: código onde velocidade e custo importam, IA onde o contexto importa. Um motor de regras lê os critérios do edital e filtra a base de forma determinística: códigos de natureza jurídica, regras de exclusão, uma nota de 0 a 4 de vulnerabilidade territorial construída a partir de marcadores de endereço, uma nota de 0 a 4 de área social e um filtro estrito de município. Só as organizações aprovadas chegam à IA, que escreve a abordagem personalizada para cada uma.",
-    },
-    result: {
-      en: "Screening went from hundreds of organizations per week to thousands in minutes. Delivered on a real federal-bank grant at about US$20 of processing cost, and every approved organization carries an auditable justification (its scores and criteria), which funders can trace. Responding to a new grant now means swapping the PDF and the rules: hours, not weeks.",
-      pt: "A triagem passou de centenas de organizações por semana para milhares em minutos. Entregue em um edital real de banco federal por cerca de US$ 20 de custo de processamento, e cada organização aprovada carrega uma justificativa auditável (as notas e critérios), que os financiadores podem rastrear. Responder a um novo edital agora é trocar o PDF e as regras: horas, não semanas.",
-    },
-    aboutClient: {
-      sector: {
-        en: "Nonprofit support institute (trains and connects NGOs and companies)",
-        pt: "Instituto de apoio a organizações sem fins lucrativos (treina e conecta ONGs e empresas)",
-      },
-      scale: { en: "National outreach operation", pt: "Operação nacional de outreach" },
+    cta: {
+      pt: "A pesquisa está consumindo o tempo de quem deveria conversar com clientes e parceiros? Converse com a Veehtor.",
+      en: "Is research taking time away from conversations with customers and partners? Talk to Veehtor.",
     },
     seoDescription: {
-      en: "A hybrid rules-plus-AI pipeline filters a national nonprofit database for Phomenta grant cycles in hours, at about US$20 of processing cost per grant.",
-      pt: "Um pipeline híbrido de regras e IA filtra uma base nacional de ONGs para os ciclos de editais da Phomenta em horas, por cerca de US$ 20 de custo de processamento por edital.",
+      pt: "Um instituto de apoio a organizações sociais passou a pesquisar contatos, aplicar critérios, criar registros no CRM e preparar mensagens personalizadas para revisão humana.",
+      en: "A nonprofit support organization researches contacts, applies criteria, creates CRM records, and prepares personalized outreach drafts for human review.",
     },
   },
   {
-    slug: "robbin-payroll",
-    client: "Robbin Services",
-    sector: "Construction",
-    areas: ["Human Resources"],
-    title: {
-      en: "Robbin Services: payroll from timecards to payment, calculated automatically",
-      pt: "Robbin Services: folha de pagamento do cartão-ponto ao pagamento, calculada automaticamente",
-    },
-    summary: {
-      en: "A North Carolina electrical subcontractor stopped closing crew payroll by hand: each worker's rules applied automatically, every week.",
-      pt: "Um subcontratado elétrico da Carolina do Norte parou de fechar a folha da equipe no braço: as regras de cada trabalhador aplicadas automaticamente, toda semana.",
-    },
-    metrics: [
-      {
-        value: { en: "~US$15,000/year", pt: "~US$ 15.000/ano" },
-        label: {
-          en: "Owner and admin time recovered (6 h/week at US$50/h)",
-          pt: "Tempo de dono e admin recuperado (6h/semana a US$ 50/h)",
-        },
-        estimated: true,
-      },
-      {
-        value: { en: "3", pt: "3" },
-        label: {
-          en: "Time categories tracked per worker: the job, travel, supply runs",
-          pt: "Categorias de tempo por trabalhador: obra, deslocamento e compra de material",
-        },
-      },
-      {
-        value: { en: "Hours to minutes", pt: "Horas para minutos" },
-        label: { en: "Weekly payroll closing", pt: "Fechamento semanal da folha" },
-      },
-    ],
-    challenge: {
-      en: "Crew timecards lived in the field-service tool, but payroll was closed by hand: each electrician has their own day rate, overtime rule, lunch window, and travel-time treatment. Weekly closing consumed about 6 hours and invited errors: negative durations, missing lunch entries inflating paid hours.",
-      pt: "Os cartões-ponto da equipe viviam na ferramenta de field-service, mas a folha era fechada no braço: cada eletricista tem sua diária, sua regra de hora extra, sua janela de almoço e seu tratamento de tempo de deslocamento. O fechamento semanal consumia cerca de 6 horas e abria espaço para erros: durações negativas, almoços não registrados inflando as horas pagas.",
-    },
-    solution: {
-      en: "We built a pipeline that reads the timecards and applies each person's documented rules automatically: day rates, overtime after 8 hours, lunch detection. Clock-in and clock-out are split into three categories, the job itself, travel time, and supply runs, so every paid hour lands in the right bucket. The pipeline also audits the data, catching inconsistencies that used to distort pay.",
-      pt: "Construímos um pipeline que lê os cartões-ponto e aplica automaticamente as regras documentadas de cada pessoa: diárias, hora extra depois de 8 horas, detecção de almoço. As entradas e saídas são separadas em três categorias, a própria obra, tempo de deslocamento e compra de material, então cada hora paga cai no balde certo. O pipeline também audita os dados, pegando inconsistências que antes distorciam o pagamento.",
-    },
-    result: {
-      en: "Weekly closing went from hours of spreadsheet work to minutes of review, with each worker paid exactly by their agreed rules. Clean, categorized time data made it possible to compute each technician's real cost per hour, and exposed where paid hours were leaking, which became the field-productivity case below.",
-      pt: "O fechamento semanal saiu de horas de planilha para minutos de revisão, com cada trabalhador pago exatamente pelas regras acordadas. Dados de tempo limpos e categorizados tornaram possível calcular o custo real por hora de cada técnico e expuseram onde as horas pagas estavam vazando, o que virou o caso de produtividade em campo abaixo.",
-    },
-    aboutClient: {
-      sector: {
-        en: "Electrical subcontractor for general contractors (North Carolina, USA)",
-        pt: "Subcontratado elétrico para general contractors (Carolina do Norte, EUA)",
-      },
-      size: { en: "Field crew plus virtual assistant", pt: "Equipe de campo mais assistente virtual" },
-      scale: { en: "100+ invoices issued", pt: "100+ notas emitidas" },
-    },
-    seoDescription: {
-      en: "A North Carolina electrical subcontractor automated weekly payroll from raw timecards. Closing went from hours to minutes, with each worker's rules applied per line.",
-      pt: "Um subcontratado elétrico da Carolina do Norte automatizou a folha semanal a partir dos cartões-ponto brutos. O fechamento passou de horas para minutos, com as regras de cada trabalhador aplicadas linha por linha.",
-    },
-  },
-  {
-    slug: "robbin-receivables-cash",
-    client: "Robbin Services",
+    id: "receivables",
+    slug: "electrical-contractor-receivables",
+    legacySlugs: ["robbin-receivables-cash"],
+    clientId: "electrical",
+    order: 5,
     sector: "Construction",
     areas: ["Finance"],
     title: {
-      en: "Robbin Services: invoices into QuickBooks, and overdue balances that stopped hiding",
-      pt: "Robbin Services: notas fiscais entrando no QuickBooks, e saldos em atraso que pararam de se esconder",
+      pt: "Saldos em atraso passaram a gerar cobrança e regras para novos serviços",
+      en: "Overdue balances now trigger collection follow-up and booking rules",
     },
     summary: {
-      en: "An AI parser posts invoices and monthly costs into QuickBooks, and a weekly receivables review turned unpaid balances into rules, reminders, and protected cash.",
-      pt: "Um parser com IA lança faturas e custos mensais no QuickBooks, e uma revisão semanal de recebíveis transformou saldos em aberto em regras, lembretes e caixa protegido.",
+      pt: "A integração com o financeiro e uma revisão semanal de recebíveis deram visibilidade a saldos pendentes. Lembretes, entrada antecipada e critérios de agendamento passaram a fazer parte da rotina.",
+      en: "Accounting integration and a weekly receivables review made outstanding balances visible. Payment reminders, upfront deposits, and booking criteria became part of the operating routine.",
     },
-    metrics: [
+    bottleneck: {
+      pt: "Faturas e custos eram lançados manualmente no sistema financeiro. Ao mesmo tempo, saldos em aberto podiam passar despercebidos, inclusive quando clientes em atraso solicitavam novos serviços.",
+      en: "Invoices and costs were entered manually into the accounting system. At the same time, outstanding balances could go unnoticed, including when overdue customers requested new work.",
+    },
+    implemented: {
+      pt: "A Veehtor automatizou a extração de dados de faturas e os lançamentos previstos no fluxo do QuickBooks. A revisão de recebíveis passou a orientar lembretes de pagamento, exigência de entrada em projetos maiores e critérios para agendar novos trabalhos. A gestão também incorporou verificações de custo de material e preço dos serviços.",
+      en: "Veehtor automated invoice data extraction and the accounting entries included in the QuickBooks workflow. Receivables reviews informed scheduled reminders, upfront deposits for larger projects, and criteria for booking additional work. Management also added checks on material costs and job pricing.",
+    },
+    changed: {
+      pt: "Pendências passaram a ter visibilidade e encaminhamento dentro de uma rotina de cobrança. A empresa passou a aplicar critérios de pagamento e agendamento aos novos serviços, com acompanhamento dos saldos em aberto.",
+      en: "Outstanding balances gained visibility and a defined follow-up process. The business began applying payment and booking criteria to new jobs while tracking open receivables.",
+    },
+    highlights: [
+      { pt: "Recebíveis com acompanhamento semanal.", en: "Weekly receivables monitoring." },
       {
-        value: { en: "US$5,000-14,500", pt: "US$ 5.000-14.500" },
-        label: {
-          en: "In at-risk receivables surfaced and chased per week",
-          pt: "Em recebíveis em risco identificados e cobrados por semana",
-        },
-      },
-      {
-        value: { en: "50%", pt: "50%" },
-        label: {
-          en: "Upfront deposit now required on large projects",
-          pt: "Sinal obrigatório agora exigido em projetos grandes",
-        },
-      },
-      {
-        value: { en: "100+", pt: "100+" },
-        label: { en: "Invoices processed automatically", pt: "Faturas processadas automaticamente" },
+        pt: "Cobrança e novos agendamentos orientados por regras.",
+        en: "Collection follow-up and bookings guided by business rules.",
       },
     ],
-    challenge: {
-      en: "Every invoice and monthly cost was typed into QuickBooks by hand, and unpaid balances piled up unnoticed: invoices marked as paid still carried open balances, overdue customers kept getting new bookings, and some jobs quietly lost money, with material alone eating most of the revenue.",
-      pt: "Cada fatura e custo mensal era digitado no QuickBooks no braço, e os saldos em aberto se acumulavam sem ninguém notar: faturas marcadas como pagas ainda carregavam saldo, clientes em atraso continuavam a receber novos agendamentos, e alguns serviços quietamente perdiam dinheiro, com só o material comendo boa parte da receita.",
-    },
-    solution: {
-      en: "An AI parser reads the invoices, extracts the data, and posts monthly costs directly into QuickBooks Online. On top of clean books, a weekly monitoring routine surfaces open and overdue balances and turned into business rules: automatic payment reminders (1 day before, 3 and 7 days after due date), a 50% upfront deposit on large projects, a booking lock for customers more than 7 days late, and margin checks that flag jobs where material cost is out of proportion, now covered by a minimum-price policy and formal change orders.",
-      pt: "Um parser com IA lê as faturas, extrai os dados e lança os custos mensais direto no QuickBooks Online. Sobre livros limpos, uma rotina semanal de monitoramento identifica saldos em aberto e em atraso e virou regra de negócio: lembretes automáticos de pagamento (1 dia antes, 3 e 7 dias depois do vencimento), sinal de 50% em projetos grandes, bloqueio de agendamento para clientes com mais de 7 dias de atraso, e checagens de margem que sinalizam serviços em que o custo de material está fora de proporção, agora cobertos por política de preço mínimo e change orders formais.",
-    },
-    result: {
-      en: "Data entry disappeared and the books stay current. Every week, US$5,000 to US$14,500 in at-risk balances get surfaced and acted on instead of aging silently, and cash became predictable: deposits before big jobs, reminders on schedule, and no new work booked for late payers.",
-      pt: "A digitação sumiu e os livros ficam em dia. Toda semana, US$ 5.000 a US$ 14.500 em saldos em risco são identificados e cobrados em vez de envelhecerem em silêncio, e o caixa ficou previsível: sinal antes das obras grandes, lembretes no prazo, e nenhum trabalho novo agendado para maus pagadores.",
-    },
-    aboutClient: {
-      sector: {
-        en: "Electrical subcontractor for general contractors (North Carolina, USA)",
-        pt: "Subcontratado elétrico para general contractors (Carolina do Norte, EUA)",
-      },
-      size: { en: "Field crew plus virtual assistant", pt: "Equipe de campo mais assistente virtual" },
-      scale: { en: "100+ invoices issued", pt: "100+ notas emitidas" },
+    cta: {
+      pt: "Existem saldos em aberto sem próximo passo definido na sua empresa? Converse com a Veehtor sobre a rotina de recebíveis.",
+      en: "Does your business have outstanding balances with no clear next action? Talk to Veehtor about your receivables workflow.",
     },
     seoDescription: {
-      en: "AI posts invoices into QuickBooks and a weekly receivables review turned unpaid balances into deposits, reminders, and protected cash for Robbin Services.",
-      pt: "IA lança faturas no QuickBooks e uma revisão semanal de recebíveis transformou saldos em aberto em sinais, lembretes e caixa protegido para a Robbin Services.",
+      pt: "Uma empresa de serviços elétricos nos EUA integrou faturas ao financeiro e criou uma revisão semanal de recebíveis, com lembretes, entrada antecipada e critérios de agendamento.",
+      en: "A US electrical contractor integrated invoices with accounting and built a weekly receivables review, with reminders, upfront deposits, and booking criteria.",
     },
   },
   {
-    slug: "robbin-field-productivity",
-    client: "Robbin Services",
-    sector: "Construction",
-    areas: ["Operations"],
+    id: "brewery-time-tracking",
+    slug: "multi-location-brewery-time-tracking",
+    legacySlugs: ["complo-time-tracking"],
+    clientId: "brewery",
+    order: 6,
+    sector: "Food & Beverage",
+    areas: ["Human Resources"],
     title: {
-      en: "Robbin Services: non-billable hours cut from up to 18% to under 5%",
-      pt: "Robbin Services: horas não faturáveis cortadas de até 18% para menos de 5%",
+      pt: "Jornadas e cálculo de pagamentos reunidos para conferência",
+      en: "Time records and payment calculations brought together for review",
     },
     summary: {
-      en: "Tracking work, travel, and supply runs separately exposed where paid hours leaked, and simple routines turned the leak into billable capacity and bigger jobs.",
-      pt: "Separar trabalho, deslocamento e compra de material expôs onde as horas pagas vazavam, e rotinas simples transformaram o vazamento em capacidade faturável e serviços maiores.",
+      pt: "Uma cervejaria com vários pontos de venda substituiu o controle manual de jornadas por registros no celular e cálculo automatizado. A gestão recebe horas e valores organizados para revisar o fechamento.",
+      en: "A multi-location brewery replaced manual time tracking with mobile records and automated calculations. Management receives organized hours and payment amounts for review.",
     },
-    metrics: [
+    bottleneck: {
+      pt: "Toda semana, a gestão precisava consolidar as horas de profissionais que atuavam em diferentes pontos de venda e calcular quanto cada um tinha a receber. Os registros manuais dificultavam a conferência.",
+      en: "Every week, management had to consolidate time worked across different locations and calculate the amount owed to each worker. Manual records made that review difficult.",
+    },
+    implemented: {
+      pt: "A Veehtor construiu um aplicativo de entrada e saída pelo celular, com geolocalização no registro. O fluxo sinaliza batidas esquecidas e prepara o cálculo semanal com horas, valores e dados de pagamento, enviado à gestão pelo WhatsApp.",
+      en: "Veehtor built a mobile clock-in and clock-out application with location captured at the time of entry. The workflow flags missing entries and prepares weekly hours, amounts, and payment details for management through WhatsApp.",
+    },
+    changed: {
+      pt: "Os registros e o cálculo passaram a chegar organizados para conferência da gestão. Esse primeiro módulo também abriu caminho para ampliar a plataforma a outras rotinas da mesma operação.",
+      en: "Time records and payment calculations are now brought together for management review. This first module also provided a starting point for extending the platform to other workflows in the same business.",
+    },
+    highlights: [
+      { pt: "Registro de jornadas pelo celular.", en: "Mobile time records." },
       {
-        value: { en: "18.2% to under 5%", pt: "18,2% para menos de 5%" },
-        label: {
-          en: "Non-billable share of paid hours",
-          pt: "Participação de horas não faturáveis nas horas pagas",
-        },
-      },
-      {
-        value: { en: "10-15 h/week", pt: "10-15 h/semana" },
-        label: {
-          en: "Of productive capacity freed (US$300-500/week in payroll)",
-          pt: "De capacidade produtiva liberada (US$ 300-500/semana em folha)",
-        },
-      },
-      {
-        value: { en: "+50%", pt: "+50%" },
-        label: {
-          en: "Average job ticket (US$2,101 to US$3,148)",
-          pt: "Ticket médio dos serviços (US$ 2.101 para US$ 3.148)",
-        },
+        pt: "Cálculo semanal preparado para conferência.",
+        en: "Weekly payment calculations prepared for review.",
       },
     ],
-    challenge: {
-      en: "Paid hours were leaking into supply-store runs and unplanned driving: non-billable time consumed 13.5% to 18.2% of the crew's week, and in one extreme week a technician spent 36.9% of his paid time buying supplies. Nothing measured the leak, so nothing managed it.",
-      pt: "Horas pagas vazavam em idas à loja de material e deslocamentos não planejados: o tempo não faturável consumia de 13,5% a 18,2% da semana da equipe, e numa semana extrema um técnico passou 36,9% do tempo pago comprando material. Nada media o vazamento, então nada gerenciava.",
-    },
-    solution: {
-      en: "With clock-in and clock-out already split into job, travel, and supply time (see the payroll case), the leak became visible week by week. We turned measurement into routine: purchases consolidated into two supply runs per week, pre-job material checklists so crews arrive complete, routing by zone, and a weekly report tracking the non-billable share. The freed hours were pointed at higher-ticket jobs and recurring key accounts.",
-      pt: "Com as entradas e saídas já separadas em obra, deslocamento e compra de material (ver o caso de folha), o vazamento ficou visível semana a semana. Transformamos a medição em rotina: compras consolidadas em duas idas por semana, checklists de material antes do serviço para a equipe chegar completa, roteamento por zona e um relatório semanal acompanhando a participação de horas não faturáveis. As horas liberadas foram apontadas para serviços de ticket mais alto e clientes-chave recorrentes.",
-    },
-    result: {
-      en: "Whole weeks now close with zero supply hours, non-billable time runs between 0% and 4.7%, and 10 to 15 hours per week came back as billable capacity. The average job ticket rose about 50%, and weekly revenue grew 66% in the first weeks of the new schedule.",
-      pt: "Semanas inteiras agora fecham com zero horas de compra de material, o tempo não faturável fica entre 0% e 4,7%, e 10 a 15 horas por semana voltaram como capacidade faturável. O ticket médio dos serviços subiu cerca de 50%, e a receita semanal cresceu 66% nas primeiras semanas do novo cronograma.",
-    },
-    aboutClient: {
-      sector: {
-        en: "Electrical subcontractor for general contractors (North Carolina, USA)",
-        pt: "Subcontratado elétrico para general contractors (Carolina do Norte, EUA)",
-      },
-      size: { en: "Field crew plus virtual assistant", pt: "Equipe de campo mais assistente virtual" },
-      scale: { en: "100+ invoices issued", pt: "100+ notas emitidas" },
+    cta: {
+      pt: "Fechar jornadas de várias unidades está tomando tempo da gestão? Converse com a Veehtor sobre essa rotina.",
+      en: "Is consolidating time across locations taking up management time? Talk to Veehtor about the workflow.",
     },
     seoDescription: {
-      en: "Splitting paid time into job, travel, and supply runs let Robbin Services cut non-billable hours from up to 18% to under 5% and raise the average ticket by 50%.",
-      pt: "Separar o tempo pago em obra, deslocamento e compra de material fez a Robbin Services cortar as horas não faturáveis de até 18% para menos de 5% e elevar o ticket médio em 50%.",
+      pt: "Uma cervejaria com vários pontos de venda trocou o controle manual de jornadas por registros no celular e cálculo semanal automatizado, preparado para conferência da gestão.",
+      en: "A multi-location brewery replaced manual time tracking with mobile records and automated weekly calculations prepared for management review.",
+    },
+    home: {
+      context: { pt: "Fechamento de jornadas", en: "Timesheet closing" },
+      short: {
+        pt: "Registros de ponto pelo celular e cálculo semanal preparado para a conferência da gestão.",
+        en: "Mobile time records and weekly calculations prepared for management review.",
+      },
+    },
+  },
+  {
+    id: "payroll",
+    slug: "electrical-contractor-payroll",
+    legacySlugs: ["robbin-payroll"],
+    clientId: "electrical",
+    order: 7,
+    sector: "Construction",
+    areas: ["Human Resources"],
+    title: {
+      pt: "Folha calculada com as regras de cada profissional e exceções para revisão",
+      en: "Payroll calculated using each worker's rules, with exceptions flagged for review",
+    },
+    summary: {
+      pt: "Os registros de jornada passaram a alimentar o cálculo semanal da folha. Regras individuais de pagamento são aplicadas no fluxo, com identificação de inconsistências para conferência.",
+      en: "Time records now feed weekly payroll calculations. The workflow applies individual pay rules and identifies data inconsistencies for review.",
+    },
+    bottleneck: {
+      pt: "A equipe registrava a jornada em um sistema de campo, mas a folha ainda exigia cálculo manual. Diárias, horas extras, intervalos e tratamento dos deslocamentos variavam conforme as regras documentadas de cada profissional.",
+      en: "The crew tracked time in a field-service system, but payroll still required manual calculations. Day rates, overtime, breaks, and travel treatment varied according to each worker's documented arrangements.",
+    },
+    implemented: {
+      pt: "A Veehtor construiu um fluxo que lê os registros, aplica essas regras e identifica inconsistências nos dados. As horas ficam separadas entre serviço, deslocamento e compra de material, permitindo revisar o cálculo e entender a composição do tempo pago.",
+      en: "Veehtor built a workflow that reads time records, applies those rules, and identifies inconsistencies. Hours are separated into job time, travel, and supply runs, allowing the team to review calculations and understand how paid time is distributed.",
+    },
+    changed: {
+      pt: "A equipe passou a conferir os cálculos preparados pelo sistema. A mesma organização dos dados também sustentou o trabalho de produtividade em campo descrito em outro módulo desta operação.",
+      en: "The team now checks calculations prepared by the system. The same time data also supported the field-productivity work described in another module for this business.",
+    },
+    highlights: [
+      {
+        pt: "Regras individuais aplicadas ao cálculo.",
+        en: "Individual rules applied to payroll calculations.",
+      },
+      {
+        pt: "Inconsistências identificadas para revisão.",
+        en: "Data inconsistencies flagged for review.",
+      },
+    ],
+    cta: {
+      pt: "Sua folha ainda depende de recalcular regras toda semana? Converse com a Veehtor sobre esse fechamento.",
+      en: "Does payroll still require recalculating pay rules every week? Talk to Veehtor about the workflow.",
+    },
+    seoDescription: {
+      pt: "Uma empresa de serviços elétricos nos EUA passou a calcular a folha a partir dos registros de jornada, aplicando as regras de cada profissional e identificando inconsistências para revisão.",
+      en: "A US electrical contractor now calculates payroll from time records, applying each worker's rules and flagging inconsistencies for review.",
+    },
+  },
+  {
+    id: "brewery-checklists",
+    slug: "multi-location-brewery-checklists",
+    legacySlugs: ["complo-ai-checklists"],
+    clientId: "brewery",
+    order: 8,
+    sector: "Food & Beverage",
+    areas: ["Operations"],
+    title: {
+      pt: "Abertura e fechamento com registros e alertas para os gerentes",
+      en: "Opening and closing checks with records and manager alerts",
+    },
+    summary: {
+      pt: "Checklists digitais reúnem as verificações de cada unidade. Nos itens com foto, uma avaliação por IA ajuda a sinalizar o que precisa de atenção do responsável.",
+      en: "Digital checklists bring each location's checks into one workflow. For items with photo evidence, AI provides an initial assessment to help flag issues for the responsible manager.",
+    },
+    bottleneck: {
+      pt: "Abrir e fechar uma unidade exige repetir verificações de abastecimento, limpeza e condições operacionais. A gestão precisava acompanhar a execução e identificar os pontos que mereciam conferência.",
+      en: "Opening and closing each location requires repeated checks on supplies, cleanliness, and operating conditions. Management needed a way to follow execution and identify items that required attention.",
+    },
+    implemented: {
+      pt: "A Veehtor colocou checklists no aplicativo da operação. Nos itens definidos para registro fotográfico, a equipe envia uma imagem, a IA faz uma avaliação inicial e o fluxo alerta o gerente quando identifica uma possível pendência. Os registros ficam disponíveis para consulta.",
+      en: "Veehtor added checklists to the operation's application. For designated photo-based items, staff submit an image, AI provides an initial assessment, and the workflow alerts the manager to a potential issue. Records remain available for review.",
+    },
+    changed: {
+      pt: "A operação passou a contar com um fluxo de registro e encaminhamento de exceções. O responsável pela unidade recebe os alertas, confirma os problemas e conduz a ação corretiva.",
+      en: "The operation gained a workflow for recording checks and routing exceptions. The location manager receives alerts, confirms issues, and carries out corrective action.",
+    },
+    highlights: [
+      { pt: "Verificações registradas por unidade.", en: "Checks recorded by location." },
+      {
+        pt: "Evidências e alertas para o responsável.",
+        en: "Evidence and alerts routed to the responsible manager.",
+      },
+    ],
+    cta: {
+      pt: "Como você acompanha a execução das rotinas em cada unidade? Converse com a Veehtor sobre esse processo.",
+      en: "How do you track routine execution across locations? Talk to Veehtor about that process.",
+    },
+    seoDescription: {
+      pt: "Uma cervejaria com vários pontos de venda passou a registrar abertura e fechamento em checklists digitais, com avaliação por IA nos itens com foto e alertas para o gerente da unidade.",
+      en: "A multi-location brewery records opening and closing checks in digital checklists, with AI assessment on photo items and alerts routed to the location manager.",
+    },
+  },
+  {
+    id: "brewery-dashboard",
+    slug: "multi-location-brewery-management-dashboard",
+    legacySlugs: ["complo-ai-dashboard"],
+    clientId: "brewery",
+    order: 9,
+    sector: "Food & Beverage",
+    areas: ["Finance", "Operations"],
+    title: {
+      pt: "Vendas e custos reunidos para acompanhar cada unidade",
+      en: "Sales and costs brought together for location-level management",
+    },
+    summary: {
+      pt: "Dados dos sistemas integrados passaram a compor uma visão por unidade e da rede. A IA apoia a leitura dos indicadores para orientar a conferência de custos e o planejamento operacional.",
+      en: "Data from integrated systems now supports both location-level and network-wide views. AI helps interpret indicators for cost review and operational planning.",
+    },
+    bottleneck: {
+      pt: "Vendas, pedidos e custos estavam distribuídos entre sistemas e planilhas. Para entender uma variação no desempenho, a gestão precisava reunir essas informações manualmente.",
+      en: "Sales, orders, and costs were spread across systems and spreadsheets. Understanding a change in performance required management to bring those records together manually.",
+    },
+    implemented: {
+      pt: "A Veehtor construiu um painel que consolida os dados integrados. Os gerentes acompanham suas unidades, enquanto os sócios acessam a visão conjunta. A IA ajuda a interpretar os indicadores e a sinalizar relações que merecem análise, como a distribuição das vendas ao longo da semana e o custo de profissionais por turno.",
+      en: "Veehtor built a dashboard that consolidates the integrated data. Managers follow their own locations, while owners see the combined view. AI helps interpret indicators and flag relationships worth examining, such as sales by day of the week and staffing costs.",
+    },
+    changed: {
+      pt: "A gestão passou a ter uma visão consolidada para apoiar decisões da rotina. Gerentes e sócios conseguem consultar os dados conforme sua responsabilidade e usar essa informação na análise de vendas, custos e escalas.",
+      en: "Management gained a consolidated view to support operating decisions. Managers and owners can access the data relevant to their responsibilities and use it to review sales, costs, and staffing.",
+    },
+    highlights: [
+      { pt: "Visão por unidade e consolidada.", en: "Location-level and network-wide views." },
+      {
+        pt: "Indicadores reunidos para apoiar decisões.",
+        en: "Consolidated indicators to support decisions.",
+      },
+    ],
+    cta: {
+      pt: "Você consegue comparar vendas e custos entre unidades sem consolidar tudo manualmente? Converse com a Veehtor.",
+      en: "Can you compare sales and costs across locations without combining records by hand? Talk to Veehtor.",
+    },
+    seoDescription: {
+      pt: "Uma cervejaria com vários pontos de venda reuniu vendas, pedidos e custos em um painel com visão por unidade e da rede, com apoio de IA na leitura dos indicadores.",
+      en: "A multi-location brewery brought sales, orders, and costs into one dashboard with location-level and network-wide views, with AI support for reading indicators.",
+    },
+  },
+  {
+    id: "brewery-reviews",
+    slug: "multi-location-brewery-customer-reviews",
+    legacySlugs: ["complo-customer-voice"],
+    clientId: "brewery",
+    order: 10,
+    sector: "Food & Beverage",
+    areas: ["Customer Relations"],
+    title: {
+      pt: "Avaliações de clientes organizadas em uma fila de atenção para os gerentes",
+      en: "Customer reviews organized into a manager action queue",
+    },
+    summary: {
+      pt: "A coleta periódica reúne avaliações do Google no painel da operação, destaca comentários que precisam de atenção e permite responder pelo mesmo ambiente.",
+      en: "Scheduled collection brings Google reviews into the operating dashboard, highlights comments that need attention, and lets managers respond in the same workspace.",
+    },
+    bottleneck: {
+      pt: "Ler avaliações uma a uma dificultava acompanhar as pendências e perceber quais temas voltavam a aparecer. A gestão precisava transformar comentários dispersos em uma rotina de acompanhamento.",
+      en: "Reading reviews individually made it difficult to track unanswered comments and notice recurring themes. Management needed to turn scattered feedback into a regular review process.",
+    },
+    implemented: {
+      pt: "A Veehtor integrou as avaliações ao painel usado pelos gerentes. O fluxo coleta os comentários semanalmente, organiza por nota e destaca reclamações e avaliações sem resposta. O gerente pode responder no próprio ambiente.",
+      en: "Veehtor integrated reviews into the dashboard used by managers. The workflow collects comments weekly, organizes them by rating, and highlights complaints and unanswered reviews. Managers can respond from the same workspace.",
+    },
+    changed: {
+      pt: "A entrega organiza a revisão dos comentários e o acompanhamento dos temas recorrentes. Com esse histórico, a equipe pode observar a evolução das reclamações após suas ações e definir o que precisa de atenção em cada unidade.",
+      en: "The implementation organizes comment review and makes recurring themes easier to follow. The history allows the team to monitor complaints after taking action and identify what needs attention at each location.",
+    },
+    highlights: [
+      {
+        pt: "Avaliações reunidas no painel da operação.",
+        en: "Reviews brought into the operating dashboard.",
+      },
+      {
+        pt: "Reclamações e respostas pendentes priorizadas.",
+        en: "Complaints and unanswered comments prioritized.",
+      },
+    ],
+    cta: {
+      pt: "O que seus clientes dizem está virando ação na operação? Converse com a Veehtor sobre essa rotina.",
+      en: "Is customer feedback turning into action in your operation? Talk to Veehtor about the workflow.",
+    },
+    seoDescription: {
+      pt: "Uma cervejaria com vários pontos de venda passou a reunir as avaliações do Google no painel da operação, priorizando reclamações e respostas pendentes para os gerentes.",
+      en: "A multi-location brewery brings Google reviews into its operating dashboard, prioritizing complaints and unanswered comments for managers.",
     },
   },
 ];
 
-/* ============================================================
- * Approved proof classification (see Regras de prova).
- * Kept as lookups so the case objects above stay untouched.
- * ============================================================ */
-
-/** Card-level status per case, drives badge + listing order. */
-export const CASE_STATUS: Record<string, ProofClass> = {
-  "dcarvalho-credit-scoring": "operational",
-  "complo-time-tracking": "measured",
-  "complo-ai-checklists": "system",
-  "complo-ai-dashboard": "system",
-  "complo-customer-voice": "system",
-  "phomenta-linkedin-leads": "operational",
-  "phomenta-grant-prospecting": "operational",
-  "robbin-payroll": "measured",
-  "robbin-receivables-cash": "estimated",
-  "robbin-field-productivity": "measured",
-};
-
-/** Per-metric classification, index-aligned with case.metrics. */
-export const CASE_METRIC_PROOFS: Record<string, [ProofClass, ProofClass, ProofClass]> = {
-  "dcarvalho-credit-scoring":   ["operational", "scale",       "scale"],
-  "complo-time-tracking":       ["estimated",   "scale",       "operational"],
-  "complo-ai-checklists":       ["scale",       "system",      "operational"],
-  "complo-ai-dashboard":        ["scale",       "measured",    "system"],
-  "complo-customer-voice":      ["scale",       "system",      "operational"],
-  "phomenta-linkedin-leads":    ["operational", "estimated",   "operational"],
-  "phomenta-grant-prospecting": ["operational", "operational", "estimated"],
-  "robbin-payroll":             ["estimated",   "scale",       "operational"],
-  "robbin-receivables-cash":    ["estimated",   "estimated",   "scale"],
-  "robbin-field-productivity":  ["measured",    "operational", "estimated"],
-};
-
-/** Honesty note per case, rendered when present. */
-export const CASE_HONESTY: Record<string, LS> = {
-  "dcarvalho-credit-scoring": {
-    en: "The final approval remains human. The system delivers a recommendation; the committee decides.",
-    pt: "A aprovação final continua humana. O sistema entrega recomendação; o comitê decide.",
-  },
-  "complo-ai-checklists": {
-    en: "The AI scores; corrective action stays human.",
-    pt: "A IA nota; a ação corretiva continua humana.",
-  },
-  "robbin-receivables-cash": {
-    en: "Cash gain estimated from average payment terms; not audited.",
-    pt: "Ganho de caixa estimado a partir de prazo médio; não auditado.",
-  },
-  "robbin-field-productivity": {
-    en: "Capacity freed up; not realized savings.",
-    pt: "Capacidade liberada; não é economia realizada.",
-  },
-};
-
-/** Listing sort order: measured → operational → system → estimated. */
-const STATUS_RANK: Record<ProofClass, number> = {
-  measured: 0,
-  operational: 1,
-  system: 2,
-  estimated: 3,
-  scale: 4,
-};
-
-export const getStatus = (c: CaseStudy): ProofClass =>
-  c.status ?? CASE_STATUS[c.slug] ?? "system";
-
-export const getMetricProof = (c: CaseStudy, i: number): ProofClass => {
-  const m = c.metrics[i];
-  if (m.proof) return m.proof;
-  const arr = CASE_METRIC_PROOFS[c.slug];
-  return arr?.[i] ?? "scale";
-};
-
-export const getHonesty = (c: CaseStudy): LS | undefined =>
-  c.honesty ?? CASE_HONESTY[c.slug];
-
+/** Editorial order, identical in both languages. */
 export const sortedCases = (list: CaseStudy[] = CASE_STUDIES): CaseStudy[] =>
-  [...list].sort((a, b) => STATUS_RANK[getStatus(a)] - STATUS_RANK[getStatus(b)]);
+  [...list].sort((a, b) => a.order - b.order);
 
-/** Localized labels for proof badges. */
+/** The first three cases get visual priority in the catalog, without duplication. */
+export const FEATURED_COUNT = 3;
+
+export const featuredCases = (): CaseStudy[] => sortedCases().slice(0, FEATURED_COUNT);
+
+export const getClientName = (c: CaseStudy): LS => CLIENTS[c.clientId];
+
+export const bySlug = (slug?: string): CaseStudy | undefined =>
+  slug ? CASE_STUDIES.find((c) => c.slug === slug) : undefined;
+
+export const byLegacySlug = (slug?: string): CaseStudy | undefined =>
+  slug ? CASE_STUDIES.find((c) => c.legacySlugs.includes(slug)) : undefined;
+
+export const byId = (id: string): CaseStudy | undefined =>
+  CASE_STUDIES.find((c) => c.id === id);
+
+/** Other implementations for the same organization, in editorial order. */
+export const siblingCases = (c: CaseStudy): CaseStudy[] =>
+  sortedCases().filter((o) => o.clientId === c.clientId && o.id !== c.id);
+
+/** Localized labels for proof badges. Rendered only for documented metrics. */
 export const PROOF_LABELS: Record<ProofClass, LS> = {
   measured: { en: "Measured result", pt: "Resultado medido" },
   operational: { en: "Operational result", pt: "Resultado operacional" },
@@ -762,3 +654,4 @@ export const PROOF_LABELS: Record<ProofClass, LS> = {
   scale: { en: "Scale", pt: "Escala" },
 };
 
+export const ALL_SLUGS = CASE_STUDIES.map((c) => c.slug);

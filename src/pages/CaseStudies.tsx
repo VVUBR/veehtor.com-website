@@ -13,8 +13,8 @@ import {
   PROOF_LABELS,
   pick,
   sortedCases,
-  getStatus,
-  getMetricProof,
+  getClientName,
+  FEATURED_COUNT,
   type CaseStudy,
   type ProofClass,
   type Sector,
@@ -29,6 +29,8 @@ const badgeClass: Record<ProofClass, string> = {
   estimated: "b-estimated",
   scale: "b-scale",
 };
+
+const SITE = "https://www.veehtor.com";
 
 function setMeta(title: string, description: string) {
   document.title = title;
@@ -45,50 +47,67 @@ function setMeta(title: string, description: string) {
   setOrCreate("description", description);
   setOrCreate("og:title", title, true);
   setOrCreate("og:description", description, true);
+  setOrCreate("og:url", `${SITE}/case-studies`, true);
+  setOrCreate("twitter:title", title);
+  setOrCreate("twitter:description", description);
   let canon = document.querySelector('link[rel="canonical"]');
   if (!canon) {
     canon = document.createElement("link");
     canon.setAttribute("rel", "canonical");
     document.head.appendChild(canon);
   }
-  canon.setAttribute("href", "/case-studies");
+  canon.setAttribute("href", `${SITE}/case-studies`);
 }
 
-function CaseCard({ c, lang, cardCta }: { c: CaseStudy; lang: "en" | "pt"; cardCta: string }) {
-  const status = getStatus(c);
-  const showMetrics = c.metrics.slice(0, 2);
+function CaseCard({
+  c,
+  lang,
+  cardCta,
+  featured,
+}: {
+  c: CaseStudy;
+  lang: "en" | "pt";
+  cardCta: string;
+  featured: boolean;
+}) {
+  const metrics = (c.metrics ?? []).slice(0, 2);
+  const highlights = c.highlights.slice(0, 2);
   return (
     <Link
       to={`/case-studies/${c.slug}`}
-      className="scard-link reveal"
-      onClick={() => track("case_clicked", { slug: c.slug, from: "list" })}
+      className={`scard-link reveal${featured ? " scard-featured" : ""}`}
+      onClick={() => track("case_clicked", { case_id: c.id, slug: c.slug, lang, from: "list" })}
     >
       <article className="scard">
         <div className="case-context">
           {pick(SECTOR_LABELS[c.sector], lang)}
           {c.areas[0] && <> · {pick(AREA_LABELS[c.areas[0]], lang)}</>}
         </div>
-        <div className="case-client">{c.client}</div>
+        <div className="case-client">{pick(getClientName(c), lang)}</div>
         <h3>{pick(c.title, lang)}</h3>
         <p className="desc">{pick(c.summary, lang)}</p>
-        <div>
-          {showMetrics.map((m, i) => {
-            const proof = getMetricProof(c, i);
-            return (
+
+        {metrics.length > 0 ? (
+          <div>
+            {metrics.map((m, i) => (
               <div className="m" key={i}>
                 <div className="m-value">{pick(m.value, lang)}</div>
                 <div className="m-label">{pick(m.label, lang)}</div>
-                <span className={`badge ${badgeClass[proof]}`} style={{ marginTop: ".55rem" }}>
-                  {pick(PROOF_LABELS[proof], lang)}
+                <span className={`badge ${badgeClass[m.proof]}`} style={{ marginTop: ".55rem" }}>
+                  {pick(PROOF_LABELS[m.proof], lang)}
                 </span>
               </div>
-            );
-          })}
-        </div>
-        <span className={`badge ${badgeClass[status]}`}>{pick(PROOF_LABELS[status], lang)}</span>
-        <span className="case-cta">
-          {cardCta} <span className="arr">→</span>
-        </span>
+            ))}
+          </div>
+        ) : (
+          <ul className="case-highlights">
+            {highlights.map((h, i) => (
+              <li key={i}>{pick(h, lang)}</li>
+            ))}
+          </ul>
+        )}
+
+        <span className="case-cta">{cardCta}</span>
       </article>
     </Link>
   );
@@ -130,14 +149,14 @@ export default function CaseStudies() {
   useEffect(() => {
     setMeta(UI.metaTitle, UI.metaDescription);
     window.scrollTo(0, 0);
-    track("case_list_viewed", { count: allSorted.length });
-  }, [allSorted.length, UI.metaTitle, UI.metaDescription]);
+    track("case_list_viewed", { count: allSorted.length, lang: language });
+  }, [allSorted.length, UI.metaTitle, UI.metaDescription, language]);
 
   useEffect(() => {
     if (sector !== "All" || area !== "All") {
-      track("case_filter_changed", { sector, area, count: cases.length });
+      track("case_filter_changed", { sector, area, count: cases.length, lang: language });
     }
-  }, [sector, area, cases.length]);
+  }, [sector, area, cases.length, language]);
 
   const pill = (active: boolean): React.CSSProperties => ({
     padding: ".4rem .85rem",
@@ -167,19 +186,20 @@ export default function CaseStudies() {
       <SiteNav />
 
       <main id="main">
-        <section className="page-hero">
+        <section className="page-hero page-hero-compact">
           <div className="wrap">
             <div className="eyebrow reveal"><b>{UI.eyebrow}</b></div>
             <h1 className="reveal">
               {UI.h1a}<br />{UI.h1b}
             </h1>
             <p className="lede reveal">{UI.lede}</p>
+            <p className="lede reveal" style={{ marginTop: ".5rem" }}>{UI.lede2}</p>
           </div>
         </section>
 
-        <section className="zone-white">
+        <section className="zone-white section-compact">
           <div className="wrap">
-            <div className="reveal" style={{ marginBottom: "2rem", display: "grid", gap: "1.1rem" }}>
+            <div className="reveal case-filters">
               <div>
                 <div style={filterLabel}>{UI.filterSector}</div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem" }}>
@@ -210,7 +230,13 @@ export default function CaseStudies() {
             {cases.length > 0 ? (
               <div className="cases-list">
                 {cases.map((c) => (
-                  <CaseCard key={c.slug} c={c} lang={language} cardCta={UI.cardCta} />
+                  <CaseCard
+                    key={c.slug}
+                    c={c}
+                    lang={language}
+                    cardCta={UI.cardCta}
+                    featured={c.order <= FEATURED_COUNT}
+                  />
                 ))}
               </div>
             ) : (
@@ -224,9 +250,7 @@ export default function CaseStudies() {
         <section className="dark">
           <div className="wrap closing">
             <div className="eyebrow reveal">{UI.closingEyebrow}</div>
-            <h2 className="reveal">
-              {UI.closingH2a}<br />{UI.closingH2b}
-            </h2>
+            <h2 className="reveal">{UI.closingH2}</h2>
             <p className="reveal">{UI.closingBody}</p>
             <button
               className="btn btn-primary reveal"

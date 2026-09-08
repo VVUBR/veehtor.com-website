@@ -410,3 +410,22 @@
 @media(max-width:640px){
   .home .cases-list{grid-template-columns:1fr}
 }
+
+/* ===== Case studies catalog and detail ===== */
+.home .page-hero-compact{padding:clamp(3.2rem,7vh,5rem) 0 clamp(1.2rem,2.5vh,1.8rem)}
+.home .page-hero-compact .lede{margin-top:.8rem;max-width:44rem}
+.home .section-compact{padding-top:1.4rem}
+.home .case-filters{margin-bottom:1.6rem;display:grid;gap:.9rem}
+.home .case-highlights{list-style:none;margin:.9rem 0 1.1rem;padding:0;display:grid;gap:.45rem}
+.home .case-highlights li{position:relative;padding-left:1rem;font-size:.92rem;line-height:1.5;color:#33394A}
+.home .case-highlights li::before{content:"";position:absolute;left:0;top:.62em;width:.35rem;height:.35rem;border-radius:50%;background:var(--ink);opacity:.55}
+.home .scard h3{overflow-wrap:break-word;hyphens:auto}
+.home .scard-featured .scard{border-color:var(--ink)}
+.home .scard-featured .scard h3{font-size:1.32rem}
+.home .sibling-list{list-style:none;margin:.8rem 0 0;padding:0;display:grid;gap:.5rem}
+.home .sibling-list a{font-weight:600;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line)}
+.home .sibling-list a:hover{border-color:var(--ink)}
+.home .n-block .btn{margin-top:1.1rem}
+@media(max-width:900px){
+  .home .scard-featured .scard h3{font-size:1.18rem}
+}

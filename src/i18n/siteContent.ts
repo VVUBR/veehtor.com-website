@@ -64,6 +64,7 @@ export interface SiteContentBundle {
     h1a: string;
     h1b: string;
     lede: string;
+    lede2: string;
     filterSector: string;
     filterArea: string;
     allSectors: string;
@@ -72,8 +73,7 @@ export interface SiteContentBundle {
     empty: string;
     cardCta: string;
     closingEyebrow: string;
-    closingH2a: string;
-    closingH2b: string;
+    closingH2: string;
     closingBody: string;
     closingCta: string;
   };
@@ -83,23 +83,20 @@ export interface SiteContentBundle {
     notFoundTitle: string;
     notFoundMetaTitle: string;
     backToList: string;
-    contextEyebrow: string;
-    contextH2: string;
-    solutionEyebrow: string;
-    solutionH2: string;
-    resultEyebrow: string;
-    resultH2: string;
-    scaleEyebrow: string;
-    scaleH2: string;
-    scaleSector: string;
-    scaleSize: string;
-    scaleScale: string;
-    scaleAreas: string;
-    honestyLabel: string;
+    bottleneckEyebrow: string;
+    bottleneckH2: string;
+    implementedEyebrow: string;
+    implementedH2: string;
+    changedEyebrow: string;
+    changedH2: string;
+    highlightsH2: string;
+    measurementH2: string;
+    ctaEyebrow: string;
+    ctaButton: string;
+    siblingsH2: string;
     nextCase: string;
     closingEyebrow: string;
-    closingH2a: string;
-    closingH2b: string;
+    closingH2: string;
     closingBody: string;
     closingCta: string;
   };
@@ -195,52 +192,52 @@ const pt: SiteContentBundle = {
     successCta: "Escolher horário",
   },
   caseStudiesUI: {
-    metaTitle: "Cases entregues | Veehtor AI",
+    metaTitle: "Cases de implementação | Veehtor AI",
     metaDescription:
-      "Sistemas em operação com resultados que aparecem no processo. Casos de crédito, folha, checklists por IA e prospecção.",
+      "Análise de crédito, equipes em campo, prospecção e gestão de várias unidades. Veja o processo que mudou e como a solução entrou na rotina.",
     skip: "Ir para o conteúdo",
-    eyebrow: "SISTEMAS ENTREGUES",
-    h1a: "Sistemas em operação.",
-    h1b: "Resultados que aparecem no processo.",
-    lede: "Cada case informa o que foi resolvido, o que foi medido e a escala em que o sistema opera.",
+    eyebrow: "CASES DE IMPLEMENTAÇÃO",
+    h1a: "Menos gargalos.",
+    h1b: "Mais capacidade para operar.",
+    lede: "Análise de crédito, equipes em campo, prospecção e gestão de várias unidades.",
+    lede2:
+      "Veja o processo que mudou, como a solução entrou na rotina e o que foi observado em cada implementação.",
     filterSector: "SETOR DE INDÚSTRIA",
     filterArea: "ÁREA DA EMPRESA",
     allSectors: "Todos",
     allAreas: "Todas",
     counter: (n, total) => `${n} de ${total} cases`,
     empty: "Nenhum case com essa combinação de setor e área.",
-    cardCta: "Ver sistema e resultados",
+    cardCta: "Ver o case completo",
     closingEyebrow: "Próximo passo",
-    closingH2a: "Qual processo da sua operação",
-    closingH2b: "custa mais do que deveria?",
-    closingBody: "30 minutos. Direto no processo. Sem apresentação genérica.",
-    closingCta: "Analisar meu processo",
+    closingH2: "Qual rotina está limitando a sua operação?",
+    closingBody:
+      "Conte à Veehtor onde o trabalho trava hoje. A conversa começa pelo gargalo e pelo impacto que vale medir.",
+    closingCta: "Conversar com a Veehtor",
   },
   caseDetailUI: {
     breadcrumbRoot: "Cases",
     breadcrumbAria: "Trilha de navegação",
     notFoundTitle: "Case não encontrado",
     notFoundMetaTitle: "Case não encontrado | Veehtor AI",
-    backToList: "Voltar para cases entregues",
-    contextEyebrow: "Contexto e gargalo",
-    contextH2: "O que estava travando",
-    solutionEyebrow: "O que construímos",
-    solutionH2: "O sistema",
-    resultEyebrow: "O que mudou",
-    resultH2: "Antes e depois",
-    scaleEyebrow: "Escala e operação",
-    scaleH2: "Onde o sistema roda",
-    scaleSector: "Setor",
-    scaleSize: "Porte",
-    scaleScale: "Escala",
-    scaleAreas: "Áreas",
-    honestyLabel: "Nota de honestidade",
+    backToList: "Voltar para os cases",
+    bottleneckEyebrow: "Contexto",
+    bottleneckH2: "O gargalo",
+    implementedEyebrow: "Entrega",
+    implementedH2: "O que implementamos",
+    changedEyebrow: "Resultado",
+    changedH2: "O que mudou",
+    highlightsH2: "Destaques",
+    measurementH2: "Como medimos",
+    ctaEyebrow: "Sobre esta rotina",
+    ctaButton: "Conversar com a Veehtor",
+    siblingsH2: "Outras implementações nesta operação",
     nextCase: "Próximo case",
     closingEyebrow: "Próximo passo",
-    closingH2a: "Qual processo da sua operação",
-    closingH2b: "custa mais do que deveria?",
-    closingBody: "30 minutos. Direto no processo. Sem apresentação genérica.",
-    closingCta: "Analisar meu processo",
+    closingH2: "Qual rotina está limitando a sua operação?",
+    closingBody:
+      "Conte à Veehtor onde o trabalho trava hoje. A conversa começa pelo gargalo e pelo impacto que vale medir.",
+    closingCta: "Conversar com a Veehtor",
   },
   notFound: {
     metaTitle: "Página não encontrada | Veehtor AI",
@@ -569,52 +566,52 @@ const en: SiteContentBundle = {
     successCta: "Pick a slot",
   },
   caseStudiesUI: {
-    metaTitle: "Delivered systems | Veehtor AI",
+    metaTitle: "Implementation case studies | Veehtor AI",
     metaDescription:
-      "Systems in operation with results that show up in the process. Cases across credit, payroll, AI checklists and prospecting.",
+      "Credit analysis, field operations, outreach, and management across locations. See the process that changed and how the system fits into daily work.",
     skip: "Skip to content",
-    eyebrow: "DELIVERED SYSTEMS",
-    h1a: "Systems in operation.",
-    h1b: "Results that show up in the process.",
-    lede: "Every case shows what was solved, what was measured and the scale the system runs at.",
+    eyebrow: "IMPLEMENTATION CASE STUDIES",
+    h1a: "Fewer bottlenecks.",
+    h1b: "More operating capacity.",
+    lede: "Credit analysis, field operations, outreach, and management across locations.",
+    lede2:
+      "See the process that changed, how the system fits into daily work, and what each implementation showed.",
     filterSector: "INDUSTRY",
     filterArea: "BUSINESS AREA",
     allSectors: "All",
     allAreas: "All",
     counter: (n, total) => `${n} of ${total} cases`,
     empty: "No case matches this sector and area combination.",
-    cardCta: "See the system and results",
+    cardCta: "Read the case study",
     closingEyebrow: "Next step",
-    closingH2a: "Which process in your operation",
-    closingH2b: "costs more than it should?",
-    closingBody: "30 minutes. Straight into the process. No generic pitch.",
-    closingCta: "Review my process\u00a0",
+    closingH2: "Which workflow is holding your business back?",
+    closingBody:
+      "Tell Veehtor where work gets stuck today. We start with the bottleneck and the result worth measuring.",
+    closingCta: "Talk to Veehtor",
   },
   caseDetailUI: {
     breadcrumbRoot: "Cases",
     breadcrumbAria: "Breadcrumb",
     notFoundTitle: "Case not found",
     notFoundMetaTitle: "Case not found | Veehtor AI",
-    backToList: "Back to delivered cases",
-    contextEyebrow: "Context and bottleneck",
-    contextH2: "What was in the way",
-    solutionEyebrow: "What we built",
-    solutionH2: "The system",
-    resultEyebrow: "What changed",
-    resultH2: "Before and after",
-    scaleEyebrow: "Scale and operation",
-    scaleH2: "Where the system runs",
-    scaleSector: "Sector",
-    scaleSize: "Size",
-    scaleScale: "Scale",
-    scaleAreas: "Areas",
-    honestyLabel: "Honesty note",
+    backToList: "Back to case studies",
+    bottleneckEyebrow: "Context",
+    bottleneckH2: "The bottleneck",
+    implementedEyebrow: "Delivery",
+    implementedH2: "What we implemented",
+    changedEyebrow: "Outcome",
+    changedH2: "What changed",
+    highlightsH2: "Highlights",
+    measurementH2: "Measurement scope",
+    ctaEyebrow: "About this workflow",
+    ctaButton: "Talk to Veehtor",
+    siblingsH2: "Other implementations in this business",
     nextCase: "Next case",
     closingEyebrow: "Next step",
-    closingH2a: "Which process in your operation",
-    closingH2b: "costs more than it should?",
-    closingBody: "30 minutes. Straight into the process. No generic pitch.",
-    closingCta: "Review my process\u00a0",
+    closingH2: "Which workflow is holding your business back?",
+    closingBody:
+      "Tell Veehtor where work gets stuck today. We start with the bottleneck and the result worth measuring.",
+    closingCta: "Talk to Veehtor",
   },
   notFound: {
     metaTitle: "Page not found | Veehtor AI",
