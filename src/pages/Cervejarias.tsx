@@ -10,7 +10,10 @@ import complotap from "@/assets/complo-tap.jpg.asset.json";
 import comploGarden from "@/assets/complo-garden.jpg.asset.json";
 import vitorPhoto from "@/assets/vitor-ungari.jpg.asset.json";
 
-const WHATSAPP_NUMBER = "5511973022058";
+const WHATSAPP_NUMBER = "17816559279";
+const WHATSAPP_TEXT =
+  "Olá, Vitor. Vi a página para cervejarias e quero falar sobre a rotina que está travando a minha operação.";
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_TEXT)}`;
 
 const NAVY = "#111828";
 const TEAL = "#15B7A8";
