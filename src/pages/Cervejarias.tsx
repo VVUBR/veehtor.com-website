@@ -500,28 +500,6 @@ function Faq() {
   );
 }
 
-const FIELDS = [
-  { name: "nome", label: "Nome", type: "input" as const },
-  { name: "cervejaria", label: "Nome da cervejaria", type: "input" as const },
-  { name: "unidades", label: "Quantas unidades", type: "input" as const },
-  { name: "whatsapp", label: "WhatsApp", type: "input" as const },
-  { name: "rotina", label: "Qual rotina está travando", type: "textarea" as const },
-  { name: "tentativas", label: "O que você já tentou para resolver", type: "textarea" as const },
-];
-
-function buildWhatsAppUrl(values: Record<string, string>) {
-  const text = [
-    "Olá, Vitor. Quero falar sobre a rotina que está travando na minha operação.",
-    "",
-    `Nome: ${values.nome}`,
-    `Cervejaria: ${values.cervejaria}`,
-    `Unidades: ${values.unidades}`,
-    `WhatsApp: ${values.whatsapp}`,
-    `Rotina que está travando: ${values.rotina}`,
-    `O que já tentei: ${values.tentativas}`,
-  ].join("\n");
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-}
 
 function ChamadaFinal() {
   const [values, setValues] = useState<Record<string, string>>({});
