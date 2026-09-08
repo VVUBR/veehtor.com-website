@@ -107,7 +107,9 @@ function Header() {
           <Logo textColor="#FFFFFF" className="h-6 w-auto" />
         </a>
         <a
-          href="#conversa"
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
           className="rounded-full px-4 py-2 text-[14px] transition-transform hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111828]"
           style={{ ...body, fontWeight: 600, background: TEAL, color: NAVY }}
         >
