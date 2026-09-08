@@ -39,6 +39,9 @@ export default function Index() {
   const navigate = useNavigate();
   const { open: openDialog } = useMapDialog();
   const C = useHomeContent();
+  const { language } = useLanguage();
+  const featured = useMemo(() => featuredCases(), []);
+
 
   const reducedOrSmall = useMemo(() => {
     if (typeof window === "undefined") return true;
