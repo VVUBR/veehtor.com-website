@@ -124,7 +124,7 @@ function Hero() {
             className="mt-7 text-[17px] md:text-[19px] leading-[1.6]"
             style={{ ...body, color: "rgba(255,255,255,0.82)", maxWidth: "68ch" }}
           >
-            Você já tentou várias ferramentas. Trocou de PDV, montou planilha, comprou automação, colocou alguém do time para cuidar. E na sexta-feira o gerente continua fechando a folha na mão. A gente ataca sua rotina prioritária, coloca a solução dentro das ferramentas que a casa já usa, e mede o antes e o depois. Em 21 dias.
+            Você já tentou várias ferramentas. Trocou de PDV, montou planilha, comprou automação, colocou alguém do time para cuidar. E no fim da semana, o gerente continua fechando a folha na mão. A gente ataca sua rotina prioritária, coloca a solução dentro das ferramentas que a casa já usa, e mede o antes e o depois. Em 21 dias.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
             <a
