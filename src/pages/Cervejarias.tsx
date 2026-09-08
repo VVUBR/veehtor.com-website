@@ -8,7 +8,7 @@ import {
 import { Logo } from "@/components/site/Logo";
 import complotap from "@/assets/complo-tap.jpg.asset.json";
 import comploGarden from "@/assets/complo-garden.jpg.asset.json";
-import comploCheers from "@/assets/complo-cheers.jpg.asset.json";
+import vitorPhoto from "@/assets/vitor-ungari.jpg.asset.json";
 import vitorPhoto from "@/assets/vitor-ungari.jpg.asset.json";
 
 const WHATSAPP_NUMBER = "5511973022058";
@@ -60,24 +60,8 @@ function H2({ children, onLight = false }: { children: React.ReactNode; onLight?
   );
 }
 
-function Body({
-  children,
-  onLight = false,
-  className = "",
-}: {
-  children: React.ReactNode;
-  onLight?: boolean;
-  className?: string;
-}) {
-  return (
-    <p
-      className={"text-[17px] md:text-[19px] leading-[1.6] " + className}
-      style={{ ...body, color: onLight ? "#3A3F४C".replace("४", "4") : "rgba(255,255,255,0.82)", maxWidth: "68ch" }}
-    >
-      {children}
-    </p>
-  );
-}
+
+
 
 function ScrollButton({
   children,
