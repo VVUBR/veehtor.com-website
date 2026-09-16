@@ -55,6 +55,8 @@ export type PayableDoc = {
   invoiceDate: Date | null;
   dueDate: Date | null;    // doc_due_date
   docTotal: number;
+  docPago: number;
+  docSaldo: number;
   overdue: boolean;
   items: PayableLine[];
 };

@@ -118,13 +118,15 @@ function DashboardInner() {
   const payableDocsScope = useMemo(
     () => data.payableDocs.filter(
       (p) =>
+        // Docs fully settled by registered payments (saldo zero) are not open payables.
+        p.docSaldo > 0 &&
         (job === "__ALL__" ? inAllowed(p.job || "") : p.job === job || (job === "__UNASSIGNED__" && !p.job))
     ),
     [data.payableDocs, job, allowedProjects],
   );
-  const openPay = payableDocsScope.reduce((s, p) => s + p.docTotal, 0);
+  const openPay = payableDocsScope.reduce((s, p) => s + p.docSaldo, 0);
   const overduePay = payableDocsScope.filter((p) => p.overdue);
-  const overdueSum = overduePay.reduce((s, p) => s + p.docTotal, 0);
+  const overdueSum = overduePay.reduce((s, p) => s + p.docSaldo, 0);
 
   const activeJobMeta = useMemo(
     () => (job !== "__ALL__" ? data.jobsMeta.find((j) => j.name === job) ?? null : null),
@@ -150,8 +152,8 @@ function DashboardInner() {
   }, [job, data.committed, allowedProjects, unassignedCounts]);
 
   const committedUnassigned = data.committed.unassignedAmount;
-  const openPayUnassigned = payableDocsScope.filter((p) => !p.job).reduce((s, p) => s + p.docTotal, 0);
-  const overdueUnassigned = overduePay.filter((p) => !p.job).reduce((s, p) => s + p.docTotal, 0);
+  const openPayUnassigned = payableDocsScope.filter((p) => !p.job).reduce((s, p) => s + p.docSaldo, 0);
+  const overdueUnassigned = overduePay.filter((p) => !p.job).reduce((s, p) => s + p.docSaldo, 0);
   const isAll = job === "__ALL__" && unassignedCounts;
   const withUnassigned = (base: string | undefined, v: number) => {
     if (!isAll || v <= 0) return base;
