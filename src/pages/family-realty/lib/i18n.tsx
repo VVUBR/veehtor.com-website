@@ -111,6 +111,8 @@ const DICT: Record<string, { pt: string; en: string }> = {
   sec_topay: { pt: "A pagar", en: "To pay" },
   already_paid: { pt: "Já pago", en: "Already paid" },
   balance_due: { pt: "Saldo a pagar", en: "Balance due" },
+  past_due_today: { pt: "Vencido até hoje", en: "Past due today" },
+  past_due_of: { pt: "{a} de {b} vencidos", en: "{a} of {b} past due" },
   of_value: { pt: "de {v}", en: "of {v}" },
   sec_contracts: { pt: "Contratos", en: "Contracts" },
   sec_evb: { pt: "Estimate vs Billed", en: "Estimate vs Billed" },

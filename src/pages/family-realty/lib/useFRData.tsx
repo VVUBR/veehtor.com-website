@@ -97,6 +97,8 @@ type InvoiceRow = {
   doc_due_date?: string | null;
   doc_pago?: number | string | null;
   doc_saldo?: number | string | null;
+  doc_vencido?: number | string | null;
+  doc_saldo_vencido?: number | string | null;
 };
 type UnassignedRow = {
   invoice_id?: string;
@@ -316,7 +318,7 @@ async function loadAll() {
   invoices.forEach((r, i) => {
     const canonical = r.supplier_canonical || r.supplier || "";
     const invoiceNumber = (r.invoice_number || "").trim();
-    const docKey = String(r.doc_key ?? invoiceNumber ?? r.invoice_id ?? `doc-${i}`);
+    const docKey = `${r.supplier_canonical || r.supplier || ""}|${r.doc_key ?? invoiceNumber ?? r.invoice_id ?? `doc-${i}`}`;
     const docDue = parseSafeDate(r.doc_due_date ?? r.due_date).date;
     const line: PayableLine = {
       id: String(r.invoice_id ?? `inv-${i}`),
@@ -328,8 +330,6 @@ async function loadAll() {
     const existing = payableDocsMap.get(docKey);
     if (existing) {
       existing.items.push(line);
-      // Overdue truthy if any line is overdue.
-      if (r.overdue) existing.overdue = true;
     } else {
       payableDocsMap.set(docKey, {
         id: docKey,
@@ -343,7 +343,9 @@ async function loadAll() {
         docTotal: num(r.doc_total ?? r.amount),
         docPago: num(r.doc_pago),
         docSaldo: num(r.doc_saldo ?? r.doc_total),
-        overdue: !!r.overdue,
+        docVencido: num(r.doc_vencido),
+        docSaldoVencido: num(r.doc_saldo_vencido),
+        overdue: num(r.doc_saldo_vencido) > 0,
         items: [line],
       });
     }
