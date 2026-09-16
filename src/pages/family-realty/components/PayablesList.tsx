@@ -82,6 +82,11 @@ export default function PayablesList({ docs, job }: { docs: PayableDoc[]; job: s
                     <td>
                       <div style={{ fontSize: 12 }}>{fmtDateLocale(r.dueDate, lang)}</div>
                       <div style={{ fontSize: 11, color: r.overdue ? "var(--fr-red)" : "var(--fr-muted)" }}>{r.dueLabel}</div>
+                      {r.docSaldoVencido > 0 && r.docSaldoVencido < r.docSaldo && (
+                        <div style={{ fontSize: 11, color: "var(--fr-red)" }}>
+                          {t("past_due_of", { a: fmtCurrency(r.docSaldoVencido), b: fmtCurrency(r.docSaldo) })}
+                        </div>
+                      )}
                     </td>
                     <td style={{ textAlign: "right" }}>
                       <div style={{ fontVariantNumeric: "tabular-nums", fontWeight: 700 }}>{fmtCurrency(r.docSaldo)}</div>
@@ -104,6 +109,15 @@ export default function PayablesList({ docs, job }: { docs: PayableDoc[]; job: s
                       <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{fmtCurrency(it.amount)}</td>
                     </tr>
                   ))}
+                  {open && r.docSaldoVencido > 0 && r.docSaldoVencido !== r.docSaldo && (
+                    <tr style={{ background: "var(--fr-surface)", fontSize: 12, borderTop: r.docPago > 0 ? undefined : "1px solid var(--fr-border)" }}>
+                      <td></td>
+                      <td colSpan={5} style={{ paddingLeft: 24, color: "var(--fr-red)" }}>{t("past_due_today")}</td>
+                      <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", color: "var(--fr-red)" }}>
+                        {fmtCurrency(r.docSaldoVencido)}
+                      </td>
+                    </tr>
+                  )}
                   {open && r.docPago > 0 && (
                     <>
                       <tr style={{ background: "var(--fr-surface)", fontSize: 12, borderTop: "1px solid var(--fr-border)" }}>
