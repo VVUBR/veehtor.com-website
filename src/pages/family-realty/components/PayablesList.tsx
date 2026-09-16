@@ -32,7 +32,7 @@ export default function PayablesList({ docs, job }: { docs: PayableDoc[]; job: s
     });
   }, [docs, job, t, supplier]);
 
-  const total = rows.reduce((s, r) => s + r.docTotal, 0);
+  const total = rows.reduce((s, r) => s + r.docSaldo, 0);
   const supplierOptions = useMemo(() => docs.map((d) => d.supplierCanonical || d.supplier), [docs]);
 
   return (
@@ -83,7 +83,14 @@ export default function PayablesList({ docs, job }: { docs: PayableDoc[]; job: s
                       <div style={{ fontSize: 12 }}>{fmtDateLocale(r.dueDate, lang)}</div>
                       <div style={{ fontSize: 11, color: r.overdue ? "var(--fr-red)" : "var(--fr-muted)" }}>{r.dueLabel}</div>
                     </td>
-                    <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", fontWeight: 700 }}>{fmtCurrency(r.docTotal)}</td>
+                    <td style={{ textAlign: "right" }}>
+                      <div style={{ fontVariantNumeric: "tabular-nums", fontWeight: 700 }}>{fmtCurrency(r.docSaldo)}</div>
+                      {r.docPago > 0 && (
+                        <div style={{ fontSize: 11, color: "var(--fr-muted)" }}>
+                          {t("of_value", { v: fmtCurrency(r.docTotal) })}
+                        </div>
+                      )}
+                    </td>
                   </tr>
                   {open && r.items.map((it) => (
                     <tr key={it.id} style={{ background: "var(--fr-surface)", fontSize: 12 }}>
@@ -97,6 +104,24 @@ export default function PayablesList({ docs, job }: { docs: PayableDoc[]; job: s
                       <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{fmtCurrency(it.amount)}</td>
                     </tr>
                   ))}
+                  {open && r.docPago > 0 && (
+                    <>
+                      <tr style={{ background: "var(--fr-surface)", fontSize: 12, borderTop: "1px solid var(--fr-border)" }}>
+                        <td></td>
+                        <td colSpan={5} style={{ paddingLeft: 24, color: "var(--fr-muted)" }}>{t("already_paid")}</td>
+                        <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", color: "var(--fr-muted)" }}>
+                          -{fmtCurrency(r.docPago)}
+                        </td>
+                      </tr>
+                      <tr style={{ background: "var(--fr-surface)", fontSize: 12 }}>
+                        <td></td>
+                        <td colSpan={5} style={{ paddingLeft: 24, fontWeight: 700 }}>{t("balance_due")}</td>
+                        <td style={{ textAlign: "right", fontVariantNumeric: "tabular-nums", fontWeight: 700 }}>
+                          {fmtCurrency(r.docSaldo)}
+                        </td>
+                      </tr>
+                    </>
+                  )}
                 </FragmentRow>
               );
             })}
