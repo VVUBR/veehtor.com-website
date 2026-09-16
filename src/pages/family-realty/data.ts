@@ -57,6 +57,8 @@ export type PayableDoc = {
   docTotal: number;
   docPago: number;
   docSaldo: number;
+  docVencido: number;
+  docSaldoVencido: number;
   overdue: boolean;
   items: PayableLine[];
 };
