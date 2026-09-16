@@ -95,6 +95,8 @@ type InvoiceRow = {
   doc_key?: string | null;
   doc_total?: number | string | null;
   doc_due_date?: string | null;
+  doc_pago?: number | string | null;
+  doc_saldo?: number | string | null;
 };
 type UnassignedRow = {
   invoice_id?: string;
@@ -339,6 +341,8 @@ async function loadAll() {
         invoiceDate: parseSafeDate(r.invoice_date).date,
         dueDate: docDue,
         docTotal: num(r.doc_total ?? r.amount),
+        docPago: num(r.doc_pago),
+        docSaldo: num(r.doc_saldo ?? r.doc_total),
         overdue: !!r.overdue,
         items: [line],
       });
