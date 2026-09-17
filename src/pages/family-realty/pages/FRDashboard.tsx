@@ -201,7 +201,7 @@ function DashboardInner() {
           </div>
         )}
 
-        <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-4">
+        <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 10 }}>
           <KpiCard
             label={job === "__ALL__" ? t("kpi_budget_total") : t("kpi_budget_job")}
             value={fmtCurrency(totalBudget)}
