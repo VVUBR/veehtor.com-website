@@ -5,7 +5,6 @@ import FRLogin from "./pages/FRLogin";
 import FRForgotPassword from "./pages/FRForgotPassword";
 import FRResetPassword from "./pages/FRResetPassword";
 import FRDashboard from "./pages/FRDashboard";
-import KpiPreview from "./pages/KpiPreview";
 import { I18nProvider } from "./lib/i18n";
 
 export default function FamilyRealty() {
