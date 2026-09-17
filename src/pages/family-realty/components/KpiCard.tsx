@@ -20,15 +20,35 @@ export default function KpiCard({
     "var(--fr-navy)";
 
   return (
-    <div className="fr-card p-5 flex flex-col gap-2">
-      <div className="fr-muted" style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+    <div className="fr-card p-3 flex flex-col gap-1" style={{ minWidth: 0 }}>
+      <div className="fr-muted" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.04em" }}>
         {label}
       </div>
-      <div className="fr-heading" style={{ fontSize: 28, color: toneColor(tone), lineHeight: 1.1 }}>
+      <div
+        className="fr-heading"
+        style={{
+          fontSize: "clamp(15px, 1.6vw, 22px)",
+          color: toneColor(tone),
+          lineHeight: 1.1,
+          whiteSpace: "nowrap",
+          fontVariantNumeric: "tabular-nums",
+          minWidth: 0,
+        }}
+      >
         {value}
       </div>
       {sub && (
-        <div style={{ fontSize: 13, color: subTone ? toneColor(subTone) : "var(--fr-muted)" }}>
+        <div
+          style={{
+            fontSize: 11,
+            lineHeight: 1.25,
+            color: subTone ? toneColor(subTone) : "var(--fr-muted)",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
           {sub}
         </div>
       )}
