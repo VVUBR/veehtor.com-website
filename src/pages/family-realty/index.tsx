@@ -14,6 +14,7 @@ export default function FamilyRealty() {
       <FRAuthProvider>
         <Routes>
           <Route path="login" element={<FRLogin />} />
+          <Route path="__kpi-preview" element={<KpiPreview />} />
           <Route path="forgot-password" element={<FRForgotPassword />} />
           <Route path="reset-password" element={<FRResetPassword />} />
           <Route
