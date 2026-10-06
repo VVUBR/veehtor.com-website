@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>Veehtor AI para cervejarias, bares e restaurantes</title>
+<meta name="description" content="As cinco coisas que a Veehtor AI constroi para operacao de bar, cervejaria e restaurante: checklist com prova, campanha no WhatsApp, atendimento unificado, leitura semanal do negocio e ranking de chope ao vivo.">
+<link rel="canonical" href="https://veehtor.com/bares-restaurantes">
+
+<!-- previa do link quando alguem compartilha no WhatsApp -->
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:url" content="https://veehtor.com/bares-restaurantes">
+<meta property="og:site_name" content="Veehtor AI">
+<meta property="og:title" content="A casa esta cheia, a venda esta boa, e no fim do mes sobra pouco.">
+<meta property="og:description" content="Da para aumentar o lucro sem vender mais. Veja as cinco coisas que a gente constroi dentro da rotina que a sua casa ja tem.">
+<!-- TROCAR: imagem de previa, 1200x630, hospedada no proprio dominio -->
+<meta property="og:image" content="https://veehtor.com/og-bares-restaurantes.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0}
+  img,video{max-width:100%}
+  [hidden]{display:none!important}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caladea:wght@400;700&family=Carlito:wght@400;700&display=swap">
+
+<style>
+/* Layout: faixas de largura total que alternam de fundo, uma por assunto.
+   Cabecalho de cada faixa centralizado; conteudo em grade larga que ocupa a tela. */
+:root{
+  color-scheme: dark;
+  --primary:#111828;
+  --primary-2:#182134;
+  --primary-3:#1F2A41;
+  --teal:#15B7A8;
+  --teal-dark:#0E8F84;
+  --orange:#F87316;
+  --green:#21C65D;
+  --light-1:#E6E7E9;
+  --light-2:#DBDCE0;
+  --ink:#030619;
+  --ink-2:#2C3343;
+  --ink-3:#5A6274;
+  --line-light:#C7C9CE;
+  --on-dark:#FFFFFF;
+  --on-dark-2:#AFB7C6;
+  --on-dark-3:#7C879C;
+  --line:#2A3650;
+  --display:"Caladea",Cambria,Georgia,serif;
+  --body:"Carlito",Calibri,"Segoe UI",system-ui,sans-serif;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--primary);
+  color:var(--on-dark);
+  font-family:var(--body);
+  font-size:17.5px;
+  line-height:1.6;
+  margin:0;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;text-wrap:balance;letter-spacing:-.015em}
+p{margin:0}
+
+.wrap{max-width:1240px;margin:0 auto;padding-inline:24px}
+.band{padding-block:clamp(60px,8.5vw,104px)}
+.band.alt{background:var(--primary-2)}
+.band.light{background:var(--light-1);color:var(--ink)}
+
+.eyebrow{
+  font-family:var(--body);font-weight:700;font-size:12.5px;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--teal);
+}
+.band.light .eyebrow{color:var(--teal-dark)}
+
+/* cabecalho de cada faixa */
+.head{max-width:940px}
+.head h2{font-size:clamp(27px,3.6vw,40px);line-height:1.14;margin-top:16px}
+.head .sub{margin-top:18px;font-size:clamp(17px,1.9vw,19.5px);color:var(--on-dark-2);line-height:1.55}
+.band.light .head .sub{color:var(--ink-2)}
+.rule{width:60px;height:3px;background:var(--teal);border-radius:3px;margin:24px 0 0}
+.band.light .rule{background:var(--teal-dark)}
+
+/* ---------- hero ---------- */
+.hero{padding-block:clamp(64px,9.5vw,116px) clamp(52px,7.5vw,84px)}
+.hero h1{font-size:clamp(33px,5.2vw,56px);line-height:1.08;margin-top:20px;max-width:16em}
+.hero .lead{
+  margin-top:26px;font-size:clamp(17.5px,2.1vw,20.5px);color:var(--on-dark-2);
+  max-width:64ch;line-height:1.55;
+}
+
+.proof{
+  margin-top:42px;max-width:760px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding-block:26px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 22px;
+}
+.proof .fig{
+  font-family:var(--display);font-weight:700;font-size:clamp(27px,3.8vw,40px);
+  color:var(--green);line-height:1.1;
+}
+.proof .cap{color:var(--on-dark-2);font-size:16.5px;max-width:42ch}
+
+/* ---------- botao whatsapp ---------- */
+.wa{
+  display:inline-flex;align-items:center;gap:11px;
+  background:var(--orange);color:var(--primary);
+  font-family:var(--body);font-weight:700;font-size:17px;line-height:1;
+  padding:17px 26px;border-radius:999px;text-decoration:none;
+  box-shadow:0 10px 26px -14px rgba(248,115,22,.9);
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.wa:hover{transform:translateY(-1px);box-shadow:0 14px 30px -14px rgba(248,115,22,1)}
+.wa:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
+.wa svg{width:21px;height:21px;fill:var(--primary);flex:none}
+.wa-hero{margin-top:36px}
+
+.wa-float{
+  position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom, 0px));
+  z-index:50;font-size:16px;padding:14px 21px;
+  box-shadow:0 10px 30px -10px rgba(0,0,0,.75), 0 0 0 1px rgba(248,115,22,.35);
+}
+.wa-float svg{width:20px;height:20px}
+.wa-note{margin-top:16px;font-size:15.5px;color:var(--on-dark-3)}
+.wa-note b{color:var(--on-dark-2);font-weight:700;user-select:all}
+
+/* ---------- pilares ---------- */
+.pillars{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(26px,3.6vw,52px);
+  margin-top:48px;
+}
+.pillar{border-top:2px solid var(--teal);padding-top:20px;min-width:0}
+.pillar h3{font-size:22px;margin-bottom:10px}
+.pillar p{font-size:16.5px;line-height:1.55;color:var(--on-dark-2)}
+
+/* ---------- declaracao ---------- */
+.claim{max-width:900px}
+.claim h2{font-size:clamp(28px,4.2vw,46px);line-height:1.12;margin-top:16px;max-width:15em}
+.claim p{margin-top:22px;font-size:clamp(17px,2vw,19.5px);color:var(--on-dark-2);line-height:1.6;max-width:62ch}
+
+/* ---------- solucoes ---------- */
+.sol{
+  display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(32px,4.5vw,64px);
+  align-items:center;margin-top:48px;
+}
+.sol.flip .shot{order:-1}
+.sol.wide{grid-template-columns:1fr;margin-top:46px}
+.rows{display:flex;flex-direction:column;gap:22px}
+.sol.wide .rows{
+  flex-direction:row;display:grid;grid-template-columns:repeat(3,1fr);
+  gap:clamp(24px,3.4vw,48px);align-items:start;
+}
+.row{min-width:0}
+.row .lab{
+  font-weight:700;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--on-dark-3);margin-bottom:7px;
+}
+.band.light .row .lab{color:var(--ink-3)}
+.row p{font-size:16.8px;line-height:1.55;color:var(--on-dark-2)}
+.band.light .row p{color:var(--ink-2)}
+.row.get .lab{color:var(--teal)}
+.band.light .row.get .lab{color:var(--teal-dark)}
+.row.get p{color:var(--on-dark);font-weight:700}
+.band.light .row.get p{color:var(--ink)}
+.sol.wide .row{padding-top:18px;border-top:2px solid var(--line)}
+.sol.wide .row.get{border-top-color:var(--teal)}
+.band.light .sol.wide .row{border-top-color:var(--line-light)}
+.band.light .sol.wide .row.get{border-top-color:var(--teal-dark)}
+
+/* ---------- moldura de tela ---------- */
+.shot{min-width:0}
+.frame{
+  border:1px solid var(--line);border-radius:12px;background:var(--primary-3);
+  overflow:hidden;box-shadow:0 20px 48px -30px rgba(0,0,0,.95);
+}
+.band.light .frame{border-color:var(--line-light);background:var(--light-2);box-shadow:0 20px 44px -32px rgba(3,6,25,.5)}
+.frame .bar{
+  display:flex;align-items:center;gap:7px;padding:11px 14px;border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.03);
+}
+.band.light .frame .bar{border-bottom-color:#C9CCD2;background:rgba(3,6,25,.04)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--on-dark-3);opacity:.5}
+.band.light .dot{background:#8A909C}
+.frame .bar span{
+  margin-left:6px;font-size:12px;letter-spacing:.07em;text-transform:uppercase;
+  font-weight:700;color:var(--on-dark-3);
+}
+.band.light .frame .bar span{color:var(--ink-3)}
+.slot{
+  aspect-ratio:4/3;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;padding:28px;text-align:center;
+}
+.slot .ico{
+  width:44px;height:44px;border-radius:10px;border:1.5px dashed var(--on-dark-3);
+  display:flex;align-items:center;justify-content:center;opacity:.65;
+}
+.band.light .slot .ico{border-color:#8A909C}
+.slot .ico svg{width:21px;height:21px;stroke:var(--on-dark-3);fill:none;stroke-width:1.7}
+.band.light .slot .ico svg{stroke:var(--ink-3)}
+.slot .t{font-weight:700;font-size:15px;color:var(--on-dark-2);max-width:30ch;line-height:1.4}
+.band.light .slot .t{color:var(--ink-2)}
+.slot .n{font-size:13px;color:var(--on-dark-3)}
+.band.light .slot .n{color:var(--ink-3)}
+
+/* ---------- fechamento ---------- */
+.cta h2{font-size:clamp(28px,4vw,44px);max-width:15em;margin-top:16px;line-height:1.12}
+.cta .sub{margin-top:20px;color:var(--on-dark-2);font-size:18.5px;max-width:52ch;line-height:1.55}
+.sig{
+  margin-top:44px;padding-top:30px;border-top:1px solid var(--line);
+  font-size:20px;line-height:1.5;font-family:var(--display);max-width:50ch;color:var(--on-dark-2);
+}
+
+footer{padding-block:32px 104px;border-top:1px solid var(--line);color:var(--on-dark-3);font-size:13.5px}
+
+@media (max-width:880px){
+  .sol{grid-template-columns:1fr;gap:34px}
+  .sol.flip .shot{order:0}
+  .sol.wide .rows{grid-template-columns:1fr;gap:22px}
+  .pillars{grid-template-columns:1fr;gap:30px;margin-top:38px}
+}
+@media (max-width:520px){
+  body{font-size:16.5px}
+  .wrap{padding-inline:20px}
+  .wa-float{right:12px;bottom:calc(12px + env(safe-area-inset-bottom, 0px));padding:13px 18px;font-size:15px}
+  .proof{gap:6px}
+  .proof .cap{max-width:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- peças: whatsapp, vídeo e TV do ranking ---------- */
+.wa-win{width:100%;max-width:430px;margin-inline:auto;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0b141a;box-shadow:0 22px 50px -28px rgba(0,0,0,.95);display:flex;flex-direction:column}
+.band.light .wa-win{border-color:var(--line-light)}
+.wh{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#202c33}
+.wav{width:38px;height:38px;border-radius:50%;background:#214633;display:grid;place-items:center;flex:none}
+.wav svg{width:20px;height:20px;stroke:#f3e9d9;fill:none;stroke-width:2}
+.wt{min-width:0;flex:1}
+.wt b{display:block;font-size:15.5px;color:#e9edef;font-weight:700;line-height:1.3}
+.wt i{display:block;font-style:normal;font-size:12.5px;color:#8696a0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.wb{height:452px;padding:14px;display:flex;flex-direction:column;gap:10px;justify-content:flex-end;overflow:hidden;background:radial-gradient(circle at 18% 22%,rgba(255,255,255,.022) 0 2px,transparent 2px),radial-gradient(circle at 72% 58%,rgba(255,255,255,.022) 0 2px,transparent 2px),#0b141a;background-size:120px 120px,160px 160px,auto}
+.wf{display:flex;align-items:center;gap:12px;padding:11px 14px;background:#202c33;color:#8696a0;font-size:14px}
+.wf svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;flex:none}
+.wf span{flex:1}
+.msg{align-self:flex-start;max-width:93%;background:#1f2c34;border-radius:9px;padding:9px 11px 7px;font-size:14.5px;line-height:1.5;color:#e9edef;box-shadow:0 1px 1px rgba(0,0,0,.3);opacity:0;transform:translateY(14px) scale(.985)}
+.msg.on{animation:chega 420ms cubic-bezier(.22,.61,.36,1) forwards}
+@keyframes chega{to{opacity:1;transform:none}}
+.msg .de{font-size:13px;font-weight:700;color:#53bdeb;margin-bottom:5px}
+.msg .cd{background:rgba(255,255,255,.055);border-radius:6px;padding:7px 9px;margin-bottom:7px;border-left:3px solid #25D366}
+.msg .cd b{display:block;font-size:13.5px;color:#e9edef;font-weight:700}
+.msg .cd em{font-style:normal;font-size:12.5px;color:#8696a0}
+.msg .ln{display:flex;gap:7px;align-items:flex-start}
+.msg .ln i{font-style:normal;flex:none;width:17px;text-align:center}
+.msg .ttl{font-weight:700}
+.msg .lk{color:#53bdeb;word-break:break-all}
+.msg .hr{text-align:right;font-size:11.5px;color:#8696a0;margin-top:3px}
+
+.vidbox{width:100%;max-width:430px;margin-inline:auto;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#000;box-shadow:0 22px 50px -28px rgba(0,0,0,.95);line-height:0}
+.band.light .vidbox{border-color:var(--line-light)}
+.vidbox video{display:block;width:100%;height:auto}
+
+.tv{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;border:1px solid var(--line);box-shadow:0 22px 50px -30px rgba(0,0,0,.95)}
+.band.light .tv{border-color:var(--line-light)}
+.stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;background:#0c0e0c;overflow:hidden;font-family:"Carlito",Calibri,system-ui,Arial,sans-serif;color:#f3e9d9}
+.dd{font-family:"Barlow Condensed","Arial Narrow",Arial,sans-serif}
+.nn{font-variant-numeric:tabular-nums}
+.ell{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.screen{position:absolute;inset:0;display:grid;grid-template-rows:132px minmax(0,1fr) 58px;opacity:0;transform:translateY(26px);transition:opacity 620ms cubic-bezier(.22,.61,.36,1),transform 620ms cubic-bezier(.22,.61,.36,1)}
+.screen.is-on{opacity:1;transform:none}
+.sbar{display:flex;align-items:center;justify-content:space-between;padding:0 64px;gap:24px}
+.sbar.t{border-bottom:1px solid rgba(243,233,217,.12)}
+.sbar.b{border-top:1px solid rgba(243,233,217,.12)}
+.casa{margin:0;font-size:62px;font-weight:800;line-height:1;min-width:0;color:#f3e9d9}
+.rot{font-size:28px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#d89433;margin:0}
+.rod{font-size:26px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#b4b2aa}
+.tot{display:flex;align-items:baseline;gap:14px;flex:none}
+.tot .v{font-size:78px;font-weight:900;line-height:1;color:#d89433}
+.tot .u{font-size:28px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#b4b2aa}
+.corpo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;padding:26px 64px 0;min-height:0}
+.podio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;align-items:end;min-width:0}
+.lugar{display:flex;flex-direction:column;align-items:center;gap:14px}
+.pos{font-size:46px;font-weight:900;color:#214633;transition:font-size 420ms ease,color 420ms ease}
+.lugar.p1 .pos{font-size:64px;color:#d89433}
+.lugar.p2 .pos{color:#b2632e}
+.caneca{position:relative;width:220px;height:320px;transform-origin:bottom center;transition:width 620ms cubic-bezier(.22,.61,.36,1),height 620ms cubic-bezier(.22,.61,.36,1),transform 520ms cubic-bezier(.34,1.56,.64,1)}
+.lugar.p1 .caneca{width:250px;height:440px}
+.lugar.p3 .caneca{height:290px}
+.caneca.pulsa{transform:scale(1.07)}
+.copo{position:absolute;inset:0;overflow:hidden;clip-path:polygon(7% 0,93% 0,85% 100%,15% 100%);background:rgba(243,233,217,.055);display:flex;flex-direction:column;justify-content:flex-end}
+.copo::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:linear-gradient(90deg,rgba(243,233,217,.16) 0 6%,transparent 14% 86%,rgba(243,233,217,.08) 94% 100%),linear-gradient(180deg,rgba(243,233,217,.22) 0 10px,transparent 10px)}
+.cheio{position:relative;z-index:1;background:linear-gradient(180deg,#e5a23a,#b2632e);transition:height 1100ms cubic-bezier(.22,.61,.36,1)}
+.espuma{position:absolute;left:0;right:0;top:-18px;height:26px;z-index:2;background:rgba(249,243,229,.94);border-radius:50% 50% 40% 40%/70% 70% 30% 30%;box-shadow:0 6px 14px rgba(12,14,12,.35)}
+.bolha{position:absolute;bottom:6px;border-radius:50%;background:rgba(249,243,229,.55);animation:sobe linear infinite;z-index:2}
+@keyframes sobe{0%{transform:translateY(0) scale(.6);opacity:0}14%{opacity:.7}86%{opacity:.3}100%{transform:translateY(calc(var(--sobe,300px) * -1)) scale(1.2);opacity:0}}
+.nomep{max-width:100%;font-size:46px;font-weight:700}
+.lugar.p1 .nomep{font-size:56px;font-weight:800}
+.litros{font-size:50px;font-weight:800;color:#d89433}
+.lugar.p1 .litros{font-size:64px;font-weight:900}
+.lateral{display:flex;flex-direction:column;gap:18px;border-left:1px solid rgba(243,233,217,.12);padding-left:48px;min-width:0}
+.linhas{display:flex;flex-direction:column;gap:8px}
+.linha{display:grid;grid-template-columns:92px minmax(0,1fr) 210px;align-items:center;height:104px;gap:16px;border-radius:12px;padding:0 18px}
+.linha.par{background:rgba(243,233,217,.045)}
+.linha .r{font-size:54px;font-weight:800;color:#b4b2aa}
+.linha .nm{font-size:52px;font-weight:600}
+.linha .lt{font-size:50px;font-weight:700;text-align:right;color:#d89433}
+.linha.subiu{animation:brilho 1500ms ease-out}
+@keyframes brilho{0%{background:rgba(216,148,51,.40)}100%{background:rgba(216,148,51,0)}}
+.semana{display:flex;flex-direction:column;gap:6px;padding:26px 64px 0;min-height:0}
+.grow{display:grid;grid-template-columns:96px minmax(0,1fr) 400px 220px;align-items:center;height:78px;gap:20px;border-radius:10px;padding:0 22px}
+.grow.par{background:rgba(243,233,217,.045)}
+.grow .r{font-size:48px;font-weight:800;color:#b4b2aa}
+.grow.top1 .r,.grow.top2 .r,.grow.top3 .r{color:#d89433}
+.grow .nm{font-size:46px;font-weight:600}
+.grow.top1 .nm{font-weight:800}
+.grow .un{font-size:32px;font-weight:600;color:#b4b2aa}
+.grow .lt{font-size:46px;font-weight:700;text-align:right;color:#d89433}
+@media (prefers-reduced-motion:reduce){
+  .msg{opacity:1;transform:none;animation:none!important}
+  .screen,.caneca,.cheio,.pos,.linha.subiu{transition:none;animation:none}
+  .bolha{animation:none;opacity:0}
+}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Veehtor AI · cervejarias, bares e restaurantes</div>
+    <h1>A casa está cheia, a venda está boa, e no fim do mês sobra pouco. Onde está o buraco?</h1>
+    <p class="lead">As cinco coisas que a gente constrói para operação de bar, cervejaria e restaurante, cada uma dentro da rotina que já existe na casa.</p>
+
+    <div class="proof">
+      <div class="fig">1 dia → 15 minutos</div>
+      <div class="cap">por semana, no fechamento da folha dos freelancers de uma rede de seis unidades.</div>
+    </div>
+
+    <a class="wa wa-hero" href="https://wa.me/5516994294039?text=Ol%C3%A1%21%20Vim%20pela%20p%C3%A1gina%20de%20solu%C3%A7%C3%B5es%20para%20cervejarias%20e%20bares%20e%20quero%20falar%20sobre%20a%20rotina%20que%20est%C3%A1%20travando%20a%20minha%20opera%C3%A7%C3%A3o." target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0 0 20.885 3.4"/></svg>
+      Falar sobre minha operação
+    </a>
+  </div>
+</div>
+
+<div class="band alt">
+  <div class="wrap">
+    <div class="claim">
+      <div class="eyebrow">A ideia por trás de tudo isto</div>
+      <h2>Dá para aumentar o lucro sem vender mais</h2>
+      <p>Boa parte do que falta no fim do mês não está na venda. Está no que escapa no meio do caminho: chope que sai do barril e não entra na comanda, hora lançada errada, desperdício que ninguém contou, cliente que veio uma vez e nunca mais foi chamado. Fechar esses buracos não exige uma mesa a mais.</p>
+    </div>
+  </div>
+</div>
+
+<div class="band">
+  <div class="wrap">
+    <div class="head">
+      <div class="eyebrow">O que a gente vai atrás na sua operação</div>
+      <div class="rule"></div>
+    </div>
+    <div class="pillars">
+      <div class="pillar">
+        <h3>Tempo</h3>
+        <p>Horas da sua equipe gastas em coisa que não é atender cliente. Fechamento, conferência, planilha, relatório.</p>
+      </div>
+      <div class="pillar">
+        <h3>Erro</h3>
+        <p>O que é feito à mão erra. E erro em operação de bar aparece depois que já custou: o checklist que ninguém fez, a hora lançada errada, o pedido que saiu sem cobrar.</p>
+      </div>
+      <div class="pillar">
+        <h3>Dinheiro</h3>
+        <p>O que vaza sem ninguém ver. Chope que sai do barril e não entra na comanda, cliente que veio uma vez e nunca mais foi chamado, taxa de cartão que ninguém confere.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="band light">
+  <div class="wrap">
+    <div class="head">
+      <div class="eyebrow">Operação</div>
+      <h2>Checklist de abertura e fechamento, com prova</h2>
+      <div class="rule"></div>
+    </div>
+    <div class="sol">
+      <div class="rows">
+        <div class="row">
+          <div class="lab">Como é hoje</div>
+          <p>O funcionário marca num papel que limpou, abasteceu e conferiu. Você acredita. No dia em que dá problema, não existe foto, não existe horário e não existe quem fez.</p>
+        </div>
+        <div class="row">
+          <div class="lab">O que entra no lugar</div>
+          <p>Checklist no celular, com foto obrigatória em cada etapa e que só funciona dentro da loja. A foto é conferida automaticamente e sai com nota. Quando o checklist termina, a mensagem cai sozinha no grupo dos gerentes.</p>
+        </div>
+        <div class="row get">
+          <div class="lab">O que você passa a ter</div>
+          <p>Histórico com foto e horário de cada abertura e cada fechamento, de todas as unidades, sem cobrar ninguém.</p>
+        </div>
+      </div>
+      <div class="shot">
+        <div class="wa-win">
+          <div class="wh">
+            <span class="wav"><svg viewBox="0 0 24 24"><path d="M4 4h16v12H8l-4 4V4z"/></svg></span>
+            <span class="wt"><b>Bar &middot; Reports Operacionais</b><i>Gerentes, Supervis&atilde;o, Bot</i></span>
+          </div>
+          <div class="wb" id="wa"></div>
+          <div class="wf">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            <span>Digite uma mensagem</span>
+            <svg viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zM5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="band">
+  <div class="wrap">
+    <div class="head">
+      <div class="eyebrow">Clientes</div>
+      <h2>Campanha no WhatsApp para a sua própria base</h2>
+      <div class="rule"></div>
+    </div>
+    <div class="sol wide">
+      <div class="rows">
+        <div class="row">
+          <div class="lab">Como é hoje</div>
+          <p>Você tem milhares de telefones de gente que já comprou e nunca mais ouviu falar da casa. Quando sai promoção, vai a mesma mensagem para todo mundo, e ninguém sabe quanto voltou.</p>
+        </div>
+        <div class="row">
+          <div class="lab">O que entra no lugar</div>
+          <p>A base separada por quem sumiu, quem vem sempre e quem veio uma vez só. Envio no ritmo certo, para o número não ser bloqueado. Cupom que dá para seguir do envio até o caixa.</p>
+        </div>
+        <div class="row get">
+          <div class="lab">O que você passa a ter</div>
+          <p>Quanto cada campanha trouxe de gente de volta, em reais, e não em visualização.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="band alt">
+  <div class="wrap">
+    <div class="head">
+      <div class="eyebrow">Atendimento</div>
+      <h2>WhatsApp, Instagram e Facebook numa tela só</h2>
+      <div class="rule"></div>
+    </div>
+    <div class="sol wide">
+      <div class="rows">
+        <div class="row">
+          <div class="lab">Como é hoje</div>
+          <p>Quem atende abre três aplicativos no celular, perde mensagem no meio e responde a mesma pergunta vinte vezes por dia.</p>
+        </div>
+        <div class="row">
+          <div class="lab">O que entra no lugar</div>
+          <p>As três caixas de mensagem no mesmo lugar, com respostas prontas para o que mais se repete e com a inteligência artificial lendo a conversa e já sugerindo o que responder.</p>
+        </div>
+        <div class="row get">
+          <div class="lab">O que você passa a ter</div>
+          <p>Nenhuma mensagem perdida, e tempo de resposta que dá para medir e cobrar.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="band light">
+  <div class="wrap">
+    <div class="head">
+      <div class="eyebrow">Dinheiro</div>
+      <h2>A leitura do negócio, toda semana, sem você pedir</h2>
+      <div class="rule"></div>
+    </div>
+    <div class="sol flip">
+      <div class="rows">
+        <div class="row">
+          <div class="lab">Como é hoje</div>
+          <p>O número fecha no fim do mês, quando o problema já aconteceu e já custou. Venda está num sistema, estoque está em outro, e a margem só aparece depois que o contador fecha.</p>
+        </div>
+        <div class="row">
+          <div class="lab">O que entra no lugar</div>
+          <p>Faturamento, estoque, desperdício e margem no mesmo painel, por unidade e por dia. Em cima disso roda um agente que cruza tudo sozinho e escreve o que olhar primeiro, com o valor de cada coisa.</p>
+        </div>
+        <div class="row get">
+          <div class="lab">O que você passa a ter</div>
+          <p>Um relatório por semana dizendo o que mudou, quanto isso vale e o que fazer na segunda de manhã.</p>
+        </div>
+      </div>
+      <div class="shot">
+        <div class="vidbox">
+          <video src="painel-semanal.mp4" autoplay muted loop playsinline preload="metadata"></video>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="band">
+  <div class="wrap">
+    <div class="head">
+      <div class="eyebrow">Salão</div>
+      <h2>Ranking de chope na TV, ao vivo</h2>
+      <div class="rule"></div>
+    </div>
+    <div class="sol">
+      <div class="rows">
+        <div class="row">
+          <div class="lab">Como é hoje</div>
+          <p>O cliente pede o que pediria de qualquer jeito. Nada na casa faz ele pedir o próximo, a não ser o garçom perguntar.</p>
+        </div>
+        <div class="row">
+          <div class="lab">O que entra no lugar</div>
+          <p>A TV mostra quem mais tomou chope na casa naquele momento, direto do que entra na comanda. De tempos em tempos a tela troca e mostra o ranking entre todas as unidades da rede.</p>
+        </div>
+        <div class="row get">
+          <div class="lab">O que você passa a ter</div>
+          <p>Uma brincadeira entre as mesas que faz o cliente pedir mais, sem ninguém precisar oferecer.</p>
+        </div>
+      </div>
+      <div class="shot">
+        <div class="tv" id="tv">
+          <div class="stage" id="stage">
+            <section class="screen is-on" id="tela-hoje">
+              <div class="sbar t">
+                <h3 class="dd ell casa">SEU BAR</h3>
+                <div class="tot"><span class="dd nn v" id="total">0,0</span><span class="u">litros hoje</span></div>
+              </div>
+              <div class="corpo">
+                <div class="podio" id="podio"></div>
+                <div class="lateral">
+                  <p class="rot">Os que mais beberam hoje</p>
+                  <div class="linhas" id="linhas"></div>
+                </div>
+              </div>
+              <div class="sbar b">
+                <span class="rod">Diga seu nome ao gar&ccedil;om e apare&ccedil;a aqui</span>
+                <span class="nn rod" id="hora-1">agora</span>
+              </div>
+            </section>
+            <section class="screen" id="tela-semana">
+              <div class="sbar t">
+                <h3 class="dd casa">CAMPE&Otilde;ES DA SEMANA</h3>
+                <span class="rot">Top 10 desde segunda</span>
+              </div>
+              <div class="semana" id="semana"></div>
+              <div class="sbar b">
+                <span class="rod">O campe&atilde;o do m&ecirc;s leva a caneca da casa</span>
+                <span class="nn rod" id="hora-2">agora</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="band alt cta">
+  <div class="wrap">
+    <div class="eyebrow">Conversa de trinta minutos</div>
+    <h2>Me conta onde a sua casa está perdendo mais dinheiro</h2>
+    <p class="sub">Se não tiver nada que valha a pena construir, a gente fala isso na própria conversa. É mais barato para os dois lados.</p>
+
+    <a class="wa wa-hero" href="https://wa.me/5516994294039?text=Ol%C3%A1%21%20Vim%20pela%20p%C3%A1gina%20de%20solu%C3%A7%C3%B5es%20para%20cervejarias%20e%20bares%20e%20quero%20falar%20sobre%20a%20rotina%20que%20est%C3%A1%20travando%20a%20minha%20opera%C3%A7%C3%A3o." target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0 0 20.885 3.4"/></svg>
+      Falar sobre minha operação
+    </a>
+    <p class="wa-note">Ou salve o número: <b>+55 16 99429-4039</b></p>
+
+    <p class="sig">A gente entra na sua operação, acha onde o tempo e o dinheiro estão vazando, e conserta uma rotina por vez.</p>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">Veehtor AI · Tampa, Flórida e Brasil</div>
+</footer>
+
+<a class="wa wa-float" href="https://wa.me/5516994294039?text=Ol%C3%A1%21%20Vim%20pela%20p%C3%A1gina%20de%20solu%C3%A7%C3%B5es%20para%20cervejarias%20e%20bares%20e%20quero%20falar%20sobre%20a%20rotina%20que%20est%C3%A1%20travando%20a%20minha%20opera%C3%A7%C3%A3o." target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0 0 20.885 3.4"/></svg>
+  Falar no WhatsApp
+</a>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- mensagens chegando no grupo ---- */
+  var CAIXA = document.getElementById("wa");
+  if (CAIXA){
+    var ROTEIRO = [
+      { tipo:"Abertura realizada!", un:"UNIDADE CENTRO", dt:"Hoje às 10:12", resp:"Camila R. (CLT)", hr:"10:12" },
+      { tipo:"Fechamento realizado!", un:"UNIDADE SHOPPING", dt:"Hoje às 19:50", resp:"André M. (CLT)", hr:"19:50" },
+      { tipo:"Fechamento realizado!", un:"UNIDADE CENTRO", dt:"Hoje às 23:47", resp:"Patrícia L. (CLT)", hr:"23:47" }
+    ];
+    var bolha = function(m){
+      var el = document.createElement("div");
+      el.className = "msg";
+      el.innerHTML =
+        '<div class="de">Bot</div>' +
+        '<div class="cd"><b>Painel da operação</b><em>painel.seubar.com.br</em></div>' +
+        '<div class="ln"><i>🔒</i><span class="ttl"></span></div>' +
+        '<div class="ln"><i>📍</i><span>Unidade: <span class="un"></span></span></div>' +
+        '<div class="ln"><i>📅</i><span class="dt"></span></div>' +
+        '<div class="ln"><i>👤</i><span>Responsável: <span class="rs"></span></span></div>' +
+        '<div class="ln"><i>🔗</i><span>Ver fotos: <span class="lk">painel.seubar.com.br/checklist</span></span></div>' +
+        '<div class="hr"></div>';
+      el.querySelector(".ttl").textContent = m.tipo;
+      el.querySelector(".un").textContent = m.un;
+      el.querySelector(".dt").textContent = m.dt;
+      el.querySelector(".rs").textContent = m.resp;
+      el.querySelector(".hr").textContent = m.hr;
+      return el;
+    };
+    var i = 0;
+    var passo = function(){
+      if (i >= ROTEIRO.length){
+        setTimeout(function(){ CAIXA.innerHTML = ""; i = 0; passo(); }, 3400);
+        return;
+      }
+      var el = bolha(ROTEIRO[i]);
+      CAIXA.appendChild(el);
+      requestAnimationFrame(function(){ el.classList.add("on"); });
+      i++;
+      setTimeout(passo, 2100);
+    };
+    passo();
+  }
+
+  /* ---- TV do ranking ---- */
+  var tv = document.getElementById("tv"), stage = document.getElementById("stage");
+  if (!tv || !stage) return;
+
+  var BASE = [
+    { id:1, nome:"Rafa", ml:1500 }, { id:2, nome:"Bruno Cardoso", ml:1200 },
+    { id:3, nome:"Duda", ml:1100 }, { id:4, nome:"Carlão", ml:900 },
+    { id:5, nome:"Marina", ml:800 }, { id:6, nome:"Téo", ml:600 },
+    { id:7, nome:"Ana Beatriz", ml:500 }, { id:8, nome:"Gustavo", ml:300 }
+  ];
+  var SEMANA = [
+    { nome:"Rafa", dias:"4 noites", ml:11800 }, { nome:"Carlão", dias:"5 noites", ml:10400 },
+    { nome:"Duda", dias:"3 noites", ml:8700 }, { nome:"Bruno Cardoso", dias:"4 noites", ml:7900 },
+    { nome:"Marina", dias:"3 noites", ml:6200 }, { nome:"Téo", dias:"2 noites", ml:5100 },
+    { nome:"Ana Beatriz", dias:"3 noites", ml:4600 }, { nome:"Gustavo", dias:"2 noites", ml:3800 },
+    { nome:"Paty", dias:"2 noites", ml:3100 }, { nome:"Léo", dias:"1 noite", ml:2400 }
+  ];
+  var pessoas = BASE.map(function(p){ return { id:p.id, nome:p.nome, ml:p.ml }; });
+  var ordenado = function(l){ return l.slice().sort(function(a,b){ return b.ml-a.ml || a.nome.localeCompare(b.nome); }); };
+  var litros = function(ml){ return (ml/1000).toFixed(1).replace(".", ","); };
+
+  var escala = function(){ stage.style.transform = "scale(" + (tv.clientWidth/1920) + ")"; };
+  window.addEventListener("resize", escala);
+  if (window.ResizeObserver) new ResizeObserver(escala).observe(tv);
+  escala();
+
+  var podio = document.getElementById("podio"), slots = {}, lider = null;
+  var criaLugar = function(p){
+    var el = document.createElement("div");
+    el.className = "lugar"; el.dataset.id = p.id;
+    var b = "";
+    for (var k=0;k<5;k++){
+      b += '<span class="bolha" style="width:'+(7+Math.round(Math.random()*9))+'px;height:'+(7+Math.round(Math.random()*9))+'px;left:'+(14+Math.round(Math.random()*64))+'%;animation-duration:'+(5.5+Math.random()*4).toFixed(1)+'s;animation-delay:-'+(Math.random()*7).toFixed(1)+'s"></span>';
+    }
+    el.innerHTML = '<span class="dd nn pos"></span><div class="caneca"><div class="copo"><div class="cheio"><div class="espuma"></div>'+b+'</div></div></div><span class="dd ell nomep"></span><span class="dd nn litros"></span>';
+    return el;
+  };
+  var pintaPodio = function(animar){
+    var top = ordenado(pessoas).slice(0,3);
+    if (!top.length) return;
+    var maior = top[0].ml || 1, antes = {}, vis = {};
+    Object.keys(slots).forEach(function(id){ if (slots[id].parentNode) antes[id] = slots[id].getBoundingClientRect().left; });
+    [top[1], top[0], top[2]].forEach(function(p){
+      if (!p) return;
+      vis[p.id] = true;
+      var el = slots[p.id] || (slots[p.id] = criaLugar(p));
+      var posicao = top.indexOf(p)+1;
+      el.className = "lugar p"+posicao;
+      el.querySelector(".pos").textContent = posicao;
+      el.querySelector(".nomep").textContent = p.nome;
+      el.querySelector(".litros").textContent = litros(p.ml);
+      var cheio = el.querySelector(".cheio");
+      var alt = Math.max(.3, p.ml/maior);
+      cheio.style.height = (alt*100).toFixed(0) + "%";
+      cheio.style.setProperty("--sobe", Math.round((posicao===1?440:posicao===2?320:290)*alt - 14)+"px");
+      podio.appendChild(el);
+    });
+    Object.keys(slots).forEach(function(id){ if (!vis[id] && slots[id].parentNode) slots[id].parentNode.removeChild(slots[id]); });
+    if (animar){
+      Object.keys(antes).forEach(function(id){
+        var el = slots[id]; if (!el || !el.parentNode) return;
+        var dx = antes[id] - el.getBoundingClientRect().left;
+        if (Math.abs(dx) < 2) return;
+        el.style.transition = "none";
+        el.style.transform = "translateX("+dx+"px)";
+        requestAnimationFrame(function(){
+          el.style.transition = "transform 780ms cubic-bezier(.22,.61,.36,1), width 620ms cubic-bezier(.22,.61,.36,1), height 620ms cubic-bezier(.22,.61,.36,1)";
+          el.style.transform = "none";
+        });
+      });
+      if (lider !== null && top[0].id !== lider){
+        var c = slots[top[0].id].querySelector(".caneca");
+        c.classList.add("pulsa");
+        setTimeout(function(){ c.classList.remove("pulsa"); }, 560);
+      }
+    }
+    lider = top[0].id;
+  };
+
+  var linhas = document.getElementById("linhas");
+  var pintaLista = function(destacar){
+    var antes = {};
+    linhas.querySelectorAll(".linha").forEach(function(el){ antes[el.dataset.id] = el.getBoundingClientRect().top; });
+    linhas.innerHTML = "";
+    ordenado(pessoas).slice(3,10).forEach(function(p,k){
+      var div = document.createElement("div");
+      div.className = "linha" + (k%2===1 ? " par" : "");
+      div.dataset.id = p.id;
+      div.innerHTML = '<span class="dd nn r">'+(k+4)+'</span><span class="dd ell nm"></span><span class="dd nn lt">'+litros(p.ml)+'</span>';
+      div.querySelector(".nm").textContent = p.nome;
+      linhas.appendChild(div);
+    });
+    linhas.querySelectorAll(".linha").forEach(function(el){
+      var de = antes[el.dataset.id]; if (de == null) return;
+      var dy = de - el.getBoundingClientRect().top;
+      if (Math.abs(dy) < 2) return;
+      el.style.transition = "none";
+      el.style.transform = "translateY("+dy+"px)";
+      requestAnimationFrame(function(){
+        el.style.transition = "transform 620ms cubic-bezier(.22,.61,.36,1)";
+        el.style.transform = "none";
+      });
+      if (dy > 0) el.classList.add("subiu");
+    });
+    if (destacar){
+      var alvo = linhas.querySelector('[data-id="'+destacar+'"]');
+      if (alvo) alvo.classList.add("subiu");
+    }
+  };
+
+  var semana = document.getElementById("semana");
+  ordenado(SEMANA).slice(0,10).forEach(function(p,k){
+    var div = document.createElement("div");
+    div.className = "grow" + (k%2===1 ? " par" : "") + (k<3 ? " top"+(k+1) : "");
+    div.innerHTML = '<span class="dd nn r">'+(k+1)+'</span><span class="dd ell nm"></span><span class="ell un"></span><span class="dd nn lt">'+litros(p.ml)+'</span>';
+    div.querySelector(".nm").textContent = p.nome;
+    div.querySelector(".un").textContent = p.dias;
+    semana.appendChild(div);
+  });
+
+  var pintaTotal = function(){
+    document.getElementById("total").textContent = litros(pessoas.reduce(function(t,p){ return t+p.ml; }, 0));
+    var a = new Date();
+    var hh = String(a.getHours()).padStart(2,"0")+":"+String(a.getMinutes()).padStart(2,"0");
+    document.getElementById("hora-1").textContent = "atualizado " + hh;
+    document.getElementById("hora-2").textContent = "atualizado " + hh;
+  };
+  var repinta = function(animar, destacar){ pintaPodio(animar); pintaLista(destacar); pintaTotal(); };
+
+  var telas = { hoje: document.getElementById("tela-hoje"), semana: document.getElementById("tela-semana") };
+  var atual = "hoje";
+  var mostra = function(q){
+    if (q === atual) return;
+    telas[atual].classList.remove("is-on");
+    atual = q;
+    telas[atual].classList.add("is-on");
+  };
+
+  repinta(false);
+
+  setInterval(function(){
+    if (atual !== "hoje") return;
+    var alvo = pessoas[Math.floor(Math.random()*pessoas.length)];
+    alvo.ml += Math.random() < .5 ? 300 : 500;
+    repinta(true, alvo.id);
+  }, 1600);
+
+  setInterval(function(){
+    if (atual === "hoje"){ mostra("semana"); return; }
+    pessoas = BASE.map(function(p){ return { id:p.id, nome:p.nome, ml:p.ml }; });
+    Object.keys(slots).forEach(function(id){ if (slots[id].parentNode) slots[id].parentNode.removeChild(slots[id]); });
+    slots = {}; lider = null;
+    repinta(false);
+    mostra("hoje");
+  }, 11000);
+})();
+</script>
+</body>
+</html>
