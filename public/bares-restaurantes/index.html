@@ -8,7 +8,6 @@
 <meta name="description" content="As cinco coisas que a Veehtor AI constroi para operacao de bar, cervejaria e restaurante: checklist com prova, campanha no WhatsApp, atendimento unificado, leitura semanal do negocio e ranking de chope ao vivo.">
 <link rel="canonical" href="https://veehtor.com/bares-restaurantes">
 
-<!-- previa do link quando alguem compartilha no WhatsApp -->
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:url" content="https://veehtor.com/bares-restaurantes">
@@ -80,8 +79,18 @@ p{margin:0}
 }
 .band.light .eyebrow{color:var(--teal-dark)}
 
-/* cabecalho de cada faixa */
+/* cabecalho de faixa sem midia ao lado */
 .head{max-width:940px}
+
+/* hero em duas colunas: argumento na esquerda, numero na direita */
+.heroline{
+  display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);
+  gap:clamp(32px,5vw,72px);align-items:center;margin-top:34px;
+}
+
+/* bloco de texto das solucoes, com o titulo dentro da coluna */
+.txt{min-width:0;display:flex;flex-direction:column}
+.txt .rule{margin:22px 0 30px}
 .head h2{font-size:clamp(27px,3.6vw,40px);line-height:1.14;margin-top:16px}
 .head .sub{margin-top:18px;font-size:clamp(17px,1.9vw,19.5px);color:var(--on-dark-2);line-height:1.55}
 .band.light .head .sub{color:var(--ink-2)}
@@ -90,21 +99,21 @@ p{margin:0}
 
 /* ---------- hero ---------- */
 .hero{padding-block:clamp(64px,9.5vw,116px) clamp(52px,7.5vw,84px)}
-.hero h1{font-size:clamp(33px,5.2vw,56px);line-height:1.08;margin-top:20px;max-width:16em}
+.hero h1{font-size:clamp(33px,5.2vw,56px);line-height:1.08;margin-top:20px;max-width:18em}
 .hero .lead{
-  margin-top:26px;font-size:clamp(17.5px,2.1vw,20.5px);color:var(--on-dark-2);
-  max-width:64ch;line-height:1.55;
+  font-size:clamp(17.5px,2.1vw,20.5px);color:var(--on-dark-2);
+  max-width:46ch;line-height:1.55;
 }
 
 .proof{
-  margin-top:42px;max-width:760px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
-  padding-block:26px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 22px;
+  border:1px solid var(--line);border-radius:12px;background:var(--primary-2);
+  padding:30px 32px;display:flex;flex-direction:column;gap:10px;
 }
 .proof .fig{
   font-family:var(--display);font-weight:700;font-size:clamp(27px,3.8vw,40px);
   color:var(--green);line-height:1.1;
 }
-.proof .cap{color:var(--on-dark-2);font-size:16.5px;max-width:42ch}
+.proof .cap{color:var(--on-dark-2);font-size:16.5px;max-width:34ch}
 
 /* ---------- botao whatsapp ---------- */
 .wa{
@@ -118,7 +127,7 @@ p{margin:0}
 .wa:hover{transform:translateY(-1px);box-shadow:0 14px 30px -14px rgba(248,115,22,1)}
 .wa:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
 .wa svg{width:21px;height:21px;fill:var(--primary);flex:none}
-.wa-hero{margin-top:36px}
+.wa-hero{margin-top:30px;align-self:flex-start}
 
 .wa-float{
   position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom, 0px));
@@ -139,15 +148,18 @@ p{margin:0}
 .pillar p{font-size:16.5px;line-height:1.55;color:var(--on-dark-2)}
 
 /* ---------- declaracao ---------- */
-.claim{max-width:900px}
-.claim h2{font-size:clamp(28px,4.2vw,46px);line-height:1.12;margin-top:16px;max-width:15em}
-.claim p{margin-top:22px;font-size:clamp(17px,2vw,19.5px);color:var(--on-dark-2);line-height:1.6;max-width:62ch}
+.claim{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(30px,4.5vw,64px);align-items:center}
+.claim h2{font-size:clamp(28px,4.2vw,46px);line-height:1.12;margin-top:16px}
+.claim p{font-size:clamp(17px,2vw,19.5px);color:var(--on-dark-2);line-height:1.6}
 
 /* ---------- solucoes ---------- */
 .sol{
-  display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(32px,4.5vw,64px);
-  align-items:center;margin-top:48px;
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:clamp(36px,5vw,72px);align-items:center;margin-top:0;
 }
+.sol.fone{grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr)}
+/* flip inverte a ordem visual, entao as proporcoes tambem invertem */
+.sol.fone.flip{grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr)}
 .sol.flip .shot{order:-1}
 .sol.wide{grid-template-columns:1fr;margin-top:46px}
 .rows{display:flex;flex-direction:column;gap:22px}
@@ -208,17 +220,22 @@ p{margin:0}
 .band.light .slot .n{color:var(--ink-3)}
 
 /* ---------- fechamento ---------- */
-.cta h2{font-size:clamp(28px,4vw,44px);max-width:15em;margin-top:16px;line-height:1.12}
-.cta .sub{margin-top:20px;color:var(--on-dark-2);font-size:18.5px;max-width:52ch;line-height:1.55}
+.ctaline{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(32px,5vw,72px);align-items:center}
+.cta h2{font-size:clamp(28px,4vw,44px);margin-top:16px;line-height:1.12}
+.cta .sub{margin-top:20px;color:var(--on-dark-2);font-size:18.5px;line-height:1.55}
+.ctabox{border:1px solid var(--line);border-radius:12px;background:var(--primary);padding:30px 32px}
 .sig{
-  margin-top:44px;padding-top:30px;border-top:1px solid var(--line);
-  font-size:20px;line-height:1.5;font-family:var(--display);max-width:50ch;color:var(--on-dark-2);
+  margin-top:24px;padding-top:24px;border-top:1px solid var(--line);
+  font-size:19px;line-height:1.5;font-family:var(--display);color:var(--on-dark-2);
 }
 
 footer{padding-block:32px 104px;border-top:1px solid var(--line);color:var(--on-dark-3);font-size:13.5px}
 
 @media (max-width:880px){
-  .sol{grid-template-columns:1fr;gap:34px}
+  .sol,.sol.fone{grid-template-columns:1fr;gap:30px}
+  .heroline,.ctaline,.claim{grid-template-columns:1fr;gap:28px}
+  .hero .lead{max-width:none}
+  .proof .cap{max-width:none}
   .sol.flip .shot{order:0}
   .sol.wide .rows{grid-template-columns:1fr;gap:22px}
   .pillars{grid-template-columns:1fr;gap:30px;margin-top:38px}
@@ -329,25 +346,29 @@ footer{padding-block:32px 104px;border-top:1px solid var(--line);color:var(--on-
   <div class="wrap">
     <div class="eyebrow">Veehtor AI · cervejarias, bares e restaurantes</div>
     <h1>A casa está cheia, a venda está boa, e no fim do mês sobra pouco. Onde está o buraco?</h1>
-    <p class="lead">As cinco coisas que a gente constrói para operação de bar, cervejaria e restaurante, cada uma dentro da rotina que já existe na casa.</p>
-
-    <div class="proof">
-      <div class="fig">1 dia → 15 minutos</div>
-      <div class="cap">por semana, no fechamento da folha dos freelancers de uma rede de seis unidades.</div>
-    </div>
-
-    <a class="wa wa-hero" href="https://wa.me/5516994294039?text=Ol%C3%A1%21%20Vim%20pela%20p%C3%A1gina%20de%20solu%C3%A7%C3%B5es%20para%20cervejarias%20e%20bares%20e%20quero%20falar%20sobre%20a%20rotina%20que%20est%C3%A1%20travando%20a%20minha%20opera%C3%A7%C3%A3o." target="_blank" rel="noopener">
+    <div class="heroline">
+      <div class="txt">
+        <p class="lead">As cinco coisas que a gente constrói para operação de bar, cervejaria e restaurante, cada uma dentro da rotina que já existe na casa.</p>
+        <a class="wa wa-hero" href="https://wa.me/5516994294039?text=Ol%C3%A1%21%20Vim%20pela%20p%C3%A1gina%20de%20solu%C3%A7%C3%B5es%20para%20cervejarias%20e%20bares%20e%20quero%20falar%20sobre%20a%20rotina%20que%20est%C3%A1%20travando%20a%20minha%20opera%C3%A7%C3%A3o." target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0 0 20.885 3.4"/></svg>
       Falar sobre minha operação
-    </a>
+        </a>
+      </div>
+      <div class="proof">
+        <div class="fig">1 dia → 15 minutos</div>
+        <div class="cap">por semana, no fechamento da folha dos freelancers de uma rede de seis unidades.</div>
+      </div>
+    </div>
   </div>
 </div>
 
 <div class="band alt">
   <div class="wrap">
     <div class="claim">
-      <div class="eyebrow">A ideia por trás de tudo isto</div>
-      <h2>Dá para aumentar o lucro sem vender mais</h2>
+      <div>
+        <div class="eyebrow">A ideia por trás de tudo isto</div>
+        <h2>Dá para aumentar o lucro sem vender mais</h2>
+      </div>
       <p>Boa parte do que falta no fim do mês não está na venda. Está no que escapa no meio do caminho: chope que sai do barril e não entra na comanda, hora lançada errada, desperdício que ninguém contou, cliente que veio uma vez e nunca mais foi chamado. Fechar esses buracos não exige uma mesa a mais.</p>
     </div>
   </div>
@@ -378,13 +399,12 @@ footer{padding-block:32px 104px;border-top:1px solid var(--line);color:var(--on-
 
 <div class="band light">
   <div class="wrap">
-    <div class="head">
-      <div class="eyebrow">Operação</div>
-      <h2>Checklist de abertura e fechamento, com prova</h2>
-      <div class="rule"></div>
-    </div>
-    <div class="sol">
-      <div class="rows">
+    <div class="sol fone">
+      <div class="txt">
+        <div class="eyebrow">Operação</div>
+        <h2>Checklist de abertura e fechamento, com prova</h2>
+        <div class="rule"></div>
+        <div class="rows">
         <div class="row">
           <div class="lab">Como é hoje</div>
           <p>O funcionário marca num papel que limpou, abasteceu e conferiu. Você acredita. No dia em que dá problema, não existe foto, não existe horário e não existe quem fez.</p>
@@ -396,6 +416,7 @@ footer{padding-block:32px 104px;border-top:1px solid var(--line);color:var(--on-
         <div class="row get">
           <div class="lab">O que você passa a ter</div>
           <p>Histórico com foto e horário de cada abertura e cada fechamento, de todas as unidades, sem cobrar ninguém.</p>
+        </div>
         </div>
       </div>
       <div class="shot">
@@ -470,13 +491,12 @@ footer{padding-block:32px 104px;border-top:1px solid var(--line);color:var(--on-
 
 <div class="band light">
   <div class="wrap">
-    <div class="head">
-      <div class="eyebrow">Dinheiro</div>
-      <h2>A leitura do negócio, toda semana, sem você pedir</h2>
-      <div class="rule"></div>
-    </div>
-    <div class="sol flip">
-      <div class="rows">
+    <div class="sol fone flip">
+      <div class="txt">
+        <div class="eyebrow">Dinheiro</div>
+        <h2>A leitura do negócio, toda semana, sem você pedir</h2>
+        <div class="rule"></div>
+        <div class="rows">
         <div class="row">
           <div class="lab">Como é hoje</div>
           <p>O número fecha no fim do mês, quando o problema já aconteceu e já custou. Venda está num sistema, estoque está em outro, e a margem só aparece depois que o contador fecha.</p>
@@ -488,6 +508,7 @@ footer{padding-block:32px 104px;border-top:1px solid var(--line);color:var(--on-
         <div class="row get">
           <div class="lab">O que você passa a ter</div>
           <p>Um relatório por semana dizendo o que mudou, quanto isso vale e o que fazer na segunda de manhã.</p>
+        </div>
         </div>
       </div>
       <div class="shot">
@@ -501,13 +522,12 @@ footer{padding-block:32px 104px;border-top:1px solid var(--line);color:var(--on-
 
 <div class="band">
   <div class="wrap">
-    <div class="head">
-      <div class="eyebrow">Salão</div>
-      <h2>Ranking de chope na TV, ao vivo</h2>
-      <div class="rule"></div>
-    </div>
     <div class="sol">
-      <div class="rows">
+      <div class="txt">
+        <div class="eyebrow">Salão</div>
+        <h2>Ranking de chope na TV, ao vivo</h2>
+        <div class="rule"></div>
+        <div class="rows">
         <div class="row">
           <div class="lab">Como é hoje</div>
           <p>O cliente pede o que pediria de qualquer jeito. Nada na casa faz ele pedir o próximo, a não ser o garçom perguntar.</p>
@@ -519,6 +539,7 @@ footer{padding-block:32px 104px;border-top:1px solid var(--line);color:var(--on-
         <div class="row get">
           <div class="lab">O que você passa a ter</div>
           <p>Uma brincadeira entre as mesas que faz o cliente pedir mais, sem ninguém precisar oferecer.</p>
+        </div>
         </div>
       </div>
       <div class="shot">
@@ -561,17 +582,21 @@ footer{padding-block:32px 104px;border-top:1px solid var(--line);color:var(--on-
 
 <div class="band alt cta">
   <div class="wrap">
-    <div class="eyebrow">Conversa de trinta minutos</div>
-    <h2>Me conta onde a sua casa está perdendo mais dinheiro</h2>
-    <p class="sub">Se não tiver nada que valha a pena construir, a gente fala isso na própria conversa. É mais barato para os dois lados.</p>
-
-    <a class="wa wa-hero" href="https://wa.me/5516994294039?text=Ol%C3%A1%21%20Vim%20pela%20p%C3%A1gina%20de%20solu%C3%A7%C3%B5es%20para%20cervejarias%20e%20bares%20e%20quero%20falar%20sobre%20a%20rotina%20que%20est%C3%A1%20travando%20a%20minha%20opera%C3%A7%C3%A3o." target="_blank" rel="noopener">
+    <div class="ctaline">
+      <div class="txt">
+        <div class="eyebrow">Conversa de trinta minutos</div>
+        <h2>Me conta onde a sua casa está perdendo mais dinheiro</h2>
+        <p class="sub">Se não tiver nada que valha a pena construir, a gente fala isso na própria conversa. É mais barato para os dois lados.</p>
+      </div>
+      <div class="ctabox">
+        <a class="wa wa-hero" href="https://wa.me/5516994294039?text=Ol%C3%A1%21%20Vim%20pela%20p%C3%A1gina%20de%20solu%C3%A7%C3%B5es%20para%20cervejarias%20e%20bares%20e%20quero%20falar%20sobre%20a%20rotina%20que%20est%C3%A1%20travando%20a%20minha%20opera%C3%A7%C3%A3o." target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0 0 20.885 3.4"/></svg>
       Falar sobre minha operação
     </a>
-    <p class="wa-note">Ou salve o número: <b>+55 16 99429-4039</b></p>
-
-    <p class="sig">A gente entra na sua operação, acha onde o tempo e o dinheiro estão vazando, e conserta uma rotina por vez.</p>
+        <p class="wa-note">Ou salve o número: <b>+55 16 99429-4039</b></p>
+        <p class="sig">A gente entra na sua operação, acha onde o tempo e o dinheiro estão vazando, e conserta uma rotina por vez.</p>
+      </div>
+    </div>
   </div>
 </div>
 
