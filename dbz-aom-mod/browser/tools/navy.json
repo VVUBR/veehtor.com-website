@@ -1,0 +1,5 @@
+[
+ { "mode": "supremacy", "map": "sea", "players": [{ "faction": "earth", "ai": "normal" }, { "faction": "ff", "ai": "normal" }], "seed": 61 },
+ { "mode": "supremacy", "map": "sea", "players": [{ "faction": "rr", "ai": "hard" }, { "faction": "earth", "ai": "normal" }, { "faction": "ff", "ai": "normal", "team": 2 }], "seed": 62 },
+ { "mode": "conquest", "map": "namek", "players": [{ "faction": "ff", "ai": "normal" }, { "faction": "rr", "ai": "normal" }], "seed": 63 }
+]

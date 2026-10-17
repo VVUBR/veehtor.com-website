@@ -73,6 +73,10 @@ const ok = (c, m) => { if (!c) fails++; console.log((c ? 'PASS ' : 'FAIL ') + m)
   const ageBtns = await page.$$eval('#cmds .cmd.age', b => b.map(x => x.getAttribute('aria-label')));
   ok(ageBtns.length === 2, 'two age-up patron choices: ' + ageBtns.join(' | '));
   await page.click('#cmds .cmd.age >> nth=0');
+  ok(await E(() => !window.__DBH.G().blds.find(b => b.owner === 1 && b.key === 'tc').research), 'without a Temple the Saga advance is refused');
+  await E(() => { const D = window.__DBH, G = D.G(), tc = G.blds.find(b => b.owner === 1 && b.key === 'tc'); D.dev().placeBuilding('temple', 1, Math.floor(tc.x) - 9, Math.floor(tc.y) + 2, true); D.dev().refreshLists(); G.sel = [tc]; });
+  await page.waitForTimeout(300);
+  await page.click('#cmds .cmd.age >> nth=0');
   await E(() => window.__DBH.step(50));
   const P1 = await E(() => { const P = window.__DBH.G().players[1]; return { age: P.age, minors: P.minors, powers: Object.keys(P.powers) }; });
   ok(P1.age === 2 && P1.minors.length === 1 && P1.powers.length === 2, 'age 2 with minor patron and new power ' + JSON.stringify(P1));

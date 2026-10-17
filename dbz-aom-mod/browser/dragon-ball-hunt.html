@@ -224,6 +224,8 @@ kbd{background:var(--deck-2);border:1px solid var(--edge);border-bottom-width:2p
 .slot .who{font-weight:700;display:flex;align-items:center;gap:6px}
 .slot .sw{width:14px;height:14px;border-radius:4px;flex:none}
 select{background:var(--deck-2);color:var(--text);border:1px solid var(--edge);border-radius:7px;padding:7px 8px;font:500 13px var(--f-ui);min-width:0;width:100%}
+#s-mode{width:auto;min-width:190px}
+.mode-desc{flex-basis:100%;font-size:12.5px;color:var(--dim);line-height:1.4}
 .patron-info{font-size:12px;color:var(--dim);line-height:1.4;grid-column:1/-1}
 
 details.how{padding:8px 12px;font-size:13px;line-height:1.5}
@@ -354,10 +356,11 @@ details.how summary{cursor:pointer;font-weight:700}
           <div class="seg" id="s-map"></div>
         </div>
         <div class="line frame" style="padding:10px 12px">
-          <span class="lbl">Victory</span>
-          <div class="seg" id="s-victory"><button data-v="conquest" class="sel">Conquest</button><button data-v="wonder">Conquest + Wonder</button></div>
+          <span class="lbl">Game mode</span>
+          <select id="s-mode" aria-label="Game mode"></select>
           <span class="lbl">Start</span>
           <div class="seg" id="s-res"><button data-r="standard" class="sel">Standard</button><button data-r="high">Rich</button></div>
+          <div class="mode-desc" id="s-mode-desc"></div>
         </div>
         <div id="slots" class="setup"></div>
       </div>
@@ -423,7 +426,7 @@ details.how summary{cursor:pointer;font-weight:700}
 const TW = 64, TH = 32, HTW = TW / 2, HTH = TH / 2;  // isometric tile diamond at zoom 1
 const MT = 0.5;                                      // tiles per meter (one tile = 2 m, as in Age of Mythology)
 const STEP = 1 / 20;                                 // simulation tick
-const MAX_POP = 200;
+const MAX_POP = 300;
 const $ = id => document.getElementById(id);
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -715,6 +718,32 @@ const U = {
   armored: { faction: 'ff', cls: 'myth', name: 'Armored Squadron', tags: ['Biological', 'MythUnit'], hp: 760, armor: [.65, .65, .75], melee: { hack: 50, range: 1.1, rof: 1.2 }, speed: 4.8, los: 20, cost: { gold: 220, ki: 28 }, time: 24, pop: 4, at: 'temple', age: 4, size: .55,
     look: { r: 'human', skin: '#7fbfd8', hair: 'long', hairC: '#f4f4f4', top: '#1b1b2b', pants: '#1b1b2b', boots: '#8a5ad8', armor: { chest: '#8a5ad8', pad: '#f4f4f4' }, scouter: true, scale: 1.15 }, desc: "Myth unit. Cooler's armored elite." },
 
+  // ================= SHIPS =================
+  fishboat: { faction: 'earth', cls: 'ship', ship: 'fish', naval: true, fisher: true, name: 'Capsule Fishing Boat', tags: ['Ship', 'Mech', 'FishingShip'], hp: 140, armor: [.1, .2, .1], speed: 5, los: 14, cost: { wood: 60 }, time: 14, pop: 1, at: 'dock', size: 1.2,
+    look: { r: 'ship', kind: 'fish', style: 'earth' }, desc: 'Catches fish (Rations) and brings it back to the Dock. Cannot fight.' },
+  gunboat: { faction: 'earth', cls: 'ship', ship: 'arrow', naval: true, name: 'Capsule Gunboat', tags: ['Ship', 'Mech', 'ArrowShip'], hp: 320, armor: [.3, .45, .1], ranged: { pierce: 11, range: 18, rof: 2, proj: 'ki', bonus: { SiegeShip: 2.5 } }, speed: 5.6, los: 22, cost: { wood: 100, gold: 50 }, time: 18, pop: 2, at: 'dock', age: 2, size: 1.5,
+    look: { r: 'ship', kind: 'arrow', style: 'earth', scale: 1.2 }, desc: 'Arrow ship. Shoots from range. Strong against siege ships (×2.5), weak against hammer ships.' },
+  ramcruiser: { faction: 'earth', cls: 'ship', ship: 'hammer', naval: true, name: 'Kame Ram Cruiser', tags: ['Ship', 'Mech', 'HammerShip'], hp: 460, armor: [.45, .4, .2], melee: { hack: 22, crush: 8, range: 1.4, rof: 1.6, bonus: { ArrowShip: 2.6, building: 1.6 } }, speed: 5.2, los: 18, cost: { wood: 120, gold: 60 }, time: 18, pop: 2, at: 'dock', age: 2, size: 1.6,
+    look: { r: 'ship', kind: 'hammer', style: 'earth', scale: 1.2 }, desc: 'Hammer ship. Rams up close. Strong against arrow ships (×2.6) and docks, weak against siege ships.' },
+  battleship: { faction: 'earth', cls: 'ship', ship: 'siege', naval: true, name: 'Capsule Battleship', tags: ['Ship', 'Mech', 'SiegeShip'], hp: 380, armor: [.35, .5, .15], ranged: { crush: 40, range: 26, minRange: 4, rof: 4.5, aoe: 1.2, proj: 'shell', bonus: { building: 3, HammerShip: 2.5 } }, speed: 4, los: 24, cost: { wood: 170, gold: 120 }, time: 24, pop: 3, at: 'dock', age: 3, size: 1.8,
+    look: { r: 'ship', kind: 'siege', style: 'earth', scale: 1.2 }, desc: 'Siege ship. Long-range shells: triple damage against buildings, strong against hammer ships (×2.5), weak against arrow ships.' },
+  trawler: { faction: 'rr', cls: 'ship', ship: 'fish', naval: true, fisher: true, name: 'RR Trawler', tags: ['Ship', 'Mech', 'FishingShip'], hp: 140, armor: [.1, .2, .1], speed: 5, los: 14, cost: { wood: 60 }, time: 14, pop: 1, at: 'dock', size: 1.2,
+    look: { r: 'ship', kind: 'fish', style: 'rr' }, desc: 'Catches fish (Rations) and brings it back to the Dock. Cannot fight.' },
+  patrolboat: { faction: 'rr', cls: 'ship', ship: 'arrow', naval: true, name: 'RR Patrol Boat', tags: ['Ship', 'Mech', 'ArrowShip'], hp: 320, armor: [.3, .45, .1], ranged: { pierce: 11, range: 18, rof: 2, proj: 'bullet', bonus: { SiegeShip: 2.5 } }, speed: 5.6, los: 22, cost: { wood: 100, gold: 50 }, time: 18, pop: 2, at: 'dock', age: 2, size: 1.5,
+    look: { r: 'ship', kind: 'arrow', style: 'rr', scale: 1.2 }, desc: 'Arrow ship. Shoots from range. Strong against siege ships (×2.5), weak against hammer ships.' },
+  ramsub: { faction: 'rr', cls: 'ship', ship: 'hammer', naval: true, name: 'RR Ram Submarine', tags: ['Ship', 'Mech', 'HammerShip'], hp: 460, armor: [.45, .4, .2], melee: { hack: 22, crush: 8, range: 1.4, rof: 1.6, bonus: { ArrowShip: 2.6, building: 1.6 } }, speed: 5.2, los: 18, cost: { wood: 120, gold: 60 }, time: 18, pop: 2, at: 'dock', age: 2, size: 1.6,
+    look: { r: 'ship', kind: 'hammer', style: 'rr', scale: 1.2 }, desc: 'Hammer ship. Rams up close. Strong against arrow ships (×2.6) and docks, weak against siege ships.' },
+  missilecruiser: { faction: 'rr', cls: 'ship', ship: 'siege', naval: true, name: 'RR Missile Cruiser', tags: ['Ship', 'Mech', 'SiegeShip'], hp: 380, armor: [.35, .5, .15], ranged: { crush: 40, range: 26, minRange: 4, rof: 4.5, aoe: 1.2, proj: 'shell', bonus: { building: 3, HammerShip: 2.5 } }, speed: 4, los: 24, cost: { wood: 170, gold: 120 }, time: 24, pop: 3, at: 'dock', age: 3, size: 1.8,
+    look: { r: 'ship', kind: 'siege', style: 'rr', scale: 1.2 }, desc: 'Siege ship. Long-range shells: triple damage against buildings, strong against hammer ships (×2.5), weak against arrow ships.' },
+  skiff: { faction: 'ff', cls: 'ship', ship: 'fish', naval: true, fisher: true, name: 'Hover Skiff', tags: ['Ship', 'Mech', 'FishingShip'], hp: 140, armor: [.1, .2, .1], speed: 5, los: 14, cost: { wood: 60 }, time: 14, pop: 1, at: 'dock', size: 1.2,
+    look: { r: 'ship', kind: 'fish', style: 'ff' }, desc: 'Catches fish (Rations) and brings it back to the Dock. Cannot fight.' },
+  gunsaucer: { faction: 'ff', cls: 'ship', ship: 'arrow', naval: true, name: 'Saucer Gunship', tags: ['Ship', 'Mech', 'ArrowShip'], hp: 320, armor: [.3, .45, .1], ranged: { pierce: 11, range: 18, rof: 2, proj: 'ki', bonus: { SiegeShip: 2.5 } }, speed: 5.6, los: 22, cost: { wood: 100, gold: 50 }, time: 18, pop: 2, at: 'dock', age: 2, size: 1.5,
+    look: { r: 'ship', kind: 'arrow', style: 'ff', scale: 1.2 }, desc: 'Arrow ship. Shoots from range. Strong against siege ships (×2.5), weak against hammer ships.' },
+  spikesaucer: { faction: 'ff', cls: 'ship', ship: 'hammer', naval: true, name: 'Spiked Assault Saucer', tags: ['Ship', 'Mech', 'HammerShip'], hp: 460, armor: [.45, .4, .2], melee: { hack: 22, crush: 8, range: 1.4, rof: 1.6, bonus: { ArrowShip: 2.6, building: 1.6 } }, speed: 5.2, los: 18, cost: { wood: 120, gold: 60 }, time: 18, pop: 2, at: 'dock', age: 2, size: 1.6,
+    look: { r: 'ship', kind: 'hammer', style: 'ff', scale: 1.2 }, desc: 'Hammer ship. Rams up close. Strong against arrow ships (×2.6) and docks, weak against siege ships.' },
+  bombsaucer: { faction: 'ff', cls: 'ship', ship: 'siege', naval: true, name: 'Bombard Saucer', tags: ['Ship', 'Mech', 'SiegeShip'], hp: 380, armor: [.35, .5, .15], ranged: { crush: 40, range: 26, minRange: 4, rof: 4.5, aoe: 1.2, proj: 'shell', bonus: { building: 3, HammerShip: 2.5 } }, speed: 4, los: 24, cost: { wood: 170, gold: 120 }, time: 24, pop: 3, at: 'dock', age: 3, size: 1.8,
+    look: { r: 'ship', kind: 'siege', style: 'ff', scale: 1.2 }, desc: 'Siege ship. Long-range shells: triple damage against buildings, strong against hammer ships (×2.5), weak against arrow ships.' },
+
   // ================= NEUTRAL =================
   kidbuu: { cls: 'titan', name: 'Kid Buu', tags: ['MythUnit', 'Titan', 'Biological'], hp: 7000, armor: [.85, .85, .95], melee: { hack: 120, crush: 200, range: 2.5, rof: 1.5, aoe: 3 }, speed: 4.8, los: 24, regen: 40, pop: 0, size: .9,
     look: { r: 'buu' }, desc: "Titan. Regenerates 40 HP/s. Only a hero's ultimate attack or a god power can finish him." },
@@ -806,23 +835,26 @@ const B = {
   lab: { w: 4, h: 4, hp: 4000, armor: [.8, .8, .3], los: 14, special: true, attack: { pierce: 12, range: 18, rof: 1.5, arrows: 2 }, names: { rr: "Dr. Gero's Laboratory", earth: 'Laboratory', ff: 'Laboratory' }, desc: "Dr. Gero's hidden laboratory, where the androids sleep." },
   ship: { w: 5, h: 5, hp: 5500, armor: [.8, .85, .3], los: 16, special: true, attack: { pierce: 14, range: 20, rof: 1.4, arrows: 3 }, names: { ff: "Frieza's Spaceship", earth: 'Spaceship', rr: 'Spaceship' }, desc: "Frieza's personal spaceship." },
   guru: { w: 3, h: 3, hp: 2500, armor: [.7, .7, .3], los: 14, special: true, vault: true, names: { earth: "Guru's House", rr: "Guru's House", ff: "Guru's House" }, desc: "The Grand Elder's home. Bring Dragon Balls here." },
+  dock: { w: 3, h: 3, hp: 1500, armor: [.6, .6, .2], drop: ['food'], navalDrop: true, dock: true, cost: { wood: 100 }, time: 30, age: 1, los: 14,
+    names: { earth: 'Capsule Harbor', rr: 'RR Naval Yard', ff: 'Frieza Force Dock' }, desc: 'Build on a shore next to deep water. Trains ships, and fishing boats drop off fish here.' },
+  korin: { w: 3, h: 3, hp: 9999, armor: [.95, .95, .95], los: 10, special: true, monument: true, names: { earth: "Korin's Tower", rr: "Korin's Tower", ff: "Korin's Tower" }, desc: 'Keep your units around the tower, with no enemies nearby, to hold it.' },
   hut: { w: 2, h: 2, hp: 500, armor: [.5, .5, .1], los: 6, special: true, names: { earth: 'Village Hut', rr: 'Village Hut', ff: 'Village Hut' }, desc: 'A village home.' },
 };
 for (const k in B) { B[k].key = k; B[k].trains = []; B[k].techs = []; }
 const bname = (key, faction) => B[key].names[faction] || B[key].names.earth || Object.values(B[key].names)[0];
 const bcost = (key, faction) => (B[key].byF && B[key].byF[faction] && B[key].byF[faction].cost) || B[key].cost || {};
 const BUILD_MENU = {
-  earth: ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'tower', 'wall', 'gate', 'stable', 'armory', 'market', 'fortress', 'tc', 'wonder'],
-  rr: ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'reactor', 'tower', 'wall', 'gate', 'stable', 'armory', 'market', 'fortress', 'tc', 'wonder'],
-  ff: ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'tower', 'wall', 'gate', 'stable', 'armory', 'market', 'fortress', 'tc', 'wonder'],
+  earth: ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'dock', 'tower', 'wall', 'gate', 'stable', 'armory', 'market', 'fortress', 'tc', 'wonder'],
+  rr: ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'reactor', 'dock', 'tower', 'wall', 'gate', 'stable', 'armory', 'market', 'fortress', 'tc', 'wonder'],
+  ff: ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'dock', 'tower', 'wall', 'gate', 'stable', 'armory', 'market', 'fortress', 'tc', 'wonder'],
 };
 for (const k in U) { const d = U[k]; if (d.at && B[d.at]) B[d.at].trains.push(k); }
 
 // ---------- technologies ----------
 const TECH = {
-  age2: { name: 'Advance to the Namek Saga', at: 'tc', cost: { food: 400 }, time: 45, age: 1, ageUp: 2, desc: 'Choose a new patron, unlock cavalry, the Armory and more.' },
-  age3: { name: 'Advance to the Android Saga', at: 'tc', cost: { food: 800, gold: 500 }, time: 60, age: 2, ageUp: 3, desc: 'Choose a new patron, unlock siege, the Fortress and the Market.' },
-  age4: { name: 'Advance to the Buu Saga', at: 'tc', cost: { food: 1000, gold: 1000 }, time: 75, age: 3, ageUp: 4, desc: 'Choose a new patron, unlock Wonders, the Titan and the strongest transformations.' },
+  age2: { name: 'Advance to the Namek Saga', at: 'tc', cost: { food: 400 }, time: 45, age: 1, ageUp: 2, needB: 'temple', desc: 'Choose a new patron, unlock cavalry, the Armory and more. Needs a Temple.' },
+  age3: { name: 'Advance to the Android Saga', at: 'tc', cost: { food: 800, gold: 500 }, time: 60, age: 2, ageUp: 3, needB: 'armory', desc: 'Choose a new patron, unlock siege, the Fortress and the Market. Needs an Armory.' },
+  age4: { name: 'Advance to the Buu Saga', at: 'tc', cost: { food: 1000, gold: 1000 }, time: 75, age: 3, ageUp: 4, needB: 'fortress', desc: 'Choose a new patron, unlock Wonders, the Titan and the strongest transformations. Needs a Fortress.' },
   // economy
   hunting: { name: 'Hunting Scouters', at: 'granary', age: 1, cost: { food: 50, wood: 50 }, time: 20, fx: [{ t: 'gather', res: 'hunt', mul: 1.25 }], desc: 'Villagers hunt 25% faster.', icon: 'hunt' },
   plow: { name: 'Capsule Plows', at: 'granary', age: 1, cost: { food: 75, wood: 100 }, time: 25, fx: [{ t: 'gather', res: 'farm', mul: 1.2 }, { t: 'gather', res: 'berry', mul: 1.2 }], desc: 'Farms and Senzu crops +20%.', icon: 'farm' },
@@ -848,6 +880,9 @@ const TECH = {
   rng3: { name: 'Elite Gunners', at: 'barracks', age: 3, req: 'rng2', cost: { wood: 300, gold: 300 }, time: 45, fx: [{ t: 'stat', who: 'cls:ranged', stat: 'hp', mul: 1.15 }, { t: 'stat', who: 'cls:ranged', stat: 'atk', mul: 1.15 }, { t: 'stat', who: 'cls:ranged', stat: 'range', add: 2 }], desc: 'Ranged soldiers +15% HP and attack, +2 m range.', icon: 'rng' },
   cav2: { name: 'Veteran Riders', at: 'stable', age: 2, cost: { food: 200, gold: 150 }, time: 35, fx: [{ t: 'stat', who: 'cls:cavalry', stat: 'hp', mul: 1.15 }, { t: 'stat', who: 'cls:cavalry', stat: 'atk', mul: 1.15 }], desc: 'Cavalry +15% HP and attack.', icon: 'cav' },
   cav3: { name: 'Elite Riders', at: 'stable', age: 3, req: 'cav2', cost: { food: 400, gold: 300 }, time: 45, fx: [{ t: 'stat', who: 'cls:cavalry', stat: 'hp', mul: 1.15 }, { t: 'stat', who: 'cls:cavalry', stat: 'atk', mul: 1.15 }, { t: 'stat', who: 'cls:cavalry', stat: 'speed', mul: 1.08 }], desc: 'Cavalry +15% HP and attack, +8% speed.', icon: 'cav' },
+  nets: { name: 'Capsule Fishing Nets', at: 'dock', age: 1, cost: { food: 50, wood: 100 }, time: 25, fx: [{ t: 'gather', res: 'fish', mul: 1.25 }], desc: 'Fishing boats catch 25% more.', icon: 'hunt' },
+  hulls: { name: 'Reinforced Hulls', at: 'dock', age: 2, cost: { wood: 200, gold: 100 }, time: 35, fx: [{ t: 'stat', who: 'cls:ship', stat: 'hp', mul: 1.2 }], desc: 'All ships +20% HP.', icon: 'shield' },
+  navalguns: { name: 'Naval Ki Cannons', at: 'dock', age: 3, cost: { wood: 300, gold: 250 }, time: 45, fx: [{ t: 'stat', who: 'cls:ship', stat: 'atk', mul: 1.2 }], desc: 'All warships +20% attack.', icon: 'sword' },
   siege2: { name: 'Heavy Siege', at: 'fortress', age: 4, cost: { wood: 400, gold: 300 }, time: 50, fx: [{ t: 'stat', who: 'cls:siege', stat: 'hp', mul: 1.2 }, { t: 'stat', who: 'cls:siege', stat: 'atk', mul: 1.2 }], desc: 'Siege +20% HP and attack.', icon: 'siege' },
   // heroes and temple
   ssj1: { name: 'Super Saiyan Awakening', faction: 'earth', at: 'temple', age: 3, cost: { gold: 300, ki: 25 }, time: 40, fx: [{ t: 'form', unit: 'goku', form: 'goku_ssj1' }], desc: 'Goku becomes a Super Saiyan: 950 HP and Instant Kamehameha.', icon: 'ssj' },
@@ -914,16 +949,47 @@ const RES_DEF = {
   gold: { amount: 2500, type: 'gold', sub: 'gold', block: true, big: true },
   berry: { amount: 150, type: 'food', sub: 'berry', block: false },
   carcass: { amount: 350, type: 'food', sub: 'hunt', block: false },
+  fish: { amount: 500, type: 'food', sub: 'fish', block: false, naval: true },
 };
 
-const SPECIAL_NAMES = { tree: 'Capsule Alloy Grove', gold: 'Zeni Vein', berry: 'Senzu Bush', carcass: 'Dinosaur Rations' };
+// Relics: only heroes can carry them; each one kept in a Temple gives its owner a bonus.
+const RELICS = {
+  powerpole: { name: 'Power Pole', desc: 'Heroes +10% attack.', fx: [{ t: 'stat', who: 'hero', stat: 'atk', mul: 1.1 }] },
+  zsword: { name: 'Z Sword', desc: 'Infantry +12% attack.', fx: [{ t: 'stat', who: 'cls:infantry', stat: 'atk', mul: 1.12 }] },
+  scouter: { name: 'Old Scouter', desc: 'Ranged soldiers +2 m range.', fx: [{ t: 'stat', who: 'cls:ranged', stat: 'range', add: 2 }] },
+  radar: { name: 'Dragon Radar', desc: 'All your units see 3 m farther.', fx: [{ t: 'stat', who: 'all', stat: 'los', add: 3 }] },
+  nimbus: { name: 'Nimbus Seed', desc: 'Cavalry +10% speed.', fx: [{ t: 'stat', who: 'cls:cavalry', stat: 'speed', mul: 1.1 }] },
+  senzu: { name: 'Senzu Seed Pouch', desc: '+0.5 Rations per second.', trickle: { food: .5 } },
+  goldcap: { name: 'Golden Capsule', desc: '+0.35 Zeni per second.', trickle: { gold: .35 } },
+  fan: { name: 'Bansho Fan', desc: 'Capsule Alloy gathering +10%.', fx: [{ t: 'gather', res: 'wood', mul: 1.1 }] },
+  jar: { name: 'Mafuba Jar', desc: 'Myth units +10% HP.', fx: [{ t: 'stat', who: 'myth', stat: 'hp', mul: 1.1 }] },
+  shard: { name: 'Saiyan Armor Shard', desc: 'Human soldiers +3% Hack and Pierce armor.', fx: [{ t: 'stat', who: 'human', stat: 'armor', add: .03 }] },
+  flask: { name: 'Sacred Water Flask', desc: '+0.06 Ki per second.', trickle: { ki: .06 } },
+  shell: { name: "Roshi's Turtle Shell", desc: 'Villagers gather 5% faster.', fx: [{ t: 'gather', res: 'all', mul: 1.05 }] },
+};
+for (const k in RELICS) RELICS[k].key = k;
+const RELIC_CAP = 10;
+const SPECIAL_NAMES = { tree: 'Capsule Alloy Grove', gold: 'Zeni Vein', berry: 'Senzu Bush', carcass: 'Dinosaur Rations', fish: 'Giant Fish' };
 
 const MAPS = {
   earth: { name: 'Dragon Ball Hunt', biome: 'earth', desc: 'Green hills, lakes and forests. Seven guarded Dragon Balls.' },
   namek: { name: 'Planet Namek', biome: 'namek', desc: 'Blue-green islands joined by shallow water. Few trees, rich in Zeni.' },
   wasteland: { name: 'Android Wasteland', biome: 'wasteland', desc: 'A rocky desert of mesas and canyons. Lots of Zeni, little wood.' },
   highlands: { name: "Kami's Highlands", biome: 'highlands', desc: 'Snowy peaks and pine forests around a central plateau.' },
+  sea: { name: 'Kame Sea', biome: 'earth', layout: 'sea', desc: 'Bases ring a great inland sea full of giant fish. Build Docks and fight for the water.' },
 };
+// Game modes (the standard Age of Mythology set).
+const WONDER_TIME = 600, SETTLE_TIME = 300, KOTH_TIME = 300, SUDDEN_TIME = 120;
+const MODES = {
+  supremacy: { name: 'Supremacy', wonder: true, settle: true, desc: 'The standard game. Win by destroying every enemy, by keeping a Wonder standing for 10 minutes, or by holding a Town Center on every Settlement for 5 minutes.' },
+  conquest: { name: 'Conquest', desc: 'Only one way to win: destroy every enemy.' },
+  deathmatch: { name: 'Deathmatch', wonder: true, settle: true, res: 'deathmatch', desc: 'Supremacy rules, but everyone starts rich: 5000 Rations, Capsule Alloy and Zeni.' },
+  lightning: { name: 'Lightning', wonder: true, settle: true, speed: 2, desc: 'Supremacy rules at double game speed.' },
+  nomad: { name: 'Nomad', wonder: true, settle: true, nomad: true, res: 'nomad', desc: 'No Town Center. You start with three villagers somewhere on the map: find a Settlement and build one before your rivals do.' },
+  koth: { name: 'King of the Hill', koth: true, desc: "Korin's Tower stands in the middle of the map. Keep your units around it, with no enemies there, for 5 minutes in total to win. Or destroy every enemy." },
+  sudden: { name: 'Sudden Death', wonder: true, settle: true, sudden: true, desc: 'Supremacy rules, but if you lose all your Town Centers you have 2 minutes to build a new one, or you are out.' },
+};
+const modeHas = f => !!(MODES[G.opts && G.opts.mode] || MODES.conquest)[f];
 const DIFF = {
   easy: { gather: .7, maxVill: 16, firstWave: 600, waveGap: 240, waveGrow: 2, wave: 6, bonus: 0, think: 1.4, powers: .4 },
   normal: { gather: 1, maxVill: 24, firstWave: 420, waveGap: 180, waveGrow: 3, wave: 9, bonus: 0, think: 1, powers: 1 },
@@ -972,7 +1038,7 @@ function whoMatches(def, who) {
   return false;
 }
 function recomputeMods(P) {
-  const m = { gather: { food: 1, hunt: 1, farm: 1, berry: 1, wood: 1, gold: 1, all: 1 }, carry: 0, build: 1, kiRate: 1, templeHeal: 0, bld: {}, unit: [], forms: {} };
+  const m = { gather: { food: 1, hunt: 1, farm: 1, berry: 1, fish: 1, wood: 1, gold: 1, all: 1 }, carry: 0, build: 1, kiRate: 1, templeHeal: 0, bld: {}, unit: [], forms: {} };
   const apply = list => {
     for (const f of list || []) {
       if (f.t === 'gather') m.gather[f.res] *= f.mul;
@@ -987,6 +1053,7 @@ function recomputeMods(P) {
   };
   apply(PATRONS[P.major].fx);
   for (const k of P.techs) apply(TECH[k] && TECH[k].fx);
+  for (const r of relicsOf(P.id)) apply(RELICS[r.key].fx);
   P.mods = m; P.statCache = {};
 }
 const bmod = (P, key, stat, base) => { const b = P && P.mods.bld[key]; if (!b) return base; return base * (b[stat] || 1) + (b[stat + '+'] || 0); };
@@ -1096,7 +1163,7 @@ function placeBuilding(key, owner, tx, ty, built) {
   const fac = P ? P.faction : 'earth';
   const b = addEnt({
     kind: 'building', key, owner, tx, ty, w: d.w, h: d.h, x: tx + d.w / 2, y: ty + d.h / 2, r: Math.max(d.w, d.h) * .5,
-    built: !!built, progress: built ? 1 : 0, queue: [], research: null, rally: null, balls: [], cdA: 0, farmer: 0, hitFlash: 0,
+    built: !!built, progress: built ? 1 : 0, queue: [], research: null, rally: null, balls: [], relics: [], cdA: 0, farmer: 0, hitFlash: 0,
     name: bname(key, fac), garrisoned: [], fac, smokeT: rnd() * 3,
   });
   b.hp = built ? maxHp(b) : maxHp(b) * .08;
@@ -1110,7 +1177,7 @@ function placeBuilding(key, owner, tx, ty, built) {
   G.regionDirty = true;
   if (!d.walk) for (const u of G.ents) if (u.kind === 'unit' && !u.dead && !u.flying && !u.garrison && u.x >= tx - .2 && u.x <= tx + d.w + .2 && u.y >= ty - .2 && u.y <= ty + d.h + .2) {
     if (d.gate && P && isAlly(owner, u.owner)) continue;
-    const f = freeTileNear(tOf(u.x), tOf(u.y), 8); if (f) { u.x = f.x + .5; u.y = f.y + .5; u.path = null; u.wantPath = true; }
+    const f = freeTileNear(tOf(u.x), tOf(u.y), 8, false, moveTeam(u)); if (f) { u.x = f.x + .5; u.y = f.y + .5; u.path = null; u.wantPath = true; }
   }
   return b;
 }
@@ -1129,7 +1196,8 @@ function canPlace(key, tx, ty, owner, opts) {
     const s = G.settlements.find(s => s.tx === tx && s.ty === ty && !s.tc);
     if (!s) return false;
     if (!footprintFree(tx, ty, d.w, d.h, { allowSettle: true })) return false;
-  } else if (!footprintFree(tx, ty, d.w, d.h, { shallow: false })) return false;
+  } else if (!footprintFree(tx, ty, d.w, d.h, { shallow: !!d.dock })) return false;
+  if (d.dock && !dockShore(tx, ty, d.w, d.h)) return false;
   const P = G.players[owner];
   if (P && P.human && !opts.ignoreFog) for (let y = ty; y < ty + d.h; y++) for (let x = tx; x < tx + d.w; x++) if (!G.vis[idx(x, y)]) return false;
   if (opts.spacing && !d.wall && !d.gate) {
@@ -1141,30 +1209,42 @@ function canPlace(key, tx, ty, owner, opts) {
   }
   return true;
 }
+// A Dock needs open deep water along its edge, part of a real sea (not a pond).
+function dockShore(tx, ty, w, h) {
+  if (!G.nregion) return false;
+  let n = 0, reg = 0;
+  for (let y = ty - 1; y <= ty + h; y++) for (let x = tx - 1; x <= tx + w; x++) {
+    if (!inMap(x, y) || (x >= tx && x < tx + w && y >= ty && y < ty + h)) continue;
+    const i = idx(x, y);
+    if (G.map.terr[i] === T_WATER && !navBlocked(i)) { n++; reg = G.nregion[i] || reg; }
+  }
+  return n >= 3 && reg && G.nregionSize[reg] >= 40;
+}
 // Snap a TC placement to the nearest free settlement.
 function snapSettlement(wx, wy) {
   let best = null, bd = 6;
   for (const s of G.settlements) { if (s.tc) continue; const d = dist(s.tx + 2, s.ty + 2, wx, wy); if (d < bd) { bd = d; best = s; } }
   return best;
 }
-function freeTileNear(tx, ty, maxR, flyingOk) {
+function freeTileNear(tx, ty, maxR, flyingOk, team) {
   for (let r = 0; r <= maxR; r++) {
     for (let y = ty - r; y <= ty + r; y++) for (let x = tx - r; x <= tx + r; x++) {
       if (Math.max(Math.abs(x - tx), Math.abs(y - ty)) !== r) continue;
-      if (inMap(x, y) && (flyingOk || !G.map.block[idx(x, y)])) return { x, y };
+      if (inMap(x, y) && (flyingOk || (team === NAVAL ? !navBlocked(idx(x, y)) : !G.map.block[idx(x, y)]))) return { x, y };
     }
   }
   return null;
 }
 function spawnNear(b, key, owner, form) {
   const target = b.rally ? { x: b.rally.x, y: b.rally.y } : { x: b.tx + b.w + 1, y: b.ty + b.h + 1 };
+  const nav = !!U[key].naval;
   let best = null, bd = 1e9;
   for (let y = b.ty - 1; y <= b.ty + b.h; y++) for (let x = b.tx - 1; x <= b.tx + b.w; x++) {
-    if (!inMap(x, y) || G.map.block[idx(x, y)]) continue;
+    if (!inMap(x, y) || (nav ? navBlocked(idx(x, y)) : G.map.block[idx(x, y)])) continue;
     if (x >= b.tx && x < b.tx + b.w && y >= b.ty && y < b.ty + b.h) continue;
     const d = dist(x + .5, y + .5, target.x, target.y); if (d < bd) { bd = d; best = { x, y }; }
   }
-  if (!best) best = freeTileNear(b.tx, b.ty, 10) || { x: b.tx, y: b.ty };
+  if (!best) best = freeTileNear(b.tx, b.ty, 10, false, nav ? NAVAL : undefined) || { x: b.tx, y: b.ty };
   return spawnUnit(key, owner, best.x + .5 + (rnd() - .5) * .4, best.y + .5 + (rnd() - .5) * .4, form);
 }
 
@@ -1230,7 +1310,7 @@ function genSkirmish(opts) {
   const seed = opts.seed;
   rand = mulberry32(seed);
   initMap(size, size, MAPS[opts.map].biome, seed);
-  const biome = G.map.biome, C = { x: size / 2, y: size / 2 };
+  const biome = G.map.biome, C = { x: size / 2, y: size / 2 }, sea = MAPS[opts.map].layout === 'sea', seaR = size * .25;
   const R = size * .36, a0 = n === 2 ? Math.PI * .75 : rnd() * Math.PI * 2;
   const bases = [];
   for (let i = 0; i < n; i++) { const a = a0 + i * Math.PI * 2 / n; bases.push({ x: Math.round(C.x + Math.cos(a) * R), y: Math.round(C.y + Math.sin(a) * R), a }); }
@@ -1239,18 +1319,19 @@ function genSkirmish(opts) {
   const resv = (x, y, r) => reserved.push({ x, y, r });
   const isRes = (x, y, pad) => reserved.some(c => dist(c.x, c.y, x, y) < c.r + (pad || 0));
   for (const b of bases) resv(b.x, b.y, 11);
+  if (opts.koth) resv(C.x, C.y, 7);
   // settlements: one near each base, plus central ones
   const settles = [];
-  for (const b of bases) { const a = b.a + Math.PI + .9; settles.push({ x: Math.round(b.x + Math.cos(a) * 17), y: Math.round(b.y + Math.sin(a) * 17) }); }
-  for (let i = 0; i < Math.max(2, n); i++) { const a = a0 + (i + .5) * Math.PI * 2 / Math.max(2, n); settles.push({ x: Math.round(C.x + Math.cos(a) * size * .16), y: Math.round(C.y + Math.sin(a) * size * .16) }); }
+  for (const b of bases) { const a = b.a + Math.PI + (sea ? 1.75 : .9); settles.push({ x: Math.round(b.x + Math.cos(a) * 17), y: Math.round(b.y + Math.sin(a) * 17) }); }
+  for (let i = 0; i < Math.max(2, n); i++) { const a = a0 + (i + .5) * Math.PI * 2 / Math.max(2, n), r = size * (sea ? .38 : .16); settles.push({ x: Math.round(C.x + Math.cos(a) * r - 2), y: Math.round(C.y + Math.sin(a) * r - 2) }); }
   for (const s of settles) resv(s.x, s.y, 4);
   // Dragon Ball camps
   const camps = [];
   let tries = 0;
   while (camps.length < 7 && tries++ < 6000) {
     const x = rint(8, size - 9), y = rint(8, size - 9);
-    if (bases.some(b => dist(b.x, b.y, x, y) < 24)) continue;
-    if (camps.some(c => dist(c.x, c.y, x, y) < 14) || settles.some(s => dist(s.x, s.y, x, y) < 8)) continue;
+    if (bases.some(b => dist(b.x, b.y, x, y) < 24) || (sea && dist(x, y, C.x, C.y) < seaR * 1.25 + 3)) continue;
+    if (camps.some(c => dist(c.x, c.y, x, y) < 14) || settles.some(s => dist(s.x, s.y, x, y) < 8) || isRes(x, y, 2)) continue;
     camps.push({ x, y });
   }
   while (camps.length < 7) camps.push({ x: C.x + rint(-10, 10), y: C.y + rint(-10, 10) });
@@ -1259,7 +1340,14 @@ function genSkirmish(opts) {
 
   // ---- terrain by biome
   const hg = G.map.hgt;
-  if (biome === 'earth') {
+  if (sea) {
+    // a great inland sea with shallow beaches
+    for (let i = 0; i < size * size; i++) {
+      const x = i % size, y = (i / size) | 0, r = seaR * (.86 + G.noise(x / 7 + 3, y / 7 - 5, 2) * .32), d = dist(x + .5, y + .5, C.x, C.y);
+      if (d < r) G.map.terr[i] = T_WATER; else if (d < r + 1.3) G.map.terr[i] = T_SHALLOW; else if (d < r + 2.6) G.map.terr[i] = T_SAND; else if (G.noise(x / 9 + 50, y / 9, 2) > .62) G.map.terr[i] = T_DIRT;
+    }
+    for (let k = 0; k < 3 + n; k++) cliffRidge(rint(6, size - 7), rint(6, size - 7), (x, y, pad) => isRes(x, y, pad) || dist(x, y, C.x, C.y) < seaR * 1.25 + 2);
+  } else if (biome === 'earth') {
     for (let i = 0; i < size * size; i++) { const x = i % size, y = (i / size) | 0; if (G.noise(x / 9 + 50, y / 9, 2) > .62) G.map.terr[i] = T_DIRT; }
     for (let k = 0; k < 4 + n; k++) { const x = rint(10, size - 11), y = rint(10, size - 11); if (isRes(x, y, 7)) continue; paintCircle(T_WATER, x, y, 2.5 + rnd() * 3, true); }
     for (let k = 0; k < 6 + n; k++) cliffRidge(rint(6, size - 7), rint(6, size - 7), isRes);
@@ -1280,6 +1368,8 @@ function genSkirmish(opts) {
   for (const b of bases) paintCircle(T_ROAD, b.x, b.y, 7.5, true);
   for (const s of settles) paintCircle(ground, s.x + 2, s.y + 2, 4.2, true);
   for (const c of camps) paintCircle(ground, c.x, c.y, 2.8, true);
+  if (opts.koth && sea) for (const b of bases) { const L = dist(b.x, b.y, C.x, C.y); for (let s = 0; s <= L; s += .5) { const x = C.x + (b.x - C.x) * s / L, y = C.y + (b.y - C.y) * s / L; for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1], [-1, 0], [0, -1]]) { const tx = Math.floor(x) + dx, ty = Math.floor(y) + dy; if (inMap(tx, ty) && G.map.terr[idx(tx, ty)] === T_WATER) G.map.terr[idx(tx, ty)] = T_SHALLOW; } } }
+  if (opts.koth) { paintCircle(T_ROAD, C.x, C.y, 4.5, true); for (let y = C.y - 6; y <= C.y + 6; y++) for (let x = C.x - 6; x <= C.x + 6; x++) if (inMap(x, y) && dist(x, y, C.x, C.y) < 6) { const t = G.map.terr[idx(x, y)]; if (t === T_WATER || t === T_ROCK || t === T_SHALLOW) G.map.terr[idx(x, y)] = ground; } }
   for (const b of bases) for (let y = b.y - 10; y <= b.y + 10; y++) for (let x = b.x - 10; x <= b.x + 10; x++) if (inMap(x, y) && dist(x, y, b.x, b.y) < 10) { const t = G.map.terr[idx(x, y)]; if (t === T_WATER || t === T_ROCK || t === T_SHALLOW) G.map.terr[idx(x, y)] = ground; }
   for (const s of settles) for (let y = s.y - 1; y <= s.y + 5; y++) for (let x = s.x - 1; x <= s.x + 5; x++) if (inMap(x, y)) { const t = G.map.terr[idx(x, y)]; if (t === T_WATER || t === T_ROCK || t === T_SHALLOW) G.map.terr[idx(x, y)] = ground; }
   for (const c of camps) for (let y = c.y - 2; y <= c.y + 2; y++) for (let x = c.x - 2; x <= c.x + 2; x++) if (inMap(x, y)) { const t = G.map.terr[idx(x, y)]; if (t === T_WATER || t === T_ROCK) G.map.terr[idx(x, y)] = ground; }
@@ -1319,11 +1409,31 @@ function genSkirmish(opts) {
   for (let y = 0; y < size; y++) for (const x of [0, 1, size - 1, size - 2]) if (rnd() < .6 && free(x, y)) addRes('tree', x, y);
   for (let k = 0; k < 4 + n * 2; k++) for (let t = 0; t < 60; t++) { const x = rint(8, size - 9), y = rint(8, size - 9); if (!isRes(x, y, 4) && freeArea(x, y, 2)) { addRes('gold', x, y, 3000 * goldMul); break; } }
   for (let k = 0; k < 3 + n; k++) for (let t = 0; t < 60; t++) { const x = rint(8, size - 9), y = rint(8, size - 9); if (!isRes(x, y, 5) && free(x, y) && free(x + 1, y)) { const ht = biome === 'namek' ? 'frog' : rnd() < .5 ? 'stego' : 'boar'; for (let j = 0; j < 3; j++) if (free(x + j, y)) spawnUnit(ht, 0, x + j + .5, y + .5); break; } }
-  if (biome === 'earth') { const cx = Math.round(C.x - 1), cy = Math.round(C.y - 1); if (free(cx, cy) && free(cx + 1, cy + 1)) addDeco('sealedball', cx, cy, 2); }
+  placeFish(bases, size);
+  if (biome === 'earth' && !opts.koth && !sea) { const cx = Math.round(C.x - 1), cy = Math.round(C.y - 1); if (free(cx, cy) && free(cx + 1, cy + 1)) addDeco('sealedball', cx, cy, 2); }
 
-  ensureConnected(bases[0], [...bases.slice(1), ...camps, ...settles.map(s => ({ x: s.x + 2, y: s.y + 2 }))]);
+  ensureConnected(bases[0], [...bases.slice(1), ...camps, ...settles.map(s => ({ x: s.x + 2, y: s.y + 2 })), ...(opts.koth ? [{ x: C.x + 3, y: C.y + 3 }] : [])]);
   scatterDecor();
   return bases;
+}
+// Giant fish in every real body of water, plus a fair group off each base's shore.
+function placeFish(bases, size) {
+  const n = MW * MH, comp = new Int32Array(n), sizes = [0], st = [];
+  const water = i => { const t = G.map.terr[i]; return (t === T_WATER || t === T_SHALLOW) && (G.map.block[i] === 0 || G.map.block[i] === 1); };
+  let id = 0;
+  for (let i = 0; i < n; i++) { if (comp[i] || !water(i)) continue; id++; comp[i] = id; st.push(i); let c = 0; while (st.length) { const k = st.pop(), x = k % MW, y = (k / MW) | 0; c++; for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy; if (!inMap(nx, ny)) continue; const j = idx(nx, ny); if (!comp[j] && water(j)) { comp[j] = id; st.push(j); } } } sizes[id] = c; }
+  const deep = (x, y) => { if (!inMap(x, y)) return false; for (let yy = y - 1; yy <= y + 1; yy++) for (let xx = x - 1; xx <= x + 1; xx++) if (!inMap(xx, yy) || G.map.terr[idx(xx, yy)] !== T_WATER) return false; return true; };
+  const fish = [], ok = (x, y) => deep(x, y) && sizes[comp[idx(x, y)]] >= 80 && !fish.some(f => dist(f.x, f.y, x, y) < 3);
+  const put = (x, y) => { fish.push({ x, y }); addRes('fish', x, y); };
+  for (const b of bases) {
+    let got = 0;
+    for (let r = 10; r <= 26 && got < 4; r++) for (let k = 0; k < 40 && got < 4; k++) { const a = rnd() * Math.PI * 2, x = Math.round(b.x + Math.cos(a) * r), y = Math.round(b.y + Math.sin(a) * r); if (ok(x, y)) { put(x, y); got++; } }
+  }
+  for (let c = 1; c <= id; c++) {
+    if (sizes[c] < 80) continue;
+    const want = Math.min(28, Math.floor(sizes[c] / 50));
+    for (let t = 0, got = 0; t < 3000 && got < want; t++) { const x = rint(2, MW - 3), y = rint(2, MH - 3); if (comp[idx(x, y)] === c && ok(x, y) && !bases.some(b => dist(b.x, b.y, x, y) < 9)) { put(x, y); got++; } }
+  }
 }
 function cliffRidge(x, y, isRes) {
   if (isRes(x, y, 5)) return;
@@ -1369,8 +1479,12 @@ function pathAlloc() { NN = MW * MH; gS = new Float32Array(NN); came = new Int32
 function hpush(i, f) { hpI.push(i); hpF.push(f); let k = hpI.length - 1; while (k > 0) { const p = (k - 1) >> 1; if (hpF[p] <= f) break; hpI[k] = hpI[p]; hpF[k] = hpF[p]; k = p; } hpI[k] = i; hpF[k] = f; }
 function hpop() { const top = hpI[0], li = hpI.pop(), lf = hpF.pop(), n = hpI.length; if (n > 0) { let k = 0; for (;;) { let c = 2 * k + 1; if (c >= n) break; if (c + 1 < n && hpF[c + 1] < hpF[c]) c++; if (hpF[c] >= lf) break; hpI[k] = hpI[c]; hpF[k] = hpF[c]; k = c; } hpI[k] = li; hpF[k] = lf; } return top; }
 const octile = (ax, ay, bx, by) => { const dx = Math.abs(ax - bx), dy = Math.abs(ay - by); return Math.max(dx, dy) + .4142 * Math.min(dx, dy); };
-// A tile blocks a team unless it is that team's gate.
-const blocked = (i, team) => { const b = G.map.block[i]; return b !== 0 && !(b === 5 && G.map.gate[i] === team); };
+// A tile blocks a team unless it is that team's gate. Ships move with the special team NAVAL:
+// they need water (deep or shallow) with no building, deposit or decoration on it.
+const NAVAL = -9;
+const navBlocked = i => { const t = G.map.terr[i]; if (t !== T_WATER && t !== T_SHALLOW) return true; const b = G.map.block[i]; return b !== 0 && b !== 1; };
+const blocked = (i, team) => { if (team === NAVAL) return navBlocked(i); const b = G.map.block[i]; return b !== 0 && !(b === 5 && G.map.gate[i] === team); };
+const moveTeam = u => u.def.naval ? NAVAL : teamOf(u.owner);
 function astar(sx0, sy0, isGoal, gx, gy, team, maxExp) {
   sid++; hpI.length = 0; hpF.length = 0;
   if (G.prof) G.prof.astar++;
@@ -1409,6 +1523,7 @@ function smoothPath(pts, team) {
 }
 // ---------- connected regions: lets units skip targets they can never walk to ----------
 function computeRegions() {
+  computeNavRegions();
   const n = MW * MH, R = G.region && G.region.length === n ? G.region : (G.region = new Int32Array(n));
   R.fill(0); let id = 0; const st = [];
   for (let i = 0; i < n; i++) {
@@ -1424,30 +1539,48 @@ function computeRegions() {
   }
   G.regionDirty = false; G.regionT = G.time; G.regionVer = (G.regionVer || 0) + 1;
 }
-function regionAt(x, y) {
+// Connected bodies of navigable water, with their sizes (for docks, fish and the AI).
+function computeNavRegions() {
+  const n = MW * MH, R = G.nregion && G.nregion.length === n ? G.nregion : (G.nregion = new Int32Array(n));
+  R.fill(0); G.nregionSize = [0]; let id = 0; const st = [];
+  for (let i = 0; i < n; i++) {
+    if (R[i] || navBlocked(i)) continue;
+    id++; R[i] = id; st.push(i); let size = 0;
+    while (st.length) {
+      const c = st.pop(), cx = c % MW, cy = (c / MW) | 0; size++;
+      for (let k = 0; k < 4; k++) { const nx = cx + DX[k], ny = cy + DY[k]; if (nx < 0 || ny < 0 || nx >= MW || ny >= MH) continue; const j = idx(nx, ny); if (!R[j] && !navBlocked(j)) { R[j] = id; st.push(j); } }
+    }
+    G.nregionSize[id] = size;
+  }
+}
+function regionAt(x, y, naval) {
+  const RG = naval ? G.nregion : G.region;
   const tx = clamp(Math.floor(x), 0, MW - 1), ty = clamp(Math.floor(y), 0, MH - 1);
-  let r = G.region[idx(tx, ty)]; if (r) return r;
-  for (let d = 1; d <= 3; d++) for (let yy = ty - d; yy <= ty + d; yy++) for (let xx = tx - d; xx <= tx + d; xx++) if (inMap(xx, yy) && (r = G.region[idx(xx, yy)])) return r;
+  let r = RG[idx(tx, ty)]; if (r) return r;
+  for (let d = 1; d <= 3; d++) for (let yy = ty - d; yy <= ty + d; yy++) for (let xx = tx - d; xx <= tx + d; xx++) if (inMap(xx, yy) && (r = RG[idx(xx, yy)])) return r;
   return 0;
 }
 // Regions touching an entity's footprint (cached per region version).
-function regionsOf(e) {
-  if (e.kind === 'unit') return [regionAt(e.x, e.y)];
-  if (e.reg && e.reg.v === G.regionVer) return e.reg.list;
+function regionsOf(e, naval) {
+  if (e.kind === 'unit') return [regionAt(e.x, e.y, naval)];
+  const key = naval ? 'nreg' : 'reg';
+  if (e[key] && e[key].v === G.regionVer) return e[key].list;
+  const RG = naval ? G.nregion : G.region;
   const list = [], x0 = e.tx - 1, y0 = e.ty - 1, x1 = e.tx + (e.w || 1), y1 = e.ty + (e.h || 1);
-  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { if (!inMap(x, y)) continue; const r = G.region[idx(x, y)]; if (r && !list.includes(r)) list.push(r); }
-  e.reg = { v: G.regionVer, list };
+  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { if (!inMap(x, y)) continue; const r = RG[idx(x, y)]; if (r && !list.includes(r)) list.push(r); }
+  e[key] = { v: G.regionVer, list };
   return list;
 }
 function reachable(u, e) {
   if (u.flying || !G.region) return true;
-  const r = regionAt(u.x, u.y);
-  return !r || regionsOf(e).includes(r);
+  const nav = !!u.def.naval, r = regionAt(u.x, u.y, nav);
+  if (nav && e.kind === 'unit' && !e.def.naval && !e.flying) { const t = regionAt(e.x, e.y, true); return !!t && t === r; }
+  return !r || regionsOf(e, nav).includes(r);
 }
-function reachablePt(u, x, y) { if (u.flying || !G.region) return true; const a = regionAt(u.x, u.y), b = regionAt(x, y); return !a || !b || a === b; }
+function reachablePt(u, x, y) { if (u.flying || !G.region) return true; const nav = !!u.def.naval, a = regionAt(u.x, u.y, nav), b = regionAt(x, y, nav); return !a || !b || a === b; }
 function startTile(u, team) {
   let sx0 = clamp(Math.floor(u.x), 0, MW - 1), sy0 = clamp(Math.floor(u.y), 0, MH - 1);
-  if (blocked(idx(sx0, sy0), team)) { const f = freeTileNear(sx0, sy0, 6); if (f) { sx0 = f.x; sy0 = f.y; } }
+  if (blocked(idx(sx0, sy0), team)) { const f = freeTileNear(sx0, sy0, 6, false, team); if (f) { sx0 = f.x; sy0 = f.y; } }
   return [sx0, sy0];
 }
 // Path to a point. Returns false when out of path budget this tick.
@@ -1458,10 +1591,10 @@ function goTo(u, x, y) {
   if (G.pathBudget <= 0) { u.wantPath = true; return false; }
   if (!reach) u.unreachT = G.time;
   G.pathBudget--; u.wantPath = false; u.lastRepath = G.time;
-  const team = teamOf(u.owner);
+  const team = moveTeam(u);
   const [sx0, sy0] = startTile(u, team);
   let gx = clamp(Math.floor(x), 0, MW - 1), gy = clamp(Math.floor(y), 0, MH - 1), exact = true;
-  if (blocked(idx(gx, gy), team)) { const f = freeTileNear(gx, gy, 8); if (f) { gx = f.x; gy = f.y; exact = false; } }
+  if (blocked(idx(gx, gy), team)) { const f = freeTileNear(gx, gy, 8, false, team); if (f) { gx = f.x; gy = f.y; exact = false; } }
   const tiles = astar(sx0, sy0, (cx, cy) => cx === gx && cy === gy, gx, gy, team, 14000);
   const pts = [{ x: u.x, y: u.y }];
   for (let i = 1; i < tiles.length; i++) pts.push({ x: (tiles[i] % MW) + .5, y: ((tiles[i] / MW) | 0) + .5 });
@@ -1479,7 +1612,7 @@ function goToEnt(u, e) {
   if (G.pathBudget <= 0) { u.wantPath = true; return false; }
   if (!reach) u.unreachT = G.time;
   G.pathBudget--; u.wantPath = false; u.lastRepath = G.time;
-  const team = teamOf(u.owner);
+  const team = moveTeam(u);
   const [sx0, sy0] = startTile(u, team);
   let x0, y0, x1, y1;
   if (e.kind === 'building' || e.kind === 'res' || e.kind === 'deco') { x0 = e.tx; y0 = e.ty; x1 = e.tx + (e.w || 1) - 1; y1 = e.ty + (e.h || 1) - 1; } else { x0 = x1 = Math.floor(e.x); y0 = y1 = Math.floor(e.y); }
@@ -1507,7 +1640,7 @@ function stepMove(u, dt) {
 // Straight-line steering for the last few steps (and for flyers).
 function steerTo(u, x, y, dt) {
   const dx = x - u.x, dy = y - u.y, d = Math.hypot(dx, dy) || 1, step = Math.min(d, moveSpeed(u) * dt);
-  const nx = u.x + dx / d * step, ny = u.y + dy / d * step, team = teamOf(u.owner);
+  const nx = u.x + dx / d * step, ny = u.y + dy / d * step, team = moveTeam(u);
   if (u.flying || walkableAt(nx, ny, team)) { u.x = nx; u.y = ny; }
   else if (walkableAt(nx, u.y, team)) u.x = nx;
   else if (walkableAt(u.x, ny, team)) u.y = ny;
@@ -1551,7 +1684,7 @@ function moveSpeed(u) {
   let s = stats(u).speed * buffMul(u, 'spd');
   if (u.kaio) s *= 2;
   if (u.flying && !u.def.alwaysFly) s *= 1.25;
-  if (!u.flying) { const tx = Math.floor(u.x), ty = Math.floor(u.y); if (inMap(tx, ty) && G.map.terr[idx(tx, ty)] === T_SHALLOW) s *= .8; }
+  if (!u.flying && !u.def.naval) { const tx = Math.floor(u.x), ty = Math.floor(u.y); if (inMap(tx, ty) && G.map.terr[idx(tx, ty)] === T_SHALLOW) s *= .8; }
   return s;
 }
 function armorOf(e) {
@@ -1610,7 +1743,7 @@ function applyHit(att, t, d, o) {
 }
 function addKi(P, n) { P.res.ki = Math.min(P.kiCap, P.res.ki + n); }
 function knockback(t, fx, fy, d) {
-  if (t.def.cls === 'titan' || t.def.cls === 'hero' || t.def.cls === 'building') return;
+  if (t.def.cls === 'titan' || t.def.cls === 'hero' || t.def.cls === 'building' || t.def.naval) return;
   const dx = t.x - fx, dy = t.y - fy, l = Math.hypot(dx, dy) || 1;
   const nx = t.x + dx / l * d, ny = t.y + dy / l * d;
   if (t.flying || walkableAt(nx, ny, teamOf(t.owner))) { t.x = nx; t.y = ny; t.path = null; t.wantPath = true; }
@@ -1650,6 +1783,7 @@ function kill(e, killer, o) {
   if (G.scn && G.scn.onKill) G.scn.onKill(e, killer);
   if (e.kind === 'unit') {
     if (e.carryBall) dropBall(e);
+    if (e.carryRelic) dropRelic(e);
     if (P && e.owner > 0) P.stats.lost++;
     if (e.def.cls === 'hero' && P) {
       P.heroDead[e.key] = e.form || true;
@@ -1669,6 +1803,12 @@ function kill(e, killer, o) {
     for (const bid of e.balls) { const b = G.balls.find(x => x.id === bid); if (b) { b.state = 'ground'; b.temple = 0; b.x = e.x + (rnd() - .5) * 2; b.y = e.y + (rnd() - .5) * 2; } }
     if (e.balls.length && P && P.human) toast('Your Temple fell. Its Dragon Balls spilled onto the ground!', 'warn');
     e.balls = [];
+    if (e.relics.length) {
+      for (const rid of e.relics) { const r = G.relics.find(x => x.id === rid); if (r) Object.assign(r, { state: 'ground', temple: 0, x: e.x + (rnd() - .5) * 2.4, y: e.y + (rnd() - .5) * 2.4 }); }
+      e.relics = [];
+      if (P) recomputeMods(P);
+      if (P && P.human) toast('Your Temple fell. Its relics lie in the rubble!', 'warn');
+    }
     if (e.farmer) { const f = byId(e.farmer); if (f) idleOrder(f); }
     G.ruins.push({ key: e.key, tx: e.tx, ty: e.ty, w: e.w, h: e.h, x: e.x, y: e.y, t: 0, fac: e.fac });
     fxPush({ type: 'boom', x: e.x, y: e.y, z: 0, t: 0, dur: 1, color: '#ffb347', r: e.w * .9 });
@@ -1913,6 +2053,52 @@ function castPower(P, key, x, y) {
   return true;
 }
 
+// ---------- relics ----------
+const relicsOf = pid => (G.relics || []).filter(r => r.state === 'temple' && byId(r.temple) && byId(r.temple).owner === pid);
+function setupRelics(bases) {
+  G.relics = [];
+  const keys = shuffle(Object.keys(RELICS)), n = Math.min(keys.length, 4 + 2 * (G.players.length - 1));
+  const home = bases && bases[0] ? regionAt(bases[0].x, bases[0].y) : 0;
+  const spots = [];
+  for (let t = 0; t < 4000 && spots.length < n; t++) {
+    const x = rint(4, MW - 5), y = rint(4, MH - 5);
+    if (G.map.block[idx(x, y)] || G.map.terr[idx(x, y)] === T_SHALLOW || G.map.settle[idx(x, y)]) continue;
+    if (home && G.region[idx(x, y)] !== home) continue;
+    if ((bases || []).some(b => dist(b.x, b.y, x, y) < 20) || G.camps.some(c => dist(c.x, c.y, x, y) < 6) || G.settlements.some(s => dist(s.tx + 2, s.ty + 2, x, y) < 6) || spots.some(s => dist(s.x, s.y, x, y) < 12)) continue;
+    if (G.korin && dist(x, y, MW / 2, MH / 2) < 8) continue;
+    spots.push({ x, y });
+  }
+  spots.forEach((s, i) => G.relics.push({ id: 910000 + i, key: keys[i], state: 'ground', x: s.x + .5, y: s.y + .5, holder: 0, temple: 0 }));
+}
+function pickUpRelic(u, r) {
+  r.state = 'carried'; r.holder = u.id; u.carryRelic = r.id;
+  if (G.players[u.owner].human) toast(`${stats(u).name} picked up the ${RELICS[r.key].name}. Bring it to a Temple: ${RELICS[r.key].desc}`, 'gold');
+  SFX.play('select', u.x, u.y);
+}
+function dropRelic(u) {
+  const r = G.relics.find(q => q.id === u.carryRelic);
+  u.carryRelic = 0;
+  if (!r) return;
+  let x = u.x, y = u.y;
+  if (!walkableAt(x, y, -2)) { const f = freeTileNear(clamp(Math.floor(x), 0, MW - 1), clamp(Math.floor(y), 0, MH - 1), 8); if (f) { x = f.x + .5; y = f.y + .5; } }
+  Object.assign(r, { state: 'ground', holder: 0, x, y });
+}
+function depositRelic(u, t) {
+  const r = G.relics.find(q => q.id === u.carryRelic);
+  if (!r) { u.carryRelic = 0; return; }
+  if (t.relics.length >= RELIC_CAP) { if (G.players[u.owner].human) toast(`${t.name} already holds ${RELIC_CAP} relics.`, 'warn'); return; }
+  u.carryRelic = 0;
+  Object.assign(r, { state: 'temple', temple: t.id, holder: 0 }); t.relics.push(r.id);
+  const P = G.players[t.owner];
+  recomputeMods(P);
+  if (P.human) toast(`${RELICS[r.key].name} placed in ${t.name}: ${RELICS[r.key].desc}`, 'good');
+  else if (G.me && isEnemy(G.me, P.id)) toast(`The enemy placed the ${RELICS[r.key].name} in a Temple.`, 'warn');
+  SFX.play('research', u.x, u.y);
+}
+function updateRelics() {
+  for (const r of G.relics) if (r.state === 'carried') { const h = byId(r.holder); if (h) { r.x = h.x; r.y = h.y; } else r.state = 'ground'; }
+}
+
 // ---------- Dragon Balls and Shenron ----------
 function setupBalls() {
   G.balls = [];
@@ -1934,6 +2120,7 @@ function spawnGuards() {
   });
 }
 function pickUpBall(u, ball) {
+  if (u.carryRelic) return;
   ball.state = 'carried'; ball.holder = u.id; u.carryBall = ball.id;
   const P = G.players[u.owner];
   if (P.human) toast(`${stats(u).name} picked up the ${ball.star}-Star Dragon Ball. Bring it to your Temple.`, 'gold');
@@ -2038,7 +2225,19 @@ function idleOrder(u) {
   u.order = { type: 'idle' }; u.path = null; u.wantPath = false; u.meditating = false;
 }
 function nextOrder(u) { const o = u.order; if (o.then) setOrder(u, o.then); else if (u.queue.length) { const q = u.queue.shift(); u.order = q; u.path = null; u.wantPath = true; } else idleOrder(u); }
-const isCombat = u => u.def.cls !== 'villager' && u.def.cls !== 'huntable';
+const isCombat = u => u.def.cls !== 'villager' && u.def.cls !== 'huntable' && !u.def.fisher;
+// Can this unit ever hit that target? Land fighters cannot reach ships at sea (ranged units and fliers can);
+// ships only hunt land targets they can get close to.
+function canTarget(u, e) {
+  const st = stats(u);
+  if (e.kind === 'unit' && e.def.naval) return !!(u.def.naval || u.flying || st.ranged || st.special);
+  if (u.def.naval) {
+    if (st.ranged) return true;
+    if (e.kind === 'unit') return !e.flying && regionAt(e.x, e.y, true) === regionAt(u.x, u.y, true);
+    return regionsOf(e, true).includes(regionAt(u.x, u.y, true));
+  }
+  return true;
+}
 
 function findEnemy(u, withBuildings, range) {
   const r = range || stats(u).los; let best = null, bd = 1e9;
@@ -2049,36 +2248,39 @@ function findEnemy(u, withBuildings, range) {
       const hb = e.lastHitBy && byId(e.lastHitBy);
       if (!(hb && hb.owner === u.owner && G.time - e.lastHitAt < 8) && !(e.order.type === 'attack' && byId(e.order.tid) && byId(e.order.tid).owner === u.owner)) return;
     }
+    if ((e.def.naval || u.def.naval) && !canTarget(u, e)) return;
     let d = Math.hypot(e.x - u.x, e.y - u.y);
     if (e.def.cls === 'villager') d += 2;
     if (d < bd) { bd = d; best = e; }
   });
-  if (!best && withBuildings) for (const b of G.blds) if (!b.dead && isEnemy(u.owner, b.owner)) { const d = edgeDist(u, b) + (B[b.key].wall ? 6 : 0); if (d < r && d < bd) { bd = d; best = b; } }
+  if (!best && withBuildings) for (const b of G.blds) if (!b.dead && isEnemy(u.owner, b.owner)) { const d = edgeDist(u, b) + (B[b.key].wall ? 6 : 0); if (d < r && d < bd && (!u.def.naval || canTarget(u, b))) { bd = d; best = b; } }
   return best;
 }
 function retaliateTarget(u) {
   if (!u.lastHitBy || G.time - u.lastHitAt > 3) return null;
   const a = byId(u.lastHitBy);
-  return a && a.kind !== 'building' && (isEnemy(u.owner, a.owner) || a.owner === 0) && Math.hypot(a.x - u.x, a.y - u.y) < stats(u).los * 1.4 ? a : null;
+  return a && a.kind !== 'building' && (isEnemy(u.owner, a.owner) || a.owner === 0) && Math.hypot(a.x - u.x, a.y - u.y) < stats(u).los * 1.4 && canTarget(u, a) ? a : null;
 }
 function nearestDrop(u, type) {
   let best = null, bd = 1e9;
-  for (const b of G.blds) if (!b.dead && b.owner === u.owner && b.built && B[b.key].drop && B[b.key].drop.includes(type)) { const d = edgeDist(u, b); if (d < bd) { bd = d; best = b; } }
+  const nav = !!u.def.naval;
+  for (const b of G.blds) if (!b.dead && b.owner === u.owner && b.built && B[b.key].drop && B[b.key].drop.includes(type) && !!B[b.key].navalDrop === nav && (!nav || regionsOf(b, true).includes(regionAt(u.x, u.y, true)))) { const d = edgeDist(u, b); if (d < bd) { bd = d; best = b; } }
   return best;
 }
 // Nearest resource of a type, avoiding crowded spots.
 function findRes(x, y, type, maxD, owner, skip, fromU) {
-  const reg = fromU && !fromU.flying ? regionAt(fromU.x, fromU.y) : regionAt(x, y);
+  const nav = !!(fromU && fromU.def.naval);
+  const reg = fromU && !fromU.flying ? regionAt(fromU.x, fromU.y, nav) : regionAt(x, y);
   const crowd = new Map();
   for (const u of G.units) if (u.owner === owner && (u.order.type === 'gather' || u.order.type === 'return') && u.order.rid) crowd.set(u.order.rid, (crowd.get(u.order.rid) || 0) + 1);
   let best = null, bd = maxD;
   for (const r of G.ress) {
-    if (r.dead || RES_DEF[r.key].type !== type || r.amount <= 0 || r.id === skip) continue;
+    if (r.dead || RES_DEF[r.key].type !== type || r.amount <= 0 || r.id === skip || !!RES_DEF[r.key].naval !== nav) continue;
     const c = crowd.get(r.id) || 0, cap = r.key === 'gold' ? 8 : r.key === 'tree' ? 2 : r.key === 'carcass' ? 5 : 3;
     const d = Math.hypot(r.x - x, r.y - y) + (c >= cap ? 60 : c * .8);
-    if (d < bd && (!reg || regionsOf(r).includes(reg))) { bd = d; best = r; }
+    if (d < bd && (!reg || regionsOf(r, nav).includes(reg))) { bd = d; best = r; }
   }
-  if (type === 'food') for (const b of G.blds) if (!b.dead && b.owner === owner && b.key === 'farm' && b.built && b.id !== skip && !(byId(b.farmer) && byId(b.farmer).order.rid === b.id)) { const d = Math.hypot(b.x - x, b.y - y); if (d < bd) { bd = d; best = b; } }
+  if (type === 'food' && !nav) for (const b of G.blds) if (!b.dead && b.owner === owner && b.key === 'farm' && b.built && b.id !== skip && !(byId(b.farmer) && byId(b.farmer).order.rid === b.id)) { const d = Math.hypot(b.x - x, b.y - y); if (d < bd) { bd = d; best = b; } }
   return best;
 }
 // Walk until within `reach` tiles of an entity's edge: path when far, steer straight in when close.
@@ -2153,7 +2355,7 @@ function updateUnit(u, dt) {
         P.res[u.carry] += u.carryAmt; P.stats.gathered += u.carryAmt; u.carryAmt = 0;
         const r = byId(o.rid);
         if (r && (r.kind === 'building' || r.amount > 0)) setOrder(u, { type: 'gather', rid: r.id, rtype: o.rtype });
-        else { const n = findRes(u.x, u.y, o.rtype, 14, u.owner); if (n) setOrder(u, { type: 'gather', rid: n.id, rtype: o.rtype }); else idleOrder(u); }
+        else { const n = findRes(u.x, u.y, o.rtype, 14, u.owner, 0, u); if (n) setOrder(u, { type: 'gather', rid: n.id, rtype: o.rtype }); else idleOrder(u); }
       }
       break;
     }
@@ -2192,8 +2394,16 @@ function updateUnit(u, dt) {
       break;
     }
     case 'pickup': {
+      if (o.relic) {
+        const r = G.relics.find(q => q.id === o.relic);
+        if (!r || r.state !== 'ground' || u.carryBall || u.carryRelic) { nextOrder(u); break; }
+        if (Math.hypot(u.x - r.x, u.y - r.y) <= u.r + .5) { pickUpRelic(u, r); nextOrder(u); break; }
+        if (u.wantPath) { goTo(u, r.x, r.y); if (!u.path) break; }
+        if (stepMove(u, dt) && Math.hypot(u.x - r.x, u.y - r.y) > u.r + .5) { if (Math.hypot(u.x - r.x, u.y - r.y) < 1.5) steerTo(u, r.x, r.y, dt); else u.wantPath = true; }
+        break;
+      }
       const ball = G.balls.find(b => b.id === o.ball);
-      if (!ball || ball.state !== 'ground' || u.carryBall) { nextOrder(u); break; }
+      if (!ball || ball.state !== 'ground' || u.carryBall || u.carryRelic) { nextOrder(u); break; }
       if (Math.hypot(u.x - ball.x, u.y - ball.y) <= u.r + .5) { pickUpBall(u, ball); nextOrder(u); break; }
       if (u.wantPath) { goTo(u, ball.x, ball.y); if (!u.path) break; }
       if (stepMove(u, dt) && Math.hypot(u.x - ball.x, u.y - ball.y) > u.r + .5) { if (Math.hypot(u.x - ball.x, u.y - ball.y) < 1.5) steerTo(u, ball.x, ball.y, dt); else u.wantPath = true; }
@@ -2201,8 +2411,8 @@ function updateUnit(u, dt) {
     }
     case 'deposit': {
       const t = byId(o.bid);
-      if (!t || !t.built || !u.carryBall) { nextOrder(u); break; }
-      if (approach(u, t, dt, .6)) { depositBall(u, t); nextOrder(u); }
+      if (!t || !t.built || (!u.carryBall && !u.carryRelic)) { nextOrder(u); break; }
+      if (approach(u, t, dt, .6)) { if (u.carryBall) depositBall(u, t); if (u.carryRelic && t.owner === u.owner) depositRelic(u, t); nextOrder(u); }
       break;
     }
   }
@@ -2244,8 +2454,8 @@ function gatherThink(u, o, dt, P) {
   const type = resType(r), sub = resSub(r);
   if (u.carry !== type) { u.carry = type; u.carryAmt = 0; }
   const aiMult = P.ai ? P.ai.diff.gather : 1, g = P.mods.gather;
-  const base = { hunt: .95, berry: .65, farm: .55, wood: .6, gold: .6 }[sub] || .6;
-  const rate = base * (g[sub] || 1) * (sub === 'hunt' || sub === 'berry' || sub === 'farm' ? g.food : 1) * g.all * aiMult;
+  const base = { hunt: .95, berry: .65, farm: .55, fish: .8, wood: .6, gold: .6 }[sub] || .6;
+  const rate = base * (g[sub] || 1) * (sub === 'hunt' || sub === 'berry' || sub === 'farm' || sub === 'fish' ? g.food : 1) * (u.def.fisher ? 1 : g.all) * aiMult;
   let amt = Math.min(rate * dt, cap - u.carryAmt);
   if (r.kind === 'res') { amt = Math.min(amt, r.amount); r.amount -= amt; if (r.amount <= 0) removeRes(r); }
   u.carryAmt += amt; u.anim = 'work';
@@ -2303,7 +2513,7 @@ function completeBuilding(b) {
   b.built = true; b.progress = 1; b.hp = Math.min(b.hp, maxHp(b));
   const P = G.players[b.owner]; P.stats.built++;
   if (P.human && !B[b.key].wall) { toast(`${b.name} complete.`, 'good'); SFX.play('build', b.x, b.y); }
-  if (b.key === 'wonder') { P.wonderSince = G.time; toast(`${P.human ? 'Your' : P.name + "'s"} Wonder stands! ${G.opts.victory === 'wonder' ? 'Defend it for 5 minutes to win.' : ''}`, P.human ? 'gold' : 'warn'); }
+  if (b.key === 'wonder') { P.wonderSince = G.time; toast(`${P.human ? 'Your' : P.name + "'s"} Wonder stands! ${modeHas('wonder') ? 'Defend it for 10 minutes to win.' : ''}`, P.human ? 'gold' : 'warn'); }
   if (G.scn && G.scn.onBuilt) G.scn.onBuilt(b);
 }
 function updateBuilding(b, dt) {
@@ -2340,6 +2550,7 @@ function updateBuilding(b, dt) {
         if (def.cls === 'hero') { delete P.heroDead[q.key]; if (P.human) { announce(stats(u).name + ' joins the fight!'); } }
         if (P.human) SFX.play('train', b.x, b.y);
         if (b.rally) issueRally(u, b.rally);
+        else if (u.def.fisher) { const r = findRes(u.x, u.y, 'food', 30, u.owner, 0, u); if (r) setOrder(u, { type: 'gather', rid: r.id, rtype: 'food' }); }
         if (G.scn && G.scn.onTrain) G.scn.onTrain(u, b);
       }
     }
@@ -2352,7 +2563,8 @@ function updateBuilding(b, dt) {
 }
 function issueRally(u, rally) {
   const t = rally.eid ? G.byId.get(rally.eid) : null;
-  if (t && !t.dead && (t.kind === 'res' || (t.kind === 'building' && t.key === 'farm')) && u.def.cls === 'villager') setOrder(u, { type: 'gather', rid: t.id, rtype: resType(t) });
+  if (t && !t.dead && (t.kind === 'res' || (t.kind === 'building' && t.key === 'farm')) && ((u.def.cls === 'villager' && !(t.kind === 'res' && RES_DEF[t.key].naval)) || (u.def.fisher && t.kind === 'res' && RES_DEF[t.key].naval))) setOrder(u, { type: 'gather', rid: t.id, rtype: resType(t) });
+  else if (u.def.fisher) { const r = findRes(rally.x, rally.y, 'food', 20, u.owner, 0, u); if (r) setOrder(u, { type: 'gather', rid: r.id, rtype: 'food' }); else setOrder(u, { type: 'move', x: rally.x, y: rally.y }); }
   else if (t && !t.dead && t.kind === 'building' && t.key === 'temple' && u.def.cls === 'villager' && G.players[u.owner].faction === 'earth') setOrder(u, { type: 'meditate', bid: t.id });
   else setOrder(u, { type: 'move', x: rally.x + (rnd() - .5) * .8, y: rally.y + (rnd() - .5) * .8, amove: isCombat(u) });
 }
@@ -2429,6 +2641,7 @@ function techCheck(P, b, key) {
   if (T.ageUp && T.age !== P.age) return 'Not available';
   if (!T.ageUp && T.age > P.age) return `Needs the ${AGES[T.age]}`;
   if (T.req && !P.techs.has(T.req)) return `Needs ${TECH[T.req].name}`;
+  if (T.needB && !G.blds.some(x => x.owner === P.id && x.key === T.needB && x.built)) return `Needs a finished ${bname(T.needB, P.faction)}`;
   if (!canAfford(P, T.cost)) return 'Not enough resources';
   return null;
 }
@@ -2474,6 +2687,7 @@ function economy(dt) {
       if (u.meditating && u.order.type === 'meditate') med++;
     }
     P.popCap = Math.min(MAX_POP, cap); P.pop = pop; P.qpop = qpop;
+    for (const r of relicsOf(P.id)) { const tr = RELICS[r.key].trickle; if (tr) for (const k in tr) { if (k === 'ki') addKi(P, tr[k] * dt); else P.res[k] += tr[k] * dt; } }
     if (P.faction === 'earth') addKi(P, Math.min(med, 10 * Math.max(1, temples.length)) * .18 * P.mods.kiRate * (P.ai ? P.ai.diff.gather : 1) * dt);
     const drain = (fliers * .4 + drainers) * dt;
     if (drain > 0) {
@@ -2502,10 +2716,47 @@ function checkVictory() {
     const hasProd = G.blds.some(b => b.owner === P.id && PRODUCTION.has(b.key) && b.built);
     if (!hasUnit && !hasProd) defeatPlayer(P);
   }
-  if (G.opts.victory === 'wonder') for (const P of G.players) if (P.id && !P.defeated && P.wonderSince && G.time - P.wonderSince >= 300) { endGame(P.team, 'wonder'); return; }
+  if (modeHas('sudden')) for (const P of G.players) {
+    if (!P.id || P.defeated) continue;
+    if (G.blds.some(b => b.owner === P.id && b.key === 'tc' && b.built)) { P.sdSince = 0; continue; }
+    if (!P.sdSince) { P.sdSince = G.time; if (P.human) { announce('Build a Town Center!'); toast('Sudden Death: you have no Town Center. Build one on a Settlement within 2 minutes or you lose.', 'warn'); } else if (G.me && isEnemy(G.me, P.id)) toast(`${P.name} lost every Town Center. Two minutes to rebuild, or they are out.`, 'good'); }
+    else if (G.time - P.sdSince >= SUDDEN_TIME) { if (P.human) toast('Sudden Death: no Town Center was rebuilt in time.', 'warn'); defeatPlayer(P); }
+  }
+  if (modeHas('wonder')) for (const P of G.players) if (P.id && !P.defeated && P.wonderSince && G.time - P.wonderSince >= WONDER_TIME) { endGame(P.team, 'wonder'); return; }
+  if (modeHas('settle') && G.settlements.length >= 3) {
+    const owners = new Set();
+    for (const s of G.settlements) { const tc = s.tc && byId(s.tc); owners.add(tc && tc.built ? G.players[tc.owner].team : 0); }
+    const team = owners.size === 1 && !owners.has(0) ? [...owners][0] : 0;
+    if (!team) G.settleHold = null;
+    else if (!G.settleHold || G.settleHold.team !== team) { G.settleHold = { team, since: G.time }; const P = humanP(); if (P) toast(P.team === team ? 'You hold every Settlement! Keep them for 5 minutes to win.' : 'The enemy holds every Settlement! Take one back within 5 minutes.', P.team === team ? 'gold' : 'warn'); }
+    else if (G.time - G.settleHold.since >= SETTLE_TIME) { endGame(team, 'settlements'); return; }
+  }
+  if (G.koth && G.koth.held >= KOTH_TIME) { endGame(G.koth.team, 'koth'); return; }
   const teams = new Set(G.players.filter(P => P.id && !P.defeated).map(P => P.team));
   if (teams.size <= 1) endGame([...teams][0] || 0, 'conquest');
   else if (humanP() && humanP().defeated && !G.over) endGame(-1, 'defeat');
+}
+function updateKoth(dt) {
+  const k = byId(G.korin); if (!k) return;
+  const teams = new Set();
+  forUnitsNear(k.x, k.y, 6.5, u => { if (u.owner > 0 && !u.garrison && u.def.cls !== 'villager') teams.add(G.players[u.owner].team); });
+  if (teams.size !== 1) return;
+  const t = [...teams][0];
+  if (G.koth.team !== t) {
+    G.koth = { team: t, held: 0 };
+    const P = humanP();
+    if (P) { if (P.team === t) { toast("You took Korin's Tower! Hold it for 5 minutes.", 'gold'); SFX.play('age'); } else toast("The enemy took Korin's Tower!", 'warn'); }
+  } else G.koth.held += dt;
+}
+// Victory countdowns for the HUD: [{ team, label, left }]
+function victoryTimers() {
+  const out = [];
+  if (modeHas('wonder')) for (const P of G.players) if (P.id && !P.defeated && P.wonderSince) out.push({ team: P.team, color: P.color, label: `${P.name}'s Wonder`, left: WONDER_TIME - (G.time - P.wonderSince) });
+  if (G.settleHold) { const P = G.players.find(Q => Q.id && Q.team === G.settleHold.team); out.push({ team: G.settleHold.team, color: P ? P.color : 0, label: `Team ${G.settleHold.team} holds every Settlement`, left: SETTLE_TIME - (G.time - G.settleHold.since) }); }
+  if (G.koth && G.koth.team) { const P = G.players.find(Q => Q.id && Q.team === G.koth.team); out.push({ team: G.koth.team, color: P ? P.color : 0, label: `${P && G.players.filter(Q => Q.id && Q.team === G.koth.team).length === 1 ? P.name : 'Team ' + G.koth.team} holds Korin's Tower`, left: KOTH_TIME - G.koth.held }); }
+  const me = humanP();
+  if (me && me.sdSince && !me.defeated) out.push({ team: -1, color: 2, label: 'Rebuild a Town Center', left: SUDDEN_TIME - (G.time - me.sdSince) });
+  return out;
 }
 function defeatPlayer(P) {
   if (P.defeated) return;
@@ -2559,6 +2810,8 @@ function tick(dt) {
   updateProjectiles(dt);
   for (let i = G.delayed.length - 1; i >= 0; i--) if (G.time >= G.delayed[i].at) { const d = G.delayed.splice(i, 1)[0]; d.fn(); }
   updateBalls(dt);
+  updateRelics();
+  if (G.koth) updateKoth(dt);
   for (const P of G.players) if (P.ai && !P.defeated) aiThink(P, dt);
   if (G.scn && G.scn.tick) G.scn.tick(dt);
   G.fogT -= dt; if (G.fogT <= 0) { G.fogT = .25; updateFog(); }
@@ -2573,13 +2826,13 @@ function tick(dt) {
 function separate(dt) {
   for (const u of G.units) {
     if (u.dead || u.leap || u.garrison) continue;
-    const ox = u.x, oy = u.y, team = teamOf(u.owner);
+    const ox = u.x, oy = u.y, team = moveTeam(u);
     forUnitsNear(u.x, u.y, u.r + .5, o => {
-      if (o === u || o.dead || o.flying !== u.flying || o.leap) return;
+      if (o === u || o.dead || o.flying !== u.flying || o.leap || !!o.def.naval !== !!u.def.naval) return;
       const dx = u.x - o.x, dy = u.y - o.y, d = Math.hypot(dx, dy) || .01, overlap = u.r + o.r - d;
       if (overlap > 0) { const push = Math.min(overlap * .5, .09) * (u.moving && !o.moving ? .35 : 1); u.x += dx / d * push; u.y += dy / d * push; }
     });
-    if (!u.flying && !walkableAt(u.x, u.y, team)) { u.x = ox; u.y = oy; if (!walkableAt(u.x, u.y, team)) { const f = freeTileNear(clamp(Math.floor(u.x), 0, MW - 1), clamp(Math.floor(u.y), 0, MH - 1), 5); if (f) { u.x = f.x + .5; u.y = f.y + .5; } } }
+    if (!u.flying && !walkableAt(u.x, u.y, team)) { u.x = ox; u.y = oy; if (!walkableAt(u.x, u.y, team)) { const f = freeTileNear(clamp(Math.floor(u.x), 0, MW - 1), clamp(Math.floor(u.y), 0, MH - 1), 5, false, team); if (f) { u.x = f.x + .5; u.y = f.y + .5; } } }
     u.x = clamp(u.x, .2, MW - .2); u.y = clamp(u.y, .2, MH - .2);
     if (u.flying && !u.def.alwaysFly) u.lift = Math.min(1, u.lift + dt * 2); else if (!u.def.alwaysFly && !u.leap) u.lift = Math.max(0, u.lift - dt * 3);
     if (u.path && u.order.type !== 'idle') {
@@ -2628,7 +2881,7 @@ function aiThink(P, dt) {
   const tcs = blds.filter(b => b.key === 'tc');
   const tc = tcs.find(b => b.built) || tcs[0];
   const vills = units.filter(u => u.def.cls === 'villager' && !u.garrison);
-  const army = units.filter(u => u.def.cls !== 'villager' && u.def.cls !== 'hero' && !u.garrison);
+  const army = units.filter(u => u.def.cls !== 'villager' && u.def.cls !== 'hero' && !u.garrison && !u.def.naval);
   const heroes = units.filter(u => u.def.cls === 'hero');
   const hero = heroes.find(h => h.key === FACTIONS[P.faction].mainHero) || heroes[0];
   const count = k => blds.filter(b => b.key === k).length;
@@ -2647,6 +2900,12 @@ function aiThink(P, dt) {
     for (const b of blds) if (dist(e.x, e.y, b.x, b.y) < 12) { threatN++; if (!threat) threat = e; break; }
   }
 
+  // ---- no Town Center (Nomad start, or all lost): claim the nearest free Settlement
+  if (!tcs.length && vills.length && !(G.scn && G.scn.locked && G.scn.locked.has('tc'))) {
+    const s = freeSettlementNear(anchor, 999);
+    if (s && !buildCheck(P, 'tc') && aiBuild(P, 'tc', s, vills, Math.min(vills.length, 6))) return;
+    if (s && !canAfford(P, bcost('tc', P.faction))) { for (const r of ['wood', 'gold']) if (P.res[r] < bcost('tc', P.faction)[r]) { const v = vills.find(x => x.order.type === 'idle'); const n = v && findRes(v.x, v.y, r, 40, P.id, 0, v); if (n) setOrder(v, { type: 'gather', rid: n.id, rtype: r }); } }
+  }
   // ---- economy
   const ageKey = ['', 'age2', 'age3', 'age4'][P.age];
   const maxAge = F.maxAge || 4;
@@ -2671,9 +2930,10 @@ function aiThink(P, dt) {
     else if (P.age >= 3 && count('fortress') === 0) aiBuild(P, 'fortress', anchor, vills, 3, 6, 15);
     else if (P.age >= 3 && count('barracks') < 2) aiBuild(P, 'barracks', anchor, vills, 2, 6, 15);
     else if (P.age >= 3 && count('market') === 0) aiBuild(P, 'market', anchor, vills, 1, 6, 15);
-    else if (P.age >= 4 && G.opts.victory === 'wonder' && count('wonder') === 0 && A.diffKey !== 'easy') aiBuild(P, 'wonder', anchor, vills, 6, 7, 18);
+    else if (P.age >= 4 && modeHas('wonder') && count('wonder') === 0 && A.diffKey !== 'easy') aiBuild(P, 'wonder', anchor, vills, 6, 7, 18);
   }
   aiVillagers(P, A, vills, anchor, temple);
+  if (!F.noNavy) aiNavy(P, A, units, blds, vills, anchor, enemies);
   if (threat && threatN >= 4 && tc && tc.built) {
     for (const v of vills) if (!v.garrison && v.order.type !== 'garrison' && dist(v.x, v.y, tc.x, tc.y) < 10 && tc.garrisoned.length < B.tc.garrison) setOrder(v, { type: 'garrison', bid: tc.id });
     A.garrisoned = true;
@@ -2681,6 +2941,8 @@ function aiThink(P, dt) {
 
   // ---- ages and technologies
   const saving = ageKey && P.age < maxAge && tc && !tc.research && ((P.age === 1 && vills.length >= 12) || (P.age === 2 && vills.length >= 18 && built('barracks').length) || (P.age === 3 && army.length >= 8));
+  const needB = ageKey && TECH[ageKey].needB;
+  if (saving && needB && !F.noAge && count(needB) === 0 && vills.length) aiBuild(P, needB, anchor, vills, 2, 5, 14);
   if (ageKey && P.age < maxAge && tc && !tc.research && saving && !F.noAge) {
     const opts = FACTIONS[P.faction].minors[P.age + 1];
     startTech(P, tc, ageKey, A.patronPref && A.patronPref[P.age + 1] || opts[Math.floor(rnd() * opts.length)]);
@@ -2748,12 +3010,21 @@ function aiThink(P, dt) {
       if (A.powerCd <= 0) aiPowers(P, enemies, true);
     }
   }
+  if (G.koth && !threat && !F.noAttack) {
+    const k = byId(G.korin), held = G.koth.team === P.team;
+    if (k) {
+      const near = home.filter(u => dist(u.x, u.y, k.x, k.y) < 8);
+      if (!held && home.length >= Math.min(6, A.waveTarget) && now > 120) { for (const u of home) { A.wave.add(u.id); setOrder(u, { type: 'move', x: k.x + (rnd() - .5) * 4, y: k.y + (rnd() - .5) * 4, amove: true }); } A.lastWaveCmd = now; }
+      else if (held && near.length < 4) for (const u of home.filter(u => u.order.type === 'idle').slice(0, 4 - near.length)) setOrder(u, { type: 'move', x: k.x + (rnd() - .5) * 5, y: k.y + (rnd() - .5) * 5, amove: true });
+    }
+  }
   if (now - A.lastWaveCmd > 10 && A.wave.size) {
     A.lastWaveCmd = now;
     for (const id of A.wave) { const u = byId(id); if (u && u.order.type === 'idle') { const t = F.waveTo || aiTarget(P, u, enemies); if (t) setOrder(u, { type: 'move', x: t.x, y: t.y, amove: true }); } }
   }
   // ---- Dragon Balls, powers, Shenron, market
   if (hero && !G.stoneUntil && G.balls.length && !F.noHunt) aiHunt(P, hero, home, temple);
+  if (temple && G.relics.length && !F.noHunt && !threat) aiRelics(P, heroes, temple, anchor);
   if (P.powers.shenron && P.powers.shenron.state === 'ready') castPower(P, 'shenron', 0, 0);
   if (A.powerCd <= 0) aiPowers(P, enemies, false);
   if (A.tradeCd <= 0 && built('market').length) {
@@ -2835,7 +3106,7 @@ function aiArmyOnly(P, army, heroes, enemies) {
 }
 function aiHunt(P, hero, army, temple) {
   const A = P.ai;
-  if (!temple) return;
+  if (!temple || hero.carryRelic) return;
   if (hero.carryBall) { if (hero.order.type !== 'deposit') setOrder(hero, { type: 'deposit', bid: temple.id }); A.hunt = null; return; }
   if (A.hunt) {
     const ball = G.balls.find(b => b.id === A.hunt.ball);
@@ -2857,6 +3128,75 @@ function aiHunt(P, hero, army, temple) {
   const escorts = army.filter(u => !A.wave.has(u.id)).slice(0, 5).map(u => u.id);
   A.hunt = { ball: best.id, escorts, hero: hero.id };
   setOrder(hero, { type: 'move', x: best.x, y: best.y, amove: true, hunt: true });
+}
+// ---- navy: a Dock on the nearest real sea, fishing boats, and warships picked by counters
+function aiNavy(P, A, units, blds, vills, anchor, enemies) {
+  const now = G.time;
+  if (!A.sea || now - A.sea.t > 90) {
+    let best = null, bd = 34;
+    const cx = Math.floor(anchor.x), cy = Math.floor(anchor.y);
+    for (let y = cy - 34; y <= cy + 34; y += 1) for (let x = cx - 34; x <= cx + 34; x += 1) {
+      if (!inMap(x, y)) continue; const i = idx(x, y);
+      if (G.map.terr[i] !== T_WATER || !G.nregion[i] || G.nregionSize[G.nregion[i]] < 120) continue;
+      const d = dist(x, y, anchor.x, anchor.y); if (d < bd) { bd = d; best = { x, y, reg: G.nregion[i] }; }
+    }
+    A.sea = Object.assign({ t: now, reg: 0 }, best || {});
+  }
+  const reg = A.sea.reg; if (!reg) return;
+  const inSea = e => e.kind === 'unit' ? regionAt(e.x, e.y, true) === reg : regionsOf(e, true).includes(reg);
+  const fishN = G.ress.filter(r => r.key === 'fish' && G.nregion[idx(r.tx, r.ty)] === reg).length;
+  const docks = blds.filter(b => b.key === 'dock'), dock = docks.find(b => b.built);
+  const foeShips = G.units.filter(u => u.def.naval && !u.def.fisher && enemies.some(Q => Q.id === u.owner) && inSea(u));
+  const foeNaval = foeShips.length || G.units.some(u => u.def.fisher && enemies.some(Q => Q.id === u.owner) && inSea(u)) || G.blds.some(b => b.key === 'dock' && enemies.some(Q => Q.id === b.owner) && inSea(b));
+  if (!docks.length && vills.length >= 8 && now > 100 && (fishN >= 3 || foeNaval) && !buildCheck(P, 'dock')) {
+    // shore tile nearest home, next to this sea
+    let shore = null, bd = 1e9;
+    for (let y = A.sea.y - 10; y <= A.sea.y + 10; y++) for (let x = A.sea.x - 10; x <= A.sea.x + 10; x++) {
+      if (!inMap(x, y) || G.map.terr[idx(x, y)] === T_WATER || G.map.block[idx(x, y)]) continue;
+      if (![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => inMap(x + dx, y + dy) && G.nregion[idx(x + dx, y + dy)] === reg)) continue;
+      const d = dist(x, y, anchor.x, anchor.y); if (d < bd) { bd = d; shore = { x, y }; }
+    }
+    if (shore) aiBuild(P, 'dock', shore, vills, 2, 0, 6);
+  }
+  if (!dock) return;
+  const myShips = units.filter(u => u.def.naval);
+  const fishers = myShips.filter(u => u.def.fisher), war = myShips.filter(u => !u.def.fisher);
+  const kinds = {}; for (const k in U) if (U[k].faction === P.faction && U[k].ship) kinds[U[k].ship] = k;
+  const qn = k => dock.queue.filter(q => q.key === k).length;
+  if (fishers.length + qn(kinds.fish) < Math.min(fishN, 3 + P.age * 2, 10) && dock.queue.length < 2 && P.res.wood > 120 && P.pop < P.popCap) queueUnit(P, dock, kinds.fish);
+  for (const f of fishers) if (f.order.type === 'idle') { const r = findRes(f.x, f.y, 'food', 60, P.id, 0, f); if (r) setOrder(f, { type: 'gather', rid: r.id, rtype: 'food' }); }
+  if (!dock.research) for (const k of ['nets', 'hulls', 'navalguns']) if (!techCheck(P, dock, k) && P.res.wood > TECH[k].cost.wood + 150) { startTech(P, dock, k); break; }
+  // warships: answer enemy ships with their counter, otherwise keep a small fleet
+  const fc = { arrow: 0, hammer: 0, siege: 0 }; for (const s of foeShips) fc[s.def.ship]++;
+  const mc = { arrow: 0, hammer: 0, siege: 0 }; for (const s of war) mc[s.def.ship]++;
+  const want = Math.min(14, foeShips.length ? foeShips.length + 3 : foeNaval && P.age >= 2 ? 3 + P.age : 0);
+  if (war.length < want && dock.queue.length < 2 && P.pop < P.popCap - 2) {
+    const counter = { arrow: 'hammer', hammer: P.age >= 3 ? 'siege' : 'arrow', siege: 'arrow' };
+    let pick = 'arrow', score = -1e9;
+    for (const k of ['arrow', 'hammer', 'siege']) { if (k === 'siege' && P.age < 3) continue; let sc = -mc[k]; for (const e in fc) if (counter[e] === k) sc += fc[e] * 1.5; if (sc > score) { score = sc; pick = k; } }
+    if (kinds[pick] && !trainCheck(P, dock, kinds[pick]) && P.res.wood > U[kinds[pick]].cost.wood + 80) queueUnit(P, dock, kinds[pick]);
+  }
+  // fleet orders
+  const threat = foeShips.find(s => dist(s.x, s.y, dock.x, dock.y) < 26 || fishers.some(f => dist(f.x, f.y, s.x, s.y) < 10));
+  if (threat) { for (const s of war) if (s.order.type !== 'attack') setOrder(s, { type: 'move', x: threat.x, y: threat.y, amove: true }); return; }
+  if (war.length >= 4 && now - (A.fleetT || 0) > 70) {
+    A.fleetT = now;
+    let tgt = null, td = 1e9;
+    for (const e of [...G.blds.filter(b => enemies.some(Q => Q.id === b.owner) && inSea(b)), ...G.units.filter(u => u.def.naval && enemies.some(Q => Q.id === u.owner) && inSea(u))]) { const d = dist(e.x, e.y, dock.x, dock.y) + (e.kind === 'building' && e.key === 'dock' ? -10 : 0); if (d < td) { td = d; tgt = e; } }
+    if (tgt) for (const s of war) setOrder(s, { type: 'move', x: tgt.x, y: tgt.y, amove: true });
+  } else for (const s of war) if (s.order.type === 'idle' && dist(s.x, s.y, dock.x, dock.y) > 14) setOrder(s, { type: 'move', x: dock.x + (rnd() - .5) * 8, y: dock.y + (rnd() - .5) * 8 });
+}
+// A free hero fetches relics to the Temple, AoM style.
+function aiRelics(P, heroes, temple, anchor) {
+  const A = P.ai;
+  for (const h of heroes) if (h.carryRelic && h.order.type !== 'deposit') setOrder(h, { type: 'deposit', bid: temple.id });
+  if (heroes.some(h => h.order.type === 'pickup' && h.order.relic) || heroes.some(h => h.carryRelic)) return;
+  if (temple.relics.length >= RELIC_CAP) return;
+  const h = heroes.find(x => !(A.hunt && A.hunt.hero === x.id) && !A.wave.has(x.id) && x.order.type !== 'attack' && !x.carryBall && x.hp > maxHp(x) * .6);
+  if (!h) return;
+  let best = null, bd = 55;
+  for (const r of G.relics) if (r.state === 'ground') { const d = dist(r.x, r.y, anchor.x, anchor.y); if (d < bd && reachablePt(h, r.x, r.y)) { bd = d; best = r; } }
+  if (best) setOrder(h, { type: 'pickup', relic: best.id });
 }
 function aiPowers(P, enemies, attacking) {
   const A = P.ai;
@@ -2901,13 +3241,15 @@ function resetState(opts) {
   Object.assign(G, {
     started: true, gameN: (G.gameN || 0) + 1, opts, time: 0, tickN: 0, ents: [], byId: new Map(), nextId: 1, projs: [], fx: [], texts: [], delayed: [], sel: [], balls: [], camps: [], settlements: [], bases: [],
     pings: [], corpses: [], ruins: [], treeFall: [], reveals: [], over: false, winner: 0, winTeam: 0, speed: 1, paused: false, pathBudget: 999, stoneUntil: 0, shenronOwner: 0, wishPending: 0,
-    placing: null, targeting: null, fogT: 0, units: [], blds: [], ress: [], groups: {}, headless: !!opts.headless, revealAll: !!opts.revealAll, scn: null, me: 1, chunkDirtyAll: true,
+    relics: [], objMarks: [], placing: null, targeting: null, fogT: 0, korin: 0, koth: null, settleHold: null, speedMul: 1, units: [], blds: [], ress: [], groups: {}, headless: !!opts.headless, revealAll: !!opts.revealAll, scn: null, me: 1, chunkDirtyAll: true,
   });
 }
-const START_RES = { standard: { food: 300, wood: 300, gold: 150, ki: 0 }, high: { food: 1000, wood: 1000, gold: 1000, ki: 40 } };
+const START_RES = { standard: { food: 300, wood: 300, gold: 150, ki: 0 }, high: { food: 1000, wood: 1000, gold: 1000, ki: 40 }, deathmatch: { food: 5000, wood: 5000, gold: 5000, ki: 100 }, nomad: { food: 300, wood: 450, gold: 400, ki: 0 } };
 // opts: { map, players: [{ faction, major, team, ai, color, name }], seed, victory, resources, dragonBalls, headless }
 function startSkirmish(opts) {
-  opts = Object.assign({ map: 'earth', victory: 'conquest', resources: 'standard', dragonBalls: true }, opts);
+  opts = Object.assign({ map: 'earth', resources: 'standard', dragonBalls: true }, opts);
+  if (!MODES[opts.mode]) opts.mode = opts.victory === 'wonder' ? 'supremacy' : opts.victory === 'conquest' ? 'conquest' : 'supremacy';
+  const M = MODES[opts.mode];
   opts.seed = opts.seed || ((Math.random() * 1e9) | 0);
   resetState(opts);
   G.players = [gaiaPlayer()];
@@ -2915,18 +3257,29 @@ function startSkirmish(opts) {
   const meIdx = opts.players.findIndex(p => !p.ai);
   G.me = meIdx >= 0 ? meIdx + 1 : 0;
   if (!G.me) G.revealAll = true;
-  const bases = genSkirmish({ map: opts.map, players: opts.players, seed: opts.seed });
+  const bases = genSkirmish({ map: opts.map, players: opts.players, seed: opts.seed, koth: !!M.koth });
   pathAlloc(); gridAlloc(); computeRegions();
-  G.players.forEach(P => { if (!P.id) return; Object.assign(P.res, START_RES[opts.resources] || START_RES.standard); });
+  G.players.forEach(P => { if (!P.id) return; Object.assign(P.res, START_RES[M.res || opts.resources] || START_RES.standard); });
   for (let i = 1; i < G.players.length; i++) {
     const P = G.players[i], b = bases[i - 1];
     const s = addSettlement(b.x - 2, b.y - 2);
-    const tc = placeBuilding('tc', i, s.tx, s.ty, true);
-    for (let k = 0; k < 5; k++) spawnNear(tc, FACTIONS[P.faction].villager, i);
+    if (M.nomad) {
+      // a few villagers somewhere out in the wilds, the same distance from a free Settlement for everyone
+      const a = rnd() * Math.PI * 2, d = 11 + rnd() * 3;
+      const p = freeTileNear(clamp(Math.round(b.x + Math.cos(a) * d), 3, MW - 4), clamp(Math.round(b.y + Math.sin(a) * d), 3, MH - 4), 8) || { x: b.x, y: b.y };
+      for (let k = 0; k < 3; k++) { const f = freeTileNear(p.x + (k % 2), p.y + (k >> 1), 3) || p; spawnUnit(FACTIONS[P.faction].villager, i, f.x + .5, f.y + .5); }
+      if (!opts.players[i - 1].ai) { G.reveals.push({ x: s.tx + 2, y: s.ty + 2, r: 5, until: 120 }); G.objMarks = [{ x: s.tx + 2, y: s.ty + 2 }]; }
+    } else {
+      const tc = placeBuilding('tc', i, s.tx, s.ty, true);
+      for (let k = 0; k < 5; k++) spawnNear(tc, FACTIONS[P.faction].villager, i);
+    }
     if (opts.players[i - 1].ai) initAI(P, opts.players[i - 1].ai);
   }
+  if (M.koth) { const k = placeBuilding('korin', 0, Math.floor(MW / 2) - 1, Math.floor(MH / 2) - 1, true); k.invuln = 1e12; G.korin = k.id; G.koth = { team: 0, held: 0 }; }
+  G.speedMul = M.speed || 1;
   refreshLists();
   setupBalls();
+  if (opts.relics !== false) setupRelics(bases);
   refreshLists();
   updateFog();
   economy(0);
@@ -3296,8 +3649,60 @@ function drawBuu(c, pose, f) {
   limb(c, 4, -21, hand[0], hand[1], 4, pink); blob(c, hand[0], hand[1], 2.8, 2.8, '#f4c430');
 }
 const LOOK_SCALE = l => (l.scale || 1);
+// Ships, side view facing right, waterline at y = 0.
+const SHIP_STYLE = {
+  earth: { hull: '#f2f0e8', deck: '#d9cfb5', trim: '#ff8a1e', glass: '#7fd4ff', dark: '#3a4a5a' },
+  rr: { hull: '#6d737c', deck: '#5b6b52', trim: '#d33a3a', glass: '#ffd166', dark: '#2a2e33' },
+  ff: { hull: '#efe9f7', deck: '#8a5ad8', trim: '#8a5ad8', glass: '#7dff9c', dark: '#3a2a5a' },
+};
+function drawShip(c, L, pose, f, pc) {
+  const S = SHIP_STYLE[L.style] || SHIP_STYLE.earth, team = pc != null ? pcol(pc) : S.trim, k = L.kind;
+  const bob = pose === 'walk' ? (f % 2 ? -1 : 0) : 0, lunge = pose === 'atk' && f === 1 ? 4 : 0, fire = pose === 'shoot' && f === 1;
+  c.save(); c.translate(lunge, bob);
+  const len = { fish: 22, arrow: 30, hammer: 31, siege: 36 }[k] || 30;
+  if (L.style === 'ff') {
+    // hover saucer: glow on the water, disc hull, bubble canopy
+    c.fillStyle = 'rgba(120,255,220,.35)'; c.beginPath(); c.ellipse(0, 1, len * .9, 4, 0, 0, 7); c.fill();
+    blob(c, 0, -9, len, 7, S.hull); blob(c, 0, -7, len * .92, 3.2, S.deck);
+    c.fillStyle = team; c.fillRect(-len * .7, -11, len * 1.4, 2.4);
+    if (k === 'hammer') poly(c, [[len - 3, -12], [len + 13, -8], [len - 3, -4]], '#c9c9d6');
+    blob(c, -4, -16, 8, 6, 'rgba(160,255,200,.75)');
+    if (k === 'arrow') for (const x of [-12, 10]) { blob(c, x, -15, 3.4, 3, S.dark); limb(c, x, -16, x + 8, -18, 1.8, '#2a2a2a'); }
+    if (k === 'siege') { blob(c, 8, -19, 7, 6, S.deck); blob(c, 14, -20, 3.4, 3.4, '#ff8a3a'); }
+    if (k === 'fish') { limb(c, 6, -12, 16, -24, 1.6, '#c9c9d6'); c.strokeStyle = 'rgba(230,230,200,.8)'; c.lineWidth = .8; for (let i = 0; i < 4; i++) { c.beginPath(); c.moveTo(16, -24); c.lineTo(12 + i * 3, -6); c.stroke(); } }
+  } else {
+    const deckY = k === 'fish' ? -9 : -12;
+    const bow = L.style === 'rr' ? [[len, deckY], [len + 8, deckY - 3], [len - 2, 0]] : [[len, deckY], [len + 10, deckY - 4], [len + 2, -2]];
+    poly(c, [[-len, deckY], ...bow, [-len + 4, 0]], S.hull);
+    c.fillStyle = team; c.beginPath(); c.moveTo(-len + 1, -4); c.lineTo(len + 3, -4); c.lineTo(len + 2, -2); c.lineTo(-len + 3, -2); c.closePath(); c.fill();
+    c.fillStyle = S.deck; c.fillRect(-len + 1, deckY - 1.5, len * 2, 2.5);
+    if (k === 'fish') {
+      rrect(c, -12, deckY - 10, 12, 10, L.style === 'earth' ? 5 : 1.5, S.hull); c.fillStyle = S.glass; c.fillRect(-9, deckY - 7, 6, 3);
+      limb(c, 6, deckY, 6, deckY - 22, 1.6, '#8a6a42'); limb(c, 6, deckY - 20, 18, deckY - 10, 1.2, '#8a6a42');
+      c.strokeStyle = 'rgba(230,230,200,.8)'; c.lineWidth = .8; for (let i = 0; i < 4; i++) { c.beginPath(); c.moveTo(18, deckY - 10); c.lineTo(14 + i * 3, 0); c.stroke(); }
+    } else {
+      const ch = k === 'siege' ? 14 : 11;
+      rrect(c, -16, deckY - ch, 16, ch, L.style === 'earth' ? 6 : 1.5, S.hull);
+      for (let i = 0; i < 3; i++) { c.fillStyle = S.glass; c.fillRect(-13 + i * 4.5, deckY - ch + 3, 3, 3); }
+      if (L.style === 'earth') blob(c, -8, deckY - ch - 1, 6, 3, S.trim);
+      else rrect(c, -14, deckY - ch - 4, 6, 4, 1, S.dark);
+      if (k === 'arrow') for (const x of [8, 20]) { blob(c, x, deckY - 3, 4, 3.4, S.dark); limb(c, x, deckY - 4, x + 9, deckY - 7, 2, '#2a2a2a'); if (fire) blob(c, x + 11, deckY - 8, 3, 3, '#ffe066'); }
+      if (k === 'hammer') { poly(c, [[len + 4, deckY + 1], [len + 18, -5], [len + 2, -1]], '#b8bec8'); for (const x of [-4, 6, 16]) rrect(c, x, deckY - 5, 7, 5, 1, shade(S.hull, -.2)); }
+      if (k === 'siege') {
+        rrect(c, 4, deckY - 12, 16, 12, 3, S.dark);
+        if (L.style === 'rr') { for (let i = 0; i < 3; i++) { rrect(c, 6 + i * 4.5, deckY - 20, 3.4, 9, 1, '#e8e8e8'); blob(c, 7.7 + i * 4.5, deckY - 21, 1.7, 1.7, '#d33a3a'); } }
+        else { limb(c, 14, deckY - 7, 32 - (fire ? 3 : 0), deckY - 13, 4.6, '#2a2a2a'); if (fire) blob(c, 34, deckY - 14, 4, 4, '#ffb347'); }
+      }
+    }
+  }
+  // the hull sits in the water
+  c.fillStyle = 'rgba(70,140,190,.4)'; c.fillRect(-len - 4, -1.2, len * 2 + 20, 5);
+  c.strokeStyle = 'rgba(255,255,255,.55)'; c.lineWidth = 1; c.beginPath(); c.moveTo(-len - 2, -1); c.lineTo(len + 10, -1); c.stroke();
+  c.restore();
+}
 function figureBox(L) {
   const s = LOOK_SCALE(L), r = L.r;
+  if (r === 'ship') return [150, 86, 72, 62];
   if (r === 'ape') return [96, 110, 48, 102];
   if (r === 'mech' && L.kind === 'pirate') return [70, 80, 34, 74];
   if (r === 'brute') return [60, 60, 28, 56];
@@ -3312,6 +3717,7 @@ function drawFigure(c, L, pose, f, pc) {
     case 'human': drawHuman(c, L, p, f, pc); break;
     case 'mech': drawMech(c, L, p, f, pc); break;
     case 'vehicle': drawVehicle(c, L, p, f, pc); break;
+    case 'ship': drawShip(c, L, p, f, pc); break;
     case 'beast': drawBeast(c, L, p, f); break;
     case 'saiba': drawSaiba(c, p, f, pc); break;
     case 'brute': drawBrute(c, p, f, pc); break;
@@ -3490,13 +3896,37 @@ function drawBuildingArt(c, key, fac, pc, w, h) {
     case 'lab': isoBox(c, m, m, W, Hh, 0, 16, '#6d737c'); isoDome(c, w / 2, h / 2, 1.5, 16, 34, '#9aa0a8'); isoBox(c, .5, h - 1.3, 1.3, h - .3, 0, 24, '#5d636e'); emblem(c, w / 2 + 1.2, h / 2 + 1.2, 18, 'RR', '#fff', '#d33a3a'); { const [px, py] = ip(w / 2, h / 2, 50); c.fillStyle = 'rgba(120,255,140,.7)'; c.beginPath(); c.arc(px, py, 5, 0, 7); c.fill(); } break;
     case 'ship': { const [px, py] = ip(w / 2, h / 2, 0); c.fillStyle = 'rgba(0,0,0,.25)'; c.beginPath(); c.ellipse(px, py, 150, 64, 0, 0, 7); c.fill(); for (const [x, y] of [[1, 4], [4, 1], [4, 4], [1, 1]]) isoBox(c, x - .1, y - .1, x + .1, y + .1, 0, 26, '#8a8f98'); isoEllipse(c, w / 2, h / 2, 2.5, 26, '#e6e1ee', '#8a8f98'); isoDome(c, w / 2, h / 2, 2.4, 26, 22, '#efeaf6'); isoDome(c, w / 2, h / 2, 1, 44, 16, '#d7d0e6'); for (let i = 0; i < 10; i++) { const a = i / 10 * 6.28, [qx, qy] = ip(w / 2 + Math.cos(a) * 2.3, h / 2 + Math.sin(a) * 2.3, 28); c.fillStyle = '#ff7ad8'; c.beginPath(); c.arc(qx, qy, 2.2, 0, 7); c.fill(); } break; }
     case 'guru': isoCyl(c, w / 2, h / 2, 1.3, 0, 14, '#eef4e8'); isoDome(c, w / 2, h / 2, 1.3, 14, 30, '#eef4e8'); isoCyl(c, w / 2 + 1, h / 2 - .6, .35, 0, 46, '#eef4e8'); isoDome(c, w / 2 + 1, h / 2 - .6, .35, 46, 10, '#eef4e8'); winS(c, w / 2 - .2, h / 2 + 1.25, 4, .4, 8, '#3f6f8f'); break;
+    case 'dock': {
+      const plank = fac === 'rr' ? '#5d636e' : fac === 'ff' ? '#b6aecb' : '#a8763c';
+      isoBox(c, .1, .1, w - .1, h - .1, 0, 6, plank);
+      for (let i = 0; i < 5; i++) { const y = .35 + i * .55; isoPoly(c, [[.15, y, 6.2], [w - .15, y, 6.2], [w - .15, y + .05, 6.2], [.15, y + .05, 6.2]], shade(plank, -.25), false); }
+      for (const [x, y] of [[.2, .2], [w - .2, .2], [w - .2, h - .2], [.2, h - .2]]) isoCyl(c, x, y, .12, 0, 12, shade(plank, -.3));
+      isoBox(c, .3, .3, 1.3, 1.3, 6, 22, fac === 'earth' ? A.wall : A.wall); isoRoof(c, .25, .25, 1.35, 1.35, 22, 8, A.roof);
+      // crane
+      isoCyl(c, w - .7, .7, .14, 6, 44, fac === 'rr' ? '#d33a3a' : fac === 'ff' ? '#8a5ad8' : '#ff8a1e');
+      { const a = ip(w - .7, .7, 44), b = ip(w - .7, h - .4, 40); c.strokeStyle = fac === 'rr' ? '#d33a3a' : fac === 'ff' ? '#8a5ad8' : '#ff8a1e'; c.lineWidth = 3; c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke(); c.lineWidth = 1; c.strokeStyle = '#333'; c.beginPath(); c.moveTo(b[0], b[1]); c.lineTo(b[0], b[1] + 18); c.stroke(); }
+      isoBox(c, 1.6, 1.8, 2.2, 2.4, 6, 11, fac === 'earth' ? '#3c78c8' : '#5b6b52');
+      flag(c, .5, .5, 30, team, 16);
+      break;
+    }
+    case 'korin': {
+      // Korin's Tower: a white stone pillar with Korin's sanctuary on top
+      isoCyl(c, w / 2, h / 2, 1.45, 0, 7, '#bdb39b'); isoCyl(c, w / 2, h / 2, 1.05, 7, 12, '#d8cfb6');
+      isoCyl(c, w / 2, h / 2, .55, 12, 176, '#efe8d6');
+      for (const z of [40, 80, 120, 160]) isoCyl(c, w / 2, h / 2, .6, z, z + 4, '#c98a3a');
+      isoCyl(c, w / 2, h / 2, 1.25, 176, 184, '#d9cfb5'); isoCyl(c, w / 2, h / 2, 1.05, 184, 196, '#efe8d6');
+      for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2, x = w / 2 + Math.cos(a) * .9, y = h / 2 + Math.sin(a) * .9; if (Math.sin(a) + Math.cos(a) > -.3) winS(c, x, y, 186, .18, 7, '#4a6fa5'); }
+      isoDome(c, w / 2, h / 2, 1.0, 196, 22, '#c9884a'); isoCyl(c, w / 2, h / 2, .08, 216, 232, '#ffd34d');
+      const [gx, gy] = ip(w / 2, h / 2, 234); c.fillStyle = '#ffd34d'; c.beginPath(); c.arc(gx, gy, 3.5, 0, 7); c.fill();
+      break;
+    }
     case 'hut': isoBox(c, m, m, W, Hh, 0, 14, '#d8c9a8'); isoRoof(c, m - .1, m - .1, W + .1, Hh + .1, 14, 16, '#a0572e'); winS(c, .6, Hh, 0, .45, 9, '#5a3a1e'); break;
     default: isoBox(c, m, m, W, Hh, 0, 20, A.wall);
   }
 }
 function buildingSprite(key, fac, pc) {
   const d = B[key], w = d.w, h = d.h;
-  const top = { tc: 100, wonder: 170, tower: 90, fortress: 110, temple: 80, ship: 90, lab: 70 }[key] || 70;
+  const top = { tc: 100, wonder: 170, tower: 90, fortress: 110, temple: 80, ship: 90, lab: 70, korin: 250, dock: 70 }[key] || 70;
   const W = (w + h) * HTW + 8, Hh = (w + h) * HTH + top + 6;
   return sprite(`B|${key}|${fac}|${pc}`, W, Hh, h * HTW + 4, top, c => drawBuildingArt(c, key, fac, pc, w, h));
 }
@@ -3565,7 +3995,44 @@ function goldSprite(biome) {
   });
 }
 function berrySprite() { return sprite('BERRY', 34, 28, 17, 18, c => { c.fillStyle = 'rgba(0,0,0,.2)'; c.beginPath(); c.ellipse(2, 2, 13, 5, 0, 0, 7); c.fill(); blob(c, 0, -5, 12, 9, '#2f7a34'); blob(c, -3, -8, 7, 5, '#4fa850'); c.fillStyle = '#c8f59a'; for (let i = 0; i < 6; i++) { c.beginPath(); c.ellipse(-7 + i * 2.8, -4 + (i % 2 ? 2 : -2), 1.6, 2.4, .4, 0, 7); c.fill(); } }); }
+function fishSprite(v) {
+  return sprite('FISH' + (v > .5 ? 1 : 0), 44, 26, 22, 14, c => {
+    c.fillStyle = 'rgba(20,50,80,.35)'; c.beginPath(); c.ellipse(0, 0, 14, 5, 0, 0, 7); c.fill();
+    const col = v > .5 ? '#5a8fb0' : '#6aa38a';
+    c.fillStyle = col; c.beginPath(); c.ellipse(-1, 0, 9, 3.4, 0, 0, 7); c.fill();
+    c.beginPath(); c.moveTo(7, 0); c.lineTo(13, -4); c.lineTo(13, 4); c.closePath(); c.fill();
+    c.fillStyle = 'rgba(255,255,255,.5)'; c.beginPath(); c.ellipse(-4, -1, 3, 1, 0, 0, 7); c.fill();
+  });
+}
 function carcassSprite() { return sprite('MEAT', 34, 22, 17, 12, c => { blob(c, 0, 0, 11, 5, '#8a4a2a', .2); c.strokeStyle = '#f2e6cf'; c.lineWidth = 2; for (let i = -1; i <= 1; i++) { c.beginPath(); c.moveTo(i * 4, -4); c.lineTo(i * 4 + 1, 4); c.stroke(); } }); }
+// Relic items, drawn around (0,0) at about 22 px.
+const RELIC_ART = {
+  powerpole: c => { limb(c, -9, 7, 9, -9, 3.2, '#d4141c'); for (const [x, y] of [[-9, 7], [9, -9]]) blob(c, x, y, 2.4, 2.4, '#ffd34d'); },
+  zsword: c => { limb(c, -8, 8, 7, -7, 3, '#dfe6ee'); limb(c, -9, 3, -3, 9, 2.4, '#8a6a42'); blob(c, -8, 8, 1.8, 1.8, '#ffd34d'); },
+  scouter: c => { rrect(c, -9, -4, 7, 9, 2, '#e8e8e8'); blob(c, 3, -1, 6, 5, 'rgba(90,220,120,.85)'); limb(c, -2, -4, 3, -7, 1.6, '#e8e8e8'); },
+  radar: c => { blob(c, 0, 0, 9, 9, '#f2f2f2'); blob(c, 0, 0, 6.5, 6.5, '#3fae5a'); c.strokeStyle = 'rgba(200,255,200,.8)'; c.lineWidth = .8; for (const r of [2.5, 5]) { c.beginPath(); c.arc(0, 0, r, 0, 7); c.stroke(); } blob(c, 2, -2, 1.3, 1.3, '#ffcf3a'); blob(c, 0, -9, 2, 1.5, '#cfcfcf'); },
+  nimbus: c => { for (const [x, y, r] of [[-6, 1, 5], [0, -2, 6.5], [6, 1, 5], [1, 3, 5]]) blob(c, x, y, r, r * .75, '#ffe066'); },
+  senzu: c => { blob(c, 0, 2, 8, 7, '#a8763c'); limb(c, -3, -5, 3, -5, 2.4, '#7a4a20'); for (const [x, y] of [[-3, 0], [2, 1], [-1, 4]]) blob(c, x, y, 1.8, 2.4, '#8fe06f'); },
+  goldcap: c => { rrect(c, -9, -4, 18, 8, 4, '#ffd34d'); c.fillStyle = '#c98a12'; c.fillRect(-1, -4, 2, 8); blob(c, -5, -1.5, 1.4, 1, 'rgba(255,255,255,.8)'); },
+  fan: c => { poly(c, [[0, 8], [-10, -6], [-4, -10], [4, -10], [10, -6]], '#4fa850'); limb(c, 0, 8, 0, 11, 2.2, '#8a6a42'); c.strokeStyle = '#2f7a34'; c.lineWidth = 1; for (const a of [-.7, -.25, .25, .7]) { c.beginPath(); c.moveTo(0, 8); c.lineTo(Math.sin(a) * 11, 8 - Math.cos(a) * 17); c.stroke(); } },
+  jar: c => { rrect(c, -7, -5, 14, 13, 4, '#f2f2f2'); rrect(c, -8, -8, 16, 4, 2, '#5b7fbf'); blob(c, 0, -9, 2.5, 1.5, '#3e5f9a'); c.fillStyle = '#d4141c'; c.fillRect(-4, 0, 8, 3); },
+  shard: c => { poly(c, [[-9, -3], [0, -8], [9, -3], [7, 6], [-7, 6]], '#f2f2f2'); poly(c, [[-9, -3], [0, -8], [9, -3], [0, -1]], '#ffd34d'); },
+  flask: c => { rrect(c, -2.5, -10, 5, 5, 1.5, '#d9e8f2'); blob(c, 0, 2, 7, 7, 'rgba(110,190,255,.9)'); blob(c, -2, 0, 2, 1.5, 'rgba(255,255,255,.8)'); },
+  shell: c => { blob(c, 0, 1, 10, 7.5, '#3f8f3a'); c.strokeStyle = '#2b5f28'; c.lineWidth = 1.2; c.beginPath(); c.moveTo(-6, -3); c.lineTo(6, 5); c.moveTo(6, -3); c.lineTo(-6, 5); c.stroke(); blob(c, 0, 1, 3.5, 2.6, '#6fbf4a'); },
+};
+function relicSprite(key) {
+  return sprite('RELIC|' + key, 40, 40, 20, 26, c => {
+    c.fillStyle = 'rgba(0,0,0,.25)'; c.beginPath(); c.ellipse(0, 10, 11, 4, 0, 0, 7); c.fill();
+    RELIC_ART[key](c);
+  });
+}
+function relicIcon(key, size) {
+  size = size || 40;
+  return iconCanvas('R' + key, size, c => {
+    const g = c.createRadialGradient(size / 2, size / 2, 2, size / 2, size / 2, size * .6); g.addColorStop(0, '#5b3f8a'); g.addColorStop(1, '#1d1430'); c.fillStyle = g; c.fillRect(0, 0, size, size);
+    c.save(); c.translate(size / 2, size / 2 + 1); c.scale(size / 30, size / 30); RELIC_ART[key](c); c.restore();
+  });
+}
 function sealedBallSprite(open) {
   return sprite('SEAL' + (open ? 1 : 0), 90, 90, 45, 70, c => {
     c.fillStyle = 'rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(0, 0, 34, 14, 0, 0, 7); c.fill();
@@ -3577,7 +4044,7 @@ function sealedBallSprite(open) {
 }
 
 // ---------- icons and portraits (for the HUD) ----------
-const CLASS_BG = { villager: ['#2f4a2a', '#1b2a18'], infantry: ['#5a2a1a', '#2a140c'], ranged: ['#1a3a5a', '#0c1a2a'], cavalry: ['#4a3a1a', '#24180a'], siege: ['#3a3a3a', '#1a1a1a'], myth: ['#3a1a5a', '#1a0c2a'], hero: ['#6a4a0a', '#2a1a04'], titan: ['#5a1a3a', '#2a0c1a'], guard: ['#3a3a1a', '#1a1a0c'], huntable: ['#3a3a1a', '#1a1a0c'] };
+const CLASS_BG = { ship: ['#1a4a5a', '#0c222a'], villager: ['#2f4a2a', '#1b2a18'], infantry: ['#5a2a1a', '#2a140c'], ranged: ['#1a3a5a', '#0c1a2a'], cavalry: ['#4a3a1a', '#24180a'], siege: ['#3a3a3a', '#1a1a1a'], myth: ['#3a1a5a', '#1a0c2a'], hero: ['#6a4a0a', '#2a1a04'], titan: ['#5a1a3a', '#2a0c1a'], guard: ['#3a3a1a', '#1a1a0c'], huntable: ['#3a3a1a', '#1a1a0c'] };
 function iconCanvas(key, size, draw) {
   return sprite('I|' + key + '|' + size, size, size, 0, 0, draw);
 }
@@ -3588,8 +4055,8 @@ function unitIcon(key, form, pc, size) {
     const bg = CLASS_BG[d.cls] || CLASS_BG.villager;
     const g = c.createLinearGradient(0, 0, 0, size); g.addColorStop(0, bg[0]); g.addColorStop(1, bg[1]); c.fillStyle = g; c.fillRect(0, 0, size, size);
     const [w, h, ax, ay] = figureBox(L);
-    const big = L.r === 'ape' ? .45 : L.r === 'vehicle' ? 1.15 : L.r === 'mech' && L.kind === 'pirate' ? .6 : 1.25 / (L.scale || 1);
-    c.save(); c.translate(size / 2 + (L.r === 'vehicle' ? 0 : -2), size * (L.r === 'vehicle' ? .74 : .98)); c.scale(big * size / 52, big * size / 52);
+    const big = L.r === 'ship' ? .72 : L.r === 'ape' ? .45 : L.r === 'vehicle' ? 1.15 : L.r === 'mech' && L.kind === 'pirate' ? .6 : 1.25 / (L.scale || 1);
+    c.save(); c.translate(size / 2 + (L.r === 'vehicle' || L.r === 'ship' ? -2 : -2), size * (L.r === 'ship' ? .74 : L.r === 'vehicle' ? .74 : .98)); c.scale(big * size / 52, big * size / 52);
     drawFigure(c, L, 'idle', 0, pc); c.restore();
   });
 }
@@ -3599,8 +4066,8 @@ function portrait(key, form, pc, size) {
     const d = U[key] || {}, L = form ? FORMS[form].look : (d.look || {});
     const bg = CLASS_BG[d.cls] || CLASS_BG.villager;
     const g = c.createRadialGradient(size * .5, size * .35, 4, size * .5, size * .5, size * .75); g.addColorStop(0, shade(bg[0], .15)); g.addColorStop(1, bg[1]); c.fillStyle = g; c.fillRect(0, 0, size, size);
-    const zoom = L.r === 'ape' ? 1.3 : L.r === 'vehicle' ? 2.2 : L.r === 'mech' ? 2 : L.r === 'beast' ? 2.4 : 3.2 / (L.scale || 1);
-    c.save(); c.translate(size * .44, size * (L.r === 'vehicle' ? .85 : L.r === 'beast' ? .9 : 1.42)); c.scale(zoom * size / 96, zoom * size / 96);
+    const zoom = L.r === 'ship' ? 1.5 : L.r === 'ape' ? 1.3 : L.r === 'vehicle' ? 2.2 : L.r === 'mech' ? 2 : L.r === 'beast' ? 2.4 : 3.2 / (L.scale || 1);
+    c.save(); c.translate(size * .44, size * (L.r === 'ship' ? .72 : L.r === 'vehicle' ? .85 : L.r === 'beast' ? .9 : 1.42)); c.scale(zoom * size / 96, zoom * size / 96);
     drawFigure(c, L, 'idle', 0, pc); c.restore();
   });
 }
@@ -3912,6 +4379,7 @@ function render(alpha, realDt) {
   for (const e of G.ents) if (e.kind === 'deco' && !e.dead && exploredAt(e.x, e.y)) draws.push({ d: e.x + e.y, deco: e });
   for (const t of G.treeFall) if (exploredAt(t.x, t.y) && inViewIso(isoX(t.x, t.y), isoY(t.x, t.y), 40)) draws.push({ d: t.x + t.y - .3, stump: t });
   for (const b of G.balls) if (b.state === 'ground' && (G.revealAll || visibleAt(b.x, b.y))) draws.push({ d: b.x + b.y, ball: b });
+  for (const r of G.relics) if (r.state === 'ground' && (G.revealAll || exploredAt(r.x, r.y))) draws.push({ d: r.x + r.y, relic: r });
   draws.sort((a, b) => a.d - b.d);
   for (const o of draws) {
     if (o.u) drawUnit(o.u, o.x, o.y);
@@ -3919,6 +4387,7 @@ function render(alpha, realDt) {
     else if (o.r) drawRes(o.r);
     else if (o.deco) { const sp = sealedBallSprite(G.units.some(u => u.def.cls === 'titan')); drawSpr(sp, isoX(o.deco.x, o.deco.y), isoY(o.deco.x, o.deco.y)); }
     else if (o.stump) drawSpr(stumpSprite(), isoX(o.stump.x, o.stump.y), isoY(o.stump.x, o.stump.y));
+    else if (o.relic) drawRelic(o.relic, isoX(o.relic.x, o.relic.y), isoY(o.relic.x, o.relic.y), 1);
     else if (o.ball) drawBall(isoX(o.ball.x, o.ball.y), isoY(o.ball.x, o.ball.y) - 6 - Math.sin(G.time * 3 + o.ball.star) * 2, o.ball.star, 1, true);
   }
   for (const p of G.projs) if (inViewIso(isoX(p.x, p.y), isoY(p.x, p.y), 40)) drawProj(p);
@@ -3958,7 +4427,7 @@ function drawWater(dt) {
 }
 function drawUnitGround(u, x, y) {
   const ix = isoX(x, y), iy = isoY(x, y), r = u.r * 46 * (u.ape ? 1 : 1);
-  ctx.fillStyle = `rgba(0,0,0,${u.flying || u.def.alwaysFly ? .18 : .32})`;
+  ctx.fillStyle = `rgba(0,0,0,${u.def.naval ? .12 : u.flying || u.def.alwaysFly ? .18 : .32})`;
   ctx.beginPath(); ctx.ellipse(ix + 2, iy + 1, r * 1.1, r * .5, 0, 0, 7); ctx.fill();
   if (u.owner > 0) { ctx.strokeStyle = pcol(G.players[u.owner].color); ctx.lineWidth = 1.6; ctx.beginPath(); ctx.ellipse(ix, iy, r + 2, r * .5 + 1, 0, 0, 7); ctx.stroke(); }
   if (G.sel.includes(u)) { ctx.strokeStyle = '#7dff9c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(ix, iy, r + 5, r * .5 + 3, 0, 0, 7); ctx.stroke(); }
@@ -3976,7 +4445,8 @@ function unitPose(u) {
 }
 function drawUnit(u, x, y) {
   const ix = isoX(x, y), lift = u.leap ? u.lift * 34 : (u.lift || 0) * (u.def.alwaysFly ? 0 : 30) + (u.flying ? Math.sin(G.time * 3 + u.id) * 2 : 0);
-  const iy = isoY(x, y) - lift;
+  let iy = isoY(x, y) - lift;
+  if (u.def.naval) { iy += Math.sin(G.time * 2 + u.id) * 1.2; if (u.moving && frnd() < .5) partBurst(x - Math.cos(u.face) * u.r, y - Math.sin(u.face) * u.r, 1, 1, '#e8f6ff', .25, .7, false, 2.2); }
   const st = stats(u), L = unitLook(u);
   // auras
   const auraC = u.kaio ? '#ff3b3b' : L.aura || (u.buffs.length ? '#ffd166' : null);
@@ -3991,6 +4461,7 @@ function drawUnit(u, x, y) {
   if (u.stun > 0) { ctx.fillStyle = '#fff6a8'; for (let i = 0; i < 3; i++) { const a = G.time * 4 + i * 2.1; ctx.beginPath(); ctx.arc(ix + Math.cos(a) * 9, iy - 44 + Math.sin(a) * 3, 2, 0, 7); ctx.fill(); } }
   if (u.carryAmt > .5 && u.carry) { ctx.fillStyle = u.carry === 'wood' ? '#a8763c' : u.carry === 'gold' ? '#ffd34d' : '#86e07c'; ctx.beginPath(); ctx.ellipse(ix - (flip ? -6 : 6), iy - 20, 3.5, 3, 0, 0, 7); ctx.fill(); ctx.strokeStyle = 'rgba(0,0,0,.5)'; ctx.lineWidth = 1; ctx.stroke(); }
   if (u.carryBall) { const b = G.balls.find(q => q.id === u.carryBall); drawBall(ix, iy - 52 * (L.scale || 1), b ? b.star : 1, .8); }
+  if (u.carryRelic) { const r = G.relics.find(q => q.id === u.carryRelic); if (r) drawRelic(r, ix, iy - 40 * (L.scale || 1), .7, true); }
 }
 function drawCorpse(c) {
   const L = c.ape ? APE_LOOK : (c.form ? FORMS[c.form].look : U[c.key].look) || {};
@@ -4016,6 +4487,7 @@ function drawBuilding(b) {
   const hpk = b.hp / maxHp(b);
   if (hpk < .66 && frnd() < (hpk < .33 ? .5 : .2)) partBurst(b.tx + frnd() * b.w, b.ty + frnd() * b.h, 20 + frnd() * 30, 1, hpk < .33 ? '#ff7a2a' : '#5a5450', .3, 1.6, false, hpk < .33 ? 3 : 5);
   if (b.fac === 'rr' && (b.key === 'barracks' || b.key === 'tc') && frnd() < .06) partBurst(b.tx + .8, b.ty + .8, 70, 1, '#c8c8c8', .15, 2.4, false, 5);
+  if (b.relics.length) for (let i = 0; i < b.relics.length; i++) { const r = G.relics.find(q => q.id === b.relics[i]); if (r) drawSpr(relicSprite(r.key), isoX(b.x, b.y) - 24 + (i % 5) * 12, isoY(b.x, b.y) + 16 + Math.floor(i / 5) * 8, false, .55); }
   if (b.balls.length) for (let i = 0; i < b.balls.length; i++) { const bb = G.balls.find(q => q.id === b.balls[i]); drawBall(isoX(b.x, b.y) - 18 + i * 6, isoY(b.x, b.y) + 6, bb ? bb.star : 1, .55); }
   if (b.garrisoned.length && isAlly(b.owner, G.me)) { const [px, py] = [isoX(b.x, b.y), isoY(b.x, b.y) - 20]; ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(px - 10, py - 8, 20, 12); ctx.fillStyle = '#fff'; ctx.font = '700 9px "Chakra Petch", sans-serif'; ctx.textAlign = 'center'; ctx.fillText(b.garrisoned.length, px, py + 1); }
 }
@@ -4025,7 +4497,20 @@ function drawRes(r) {
   else if (r.key === 'gold') { const s = goldSprite(G.map.biome); drawSpr(s, ix, iy, false, .55 + .45 * Math.min(1, r.amount / 1200)); }
   else if (r.key === 'berry') drawSpr(berrySprite(), ix, iy);
   else if (r.key === 'carcass') drawSpr(carcassSprite(), ix, iy);
+  else if (r.key === 'fish') {
+    const t = G.time * 1.3 + r.v * 9, ox = Math.cos(t) * 3, oy = Math.sin(t * 1.4) * 1.5;
+    ctx.strokeStyle = `rgba(255,255,255,${.25 + .2 * Math.sin(t * 2)})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(ix, iy, 12 + Math.sin(t) * 2, 5, 0, 0, 7); ctx.stroke();
+    drawSpr(fishSprite(r.v), ix + ox, iy + oy, Math.cos(t) < 0);
+  }
   if (G.hover === r) { ctx.strokeStyle = 'rgba(255,255,255,.6)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.ellipse(ix, iy, 20 * r.w, 10 * r.w, 0, 0, 7); ctx.stroke(); }
+}
+function drawRelic(r, x, y, s, carried) {
+  const k = .5 + .5 * Math.sin(G.time * 2.4 + r.id);
+  const g = ctx.createRadialGradient(x, y - 8, 1, x, y - 8, 22 * s); g.addColorStop(0, `rgba(210,170,255,${.35 + k * .25})`); g.addColorStop(1, 'rgba(180,120,255,0)');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y - 8, 22 * s, 0, 7); ctx.fill();
+  if (!carried) { ctx.strokeStyle = `rgba(220,190,255,${.4 + k * .3})`; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.ellipse(x, y + 2, 13, 6, 0, 0, 7); ctx.stroke(); }
+  drawSpr(relicSprite(r.key), x, y - (carried ? 0 : 3 + k * 2), false, s);
+  if (!carried && G.hover && G.hover.kind === 'relic' && G.hover.relic === r) { ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.ellipse(x, y + 2, 16, 8, 0, 0, 7); ctx.stroke(); }
 }
 function drawBall(x, y, star, s, glow) {
   const r = 6 * s * (1 + .06 * Math.sin(G.time * 4 + star));
@@ -4222,6 +4707,7 @@ function renderMinimap() {
   for (const b of G.blds) if (seenBld(b)) { const col = pcol(G.players[b.owner].color); for (let y = b.ty; y < b.ty + b.h; y++) for (let x = b.tx; x < b.tx + b.w; x++) dot(x + .5, y + .5, 4, col); }
   for (const u of G.units) { if (u.garrison) continue; if (!G.revealAll && !isAlly(u.owner, G.me) && !visibleAt(u.x, u.y)) continue; dot(u.x, u.y, u.def.cls === 'hero' || u.def.cls === 'titan' ? 6 : 3.5, u.owner === 0 ? '#caa25b' : pcol(G.players[u.owner].color)); }
   if (!G.revealAll) { if (G.fogDirty) refreshFog(); mctx.save(); mctx.setTransform(HTW * miniScale, HTH * miniScale, -HTW * miniScale, HTH * miniScale, MH * HTW * miniScale, 0); mctx.imageSmoothingEnabled = true; mctx.drawImage(fogCanvas, -1, -1, MW + 2, MH + 2); mctx.restore(); }
+  for (const r of G.relics) if (r.state !== 'temple' && (G.revealAll || exploredAt(r.x, r.y))) { const [mx, my] = miniXY(r.x, r.y); mctx.fillStyle = '#c99aff'; mctx.fillRect(mx - 3, my - 3, 6, 6); mctx.strokeStyle = '#fff'; mctx.lineWidth = 1; mctx.strokeRect(mx - 3, my - 3, 6, 6); }
   if (Math.sin(G.time * 6) > -.2) for (const b of G.balls) if (b.state === 'ground' || b.state === 'carried') { const [mx, my] = miniXY(b.x, b.y); mctx.fillStyle = '#ff9a1e'; mctx.beginPath(); mctx.arc(mx, my, 4, 0, 7); mctx.fill(); mctx.strokeStyle = '#fff'; mctx.lineWidth = 1.5; mctx.stroke(); }
   for (const p of G.pings) { const k = (G.time - p.t) / 2.5; if (k > 1) continue; const [mx, my] = miniXY(p.x, p.y); mctx.strokeStyle = `rgba(255,90,95,${1 - k})`; mctx.lineWidth = 3; mctx.beginPath(); mctx.arc(mx, my, 6 + k * 22, 0, 7); mctx.stroke(); }
   if (G.objMarks) for (const p of G.objMarks) { const [mx, my] = miniXY(p.x, p.y); mctx.strokeStyle = '#ffe066'; mctx.lineWidth = 2; mctx.beginPath(); mctx.arc(mx, my, 6 + Math.sin(G.time * 4) * 2, 0, 7); mctx.stroke(); }
@@ -4278,10 +4764,10 @@ function pickAt(px, py, preferOwn) {
   for (const u of G.units) {
     if (u.garrison) continue;
     if (!G.revealAll && !isAlly(u.owner, G.me) && !visibleAt(u.x, u.y)) continue;
-    const L = unitLook(u), h = (L.r === 'ape' ? 90 : 34 * (L.scale || 1)) * cam.z, lift = ((u.lift || 0) * 30) * cam.z;
+    const L = unitLook(u), h = (L.r === 'ape' ? 90 : L.r === 'ship' ? 26 : 34 * (L.scale || 1)) * cam.z, lift = ((u.lift || 0) * 30) * cam.z;
     const ux = sx(u.x, u.y), uy = sy(u.x, u.y) - lift;
     const dx = px - ux, dy = py - (uy - h / 2);
-    const rw = Math.max(9, 11 * (L.scale || 1)) * cam.z, rh = h / 2 + 6 * cam.z;
+    const rw = (L.r === 'ship' ? 30 * (L.scale || 1) : Math.max(9, 11 * (L.scale || 1))) * cam.z, rh = h / 2 + 6 * cam.z;
     if (Math.abs(dx) <= rw && Math.abs(dy) <= rh) { const d = Math.hypot(dx, dy) - (preferOwn && u.owner === G.me ? 30 : 0); if (d < bd) { bd = d; best = u; } }
   }
   if (best) return best;
@@ -4296,6 +4782,7 @@ function pickAt(px, py, preferOwn) {
     if (px > bx - hw && px < bx + hw && py > top && py < by) return b;
   }
   for (const b of G.balls) if (b.state === 'ground' && (G.revealAll || visibleAt(b.x, b.y)) && Math.hypot(sx(b.x, b.y) - px, sy(b.x, b.y) - 6 * cam.z - py) < 14 * cam.z) return { kind: 'ball', ball: b, x: b.x, y: b.y };
+  for (const r of G.relics) if (r.state === 'ground' && (G.revealAll || exploredAt(r.x, r.y)) && Math.hypot(sx(r.x, r.y) - px, sy(r.x, r.y) - 10 * cam.z - py) < 16 * cam.z) return { kind: 'relic', relic: r, x: r.x, y: r.y };
   let rb = null, rd = 1e9;
   for (const r of G.ress) {
     if (!G.revealAll && !exploredAt(r.x, r.y)) continue;
@@ -4318,13 +4805,14 @@ function boxSelect(a, b, add) {
   const x0 = Math.min(a.sx, b.sx), x1 = Math.max(a.sx, b.sx), y0 = Math.min(a.sy, b.sy), y1 = Math.max(a.sy, b.sy);
   const inside = G.units.filter(u => u.owner === G.me && !u.garrison && (() => { const px = sx(u.x, u.y), py = sy(u.x, u.y) - 16 * cam.z - (u.lift || 0) * 30 * cam.z; return px >= x0 && px <= x1 && py >= y0 && py <= y1; })());
   if (!inside.length) { if (!add) selectEntities([], false); return; }
-  const mil = inside.filter(u => u.def.cls !== 'villager');
+  const mil = inside.filter(u => u.def.cls !== 'villager' && !u.def.fisher);
   selectEntities(mil.length && mil.length < inside.length ? mil : inside, add);
 }
 function selectSameType(u) {
   const list = G.units.filter(x => x.owner === G.me && x.key === u.key && !x.garrison && (() => { const px = sx(x.x, x.y), py = sy(x.x, x.y); return px > -20 && py > -20 && px < vw + 20 && py < vh + 20; })());
   selectEntities(list, false);
 }
+const P0team = () => humanP() ? humanP().team : -1;
 const ownSel = () => G.sel.filter(e => !e.dead && e.owner === G.me);
 const selUnits = () => ownSel().filter(e => e.kind === 'unit' && !e.garrison);
 const selBlds = () => ownSel().filter(e => e.kind === 'building');
@@ -4350,19 +4838,23 @@ function command(wx, wy, target, queued) {
     const ox = ((i % cols) - (cols - 1) / 2) * .9, oy = (Math.floor(i / cols) - (Math.ceil(n / cols) - 1) / 2) * .9; i++;
     const vill = u.def.cls === 'villager';
     let o = null;
-    if (target && target.kind === 'ball') {
-      if (u.def.cls === 'hero' && !u.carryBall && !units.some(x => x !== u && x.def.cls === 'hero' && x.order.type === 'pickup' && x.order.ball === target.ball.id)) o = { type: 'pickup', ball: target.ball.id };
+    if (target && target.kind === 'relic') {
+      if (u.def.cls === 'hero' && !u.carryBall && !u.carryRelic && !units.some(x => x !== u && x.def.cls === 'hero' && x.order.type === 'pickup' && x.order.relic === target.relic.id)) o = { type: 'pickup', relic: target.relic.id };
+      else o = { type: 'move', x: wx + ox, y: wy + oy, amove: isCombat(u) };
+    } else if (target && target.kind === 'ball') {
+      if (u.def.cls === 'hero' && !u.carryBall && !u.carryRelic && !units.some(x => x !== u && x.def.cls === 'hero' && x.order.type === 'pickup' && x.order.ball === target.ball.id)) o = { type: 'pickup', ball: target.ball.id };
       else o = { type: 'move', x: wx + ox, y: wy + oy, amove: isCombat(u) };
     } else if (target && target.kind === 'building' && isAlly(target.owner, G.me)) {
       const d = B[target.key];
       if (target.owner === G.me && vill && (!target.built || target.hp < maxHp(target))) o = { type: 'build', bid: target.id };
       else if (target.owner === G.me && target.built && d.farm && vill) o = { type: 'gather', rid: target.id, rtype: 'food' };
-      else if (target.built && d.vault && u.carryBall) o = { type: 'deposit', bid: target.id };
+      else if (target.built && d.vault && (u.carryBall || (u.carryRelic && target.owner === G.me))) o = { type: 'deposit', bid: target.id };
       else if (target.owner === G.me && target.built && target.key === 'temple' && vill && P.faction === 'earth') o = { type: 'meditate', bid: target.id };
       else if (target.owner === G.me && target.built && d.drop && vill && u.carryAmt > 0 && d.drop.includes(u.carry)) o = { type: 'return', rid: u.order.rid, rtype: u.carry };
       else if (target.built && d.garrison && G.altKey) o = { type: 'garrison', bid: target.id };
       else o = { type: 'move', x: wx + ox, y: wy + oy };
-    } else if (target && target.kind === 'res' && vill) o = { type: 'gather', rid: target.id, rtype: resType(target) };
+    } else if (target && target.kind === 'res' && ((vill && !RES_DEF[target.key].naval) || (u.def.fisher && RES_DEF[target.key].naval))) o = { type: 'gather', rid: target.id, rtype: resType(target) };
+    else if (target && target.kind === 'building' && u.def.fisher && target.owner === G.me && B[target.key].navalDrop && u.carryAmt > 0) o = { type: 'return', rid: u.order.rid, rtype: u.carry };
     else if (enemyT) {
       if (vill && target.kind === 'unit' && target.def.cls !== 'huntable' && target.owner !== 0) o = { type: 'attack', tid: target.id, forced: true };
       else o = { type: 'attack', tid: target.id, hunt: vill && target.kind === 'unit' && target.def.cls === 'huntable', forced: true };
@@ -4455,7 +4947,7 @@ function getCommands() {
   const heroes = units.filter(u => u.def.cls === 'hero');
   if (vills.length && vills.length === units.length) {
     const page = G.cmdPage === 'mil' ? 'mil' : 'main';
-    const eco = BUILD_MENU[P.faction].filter(k => ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'reactor', 'tower', 'wall', 'tc'].includes(k));
+    const eco = BUILD_MENU[P.faction].filter(k => ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'reactor', 'dock', 'tower', 'wall', 'tc'].includes(k));
     const mil = BUILD_MENU[P.faction].filter(k => !eco.includes(k));
     for (const k of page === 'main' ? eco : mil) {
       const d = B[k], why = buildCheck(P, k), c = bcost(k, P.faction);
@@ -4470,6 +4962,7 @@ function getCommands() {
   for (const h of heroes.slice(0, 2)) {
     if (canFly(h)) out.push({ id: 'fly-' + h.id, icon: cmdIcon(h.flying ? 'land' : 'fly'), hero: true, on: h.flying, name: h.flying ? `Land (${stats(h).name})` : `Take flight (${stats(h).name})`, desc: 'Flying ignores terrain and walls, +25% speed and −15% Hack armor, but costs 0.4 Ki per second.', run: () => toggleFlight(h) });
     if (stats(h).kaioken) out.push({ id: 'kaio-' + h.id, icon: cmdIcon('kaioken'), hero: true, on: h.kaio, name: h.kaio ? 'Release Kaio-ken' : 'Kaio-ken', desc: 'Doubles attack and speed but costs 5 HP per second. Ground only.', run: () => toggleKaioken(h) });
+    if (h.carryRelic) out.push({ id: 'dropr-' + h.id, icon: relicIcon((G.relics.find(r => r.id === h.carryRelic) || { key: 'powerpole' }).key, 52), hero: true, name: 'Drop relic', desc: 'Put the relic down here. Bring it to your Temple instead to get its bonus.', run: () => dropRelic(h) });
     if (h.carryBall) out.push({ id: 'drop-' + h.id, icon: cmdIcon('dropball'), hero: true, name: 'Drop Dragon Ball', desc: 'Put the Dragon Ball down here.', run: () => dropBall(h) });
   }
   if (units.some(isCombat)) out.push({ id: 'amove', icon: cmdIcon('amove'), on: G.targeting && G.targeting.type === 'amove', name: 'Attack-move', desc: 'Move and fight anything on the way. Key: A', run: () => { G.targeting = { type: 'amove' }; G.placing = null; } });
@@ -4598,8 +5091,9 @@ function singleInfo(e) {
     if (st.kiDrain) extra += `<div class="stat">Form upkeep: <b>−${st.kiDrain} Ki/s</b></div>`;
     if (e.ape) extra += `<div class="stat" style="color:#ffe9a8">Great Ape for ${Math.ceil(e.ape - G.time)}s</div>`;
     if (e.carryBall) { const b = G.balls.find(q => q.id === e.carryBall); extra += `<div class="stat" style="color:var(--zeni)">Carrying the ${b ? b.star : ''}-Star Dragon Ball</div>`; }
+    if (e.carryRelic) { const r = G.relics.find(q => q.id === e.carryRelic); if (r) extra += `<div class="stat" style="color:#d7b8ff">Carrying the ${esc(RELICS[r.key].name)}: ${esc(RELICS[r.key].desc)}</div>`; }
     if (e.carryAmt > .5) extra += `<div class="stat">Carrying <b>${Math.floor(e.carryAmt)}</b> ${RES_NAME[e.carry]}</div>`;
-    const cls = { villager: 'Villager', infantry: 'Infantry', ranged: 'Ranged', cavalry: 'Cavalry', siege: 'Siege', myth: 'Myth unit', hero: 'Hero', titan: 'Titan', guard: 'Guardian', huntable: 'Animal' }[e.def.cls] || '';
+    const cls = { ship: e.def.fisher ? 'Fishing ship' : { arrow: 'Arrow ship', hammer: 'Hammer ship', siege: 'Siege ship' }[e.def.ship] || 'Ship', villager: 'Villager', infantry: 'Infantry', ranged: 'Ranged', cavalry: 'Cavalry', siege: 'Siege', myth: 'Myth unit', hero: 'Hero', titan: 'Titan', guard: 'Guardian', huntable: 'Animal' }[e.def.cls] || '';
     return `<div class="sub">${esc(owner)} · ${cls}</div><h3>${esc(e.nick || (e.ape ? 'Great Ape' : st.name))}</h3><div class="hpbar"><i style="width:${clamp(e.hp / mh, 0, 1) * 100}%"></i></div><div class="stats"><span class="stat"><b>${Math.ceil(e.hp)}</b>/${Math.round(mh)} HP</span><span class="stat">Armor H ${Math.round(A[0] * 100)}% P ${Math.round(A[1] * 100)}% C ${Math.round(A[2] * 100)}%</span></div>${atk.length ? `<div class="stat">${atk.join(' · ')}</div>` : ''}${extra}`;
   }
   const b = e, d = B[b.key], P = G.players[b.owner];
@@ -4611,11 +5105,13 @@ function singleInfo(e) {
     if (b.research) h += `<div class="stat">Researching <b>${esc(TECH[b.research.key].name)}${b.research.patron ? ' (' + PATRONS[b.research.patron].name + ')' : ''}</b> ${Math.floor(b.research.progress * 100)}%</div><div class="hpbar prog"><i style="width:${b.research.progress * 100}%"></i></div>`;
     if (d.garrison) h += `<div class="stat">Garrison: <b>${b.garrisoned.length}</b> / ${d.garrison}</div>`;
     if (d.vault && G.balls.length) h += `<div class="stat">Dragon Balls inside: <b>${b.balls.length}</b> / 7</div>`;
+    if (b.key === 'temple') h += b.relics.length ? `<div class="stat">Relics (${b.relics.length}/${RELIC_CAP}): ${b.relics.map(id => { const r = G.relics.find(q => q.id === id); return r ? `<b style="color:#d7b8ff" title="${esc(RELICS[r.key].desc)}">${esc(RELICS[r.key].name)}</b>` : ''; }).join(', ')}</div>` : (G.relics.length ? '<div class="stat">No relics yet. Heroes can bring relics here for bonuses.</div>' : '');
     if (b.key === 'temple' && P.faction === 'earth') { const n = G.units.filter(u => u.owner === G.me && u.meditating && u.order.bid === b.id).length; h += `<div class="stat">Meditating: <b>${n}</b> (+${(Math.min(n, 10) * .18 * P.mods.kiRate).toFixed(2)} Ki/s)</div>`; }
     if (b.key === 'reactor') h += `<div class="stat">Generating <b>+${bmod(P, 'reactor', 'ki', .2).toFixed(2)} Ki/s</b></div>`;
-    if (b.key === 'wonder' && P.wonderSince && G.opts.victory === 'wonder') h += `<div class="stat">Victory in <b>${fmtTime(300 - (G.time - P.wonderSince))}</b></div>`;
+    if (b.key === 'wonder' && P.wonderSince && modeHas('wonder')) h += `<div class="stat">Victory in <b>${fmtTime(WONDER_TIME - (G.time - P.wonderSince))}</b></div>`;
     if (b.key === 'market') h += `<div class="stat">Rations ${P.market.food} Zeni · Alloy ${P.market.wood} Zeni (per 100)</div>`;
   } else h += `<div class="stat">${esc(d.desc)}</div>`;
+  if (b.key === 'korin' && G.koth) h += `<div class="stat">${G.koth.team ? `Held by ${G.koth.team === P0team() ? 'your team' : 'team ' + G.koth.team}: <b>${fmtTime(Math.max(0, KOTH_TIME - G.koth.held))}</b> left to victory` : 'Nobody holds the tower yet.'}</div>`;
   return h;
 }
 $('selbody').addEventListener('pointerdown', ev => {
@@ -4627,7 +5123,7 @@ $('selbody').addEventListener('pointerdown', ev => {
 // ---------- top bar, powers, objectives ----------
 let powSig = '';
 function updateHUD() {
-  const P = humanP(); if (!P) return;
+  const P = G.me ? humanP() : null; if (!P) return;
   $('r-food').textContent = Math.floor(P.res.food); $('r-wood').textContent = Math.floor(P.res.wood); $('r-gold').textContent = Math.floor(P.res.gold);
   $('r-ki').textContent = Math.floor(P.res.ki) + '/' + P.kiCap;
   const pop = $('r-pop'); pop.textContent = P.pop + '/' + P.popCap; pop.classList.toggle('full', P.pop >= P.popCap);
@@ -4668,9 +5164,9 @@ function updateHUD() {
   renderCommands();
   if (G.scn) renderObjectives();
   const wb = $('wonderbar');
-  const wonders = G.opts.victory === 'wonder' ? G.players.filter(Q => Q.id && !Q.defeated && Q.wonderSince) : [];
-  wb.hidden = !wonders.length;
-  if (wonders.length) wb.innerHTML = wonders.map(Q => `<div style="color:${pcol(Q.color)}">${esc(Q.name)}'s Wonder: ${fmtTime(300 - (G.time - Q.wonderSince))}</div>`).join('');
+  const timers = victoryTimers();
+  wb.hidden = !timers.length;
+  if (timers.length) wb.innerHTML = timers.map(t => `<div style="color:${pcol(t.color)}">${esc(t.label)}: ${fmtTime(Math.max(0, t.left))}</div>`).join('');
   const topB = $('top').getBoundingClientRect().bottom;
   if (Math.abs(topB - (G.toastTop || 0)) > 1) { G.toastTop = topB; document.documentElement.style.setProperty('--toast-top', Math.round(topB + 6) + 'px'); document.documentElement.style.setProperty('--obj-top', Math.round(topB + 6) + 'px'); }
 }
@@ -4734,6 +5230,7 @@ function clickAt(px, py, ev) {
   const hit = pickAt(px, py, true);
   const now = performance.now(), dbl = now - lastClick < 330 && hit && lastHit === hit;
   lastClick = now; lastHit = hit;
+  if (hit && hit.kind === 'relic') { const R = RELICS[hit.relic.key]; toast(`${R.name} (relic): ${R.desc} Right-click it with a hero, then bring it to your Temple.`, 'gold'); if (!(ev && ev.shiftKey)) selectEntities([], false); return; }
   if (hit && hit.kind !== 'ball') {
     if ((dbl || (ev && (ev.ctrlKey || ev.metaKey))) && hit.kind === 'unit' && hit.owner === G.me) selectSameType(hit);
     else if (ev && ev.shiftKey && hit.owner === G.me) { if (G.sel.includes(hit)) G.sel = G.sel.filter(s => s !== hit); else G.sel.push(hit); cmdSig = ''; }
@@ -4748,12 +5245,13 @@ function tapAt(px, py) {
   lastClick = now; lastHit = hit;
   const myUnits = selUnits();
   if (hit && hit.owner === G.me && hit.kind === 'building' && myUnits.length) {
-    const useful = myUnits.some(u => (u.def.cls === 'villager' && (!hit.built || hit.hp < maxHp(hit) || B[hit.key].farm || (hit.key === 'temple' && humanP().faction === 'earth') || (B[hit.key].drop && u.carryAmt > 0))) || (u.carryBall && B[hit.key].vault));
+    const useful = myUnits.some(u => (u.def.cls === 'villager' && (!hit.built || hit.hp < maxHp(hit) || B[hit.key].farm || (hit.key === 'temple' && humanP().faction === 'earth') || (B[hit.key].drop && u.carryAmt > 0))) || ((u.carryBall || u.carryRelic) && B[hit.key].vault));
     if (useful) { command(w.x, w.y, hit, false); return; }
   }
   if (hit && hit.owner === G.me && (hit.kind === 'unit' || hit.kind === 'building')) { if (dbl && hit.kind === 'unit') selectSameType(hit); else selectEntities([hit], false); return; }
   if (myUnits.length || selBlds().length) { command(w.x, w.y, hit, false); return; }
-  selectEntities(hit && hit.kind !== 'ball' ? [hit] : [], false);
+  if (hit && hit.kind === 'relic') { const R = RELICS[hit.relic.key]; toast(`${R.name} (relic): ${R.desc} A hero can carry it to your Temple.`, 'gold'); }
+  selectEntities(hit && hit.kind !== 'ball' && hit.kind !== 'relic' ? [hit] : [], false);
 }
 // minimap
 function miniPos(e) { const r = mini.getBoundingClientRect(); return miniToWorld((e.clientX - r.left) / r.width * mini.width, (e.clientY - r.top) / r.height * mini.height); }
@@ -4837,22 +5335,31 @@ $('how-body').innerHTML = `
 <ul><li>Tap a unit to select it, then tap the ground, an enemy or a resource to order it. Drag to scroll, pinch to zoom, and turn on <b>Box select</b> to drag-select a group.</li></ul>
 <h4>Economy</h4>
 <ul><li>Villagers gather <b>Rations</b> (hunting, Senzu bushes, farms), <b>Capsule Alloy</b> (trees) and <b>Zeni</b> (veins) and carry them to a Town Center, Granary (Rations) or Storehouse (Alloy, Zeni). Build drop sites close to what you gather.</li>
-<li>Houses give 10 population (up to 10 houses) and Town Centers 15. From the Namek Saga you can build more Town Centers, but only on <b>Settlements</b> (the white H circles).</li>
+<li>Houses give 10 population (up to 10 houses) and Town Centers 15, up to 300 in total. From the Namek Saga you can build more Town Centers, but only on <b>Settlements</b> (the white H circles).</li>
+<li><b>Docks</b> go on a shore next to deep water. Fishing boats catch giant fish (Rations) and bring them back to the Dock.</li>
 <li><b>Ki</b> is this game's Favor. Earth villagers meditate at Kami's Lookout, the Red Ribbon builds Bio-Reactors, and the Frieza Force earns it by fighting.</li></ul>
 <h4>Sagas and patrons</h4>
 <p>You pick a <b>major patron</b> at the start (like an Age of Mythology god). Each time you advance a Saga at the Town Center you choose one of two <b>minor patrons</b>. Each patron grants a one-time <b>god power</b> (left column), a myth unit at the Temple, and a special technology.</p>
+<p>Like Age of Mythology, each advance needs a building first: a <b>Temple</b> for the Namek Saga, an <b>Armory</b> for the Android Saga and a <b>Fortress</b> for the Buu Saga.</p>
 <h4>Units and counters</h4>
 <ul><li>Infantry beats cavalry, cavalry beats ranged units and siege, ranged units beat infantry, and siege wrecks buildings.</li>
 <li>Heroes deal 4× damage to myth units (2.5× to Titans). Myth units deal 2.5× damage to human soldiers but only half to heroes. Only heroes can carry Dragon Balls.</li>
 <li>Heroes such as Goku, Vegeta and Frieza can fly (0.4 Ki per second each). At 0 Ki everyone lands. Special attacks fire automatically.</li>
-<li>Garrison villagers in Town Centers, towers and fortresses to protect them and add more shots.</li></ul>
+<li>Garrison villagers in Town Centers, towers and fortresses to protect them and add more shots.</li>
+<li>Ships have their own triangle: <b>arrow ships</b> beat siege ships, <b>siege ships</b> beat hammer ships (and wreck coastal buildings), and <b>hammer ships</b> beat arrow ships. Melee soldiers cannot reach ships; ranged units, towers and flying heroes can.</li></ul>
 <h4>Dragon Balls</h4>
 <p>Seven balls lie at guarded camps. Bring them to your Temple (each one trickles Ki and Zeni). Hold all seven and the <b>Summon Shenron</b> power appears: wish for Immortality, Ultimate Wealth or Restored Youth. Then the balls turn to stone for 3 minutes and scatter again.</p>
+<h4>Relics</h4>
+<p>Purple-glowing relics (the Power Pole, Z Sword, Dragon Radar, Senzu Seed Pouch and more) lie around the map. Right-click one with a hero, then right-click your Temple. Each relic kept there gives a permanent bonus. If the Temple falls, its relics spill out.</p>
+<h4>Game modes</h4>
+<ul><li><b>Supremacy</b>: win by conquest, by keeping a Wonder for 10 minutes, or by holding every Settlement for 5 minutes. <b>Conquest</b>: destroy every enemy.</li>
+<li><b>Deathmatch</b>: start with 5000 of everything. <b>Lightning</b>: double speed. <b>Nomad</b>: no Town Center; claim a Settlement first.</li>
+<li><b>King of the Hill</b>: keep units around Korin's Tower, with no enemies there, for 5 minutes. <b>Sudden Death</b>: lose your last Town Center and you have 2 minutes to rebuild.</li></ul>
 <h4>Cheat codes</h4>
 <p>Press <kbd>Enter</kbd> during a game (phone: Menu, then <b>Enter a cheat code</b>): <b>CAPSULE CORP</b> (+1000 Rations, Alloy and Zeni), <b>KAMI'S BLESSING</b> (full Ki), <b>SENZU BEAN</b> (heal your units), <b>INSTANT TRANSMISSION</b> (reveal the map), <b>SEVEN STARS</b> (all Dragon Balls to your Temple), <b>OVER 9000</b> (strongest hero form), <b>HYPERBOLIC TIME CHAMBER</b> (finish all your construction, training and research).</p>`;
 
 // ---------- skirmish setup ----------
-const SK = store.get('skirmish', null) || { map: 'earth', victory: 'conquest', resources: 'standard', slots: [
+const SK = store.get('skirmish', null) || { map: 'earth', mode: 'supremacy', resources: 'standard', slots: [
   { who: 'you', faction: 'earth', major: 'kami', team: 1, diff: 'normal' },
   { who: 'ai', faction: 'rr', major: 'gero', team: 2, diff: 'normal' },
   { who: 'closed', faction: 'ff', major: 'frieza', team: 2, diff: 'normal' },
@@ -4862,11 +5369,16 @@ function segSet(id, attr, val) { for (const b of $(id).querySelectorAll('button'
 function openSkirmish() {
   const ms = $('s-map'); ms.innerHTML = '';
   for (const k in MAPS) { const b = document.createElement('button'); b.dataset.m = k; b.textContent = MAPS[k].name; b.title = MAPS[k].desc; b.addEventListener('click', () => { SK.map = k; segSet('s-map', 'm', k); }); ms.appendChild(b); }
-  segSet('s-map', 'm', SK.map); segSet('s-victory', 'v', SK.victory); segSet('s-res', 'r', SK.resources);
+  if (!MODES[SK.mode]) SK.mode = SK.victory === 'conquest' ? 'conquest' : 'supremacy';
+  if (!MAPS[SK.map]) SK.map = 'earth';
+  $('s-mode').innerHTML = Object.keys(MODES).map(k => opt(k, MODES[k].name, SK.mode)).join('');
+  modeDesc();
+  segSet('s-map', 'm', SK.map); segSet('s-res', 'r', SK.resources);
   renderSlots();
   showScreen('scr-skirmish');
 }
-for (const b of $('s-victory').querySelectorAll('button')) b.addEventListener('click', () => { SK.victory = b.dataset.v; segSet('s-victory', 'v', SK.victory); });
+function modeDesc() { const M = MODES[SK.mode]; $('s-mode-desc').textContent = M.desc; $('s-res').style.opacity = M.res ? .4 : 1; $('s-res').title = M.res ? 'This mode sets its own starting resources.' : ''; }
+$('s-mode').addEventListener('change', () => { SK.mode = $('s-mode').value; modeDesc(); });
 for (const b of $('s-res').querySelectorAll('button')) b.addEventListener('click', () => { SK.resources = b.dataset.r; segSet('s-res', 'r', SK.resources); });
 function opt(v, label, sel) { return `<option value="${v}"${v === sel ? ' selected' : ''}>${esc(label)}</option>`; }
 function renderSlots() {
@@ -4897,7 +5409,7 @@ $('s-start').addEventListener('click', () => {
   store.set('skirmish', SK);
   const players = [];
   SK.slots.forEach((s, i) => { if (s.who === 'closed') return; players.push({ faction: s.faction, major: s.major, team: s.team, ai: s.who === 'ai' ? s.diff : null, color: i + 1, name: s.who === 'you' ? 'You' : PATRONS[s.major].name }); });
-  launch({ kind: 'skirmish', opts: { map: SK.map, victory: SK.victory, resources: SK.resources, dragonBalls: true, players } });
+  launch({ kind: 'skirmish', opts: { map: SK.map, mode: SK.mode, resources: SK.resources, dragonBalls: true, players } });
 });
 function toastMenu(msg) { alertBox(msg); }
 function alertBox(msg) { const t = document.createElement('div'); t.className = 'toast warn'; t.textContent = msg; t.style.cssText = 'position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:50'; document.body.appendChild(t); setTimeout(() => t.remove(), 3500); }
@@ -4922,7 +5434,7 @@ function enterPlay() {
   cam.z = vw < 820 ? .72 : 1;
   if (tc) centerOn(tc.x, tc.y);
   if (!G.scn) {
-    toast('Gather resources, train an army and destroy your enemies. Press P for help.', 'gold');
+    toast(G.opts.mode === 'nomad' ? 'Nomad: lead your villagers to a Settlement (the white H circles, the nearest one is marked on the minimap) and build a Town Center. Press P for help.' : G.opts.mode === 'koth' ? "King of the Hill: hold Korin's Tower in the middle of the map for 5 minutes. Press P for help." : `${MODES[G.opts.mode] ? MODES[G.opts.mode].name + ': g' : 'G'}ather resources, train an army and destroy your enemies. Press P for help.`, 'gold');
     G.sel = G.units.filter(u => u.owner === G.me && u.def.cls === 'villager');
     if (P) setTimeout(() => G.started && !G.over && toast(P.faction === 'earth' ? "Tip: build Kami's Lookout early and send villagers to meditate for Ki." : P.faction === 'rr' ? 'Tip: Bio-Reactors make your Ki. Cell hatches in the Android Saga.' : 'Tip: the Frieza Force earns Ki by fighting. Hunt the Dragon Balls with Vegeta.', ''), 4000);
   }
@@ -5020,8 +5532,8 @@ function showEnd(won, reason) {
   const P = humanP();
   $('end-title').textContent = won ? 'Victory!' : 'Defeat';
   const sub = G.scn ? (won ? G.scn.m.win : (G.scn.loseReason || 'The mission has failed.'))
-    : won ? (reason === 'wonder' ? 'Your Wonder stood for five minutes. The universe is yours.' : 'Every enemy has fallen. Peace returns… for now.')
-    : reason === 'resign' ? 'You resigned.' : 'Your forces have been wiped out. Train harder and try again.';
+    : won ? ({ wonder: 'Your Wonder stood for ten minutes. The universe is yours.', settlements: 'You held every Settlement. Nobody can challenge you now.', koth: "You held Korin's Tower. The whole world bows to you." }[reason] || 'Every enemy has fallen. Peace returns… for now.')
+    : reason === 'resign' ? 'You resigned.' : ({ wonder: 'An enemy Wonder stood for ten minutes.', settlements: 'The enemy held every Settlement for five minutes.', koth: "The enemy held Korin's Tower for five minutes." }[reason] || 'Your forces have been wiped out. Train harder and try again.');
   $('end-sub').textContent = sub;
   const st = P ? [['Time', fmtTime(G.time)], ['Saga reached', AGES[P.age]], ['Enemies defeated', P.stats.kills], ['Buildings destroyed', P.stats.killedB], ['Units lost', P.stats.lost], ['Resources gathered', Math.round(P.stats.gathered)], ['Dragon Balls secured', P.stats.balls], ['Wishes made', P.stats.wishes]] : [];
   $('end-stats').innerHTML = st.map(([a, b]) => `<div class="frame"><b>${b}</b><span>${a}</span></div>`).join('');
@@ -5042,7 +5554,7 @@ function showEnd(won, reason) {
 }
 
 // =====================================================================
-// 14. CAMPAIGN: scenario engine, dialogue, objectives, seven missions
+// 14. CAMPAIGN: scenario engine, dialogue, objectives, nine missions
 // =====================================================================
 const SPEAKERS = {
   goku: ['Goku', () => FORMS.goku_base.look], gokussj: ['Goku', () => FORMS.goku_ssj1.look], piccolo: ['Piccolo', () => U.piccolo.look], krillin: ['Krillin', () => U.krillin.look],
@@ -5050,6 +5562,9 @@ const SPEAKERS = {
   vegeta: ['Vegeta', () => FORMS.vegeta_base.look], frieza: ['Frieza', () => FORMS.frieza_base.look], friezaf: ['Frieza', () => FORMS.frieza_final.look], kami: ['Kami', () => PATRON_LOOKS.kami],
   bulma: ['Bulma', () => PATRON_LOOKS.bulma], kingkai: ['King Kai', () => PATRON_LOOKS.kingkai], guru: ['Grand Elder Guru', () => ({ r: 'human', skin: '#6fbf4a', hair: 'none', antenna: true, top: '#f4f4f4', pants: '#f4f4f4', belt: '#ffcc33', build: 'bulky', keepColors: true })],
   dende: ['Dende', () => PATRON_LOOKS.dende], gero: ['Dr. Gero', () => PATRON_LOOKS.gero], a17: ['Android 17', () => U.a17.look], a18: ['Android 18', () => U.a18.look],
+  vegetassj: ['Vegeta', () => FORMS.vegeta_ssj.look], gokussj3: ['Goku', () => FORMS.goku_ssj3.look], supremekai: ['Supreme Kai', () => PATRON_LOOKS.supremekai],
+  babidi: ['Babidi', () => ({ r: 'human', skin: '#f0e2b8', hair: 'none', top: '#3a2a6a', pants: '#3a2a6a', belt: '#ffcc33', boots: '#5a3a1e', cape: '#5a2a8a', build: 'slim', keepColors: true })],
+  dabura: ['Dabura', () => U.ginyu.look], buu: ['Kid Buu', () => U.kidbuu.look],
   cell: ['Cell', () => FORMS.cell_perfect.look], dodoria: ['Dodoria', () => ({ r: 'brute' })], zarbon: ['Zarbon', () => PATRON_LOOKS.zarbon], blue: ['General Blue', () => U.blue.look],
 };
 // ---------- dialogue ----------
@@ -5066,8 +5581,8 @@ function showLine(l) {
   const c = $('dlg-portrait').getContext('2d'), L = sp[1]();
   c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, 152, 152);
   const g = c.createRadialGradient(76, 50, 6, 76, 76, 110); g.addColorStop(0, '#3a4a7a'); g.addColorStop(1, '#0b1124'); c.fillStyle = g; c.fillRect(0, 0, 152, 152);
-  const zoom = L.r === 'brute' ? 2.6 : 4.6;
-  c.save(); c.translate(68, L.r === 'brute' ? 160 : 214); c.scale(zoom, zoom); drawFigure(c, L, 'idle', 0, null); c.restore();
+  const zoom = L.r === 'brute' ? 2.6 : L.r === 'buu' ? 3.6 : 4.6;
+  c.save(); c.translate(68, L.r === 'brute' ? 160 : L.r === 'buu' ? 190 : 214); c.scale(zoom, zoom); drawFigure(c, L, 'idle', 0, null); c.restore();
   if (l.pause) { DLG.paused = true; G.paused = true; }
 }
 function nextLine() {
@@ -5164,7 +5679,7 @@ function makeScenario(m, diffKey) {
 }
 function startMission(idx, diffKey) {
   const m = CAMPAIGN[idx];
-  const opts = { map: m.biome, victory: 'conquest', resources: 'standard', dragonBalls: !!m.dragonBalls, players: m.players, seed: m.seed, campaign: idx };
+  const opts = { map: m.biome, mode: 'conquest', resources: 'standard', dragonBalls: !!m.dragonBalls, players: m.players, seed: m.seed, campaign: idx };
   resetState(opts);
   G.players = [gaiaPlayer()];
   m.players.forEach((p, i) => G.players.push(makePlayer(i + 1, Object.assign({ color: p.color || i + 1, team: p.team || i + 1 }, p))));
@@ -5571,7 +6086,133 @@ const CAMPAIGN = [
       S.when(() => G.players[1].stats.wishes > 0, () => S.setObj('shenron', 'done'));
     },
     check(S) { if (S.done('cell') && S.done('arena')) S.win(); lostCheck(S); },
-    win: 'Cell is gone. The Earth is at peace, protected by a new generation of heroes. Thank you for playing The Saga of the Dragon Balls!' },
+    win: 'Cell is gone. The Earth is at peace… for seven years. Then a wizard named Babidi lands on Earth.' },
+
+  { id: 'm8', saga: 'Buu Saga', title: "Babidi's Spaceship", biome: 'highlands', size: 96, seed: 808,
+    blurb: 'Destroy the wizard\'s ship before Majin Buu awakens.',
+    story: ['The wizard Babidi has landed his spaceship in the mountains. Inside sleeps Majin Buu, a monster that destroyed whole galaxies. Babidi feeds him the energy of every fight on Earth.', 'Dabura, the Demon King, guards the ship, and Babidi\'s spell can turn even the proudest warrior into his puppet. Strike fast: the longer the battle drags on, the closer Buu is to waking.'],
+    goals: ["Destroy Babidi's Spaceship before Buu's energy reaches 100%", 'Optional: defeat Dabura', 'Every unit you lose feeds Buu', 'Keep at least one Town Center or villager'],
+    cast: [['gokussj', 'gohan', 'piccolo'], ['babidi', 'dabura']],
+    players: [EARTH, { faction: 'ff', major: 'frieza', name: 'Babidi', team: 2, ai: 'normal', color: 3 }],
+    terrain(S) { S.nature({ ridges: 12, forests: 24, snow: true, keep: [[48, 82, 13], [46, 14, 17], [26, 48, 6], [70, 48, 6]] }); S.clear(48, 82, 10, T_ROAD); S.clear(46, 14, 13, T_DIRT); S.ridge([[8, 46], [30, 44]], 1.2); S.ridge([[62, 44], [88, 46]], 1.2); },
+    setup(S) {
+      S.tc(1, 48, 82); S.units('colonist', 1, 51, 85, 12); S.resAround(48, 82, { hunt: 'boar' });
+      for (const [k, x, y] of [['house', 42, 86], ['house', 54, 86], ['house', 40, 80], ['house', 57, 80], ['barracks', 40, 75], ['temple', 56, 75], ['stable', 59, 84], ['armory', 36, 84]]) S.bld(k, 1, x, y);
+      S.vars.goku = S.hero('goku', 1, 48, 74, 'goku_ssj1'); S.vars.gohan = S.hero('gohan', 1, 50, 74, 'gohan_base'); S.hero('piccolo', 1, 46, 74); S.hero('krillin', 1, 47, 72);
+      S.units('fighter', 1, 48, 70, 6); S.units('gunner', 1, 50, 69, 5); S.units('rider', 1, 46, 69, 3);
+      const P = G.players[1]; P.res = { food: 900, wood: 900, gold: 800, ki: 50 }; P.age = 3; P.minors = ['piccolo', 'kingkai']; P.techs.add('ssj1'); P.powers.beamcannon = { state: 'ready' }; P.powers.kaiosurge = { state: 'ready' }; recomputeMods(P);
+      const P2 = G.players[2];
+      S.vars.ship = S.bld('ship', 2, 44, 4); S.vars.ship.name = "Babidi's Spaceship";
+      S.vars.tc2 = S.tc(2, 48, 26); S.units('worker', 2, 46, 30, 12); S.resAround(48, 26, { hunt: 'boar' });
+      for (const k of ['house', 'house', 'house', 'house', 'barracks', 'barracks', 'granary', 'storehouse', 'tower', 'tower', 'temple', 'stable', 'armory']) S.bldNear(k, 2, S.vars.tc2, 4, 14);
+      P2.age = 3; P2.minors = ['dodoria', 'ginyu']; recomputeMods(P2); P2.res = { food: 800, wood: 800, gold: 800, ki: 60 };
+      S.vars.dabura = S.hero('ginyu', 2, 46, 14, null, 'Dabura'); S.vars.dabura.buffs.push({ until: 1e9, atk: 1.4 });
+      S.units('saiyan', 2, 44, 34, 6); S.units('soldier', 2, 50, 34, 6); S.units('brute', 2, 47, 36, 2);
+      S.ai(2, S.diffKey, { maxAge: 3, noExpand: true, noHunt: true, firstWave: { easy: 600, normal: 420, hard: 300 }[S.diffKey] });
+      S.maxAge = 4; S.lock('wonder');
+      ensureConnected({ x: 48, y: 82 }, [{ x: 48, y: 26 }, { x: 46, y: 12 }]);
+      S.vars.energy = 0;
+      S.onKill = (e, k) => { if (e.kind === 'unit' && e.owner === 1 && k && k.owner === 2) S.vars.energy += e.def.cls === 'hero' ? 4 : .5; };
+      S.obj('ship', "Destroy Babidi's Spaceship", { counter: () => `Buu ${Math.min(99, Math.floor(S.vars.energy))}%` });
+      S.obj('dabura', 'Defeat Dabura', { optional: true });
+      S.obj('vegeta', 'Break the spell on Vegeta', { hidden: true });
+    },
+    start(S) {
+      S.say('babidi', 'Papparapa! Fight, fight! Every drop of your energy goes to my Majin Buu!', { pause: true });
+      S.say('supremekai', 'Babidi\'s ship is on the mountain to the north. Destroy it before Buu is fully charged!');
+      S.say('kami', 'Advance to the Buu Saga (you need a Fortress) and Goku can learn Super Saiyan 3.');
+      S.mark(46, 8);
+      const rate = { easy: .075, normal: .1, hard: .125 }[S.diffKey];
+      S.every(1, () => { S.vars.energy += rate; });
+      S.when(() => S.vars.energy >= 50, () => S.say('babidi', 'Half full already! Keep fighting, keep fighting!'));
+      S.when(() => S.t > { easy: 480, normal: 360, hard: 300 }[S.diffKey] || (S.alive(S.vars.ship) && S.vars.ship.hp < maxHp(S.vars.ship) * .75), () => {
+        S.vars.mv = S.hero('vegeta', 2, 50, 12, 'vegeta_ssj', 'Majin Vegeta'); S.vars.mv.buffs.push({ until: 1e9, atk: 1.2 });
+        S.say('vegeta', 'Kakarot! Babidi\'s magic has freed me. Now we finish what we started.', { pause: true });
+        S.say('gokussj', 'Vegeta… you let him into your heart on purpose?!');
+        S.showObj('vegeta'); S.attack([S.vars.mv], 48, 78);
+        S.when(() => S.alive(S.vars.mv) && S.vars.mv.hp < maxHp(S.vars.mv) * .3, () => {
+          const v = S.vars.mv; v.owner = 1; v.nick = 'Vegeta'; v.hp = maxHp(v) * .7; v.buffs = []; idleOrder(v); G.sel = G.sel.filter(s => s !== v);
+          S.say('vegetassj', 'Enough… I am nobody\'s puppet. Babidi, your ship is mine to destroy!');
+          S.setObj('vegeta', 'done'); announce('Vegeta breaks free!');
+        });
+      });
+      S.when(() => !S.alive(S.vars.dabura), () => { S.setObj('dabura', 'done'); S.say('piccolo', 'The Demon King is down. Hit the ship!'); });
+      S.when(() => !S.alive(S.vars.ship), () => S.setObj('ship', 'done'));
+    },
+    check(S) {
+      if (S.done('ship')) S.win();
+      if (S.vars.energy >= 100 && !G.over) { S.setObj('ship', 'failed'); S.lose('Babidi collected enough energy. Majin Buu has awakened.'); }
+      lostCheck(S);
+    },
+    win: 'The ship is rubble, but in the dust a pink shape stirs. Majin Buu has escaped, and he is changing…' },
+
+  { id: 'm9', saga: 'Buu Saga', title: 'The Universal Spirit Bomb', biome: 'earth', size: 96, seed: 909,
+    blurb: 'Hold off Kid Buu while the Earth gathers its energy.',
+    story: ['Majin Buu has become Kid Buu, his pure and most dangerous form. He cannot be beaten by force: he regenerates from anything.', 'There is one hope. If enough people lend their energy to Kami\'s Lookout, Goku can throw the Universal Spirit Bomb. Keep villagers meditating, and keep Buu away from them.'],
+    goals: ['Fill the Spirit Bomb: keep villagers meditating at Kami\'s Lookout', 'Survive Kid Buu\'s rampages', 'Throw the Universal Spirit Bomb at Kid Buu', 'Keep at least one Town Center or villager'],
+    cast: [['gokussj', 'vegetassj', 'gohan'], ['buu']],
+    players: [EARTH, { faction: 'ff', major: 'frieza', name: 'Kid Buu', team: 2, ai: null, color: 3 }],
+    terrain(S) { S.nature({ lakes: 3, ridges: 6, forests: 22, dirt: true, keep: [[48, 66, 15], [48, 14, 8]] }); S.clear(48, 66, 11, T_ROAD); S.clear(48, 14, 6, T_DIRT); },
+    setup(S) {
+      S.tc(1, 48, 68); S.units('colonist', 1, 51, 71, 16); S.resAround(48, 68);
+      S.vars.temple = S.bld('temple', 1, 54, 60);
+      for (const [k, x, y] of [['house', 42, 72], ['house', 54, 72], ['house', 40, 66], ['house', 58, 66], ['house', 44, 76], ['barracks', 38, 60], ['stable', 60, 72], ['armory', 34, 70], ['fortress', 42, 56], ['tower', 50, 54], ['tower', 60, 56]]) S.bld(k, 1, x, y);
+      S.vars.goku = S.hero('goku', 1, 48, 60, 'goku_ssj1'); S.vars.vegeta = S.hero('vegeta', 1, 46, 60, 'vegeta_ssj', 'Vegeta'); S.vars.gohan = S.hero('gohan', 1, 50, 60, 'gohan_base'); S.hero('piccolo', 1, 52, 62);
+      S.units('fighter', 1, 46, 56, 6); S.units('gunner', 1, 50, 56, 6); S.units('rider', 1, 44, 58, 4);
+      const P = G.players[1]; P.res = { food: 1200, wood: 1000, gold: 1200, ki: 60 }; P.age = 4; P.minors = ['piccolo', 'kingkai', 'elderkai']; P.techs.add('ssj1');
+      P.powers.beamcannon = { state: 'ready' }; P.powers.kaiosurge = { state: 'ready' }; P.powers.potential = { state: 'ready' }; recomputeMods(P);
+      const P2 = G.players[2]; P2.age = 4;
+      S.vars.buu = S.units('kidbuu', 2, 48, 14, 1)[0]; S.vars.buu.home = { x: 48, y: 14 };
+      S.vars.buu.buffs.push({ until: 1e9, atk: { easy: .55, normal: .8, hard: 1 }[S.diffKey] });
+      S.lock('wonder', 'buu'); S.maxAge = 4;
+      ensureConnected({ x: 48, y: 68 }, [{ x: 48, y: 14 }]);
+      S.vars.spirit = 0;
+      S.obj('spirit', 'Gather energy for the Spirit Bomb', { counter: () => `${Math.min(100, Math.floor(S.vars.spirit))}%` });
+      S.obj('bomb', 'Throw the Universal Spirit Bomb at Kid Buu', { hidden: true });
+    },
+    start(S) {
+      S.say('buu', 'Hee hee hee! Boom! Boom! Everything goes boom!', { pause: true });
+      S.say('gokussj', "Everyone, I need your energy! Send villagers to meditate at Kami's Lookout. Vegeta, Gohan: we buy them time.");
+      S.say('kami', 'Right-click Kami\'s Lookout with villagers to meditate. The more of them, the faster the Spirit Bomb grows.');
+      const B0 = S.vars.buu;
+      let phase = 'rest';
+      const rampage = () => {
+        if (!S.alive(B0)) return false;
+        if (phase === 'rest') {
+          phase = 'attack';
+          const mine = G.blds.filter(b => b.owner === 1 && !b.dead);
+          const pick = S.vars.spirit > 40 && S.alive(S.vars.temple) && rnd() < .6 ? S.vars.temple : mine[Math.floor(rnd() * mine.length)];
+          if (pick) { fxPush({ type: 'flash', x: B0.x, y: B0.y, z: 20, t: 0, dur: .4, color: '#ff8fd0', r: 2 }); B0.x = pick.x + (rnd() - .5) * 8; B0.y = pick.y - 7; B0.px = B0.x; B0.py = B0.y; B0.path = null; S.attack([B0], pick.x, pick.y); S.say('buu', rnd() < .5 ? 'Found you!' : 'Buu is bored. Buu smashes!', { dur: 2.5 }); if (G.players[1].human) toast('Kid Buu is attacking!', 'warn'); }
+        } else {
+          phase = 'rest';
+          fxPush({ type: 'flash', x: B0.x, y: B0.y, z: 20, t: 0, dur: .4, color: '#ff8fd0', r: 2 });
+          B0.x = B0.home.x; B0.y = B0.home.y; B0.px = B0.x; B0.py = B0.y; idleOrder(B0); B0.hp = maxHp(B0);
+        }
+      };
+      S.after({ easy: 90, normal: 60, hard: 45 }[S.diffKey], () => { rampage(); S.every({ easy: 45, normal: 40, hard: 40 }[S.diffKey], rampage); });
+      S.every({ easy: 200, normal: 160, hard: 120 }[S.diffKey], () => { if (!S.alive(B0)) return false; S.wave(2, [['saibaman', 4 * S.d], ['brute', 1 * S.d]], 48, 18, 48, 64); });
+      S.every(1, () => {
+        let n = 0; for (const u of G.units) if (u.owner === 1 && u.meditating && u.order.type === 'meditate') n++;
+        S.vars.spirit += (.03 + Math.min(n, 20) * .028) * ({ easy: 1.3, normal: 1, hard: .85 }[S.diffKey]);
+        if (S.vars.spirit >= 100 && !S.vars.ready) {
+          S.vars.ready = true; S.setObj('spirit', 'done'); S.showObj('bomb');
+          G.players[1].powers.spiritbomb = { state: 'ready' }; powSig = '';
+          announce('The Spirit Bomb is ready!');
+          S.say('gokussj', 'Thank you, everyone! Use the Universal Spirit Bomb power on Kid Buu!', { pause: true });
+        }
+      });
+      S.when(() => S.vars.spirit >= 50, () => S.say('gohan', 'It\'s working! Half of the Earth is lending us its energy!'));
+      S.when(() => !S.alive(B0), () => { S.setObj('bomb', 'done'); S.setObj('spirit', 'done'); S.say('gokussj', "Goodbye, Buu. Come back as a good guy, okay? I'll be waiting."); });
+      S.every(2, () => {
+        if (!S.alive(B0)) return false;
+        const pw = G.players[1].powers.spiritbomb;
+        if (!S.vars.ready || !pw || pw.state !== 'used') { S.vars.missT = 0; return; }
+        if (!S.vars.missT) S.vars.missT = S.t;
+        else if (S.t - S.vars.missT > 6) { S.vars.missT = 0; G.players[1].powers.spiritbomb = { state: 'ready' }; powSig = ''; toast('The Spirit Bomb missed! The people of Earth lend their energy once more.', 'gold'); }
+      });
+    },
+    check(S) { if (S.done('bomb')) S.win(); lostCheck(S); },
+    win: 'Kid Buu is gone, and the universe is safe. Thank you for playing The Saga of the Dragon Balls!' },
 ];
 B.guru.trains.push('namekwarrior'); B.guru.drop = ['food', 'wood', 'gold']; B.guru.garrison = 10; B.guru.pop = 20;
 
@@ -5598,7 +6239,7 @@ function frame(now) {
       const ms = G.mouseScreen;
       if (ms && !drag && document.hasFocus() && !matchMedia('(hover: none)').matches) { const m = 12; if (ms.x < m) cam.x -= sp; if (ms.x > vw - m) cam.x += sp; if (ms.y < m) cam.y -= sp; if (ms.y > vh - m) cam.y += sp; }
       clampCam();
-      acc += real * G.speed;
+      acc += real * G.speed * (G.speedMul || 1);
       let n = 0;
       while (acc >= STEP && n < 12) { tick(STEP); acc -= STEP; n++; }
       if (n >= 12) acc = 0;
@@ -5626,7 +6267,7 @@ window.__DBH = {
   borrowAI: (secs, diff) => { const P = G.players[G.me]; initAI(P, diff || 'normal'); for (let t = 0; t < secs && !G.over; t += STEP) tick(STEP); P.ai = null; },
   launch: spec => launch(spec),
   toScreen: (x, y) => ({ x: sx(x, y), y: sy(x, y) }),
-  dev: () => ({ placeBuilding, spawnUnit, spawnNear, centerOn, castPower, applyTech, startTech, queueUnit, runCheat, refreshLists, CAMPAIGN, kill, setForm, maxHp, ballsHeld, setOrder, DLG, depositBall, quitToMenu }),
+  dev: () => ({ placeBuilding, spawnUnit, spawnNear, centerOn, castPower, applyTech, startTech, queueUnit, runCheat, refreshLists, CAMPAIGN, kill, setForm, maxHp, ballsHeld, setOrder, DLG, depositBall, quitToMenu, canPlace }),
 };
 
 })();

@@ -26,28 +26,43 @@ overwrite vanilla files and can sit next to other mods.
 design. It plays like Age of Mythology and runs in any modern browser, on desktop or
 phone. Open the file and pick **Campaign** or **Skirmish**.
 
-- **Campaign**: seven story missions from Raditz's landing to the Cell Games, with
-  briefings, objectives, character dialogue and scripted boss events (Great Ape Vegeta,
-  Frieza's final form, Goku and Gohan going Super Saiyan, Super Perfect Cell). Each win
-  unlocks the next mission. Easy, Normal and Hard difficulty.
-- **Skirmish**: 2 to 4 players with teams, against computer opponents, on four maps
-  (Earth, Planet Namek, Wasteland, Highlands). Win by conquest or by holding a Wonder.
+- **Campaign**: nine story missions across all four Sagas, from Raditz's landing to Kid
+  Buu. They have briefings, objectives, character dialogue and scripted boss events: Great
+  Ape Vegeta, Frieza's final form, Super Perfect Cell, Majin Vegeta, and the Universal
+  Spirit Bomb. Each win unlocks the next mission. Easy, Normal and Hard difficulty.
+- **Skirmish**: 2 to 4 players with teams, against computer opponents, on five maps:
+  Earth, Planet Namek, Wasteland, Highlands, and the Kame Sea (a naval map).
+- **Game modes** (the Age of Mythology set):
+  - **Supremacy**: win by conquest, a Wonder standing for 10 minutes, or a Town Center
+    on every Settlement for 5 minutes.
+  - **Conquest**: destroy every enemy.
+  - **Deathmatch**: Supremacy, but everyone starts with 5000 of each resource.
+  - **Lightning**: Supremacy at double speed.
+  - **Nomad**: no starting Town Center.
+  - **King of the Hill**: hold Korin's Tower for 5 minutes.
+  - **Sudden Death**: lose your last Town Center and you have 2 minutes to rebuild it.
 - **Three factions**:
   - **Earth Defenders**: Ki from villagers meditating at Kami's Lookout.
   - **Red Ribbon Army**: Ki from Bio-Reactors.
   - **Frieza Force**: Ki from fighting.
 
-  Each has its own villager, buildings, army, heroes with transformations, and myth
-  units.
+  Each has its own villager, buildings, army, ships, heroes with transformations, and
+  myth units.
 - **Age of Mythology rules**:
   - Four resources plus Ki.
   - Four Ages (Sagas). You pick a major patron at the start and a minor patron at each
     age-up; each patron unlocks myth units, technologies and a one-use god power.
-  - Town Centers only on Settlements; houses; walls and gates; garrisoning; market
-    trading; armory upgrades.
+  - Each age-up needs a building first: a Temple, then an Armory, then a Fortress.
+  - Up to 300 population. Town Centers only on Settlements; houses; walls and gates;
+    garrisoning; market trading; armory upgrades.
   - Counter triangle: infantry beats cavalry, cavalry beats ranged, ranged beats
     infantry. Heroes beat myth units.
   - Control groups, shift-queued orders and attack-move.
+- **Ships**: Docks, fishing boats that catch giant fish, and three warship types with
+  their own counter triangle. Arrow ships beat siege ships, siege ships beat hammer ships
+  and hammer ships beat arrow ships.
+- **Relics**: twelve Dragon Ball items, such as the Power Pole, Z Sword and Dragon
+  Radar. Only heroes can carry them. Each one kept in a Temple gives a permanent bonus.
 - **Dragon Balls**: seven guarded balls that only heroes can carry. Bring them all to
   your Temple to summon Shenron for one of three wishes.
 - **Cheat codes**: press Enter during a game (on a phone: Menu, then "Enter a cheat
@@ -67,8 +82,9 @@ Ball artwork.
 
 The source code is in `browser/src/`. Running `python3 browser/tools/build.py` rebuilds
 the HTML file. `browser/tools/` also has automated tests: `ai-test.cjs` plays
-computer-vs-computer games in Node, while `ui-test.cjs` and `campaign-test.cjs` click
-through the game in Playwright.
+computer-vs-computer games in Node (pass `"$(cat modes.json)"` or `navy.json` to try every
+game mode or the naval maps). `ui-test.cjs`, `features-test.cjs` and `campaign-test.cjs`
+click through the game in Playwright.
 
 ## Install and play
 

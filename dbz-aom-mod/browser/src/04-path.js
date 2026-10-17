@@ -8,8 +8,12 @@ function pathAlloc() { NN = MW * MH; gS = new Float32Array(NN); came = new Int32
 function hpush(i, f) { hpI.push(i); hpF.push(f); let k = hpI.length - 1; while (k > 0) { const p = (k - 1) >> 1; if (hpF[p] <= f) break; hpI[k] = hpI[p]; hpF[k] = hpF[p]; k = p; } hpI[k] = i; hpF[k] = f; }
 function hpop() { const top = hpI[0], li = hpI.pop(), lf = hpF.pop(), n = hpI.length; if (n > 0) { let k = 0; for (;;) { let c = 2 * k + 1; if (c >= n) break; if (c + 1 < n && hpF[c + 1] < hpF[c]) c++; if (hpF[c] >= lf) break; hpI[k] = hpI[c]; hpF[k] = hpF[c]; k = c; } hpI[k] = li; hpF[k] = lf; } return top; }
 const octile = (ax, ay, bx, by) => { const dx = Math.abs(ax - bx), dy = Math.abs(ay - by); return Math.max(dx, dy) + .4142 * Math.min(dx, dy); };
-// A tile blocks a team unless it is that team's gate.
-const blocked = (i, team) => { const b = G.map.block[i]; return b !== 0 && !(b === 5 && G.map.gate[i] === team); };
+// A tile blocks a team unless it is that team's gate. Ships move with the special team NAVAL:
+// they need water (deep or shallow) with no building, deposit or decoration on it.
+const NAVAL = -9;
+const navBlocked = i => { const t = G.map.terr[i]; if (t !== T_WATER && t !== T_SHALLOW) return true; const b = G.map.block[i]; return b !== 0 && b !== 1; };
+const blocked = (i, team) => { if (team === NAVAL) return navBlocked(i); const b = G.map.block[i]; return b !== 0 && !(b === 5 && G.map.gate[i] === team); };
+const moveTeam = u => u.def.naval ? NAVAL : teamOf(u.owner);
 function astar(sx0, sy0, isGoal, gx, gy, team, maxExp) {
   sid++; hpI.length = 0; hpF.length = 0;
   if (G.prof) G.prof.astar++;
@@ -48,6 +52,7 @@ function smoothPath(pts, team) {
 }
 // ---------- connected regions: lets units skip targets they can never walk to ----------
 function computeRegions() {
+  computeNavRegions();
   const n = MW * MH, R = G.region && G.region.length === n ? G.region : (G.region = new Int32Array(n));
   R.fill(0); let id = 0; const st = [];
   for (let i = 0; i < n; i++) {
@@ -63,30 +68,48 @@ function computeRegions() {
   }
   G.regionDirty = false; G.regionT = G.time; G.regionVer = (G.regionVer || 0) + 1;
 }
-function regionAt(x, y) {
+// Connected bodies of navigable water, with their sizes (for docks, fish and the AI).
+function computeNavRegions() {
+  const n = MW * MH, R = G.nregion && G.nregion.length === n ? G.nregion : (G.nregion = new Int32Array(n));
+  R.fill(0); G.nregionSize = [0]; let id = 0; const st = [];
+  for (let i = 0; i < n; i++) {
+    if (R[i] || navBlocked(i)) continue;
+    id++; R[i] = id; st.push(i); let size = 0;
+    while (st.length) {
+      const c = st.pop(), cx = c % MW, cy = (c / MW) | 0; size++;
+      for (let k = 0; k < 4; k++) { const nx = cx + DX[k], ny = cy + DY[k]; if (nx < 0 || ny < 0 || nx >= MW || ny >= MH) continue; const j = idx(nx, ny); if (!R[j] && !navBlocked(j)) { R[j] = id; st.push(j); } }
+    }
+    G.nregionSize[id] = size;
+  }
+}
+function regionAt(x, y, naval) {
+  const RG = naval ? G.nregion : G.region;
   const tx = clamp(Math.floor(x), 0, MW - 1), ty = clamp(Math.floor(y), 0, MH - 1);
-  let r = G.region[idx(tx, ty)]; if (r) return r;
-  for (let d = 1; d <= 3; d++) for (let yy = ty - d; yy <= ty + d; yy++) for (let xx = tx - d; xx <= tx + d; xx++) if (inMap(xx, yy) && (r = G.region[idx(xx, yy)])) return r;
+  let r = RG[idx(tx, ty)]; if (r) return r;
+  for (let d = 1; d <= 3; d++) for (let yy = ty - d; yy <= ty + d; yy++) for (let xx = tx - d; xx <= tx + d; xx++) if (inMap(xx, yy) && (r = RG[idx(xx, yy)])) return r;
   return 0;
 }
 // Regions touching an entity's footprint (cached per region version).
-function regionsOf(e) {
-  if (e.kind === 'unit') return [regionAt(e.x, e.y)];
-  if (e.reg && e.reg.v === G.regionVer) return e.reg.list;
+function regionsOf(e, naval) {
+  if (e.kind === 'unit') return [regionAt(e.x, e.y, naval)];
+  const key = naval ? 'nreg' : 'reg';
+  if (e[key] && e[key].v === G.regionVer) return e[key].list;
+  const RG = naval ? G.nregion : G.region;
   const list = [], x0 = e.tx - 1, y0 = e.ty - 1, x1 = e.tx + (e.w || 1), y1 = e.ty + (e.h || 1);
-  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { if (!inMap(x, y)) continue; const r = G.region[idx(x, y)]; if (r && !list.includes(r)) list.push(r); }
-  e.reg = { v: G.regionVer, list };
+  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { if (!inMap(x, y)) continue; const r = RG[idx(x, y)]; if (r && !list.includes(r)) list.push(r); }
+  e[key] = { v: G.regionVer, list };
   return list;
 }
 function reachable(u, e) {
   if (u.flying || !G.region) return true;
-  const r = regionAt(u.x, u.y);
-  return !r || regionsOf(e).includes(r);
+  const nav = !!u.def.naval, r = regionAt(u.x, u.y, nav);
+  if (nav && e.kind === 'unit' && !e.def.naval && !e.flying) { const t = regionAt(e.x, e.y, true); return !!t && t === r; }
+  return !r || regionsOf(e, nav).includes(r);
 }
-function reachablePt(u, x, y) { if (u.flying || !G.region) return true; const a = regionAt(u.x, u.y), b = regionAt(x, y); return !a || !b || a === b; }
+function reachablePt(u, x, y) { if (u.flying || !G.region) return true; const nav = !!u.def.naval, a = regionAt(u.x, u.y, nav), b = regionAt(x, y, nav); return !a || !b || a === b; }
 function startTile(u, team) {
   let sx0 = clamp(Math.floor(u.x), 0, MW - 1), sy0 = clamp(Math.floor(u.y), 0, MH - 1);
-  if (blocked(idx(sx0, sy0), team)) { const f = freeTileNear(sx0, sy0, 6); if (f) { sx0 = f.x; sy0 = f.y; } }
+  if (blocked(idx(sx0, sy0), team)) { const f = freeTileNear(sx0, sy0, 6, false, team); if (f) { sx0 = f.x; sy0 = f.y; } }
   return [sx0, sy0];
 }
 // Path to a point. Returns false when out of path budget this tick.
@@ -97,10 +120,10 @@ function goTo(u, x, y) {
   if (G.pathBudget <= 0) { u.wantPath = true; return false; }
   if (!reach) u.unreachT = G.time;
   G.pathBudget--; u.wantPath = false; u.lastRepath = G.time;
-  const team = teamOf(u.owner);
+  const team = moveTeam(u);
   const [sx0, sy0] = startTile(u, team);
   let gx = clamp(Math.floor(x), 0, MW - 1), gy = clamp(Math.floor(y), 0, MH - 1), exact = true;
-  if (blocked(idx(gx, gy), team)) { const f = freeTileNear(gx, gy, 8); if (f) { gx = f.x; gy = f.y; exact = false; } }
+  if (blocked(idx(gx, gy), team)) { const f = freeTileNear(gx, gy, 8, false, team); if (f) { gx = f.x; gy = f.y; exact = false; } }
   const tiles = astar(sx0, sy0, (cx, cy) => cx === gx && cy === gy, gx, gy, team, 14000);
   const pts = [{ x: u.x, y: u.y }];
   for (let i = 1; i < tiles.length; i++) pts.push({ x: (tiles[i] % MW) + .5, y: ((tiles[i] / MW) | 0) + .5 });
@@ -118,7 +141,7 @@ function goToEnt(u, e) {
   if (G.pathBudget <= 0) { u.wantPath = true; return false; }
   if (!reach) u.unreachT = G.time;
   G.pathBudget--; u.wantPath = false; u.lastRepath = G.time;
-  const team = teamOf(u.owner);
+  const team = moveTeam(u);
   const [sx0, sy0] = startTile(u, team);
   let x0, y0, x1, y1;
   if (e.kind === 'building' || e.kind === 'res' || e.kind === 'deco') { x0 = e.tx; y0 = e.ty; x1 = e.tx + (e.w || 1) - 1; y1 = e.ty + (e.h || 1) - 1; } else { x0 = x1 = Math.floor(e.x); y0 = y1 = Math.floor(e.y); }
@@ -146,7 +169,7 @@ function stepMove(u, dt) {
 // Straight-line steering for the last few steps (and for flyers).
 function steerTo(u, x, y, dt) {
   const dx = x - u.x, dy = y - u.y, d = Math.hypot(dx, dy) || 1, step = Math.min(d, moveSpeed(u) * dt);
-  const nx = u.x + dx / d * step, ny = u.y + dy / d * step, team = teamOf(u.owner);
+  const nx = u.x + dx / d * step, ny = u.y + dy / d * step, team = moveTeam(u);
   if (u.flying || walkableAt(nx, ny, team)) { u.x = nx; u.y = ny; }
   else if (walkableAt(nx, u.y, team)) u.x = nx;
   else if (walkableAt(u.x, ny, team)) u.y = ny;

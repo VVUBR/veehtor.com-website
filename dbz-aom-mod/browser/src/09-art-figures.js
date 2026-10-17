@@ -356,8 +356,60 @@ function drawBuu(c, pose, f) {
   limb(c, 4, -21, hand[0], hand[1], 4, pink); blob(c, hand[0], hand[1], 2.8, 2.8, '#f4c430');
 }
 const LOOK_SCALE = l => (l.scale || 1);
+// Ships, side view facing right, waterline at y = 0.
+const SHIP_STYLE = {
+  earth: { hull: '#f2f0e8', deck: '#d9cfb5', trim: '#ff8a1e', glass: '#7fd4ff', dark: '#3a4a5a' },
+  rr: { hull: '#6d737c', deck: '#5b6b52', trim: '#d33a3a', glass: '#ffd166', dark: '#2a2e33' },
+  ff: { hull: '#efe9f7', deck: '#8a5ad8', trim: '#8a5ad8', glass: '#7dff9c', dark: '#3a2a5a' },
+};
+function drawShip(c, L, pose, f, pc) {
+  const S = SHIP_STYLE[L.style] || SHIP_STYLE.earth, team = pc != null ? pcol(pc) : S.trim, k = L.kind;
+  const bob = pose === 'walk' ? (f % 2 ? -1 : 0) : 0, lunge = pose === 'atk' && f === 1 ? 4 : 0, fire = pose === 'shoot' && f === 1;
+  c.save(); c.translate(lunge, bob);
+  const len = { fish: 22, arrow: 30, hammer: 31, siege: 36 }[k] || 30;
+  if (L.style === 'ff') {
+    // hover saucer: glow on the water, disc hull, bubble canopy
+    c.fillStyle = 'rgba(120,255,220,.35)'; c.beginPath(); c.ellipse(0, 1, len * .9, 4, 0, 0, 7); c.fill();
+    blob(c, 0, -9, len, 7, S.hull); blob(c, 0, -7, len * .92, 3.2, S.deck);
+    c.fillStyle = team; c.fillRect(-len * .7, -11, len * 1.4, 2.4);
+    if (k === 'hammer') poly(c, [[len - 3, -12], [len + 13, -8], [len - 3, -4]], '#c9c9d6');
+    blob(c, -4, -16, 8, 6, 'rgba(160,255,200,.75)');
+    if (k === 'arrow') for (const x of [-12, 10]) { blob(c, x, -15, 3.4, 3, S.dark); limb(c, x, -16, x + 8, -18, 1.8, '#2a2a2a'); }
+    if (k === 'siege') { blob(c, 8, -19, 7, 6, S.deck); blob(c, 14, -20, 3.4, 3.4, '#ff8a3a'); }
+    if (k === 'fish') { limb(c, 6, -12, 16, -24, 1.6, '#c9c9d6'); c.strokeStyle = 'rgba(230,230,200,.8)'; c.lineWidth = .8; for (let i = 0; i < 4; i++) { c.beginPath(); c.moveTo(16, -24); c.lineTo(12 + i * 3, -6); c.stroke(); } }
+  } else {
+    const deckY = k === 'fish' ? -9 : -12;
+    const bow = L.style === 'rr' ? [[len, deckY], [len + 8, deckY - 3], [len - 2, 0]] : [[len, deckY], [len + 10, deckY - 4], [len + 2, -2]];
+    poly(c, [[-len, deckY], ...bow, [-len + 4, 0]], S.hull);
+    c.fillStyle = team; c.beginPath(); c.moveTo(-len + 1, -4); c.lineTo(len + 3, -4); c.lineTo(len + 2, -2); c.lineTo(-len + 3, -2); c.closePath(); c.fill();
+    c.fillStyle = S.deck; c.fillRect(-len + 1, deckY - 1.5, len * 2, 2.5);
+    if (k === 'fish') {
+      rrect(c, -12, deckY - 10, 12, 10, L.style === 'earth' ? 5 : 1.5, S.hull); c.fillStyle = S.glass; c.fillRect(-9, deckY - 7, 6, 3);
+      limb(c, 6, deckY, 6, deckY - 22, 1.6, '#8a6a42'); limb(c, 6, deckY - 20, 18, deckY - 10, 1.2, '#8a6a42');
+      c.strokeStyle = 'rgba(230,230,200,.8)'; c.lineWidth = .8; for (let i = 0; i < 4; i++) { c.beginPath(); c.moveTo(18, deckY - 10); c.lineTo(14 + i * 3, 0); c.stroke(); }
+    } else {
+      const ch = k === 'siege' ? 14 : 11;
+      rrect(c, -16, deckY - ch, 16, ch, L.style === 'earth' ? 6 : 1.5, S.hull);
+      for (let i = 0; i < 3; i++) { c.fillStyle = S.glass; c.fillRect(-13 + i * 4.5, deckY - ch + 3, 3, 3); }
+      if (L.style === 'earth') blob(c, -8, deckY - ch - 1, 6, 3, S.trim);
+      else rrect(c, -14, deckY - ch - 4, 6, 4, 1, S.dark);
+      if (k === 'arrow') for (const x of [8, 20]) { blob(c, x, deckY - 3, 4, 3.4, S.dark); limb(c, x, deckY - 4, x + 9, deckY - 7, 2, '#2a2a2a'); if (fire) blob(c, x + 11, deckY - 8, 3, 3, '#ffe066'); }
+      if (k === 'hammer') { poly(c, [[len + 4, deckY + 1], [len + 18, -5], [len + 2, -1]], '#b8bec8'); for (const x of [-4, 6, 16]) rrect(c, x, deckY - 5, 7, 5, 1, shade(S.hull, -.2)); }
+      if (k === 'siege') {
+        rrect(c, 4, deckY - 12, 16, 12, 3, S.dark);
+        if (L.style === 'rr') { for (let i = 0; i < 3; i++) { rrect(c, 6 + i * 4.5, deckY - 20, 3.4, 9, 1, '#e8e8e8'); blob(c, 7.7 + i * 4.5, deckY - 21, 1.7, 1.7, '#d33a3a'); } }
+        else { limb(c, 14, deckY - 7, 32 - (fire ? 3 : 0), deckY - 13, 4.6, '#2a2a2a'); if (fire) blob(c, 34, deckY - 14, 4, 4, '#ffb347'); }
+      }
+    }
+  }
+  // the hull sits in the water
+  c.fillStyle = 'rgba(70,140,190,.4)'; c.fillRect(-len - 4, -1.2, len * 2 + 20, 5);
+  c.strokeStyle = 'rgba(255,255,255,.55)'; c.lineWidth = 1; c.beginPath(); c.moveTo(-len - 2, -1); c.lineTo(len + 10, -1); c.stroke();
+  c.restore();
+}
 function figureBox(L) {
   const s = LOOK_SCALE(L), r = L.r;
+  if (r === 'ship') return [150, 86, 72, 62];
   if (r === 'ape') return [96, 110, 48, 102];
   if (r === 'mech' && L.kind === 'pirate') return [70, 80, 34, 74];
   if (r === 'brute') return [60, 60, 28, 56];
@@ -372,6 +424,7 @@ function drawFigure(c, L, pose, f, pc) {
     case 'human': drawHuman(c, L, p, f, pc); break;
     case 'mech': drawMech(c, L, p, f, pc); break;
     case 'vehicle': drawVehicle(c, L, p, f, pc); break;
+    case 'ship': drawShip(c, L, p, f, pc); break;
     case 'beast': drawBeast(c, L, p, f); break;
     case 'saiba': drawSaiba(c, p, f, pc); break;
     case 'brute': drawBrute(c, p, f, pc); break;

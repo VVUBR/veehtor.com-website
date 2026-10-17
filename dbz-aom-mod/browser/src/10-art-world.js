@@ -151,13 +151,37 @@ function drawBuildingArt(c, key, fac, pc, w, h) {
     case 'lab': isoBox(c, m, m, W, Hh, 0, 16, '#6d737c'); isoDome(c, w / 2, h / 2, 1.5, 16, 34, '#9aa0a8'); isoBox(c, .5, h - 1.3, 1.3, h - .3, 0, 24, '#5d636e'); emblem(c, w / 2 + 1.2, h / 2 + 1.2, 18, 'RR', '#fff', '#d33a3a'); { const [px, py] = ip(w / 2, h / 2, 50); c.fillStyle = 'rgba(120,255,140,.7)'; c.beginPath(); c.arc(px, py, 5, 0, 7); c.fill(); } break;
     case 'ship': { const [px, py] = ip(w / 2, h / 2, 0); c.fillStyle = 'rgba(0,0,0,.25)'; c.beginPath(); c.ellipse(px, py, 150, 64, 0, 0, 7); c.fill(); for (const [x, y] of [[1, 4], [4, 1], [4, 4], [1, 1]]) isoBox(c, x - .1, y - .1, x + .1, y + .1, 0, 26, '#8a8f98'); isoEllipse(c, w / 2, h / 2, 2.5, 26, '#e6e1ee', '#8a8f98'); isoDome(c, w / 2, h / 2, 2.4, 26, 22, '#efeaf6'); isoDome(c, w / 2, h / 2, 1, 44, 16, '#d7d0e6'); for (let i = 0; i < 10; i++) { const a = i / 10 * 6.28, [qx, qy] = ip(w / 2 + Math.cos(a) * 2.3, h / 2 + Math.sin(a) * 2.3, 28); c.fillStyle = '#ff7ad8'; c.beginPath(); c.arc(qx, qy, 2.2, 0, 7); c.fill(); } break; }
     case 'guru': isoCyl(c, w / 2, h / 2, 1.3, 0, 14, '#eef4e8'); isoDome(c, w / 2, h / 2, 1.3, 14, 30, '#eef4e8'); isoCyl(c, w / 2 + 1, h / 2 - .6, .35, 0, 46, '#eef4e8'); isoDome(c, w / 2 + 1, h / 2 - .6, .35, 46, 10, '#eef4e8'); winS(c, w / 2 - .2, h / 2 + 1.25, 4, .4, 8, '#3f6f8f'); break;
+    case 'dock': {
+      const plank = fac === 'rr' ? '#5d636e' : fac === 'ff' ? '#b6aecb' : '#a8763c';
+      isoBox(c, .1, .1, w - .1, h - .1, 0, 6, plank);
+      for (let i = 0; i < 5; i++) { const y = .35 + i * .55; isoPoly(c, [[.15, y, 6.2], [w - .15, y, 6.2], [w - .15, y + .05, 6.2], [.15, y + .05, 6.2]], shade(plank, -.25), false); }
+      for (const [x, y] of [[.2, .2], [w - .2, .2], [w - .2, h - .2], [.2, h - .2]]) isoCyl(c, x, y, .12, 0, 12, shade(plank, -.3));
+      isoBox(c, .3, .3, 1.3, 1.3, 6, 22, fac === 'earth' ? A.wall : A.wall); isoRoof(c, .25, .25, 1.35, 1.35, 22, 8, A.roof);
+      // crane
+      isoCyl(c, w - .7, .7, .14, 6, 44, fac === 'rr' ? '#d33a3a' : fac === 'ff' ? '#8a5ad8' : '#ff8a1e');
+      { const a = ip(w - .7, .7, 44), b = ip(w - .7, h - .4, 40); c.strokeStyle = fac === 'rr' ? '#d33a3a' : fac === 'ff' ? '#8a5ad8' : '#ff8a1e'; c.lineWidth = 3; c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke(); c.lineWidth = 1; c.strokeStyle = '#333'; c.beginPath(); c.moveTo(b[0], b[1]); c.lineTo(b[0], b[1] + 18); c.stroke(); }
+      isoBox(c, 1.6, 1.8, 2.2, 2.4, 6, 11, fac === 'earth' ? '#3c78c8' : '#5b6b52');
+      flag(c, .5, .5, 30, team, 16);
+      break;
+    }
+    case 'korin': {
+      // Korin's Tower: a white stone pillar with Korin's sanctuary on top
+      isoCyl(c, w / 2, h / 2, 1.45, 0, 7, '#bdb39b'); isoCyl(c, w / 2, h / 2, 1.05, 7, 12, '#d8cfb6');
+      isoCyl(c, w / 2, h / 2, .55, 12, 176, '#efe8d6');
+      for (const z of [40, 80, 120, 160]) isoCyl(c, w / 2, h / 2, .6, z, z + 4, '#c98a3a');
+      isoCyl(c, w / 2, h / 2, 1.25, 176, 184, '#d9cfb5'); isoCyl(c, w / 2, h / 2, 1.05, 184, 196, '#efe8d6');
+      for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2, x = w / 2 + Math.cos(a) * .9, y = h / 2 + Math.sin(a) * .9; if (Math.sin(a) + Math.cos(a) > -.3) winS(c, x, y, 186, .18, 7, '#4a6fa5'); }
+      isoDome(c, w / 2, h / 2, 1.0, 196, 22, '#c9884a'); isoCyl(c, w / 2, h / 2, .08, 216, 232, '#ffd34d');
+      const [gx, gy] = ip(w / 2, h / 2, 234); c.fillStyle = '#ffd34d'; c.beginPath(); c.arc(gx, gy, 3.5, 0, 7); c.fill();
+      break;
+    }
     case 'hut': isoBox(c, m, m, W, Hh, 0, 14, '#d8c9a8'); isoRoof(c, m - .1, m - .1, W + .1, Hh + .1, 14, 16, '#a0572e'); winS(c, .6, Hh, 0, .45, 9, '#5a3a1e'); break;
     default: isoBox(c, m, m, W, Hh, 0, 20, A.wall);
   }
 }
 function buildingSprite(key, fac, pc) {
   const d = B[key], w = d.w, h = d.h;
-  const top = { tc: 100, wonder: 170, tower: 90, fortress: 110, temple: 80, ship: 90, lab: 70 }[key] || 70;
+  const top = { tc: 100, wonder: 170, tower: 90, fortress: 110, temple: 80, ship: 90, lab: 70, korin: 250, dock: 70 }[key] || 70;
   const W = (w + h) * HTW + 8, Hh = (w + h) * HTH + top + 6;
   return sprite(`B|${key}|${fac}|${pc}`, W, Hh, h * HTW + 4, top, c => drawBuildingArt(c, key, fac, pc, w, h));
 }
@@ -226,7 +250,44 @@ function goldSprite(biome) {
   });
 }
 function berrySprite() { return sprite('BERRY', 34, 28, 17, 18, c => { c.fillStyle = 'rgba(0,0,0,.2)'; c.beginPath(); c.ellipse(2, 2, 13, 5, 0, 0, 7); c.fill(); blob(c, 0, -5, 12, 9, '#2f7a34'); blob(c, -3, -8, 7, 5, '#4fa850'); c.fillStyle = '#c8f59a'; for (let i = 0; i < 6; i++) { c.beginPath(); c.ellipse(-7 + i * 2.8, -4 + (i % 2 ? 2 : -2), 1.6, 2.4, .4, 0, 7); c.fill(); } }); }
+function fishSprite(v) {
+  return sprite('FISH' + (v > .5 ? 1 : 0), 44, 26, 22, 14, c => {
+    c.fillStyle = 'rgba(20,50,80,.35)'; c.beginPath(); c.ellipse(0, 0, 14, 5, 0, 0, 7); c.fill();
+    const col = v > .5 ? '#5a8fb0' : '#6aa38a';
+    c.fillStyle = col; c.beginPath(); c.ellipse(-1, 0, 9, 3.4, 0, 0, 7); c.fill();
+    c.beginPath(); c.moveTo(7, 0); c.lineTo(13, -4); c.lineTo(13, 4); c.closePath(); c.fill();
+    c.fillStyle = 'rgba(255,255,255,.5)'; c.beginPath(); c.ellipse(-4, -1, 3, 1, 0, 0, 7); c.fill();
+  });
+}
 function carcassSprite() { return sprite('MEAT', 34, 22, 17, 12, c => { blob(c, 0, 0, 11, 5, '#8a4a2a', .2); c.strokeStyle = '#f2e6cf'; c.lineWidth = 2; for (let i = -1; i <= 1; i++) { c.beginPath(); c.moveTo(i * 4, -4); c.lineTo(i * 4 + 1, 4); c.stroke(); } }); }
+// Relic items, drawn around (0,0) at about 22 px.
+const RELIC_ART = {
+  powerpole: c => { limb(c, -9, 7, 9, -9, 3.2, '#d4141c'); for (const [x, y] of [[-9, 7], [9, -9]]) blob(c, x, y, 2.4, 2.4, '#ffd34d'); },
+  zsword: c => { limb(c, -8, 8, 7, -7, 3, '#dfe6ee'); limb(c, -9, 3, -3, 9, 2.4, '#8a6a42'); blob(c, -8, 8, 1.8, 1.8, '#ffd34d'); },
+  scouter: c => { rrect(c, -9, -4, 7, 9, 2, '#e8e8e8'); blob(c, 3, -1, 6, 5, 'rgba(90,220,120,.85)'); limb(c, -2, -4, 3, -7, 1.6, '#e8e8e8'); },
+  radar: c => { blob(c, 0, 0, 9, 9, '#f2f2f2'); blob(c, 0, 0, 6.5, 6.5, '#3fae5a'); c.strokeStyle = 'rgba(200,255,200,.8)'; c.lineWidth = .8; for (const r of [2.5, 5]) { c.beginPath(); c.arc(0, 0, r, 0, 7); c.stroke(); } blob(c, 2, -2, 1.3, 1.3, '#ffcf3a'); blob(c, 0, -9, 2, 1.5, '#cfcfcf'); },
+  nimbus: c => { for (const [x, y, r] of [[-6, 1, 5], [0, -2, 6.5], [6, 1, 5], [1, 3, 5]]) blob(c, x, y, r, r * .75, '#ffe066'); },
+  senzu: c => { blob(c, 0, 2, 8, 7, '#a8763c'); limb(c, -3, -5, 3, -5, 2.4, '#7a4a20'); for (const [x, y] of [[-3, 0], [2, 1], [-1, 4]]) blob(c, x, y, 1.8, 2.4, '#8fe06f'); },
+  goldcap: c => { rrect(c, -9, -4, 18, 8, 4, '#ffd34d'); c.fillStyle = '#c98a12'; c.fillRect(-1, -4, 2, 8); blob(c, -5, -1.5, 1.4, 1, 'rgba(255,255,255,.8)'); },
+  fan: c => { poly(c, [[0, 8], [-10, -6], [-4, -10], [4, -10], [10, -6]], '#4fa850'); limb(c, 0, 8, 0, 11, 2.2, '#8a6a42'); c.strokeStyle = '#2f7a34'; c.lineWidth = 1; for (const a of [-.7, -.25, .25, .7]) { c.beginPath(); c.moveTo(0, 8); c.lineTo(Math.sin(a) * 11, 8 - Math.cos(a) * 17); c.stroke(); } },
+  jar: c => { rrect(c, -7, -5, 14, 13, 4, '#f2f2f2'); rrect(c, -8, -8, 16, 4, 2, '#5b7fbf'); blob(c, 0, -9, 2.5, 1.5, '#3e5f9a'); c.fillStyle = '#d4141c'; c.fillRect(-4, 0, 8, 3); },
+  shard: c => { poly(c, [[-9, -3], [0, -8], [9, -3], [7, 6], [-7, 6]], '#f2f2f2'); poly(c, [[-9, -3], [0, -8], [9, -3], [0, -1]], '#ffd34d'); },
+  flask: c => { rrect(c, -2.5, -10, 5, 5, 1.5, '#d9e8f2'); blob(c, 0, 2, 7, 7, 'rgba(110,190,255,.9)'); blob(c, -2, 0, 2, 1.5, 'rgba(255,255,255,.8)'); },
+  shell: c => { blob(c, 0, 1, 10, 7.5, '#3f8f3a'); c.strokeStyle = '#2b5f28'; c.lineWidth = 1.2; c.beginPath(); c.moveTo(-6, -3); c.lineTo(6, 5); c.moveTo(6, -3); c.lineTo(-6, 5); c.stroke(); blob(c, 0, 1, 3.5, 2.6, '#6fbf4a'); },
+};
+function relicSprite(key) {
+  return sprite('RELIC|' + key, 40, 40, 20, 26, c => {
+    c.fillStyle = 'rgba(0,0,0,.25)'; c.beginPath(); c.ellipse(0, 10, 11, 4, 0, 0, 7); c.fill();
+    RELIC_ART[key](c);
+  });
+}
+function relicIcon(key, size) {
+  size = size || 40;
+  return iconCanvas('R' + key, size, c => {
+    const g = c.createRadialGradient(size / 2, size / 2, 2, size / 2, size / 2, size * .6); g.addColorStop(0, '#5b3f8a'); g.addColorStop(1, '#1d1430'); c.fillStyle = g; c.fillRect(0, 0, size, size);
+    c.save(); c.translate(size / 2, size / 2 + 1); c.scale(size / 30, size / 30); RELIC_ART[key](c); c.restore();
+  });
+}
 function sealedBallSprite(open) {
   return sprite('SEAL' + (open ? 1 : 0), 90, 90, 45, 70, c => {
     c.fillStyle = 'rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(0, 0, 34, 14, 0, 0, 7); c.fill();
@@ -238,7 +299,7 @@ function sealedBallSprite(open) {
 }
 
 // ---------- icons and portraits (for the HUD) ----------
-const CLASS_BG = { villager: ['#2f4a2a', '#1b2a18'], infantry: ['#5a2a1a', '#2a140c'], ranged: ['#1a3a5a', '#0c1a2a'], cavalry: ['#4a3a1a', '#24180a'], siege: ['#3a3a3a', '#1a1a1a'], myth: ['#3a1a5a', '#1a0c2a'], hero: ['#6a4a0a', '#2a1a04'], titan: ['#5a1a3a', '#2a0c1a'], guard: ['#3a3a1a', '#1a1a0c'], huntable: ['#3a3a1a', '#1a1a0c'] };
+const CLASS_BG = { ship: ['#1a4a5a', '#0c222a'], villager: ['#2f4a2a', '#1b2a18'], infantry: ['#5a2a1a', '#2a140c'], ranged: ['#1a3a5a', '#0c1a2a'], cavalry: ['#4a3a1a', '#24180a'], siege: ['#3a3a3a', '#1a1a1a'], myth: ['#3a1a5a', '#1a0c2a'], hero: ['#6a4a0a', '#2a1a04'], titan: ['#5a1a3a', '#2a0c1a'], guard: ['#3a3a1a', '#1a1a0c'], huntable: ['#3a3a1a', '#1a1a0c'] };
 function iconCanvas(key, size, draw) {
   return sprite('I|' + key + '|' + size, size, size, 0, 0, draw);
 }
@@ -249,8 +310,8 @@ function unitIcon(key, form, pc, size) {
     const bg = CLASS_BG[d.cls] || CLASS_BG.villager;
     const g = c.createLinearGradient(0, 0, 0, size); g.addColorStop(0, bg[0]); g.addColorStop(1, bg[1]); c.fillStyle = g; c.fillRect(0, 0, size, size);
     const [w, h, ax, ay] = figureBox(L);
-    const big = L.r === 'ape' ? .45 : L.r === 'vehicle' ? 1.15 : L.r === 'mech' && L.kind === 'pirate' ? .6 : 1.25 / (L.scale || 1);
-    c.save(); c.translate(size / 2 + (L.r === 'vehicle' ? 0 : -2), size * (L.r === 'vehicle' ? .74 : .98)); c.scale(big * size / 52, big * size / 52);
+    const big = L.r === 'ship' ? .72 : L.r === 'ape' ? .45 : L.r === 'vehicle' ? 1.15 : L.r === 'mech' && L.kind === 'pirate' ? .6 : 1.25 / (L.scale || 1);
+    c.save(); c.translate(size / 2 + (L.r === 'vehicle' || L.r === 'ship' ? -2 : -2), size * (L.r === 'ship' ? .74 : L.r === 'vehicle' ? .74 : .98)); c.scale(big * size / 52, big * size / 52);
     drawFigure(c, L, 'idle', 0, pc); c.restore();
   });
 }
@@ -260,8 +321,8 @@ function portrait(key, form, pc, size) {
     const d = U[key] || {}, L = form ? FORMS[form].look : (d.look || {});
     const bg = CLASS_BG[d.cls] || CLASS_BG.villager;
     const g = c.createRadialGradient(size * .5, size * .35, 4, size * .5, size * .5, size * .75); g.addColorStop(0, shade(bg[0], .15)); g.addColorStop(1, bg[1]); c.fillStyle = g; c.fillRect(0, 0, size, size);
-    const zoom = L.r === 'ape' ? 1.3 : L.r === 'vehicle' ? 2.2 : L.r === 'mech' ? 2 : L.r === 'beast' ? 2.4 : 3.2 / (L.scale || 1);
-    c.save(); c.translate(size * .44, size * (L.r === 'vehicle' ? .85 : L.r === 'beast' ? .9 : 1.42)); c.scale(zoom * size / 96, zoom * size / 96);
+    const zoom = L.r === 'ship' ? 1.5 : L.r === 'ape' ? 1.3 : L.r === 'vehicle' ? 2.2 : L.r === 'mech' ? 2 : L.r === 'beast' ? 2.4 : 3.2 / (L.scale || 1);
+    c.save(); c.translate(size * .44, size * (L.r === 'ship' ? .72 : L.r === 'vehicle' ? .85 : L.r === 'beast' ? .9 : 1.42)); c.scale(zoom * size / 96, zoom * size / 96);
     drawFigure(c, L, 'idle', 0, pc); c.restore();
   });
 }

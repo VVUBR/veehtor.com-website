@@ -14,7 +14,7 @@ const ok = (c, m) => { if (!c) fails++; console.log((c ? 'PASS ' : 'FAIL ') + m)
   page.on('console', m => { if (m.type() === 'error') errs.push('console: ' + m.text()); });
   await page.goto('file://' + tmp); await page.waitForTimeout(400);
   const E = (f, a) => page.evaluate(f, a);
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < 9; i++) {
     if (only && String(i) !== only) continue;
     const e0 = errs.length;
     await E(i => window.__DBH.launch({ kind: 'mission', mission: i, diff: 'normal' }), i);
@@ -51,7 +51,7 @@ const ok = (c, m) => { if (!c) fails++; console.log((c ? 'PASS ' : 'FAIL ') + m)
     ok(w.over && w.won === 1, `m${i + 1}: forced objectives give a win ${JSON.stringify(w)}`);
     await page.waitForTimeout(1700);
     const end = await E(() => ({ vis: !document.getElementById('scr-end').hidden, title: document.getElementById('end-title').textContent, btns: [...document.querySelectorAll('#end-btns button')].map(b => b.textContent), pr: JSON.parse(localStorage.getItem('dbh2.campaign') || 'null') }));
-    ok(end.vis && /victory/i.test(end.title) && end.pr && end.pr.unlocked >= Math.min(7, i + 2), `m${i + 1}: end screen and unlock ${JSON.stringify(end)}`);
+    ok(end.vis && /victory/i.test(end.title) && end.pr && end.pr.unlocked >= Math.min(9, i + 2), `m${i + 1}: end screen and unlock ${JSON.stringify(end)}`);
     if (i === 0) await page.screenshot({ path: `${dir}/camp-end.png` });
     ok(errs.length === e0, `m${i + 1}: no errors ${errs.slice(e0).join(' | ').slice(0, 600)}`);
   }
@@ -65,7 +65,7 @@ const ok = (c, m) => { if (!c) fails++; console.log((c ? 'PASS ' : 'FAIL ') + m)
   await E(() => window.__DBH.dev().quitToMenu());
   await page.click('#m-campaign'); await page.waitForTimeout(300);
   const ml = await page.$$eval('#mission-list button', b => b.map(x => (x.disabled ? 'L ' : 'U ') + x.textContent.slice(0, 30)));
-  ok(ml.length === 7, 'campaign menu lists 7 missions: ' + ml.join(' | '));
+  ok(ml.length === 9, 'campaign menu lists 9 missions: ' + ml.join(' | '));
   await page.screenshot({ path: `${dir}/camp-menu.png` });
   await page.click('#c-play'); await page.waitForTimeout(400);
   ok(await page.isVisible('#scr-brief'), 'Play opens the briefing');

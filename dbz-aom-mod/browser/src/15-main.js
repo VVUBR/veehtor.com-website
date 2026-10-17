@@ -21,7 +21,7 @@ function frame(now) {
       const ms = G.mouseScreen;
       if (ms && !drag && document.hasFocus() && !matchMedia('(hover: none)').matches) { const m = 12; if (ms.x < m) cam.x -= sp; if (ms.x > vw - m) cam.x += sp; if (ms.y < m) cam.y -= sp; if (ms.y > vh - m) cam.y += sp; }
       clampCam();
-      acc += real * G.speed;
+      acc += real * G.speed * (G.speedMul || 1);
       let n = 0;
       while (acc >= STEP && n < 12) { tick(STEP); acc -= STEP; n++; }
       if (n >= 12) acc = 0;
@@ -49,5 +49,5 @@ window.__DBH = {
   borrowAI: (secs, diff) => { const P = G.players[G.me]; initAI(P, diff || 'normal'); for (let t = 0; t < secs && !G.over; t += STEP) tick(STEP); P.ai = null; },
   launch: spec => launch(spec),
   toScreen: (x, y) => ({ x: sx(x, y), y: sy(x, y) }),
-  dev: () => ({ placeBuilding, spawnUnit, spawnNear, centerOn, castPower, applyTech, startTech, queueUnit, runCheat, refreshLists, CAMPAIGN, kill, setForm, maxHp, ballsHeld, setOrder, DLG, depositBall, quitToMenu }),
+  dev: () => ({ placeBuilding, spawnUnit, spawnNear, centerOn, castPower, applyTech, startTech, queueUnit, runCheat, refreshLists, CAMPAIGN, kill, setForm, maxHp, ballsHeld, setOrder, DLG, depositBall, quitToMenu, canPlace }),
 };

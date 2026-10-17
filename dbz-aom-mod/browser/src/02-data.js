@@ -176,6 +176,32 @@ const U = {
   armored: { faction: 'ff', cls: 'myth', name: 'Armored Squadron', tags: ['Biological', 'MythUnit'], hp: 760, armor: [.65, .65, .75], melee: { hack: 50, range: 1.1, rof: 1.2 }, speed: 4.8, los: 20, cost: { gold: 220, ki: 28 }, time: 24, pop: 4, at: 'temple', age: 4, size: .55,
     look: { r: 'human', skin: '#7fbfd8', hair: 'long', hairC: '#f4f4f4', top: '#1b1b2b', pants: '#1b1b2b', boots: '#8a5ad8', armor: { chest: '#8a5ad8', pad: '#f4f4f4' }, scouter: true, scale: 1.15 }, desc: "Myth unit. Cooler's armored elite." },
 
+  // ================= SHIPS =================
+  fishboat: { faction: 'earth', cls: 'ship', ship: 'fish', naval: true, fisher: true, name: 'Capsule Fishing Boat', tags: ['Ship', 'Mech', 'FishingShip'], hp: 140, armor: [.1, .2, .1], speed: 5, los: 14, cost: { wood: 60 }, time: 14, pop: 1, at: 'dock', size: 1.2,
+    look: { r: 'ship', kind: 'fish', style: 'earth' }, desc: 'Catches fish (Rations) and brings it back to the Dock. Cannot fight.' },
+  gunboat: { faction: 'earth', cls: 'ship', ship: 'arrow', naval: true, name: 'Capsule Gunboat', tags: ['Ship', 'Mech', 'ArrowShip'], hp: 320, armor: [.3, .45, .1], ranged: { pierce: 11, range: 18, rof: 2, proj: 'ki', bonus: { SiegeShip: 2.5 } }, speed: 5.6, los: 22, cost: { wood: 100, gold: 50 }, time: 18, pop: 2, at: 'dock', age: 2, size: 1.5,
+    look: { r: 'ship', kind: 'arrow', style: 'earth', scale: 1.2 }, desc: 'Arrow ship. Shoots from range. Strong against siege ships (×2.5), weak against hammer ships.' },
+  ramcruiser: { faction: 'earth', cls: 'ship', ship: 'hammer', naval: true, name: 'Kame Ram Cruiser', tags: ['Ship', 'Mech', 'HammerShip'], hp: 460, armor: [.45, .4, .2], melee: { hack: 22, crush: 8, range: 1.4, rof: 1.6, bonus: { ArrowShip: 2.6, building: 1.6 } }, speed: 5.2, los: 18, cost: { wood: 120, gold: 60 }, time: 18, pop: 2, at: 'dock', age: 2, size: 1.6,
+    look: { r: 'ship', kind: 'hammer', style: 'earth', scale: 1.2 }, desc: 'Hammer ship. Rams up close. Strong against arrow ships (×2.6) and docks, weak against siege ships.' },
+  battleship: { faction: 'earth', cls: 'ship', ship: 'siege', naval: true, name: 'Capsule Battleship', tags: ['Ship', 'Mech', 'SiegeShip'], hp: 380, armor: [.35, .5, .15], ranged: { crush: 40, range: 26, minRange: 4, rof: 4.5, aoe: 1.2, proj: 'shell', bonus: { building: 3, HammerShip: 2.5 } }, speed: 4, los: 24, cost: { wood: 170, gold: 120 }, time: 24, pop: 3, at: 'dock', age: 3, size: 1.8,
+    look: { r: 'ship', kind: 'siege', style: 'earth', scale: 1.2 }, desc: 'Siege ship. Long-range shells: triple damage against buildings, strong against hammer ships (×2.5), weak against arrow ships.' },
+  trawler: { faction: 'rr', cls: 'ship', ship: 'fish', naval: true, fisher: true, name: 'RR Trawler', tags: ['Ship', 'Mech', 'FishingShip'], hp: 140, armor: [.1, .2, .1], speed: 5, los: 14, cost: { wood: 60 }, time: 14, pop: 1, at: 'dock', size: 1.2,
+    look: { r: 'ship', kind: 'fish', style: 'rr' }, desc: 'Catches fish (Rations) and brings it back to the Dock. Cannot fight.' },
+  patrolboat: { faction: 'rr', cls: 'ship', ship: 'arrow', naval: true, name: 'RR Patrol Boat', tags: ['Ship', 'Mech', 'ArrowShip'], hp: 320, armor: [.3, .45, .1], ranged: { pierce: 11, range: 18, rof: 2, proj: 'bullet', bonus: { SiegeShip: 2.5 } }, speed: 5.6, los: 22, cost: { wood: 100, gold: 50 }, time: 18, pop: 2, at: 'dock', age: 2, size: 1.5,
+    look: { r: 'ship', kind: 'arrow', style: 'rr', scale: 1.2 }, desc: 'Arrow ship. Shoots from range. Strong against siege ships (×2.5), weak against hammer ships.' },
+  ramsub: { faction: 'rr', cls: 'ship', ship: 'hammer', naval: true, name: 'RR Ram Submarine', tags: ['Ship', 'Mech', 'HammerShip'], hp: 460, armor: [.45, .4, .2], melee: { hack: 22, crush: 8, range: 1.4, rof: 1.6, bonus: { ArrowShip: 2.6, building: 1.6 } }, speed: 5.2, los: 18, cost: { wood: 120, gold: 60 }, time: 18, pop: 2, at: 'dock', age: 2, size: 1.6,
+    look: { r: 'ship', kind: 'hammer', style: 'rr', scale: 1.2 }, desc: 'Hammer ship. Rams up close. Strong against arrow ships (×2.6) and docks, weak against siege ships.' },
+  missilecruiser: { faction: 'rr', cls: 'ship', ship: 'siege', naval: true, name: 'RR Missile Cruiser', tags: ['Ship', 'Mech', 'SiegeShip'], hp: 380, armor: [.35, .5, .15], ranged: { crush: 40, range: 26, minRange: 4, rof: 4.5, aoe: 1.2, proj: 'shell', bonus: { building: 3, HammerShip: 2.5 } }, speed: 4, los: 24, cost: { wood: 170, gold: 120 }, time: 24, pop: 3, at: 'dock', age: 3, size: 1.8,
+    look: { r: 'ship', kind: 'siege', style: 'rr', scale: 1.2 }, desc: 'Siege ship. Long-range shells: triple damage against buildings, strong against hammer ships (×2.5), weak against arrow ships.' },
+  skiff: { faction: 'ff', cls: 'ship', ship: 'fish', naval: true, fisher: true, name: 'Hover Skiff', tags: ['Ship', 'Mech', 'FishingShip'], hp: 140, armor: [.1, .2, .1], speed: 5, los: 14, cost: { wood: 60 }, time: 14, pop: 1, at: 'dock', size: 1.2,
+    look: { r: 'ship', kind: 'fish', style: 'ff' }, desc: 'Catches fish (Rations) and brings it back to the Dock. Cannot fight.' },
+  gunsaucer: { faction: 'ff', cls: 'ship', ship: 'arrow', naval: true, name: 'Saucer Gunship', tags: ['Ship', 'Mech', 'ArrowShip'], hp: 320, armor: [.3, .45, .1], ranged: { pierce: 11, range: 18, rof: 2, proj: 'ki', bonus: { SiegeShip: 2.5 } }, speed: 5.6, los: 22, cost: { wood: 100, gold: 50 }, time: 18, pop: 2, at: 'dock', age: 2, size: 1.5,
+    look: { r: 'ship', kind: 'arrow', style: 'ff', scale: 1.2 }, desc: 'Arrow ship. Shoots from range. Strong against siege ships (×2.5), weak against hammer ships.' },
+  spikesaucer: { faction: 'ff', cls: 'ship', ship: 'hammer', naval: true, name: 'Spiked Assault Saucer', tags: ['Ship', 'Mech', 'HammerShip'], hp: 460, armor: [.45, .4, .2], melee: { hack: 22, crush: 8, range: 1.4, rof: 1.6, bonus: { ArrowShip: 2.6, building: 1.6 } }, speed: 5.2, los: 18, cost: { wood: 120, gold: 60 }, time: 18, pop: 2, at: 'dock', age: 2, size: 1.6,
+    look: { r: 'ship', kind: 'hammer', style: 'ff', scale: 1.2 }, desc: 'Hammer ship. Rams up close. Strong against arrow ships (×2.6) and docks, weak against siege ships.' },
+  bombsaucer: { faction: 'ff', cls: 'ship', ship: 'siege', naval: true, name: 'Bombard Saucer', tags: ['Ship', 'Mech', 'SiegeShip'], hp: 380, armor: [.35, .5, .15], ranged: { crush: 40, range: 26, minRange: 4, rof: 4.5, aoe: 1.2, proj: 'shell', bonus: { building: 3, HammerShip: 2.5 } }, speed: 4, los: 24, cost: { wood: 170, gold: 120 }, time: 24, pop: 3, at: 'dock', age: 3, size: 1.8,
+    look: { r: 'ship', kind: 'siege', style: 'ff', scale: 1.2 }, desc: 'Siege ship. Long-range shells: triple damage against buildings, strong against hammer ships (×2.5), weak against arrow ships.' },
+
   // ================= NEUTRAL =================
   kidbuu: { cls: 'titan', name: 'Kid Buu', tags: ['MythUnit', 'Titan', 'Biological'], hp: 7000, armor: [.85, .85, .95], melee: { hack: 120, crush: 200, range: 2.5, rof: 1.5, aoe: 3 }, speed: 4.8, los: 24, regen: 40, pop: 0, size: .9,
     look: { r: 'buu' }, desc: "Titan. Regenerates 40 HP/s. Only a hero's ultimate attack or a god power can finish him." },
@@ -267,23 +293,26 @@ const B = {
   lab: { w: 4, h: 4, hp: 4000, armor: [.8, .8, .3], los: 14, special: true, attack: { pierce: 12, range: 18, rof: 1.5, arrows: 2 }, names: { rr: "Dr. Gero's Laboratory", earth: 'Laboratory', ff: 'Laboratory' }, desc: "Dr. Gero's hidden laboratory, where the androids sleep." },
   ship: { w: 5, h: 5, hp: 5500, armor: [.8, .85, .3], los: 16, special: true, attack: { pierce: 14, range: 20, rof: 1.4, arrows: 3 }, names: { ff: "Frieza's Spaceship", earth: 'Spaceship', rr: 'Spaceship' }, desc: "Frieza's personal spaceship." },
   guru: { w: 3, h: 3, hp: 2500, armor: [.7, .7, .3], los: 14, special: true, vault: true, names: { earth: "Guru's House", rr: "Guru's House", ff: "Guru's House" }, desc: "The Grand Elder's home. Bring Dragon Balls here." },
+  dock: { w: 3, h: 3, hp: 1500, armor: [.6, .6, .2], drop: ['food'], navalDrop: true, dock: true, cost: { wood: 100 }, time: 30, age: 1, los: 14,
+    names: { earth: 'Capsule Harbor', rr: 'RR Naval Yard', ff: 'Frieza Force Dock' }, desc: 'Build on a shore next to deep water. Trains ships, and fishing boats drop off fish here.' },
+  korin: { w: 3, h: 3, hp: 9999, armor: [.95, .95, .95], los: 10, special: true, monument: true, names: { earth: "Korin's Tower", rr: "Korin's Tower", ff: "Korin's Tower" }, desc: 'Keep your units around the tower, with no enemies nearby, to hold it.' },
   hut: { w: 2, h: 2, hp: 500, armor: [.5, .5, .1], los: 6, special: true, names: { earth: 'Village Hut', rr: 'Village Hut', ff: 'Village Hut' }, desc: 'A village home.' },
 };
 for (const k in B) { B[k].key = k; B[k].trains = []; B[k].techs = []; }
 const bname = (key, faction) => B[key].names[faction] || B[key].names.earth || Object.values(B[key].names)[0];
 const bcost = (key, faction) => (B[key].byF && B[key].byF[faction] && B[key].byF[faction].cost) || B[key].cost || {};
 const BUILD_MENU = {
-  earth: ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'tower', 'wall', 'gate', 'stable', 'armory', 'market', 'fortress', 'tc', 'wonder'],
-  rr: ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'reactor', 'tower', 'wall', 'gate', 'stable', 'armory', 'market', 'fortress', 'tc', 'wonder'],
-  ff: ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'tower', 'wall', 'gate', 'stable', 'armory', 'market', 'fortress', 'tc', 'wonder'],
+  earth: ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'dock', 'tower', 'wall', 'gate', 'stable', 'armory', 'market', 'fortress', 'tc', 'wonder'],
+  rr: ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'reactor', 'dock', 'tower', 'wall', 'gate', 'stable', 'armory', 'market', 'fortress', 'tc', 'wonder'],
+  ff: ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'dock', 'tower', 'wall', 'gate', 'stable', 'armory', 'market', 'fortress', 'tc', 'wonder'],
 };
 for (const k in U) { const d = U[k]; if (d.at && B[d.at]) B[d.at].trains.push(k); }
 
 // ---------- technologies ----------
 const TECH = {
-  age2: { name: 'Advance to the Namek Saga', at: 'tc', cost: { food: 400 }, time: 45, age: 1, ageUp: 2, desc: 'Choose a new patron, unlock cavalry, the Armory and more.' },
-  age3: { name: 'Advance to the Android Saga', at: 'tc', cost: { food: 800, gold: 500 }, time: 60, age: 2, ageUp: 3, desc: 'Choose a new patron, unlock siege, the Fortress and the Market.' },
-  age4: { name: 'Advance to the Buu Saga', at: 'tc', cost: { food: 1000, gold: 1000 }, time: 75, age: 3, ageUp: 4, desc: 'Choose a new patron, unlock Wonders, the Titan and the strongest transformations.' },
+  age2: { name: 'Advance to the Namek Saga', at: 'tc', cost: { food: 400 }, time: 45, age: 1, ageUp: 2, needB: 'temple', desc: 'Choose a new patron, unlock cavalry, the Armory and more. Needs a Temple.' },
+  age3: { name: 'Advance to the Android Saga', at: 'tc', cost: { food: 800, gold: 500 }, time: 60, age: 2, ageUp: 3, needB: 'armory', desc: 'Choose a new patron, unlock siege, the Fortress and the Market. Needs an Armory.' },
+  age4: { name: 'Advance to the Buu Saga', at: 'tc', cost: { food: 1000, gold: 1000 }, time: 75, age: 3, ageUp: 4, needB: 'fortress', desc: 'Choose a new patron, unlock Wonders, the Titan and the strongest transformations. Needs a Fortress.' },
   // economy
   hunting: { name: 'Hunting Scouters', at: 'granary', age: 1, cost: { food: 50, wood: 50 }, time: 20, fx: [{ t: 'gather', res: 'hunt', mul: 1.25 }], desc: 'Villagers hunt 25% faster.', icon: 'hunt' },
   plow: { name: 'Capsule Plows', at: 'granary', age: 1, cost: { food: 75, wood: 100 }, time: 25, fx: [{ t: 'gather', res: 'farm', mul: 1.2 }, { t: 'gather', res: 'berry', mul: 1.2 }], desc: 'Farms and Senzu crops +20%.', icon: 'farm' },
@@ -309,6 +338,9 @@ const TECH = {
   rng3: { name: 'Elite Gunners', at: 'barracks', age: 3, req: 'rng2', cost: { wood: 300, gold: 300 }, time: 45, fx: [{ t: 'stat', who: 'cls:ranged', stat: 'hp', mul: 1.15 }, { t: 'stat', who: 'cls:ranged', stat: 'atk', mul: 1.15 }, { t: 'stat', who: 'cls:ranged', stat: 'range', add: 2 }], desc: 'Ranged soldiers +15% HP and attack, +2 m range.', icon: 'rng' },
   cav2: { name: 'Veteran Riders', at: 'stable', age: 2, cost: { food: 200, gold: 150 }, time: 35, fx: [{ t: 'stat', who: 'cls:cavalry', stat: 'hp', mul: 1.15 }, { t: 'stat', who: 'cls:cavalry', stat: 'atk', mul: 1.15 }], desc: 'Cavalry +15% HP and attack.', icon: 'cav' },
   cav3: { name: 'Elite Riders', at: 'stable', age: 3, req: 'cav2', cost: { food: 400, gold: 300 }, time: 45, fx: [{ t: 'stat', who: 'cls:cavalry', stat: 'hp', mul: 1.15 }, { t: 'stat', who: 'cls:cavalry', stat: 'atk', mul: 1.15 }, { t: 'stat', who: 'cls:cavalry', stat: 'speed', mul: 1.08 }], desc: 'Cavalry +15% HP and attack, +8% speed.', icon: 'cav' },
+  nets: { name: 'Capsule Fishing Nets', at: 'dock', age: 1, cost: { food: 50, wood: 100 }, time: 25, fx: [{ t: 'gather', res: 'fish', mul: 1.25 }], desc: 'Fishing boats catch 25% more.', icon: 'hunt' },
+  hulls: { name: 'Reinforced Hulls', at: 'dock', age: 2, cost: { wood: 200, gold: 100 }, time: 35, fx: [{ t: 'stat', who: 'cls:ship', stat: 'hp', mul: 1.2 }], desc: 'All ships +20% HP.', icon: 'shield' },
+  navalguns: { name: 'Naval Ki Cannons', at: 'dock', age: 3, cost: { wood: 300, gold: 250 }, time: 45, fx: [{ t: 'stat', who: 'cls:ship', stat: 'atk', mul: 1.2 }], desc: 'All warships +20% attack.', icon: 'sword' },
   siege2: { name: 'Heavy Siege', at: 'fortress', age: 4, cost: { wood: 400, gold: 300 }, time: 50, fx: [{ t: 'stat', who: 'cls:siege', stat: 'hp', mul: 1.2 }, { t: 'stat', who: 'cls:siege', stat: 'atk', mul: 1.2 }], desc: 'Siege +20% HP and attack.', icon: 'siege' },
   // heroes and temple
   ssj1: { name: 'Super Saiyan Awakening', faction: 'earth', at: 'temple', age: 3, cost: { gold: 300, ki: 25 }, time: 40, fx: [{ t: 'form', unit: 'goku', form: 'goku_ssj1' }], desc: 'Goku becomes a Super Saiyan: 950 HP and Instant Kamehameha.', icon: 'ssj' },
@@ -375,16 +407,47 @@ const RES_DEF = {
   gold: { amount: 2500, type: 'gold', sub: 'gold', block: true, big: true },
   berry: { amount: 150, type: 'food', sub: 'berry', block: false },
   carcass: { amount: 350, type: 'food', sub: 'hunt', block: false },
+  fish: { amount: 500, type: 'food', sub: 'fish', block: false, naval: true },
 };
 
-const SPECIAL_NAMES = { tree: 'Capsule Alloy Grove', gold: 'Zeni Vein', berry: 'Senzu Bush', carcass: 'Dinosaur Rations' };
+// Relics: only heroes can carry them; each one kept in a Temple gives its owner a bonus.
+const RELICS = {
+  powerpole: { name: 'Power Pole', desc: 'Heroes +10% attack.', fx: [{ t: 'stat', who: 'hero', stat: 'atk', mul: 1.1 }] },
+  zsword: { name: 'Z Sword', desc: 'Infantry +12% attack.', fx: [{ t: 'stat', who: 'cls:infantry', stat: 'atk', mul: 1.12 }] },
+  scouter: { name: 'Old Scouter', desc: 'Ranged soldiers +2 m range.', fx: [{ t: 'stat', who: 'cls:ranged', stat: 'range', add: 2 }] },
+  radar: { name: 'Dragon Radar', desc: 'All your units see 3 m farther.', fx: [{ t: 'stat', who: 'all', stat: 'los', add: 3 }] },
+  nimbus: { name: 'Nimbus Seed', desc: 'Cavalry +10% speed.', fx: [{ t: 'stat', who: 'cls:cavalry', stat: 'speed', mul: 1.1 }] },
+  senzu: { name: 'Senzu Seed Pouch', desc: '+0.5 Rations per second.', trickle: { food: .5 } },
+  goldcap: { name: 'Golden Capsule', desc: '+0.35 Zeni per second.', trickle: { gold: .35 } },
+  fan: { name: 'Bansho Fan', desc: 'Capsule Alloy gathering +10%.', fx: [{ t: 'gather', res: 'wood', mul: 1.1 }] },
+  jar: { name: 'Mafuba Jar', desc: 'Myth units +10% HP.', fx: [{ t: 'stat', who: 'myth', stat: 'hp', mul: 1.1 }] },
+  shard: { name: 'Saiyan Armor Shard', desc: 'Human soldiers +3% Hack and Pierce armor.', fx: [{ t: 'stat', who: 'human', stat: 'armor', add: .03 }] },
+  flask: { name: 'Sacred Water Flask', desc: '+0.06 Ki per second.', trickle: { ki: .06 } },
+  shell: { name: "Roshi's Turtle Shell", desc: 'Villagers gather 5% faster.', fx: [{ t: 'gather', res: 'all', mul: 1.05 }] },
+};
+for (const k in RELICS) RELICS[k].key = k;
+const RELIC_CAP = 10;
+const SPECIAL_NAMES = { tree: 'Capsule Alloy Grove', gold: 'Zeni Vein', berry: 'Senzu Bush', carcass: 'Dinosaur Rations', fish: 'Giant Fish' };
 
 const MAPS = {
   earth: { name: 'Dragon Ball Hunt', biome: 'earth', desc: 'Green hills, lakes and forests. Seven guarded Dragon Balls.' },
   namek: { name: 'Planet Namek', biome: 'namek', desc: 'Blue-green islands joined by shallow water. Few trees, rich in Zeni.' },
   wasteland: { name: 'Android Wasteland', biome: 'wasteland', desc: 'A rocky desert of mesas and canyons. Lots of Zeni, little wood.' },
   highlands: { name: "Kami's Highlands", biome: 'highlands', desc: 'Snowy peaks and pine forests around a central plateau.' },
+  sea: { name: 'Kame Sea', biome: 'earth', layout: 'sea', desc: 'Bases ring a great inland sea full of giant fish. Build Docks and fight for the water.' },
 };
+// Game modes (the standard Age of Mythology set).
+const WONDER_TIME = 600, SETTLE_TIME = 300, KOTH_TIME = 300, SUDDEN_TIME = 120;
+const MODES = {
+  supremacy: { name: 'Supremacy', wonder: true, settle: true, desc: 'The standard game. Win by destroying every enemy, by keeping a Wonder standing for 10 minutes, or by holding a Town Center on every Settlement for 5 minutes.' },
+  conquest: { name: 'Conquest', desc: 'Only one way to win: destroy every enemy.' },
+  deathmatch: { name: 'Deathmatch', wonder: true, settle: true, res: 'deathmatch', desc: 'Supremacy rules, but everyone starts rich: 5000 Rations, Capsule Alloy and Zeni.' },
+  lightning: { name: 'Lightning', wonder: true, settle: true, speed: 2, desc: 'Supremacy rules at double game speed.' },
+  nomad: { name: 'Nomad', wonder: true, settle: true, nomad: true, res: 'nomad', desc: 'No Town Center. You start with three villagers somewhere on the map: find a Settlement and build one before your rivals do.' },
+  koth: { name: 'King of the Hill', koth: true, desc: "Korin's Tower stands in the middle of the map. Keep your units around it, with no enemies there, for 5 minutes in total to win. Or destroy every enemy." },
+  sudden: { name: 'Sudden Death', wonder: true, settle: true, sudden: true, desc: 'Supremacy rules, but if you lose all your Town Centers you have 2 minutes to build a new one, or you are out.' },
+};
+const modeHas = f => !!(MODES[G.opts && G.opts.mode] || MODES.conquest)[f];
 const DIFF = {
   easy: { gather: .7, maxVill: 16, firstWave: 600, waveGap: 240, waveGrow: 2, wave: 6, bonus: 0, think: 1.4, powers: .4 },
   normal: { gather: 1, maxVill: 24, firstWave: 420, waveGap: 180, waveGrow: 3, wave: 9, bonus: 0, think: 1, powers: 1 },

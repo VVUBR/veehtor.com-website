@@ -21,7 +21,7 @@ function moveSpeed(u) {
   let s = stats(u).speed * buffMul(u, 'spd');
   if (u.kaio) s *= 2;
   if (u.flying && !u.def.alwaysFly) s *= 1.25;
-  if (!u.flying) { const tx = Math.floor(u.x), ty = Math.floor(u.y); if (inMap(tx, ty) && G.map.terr[idx(tx, ty)] === T_SHALLOW) s *= .8; }
+  if (!u.flying && !u.def.naval) { const tx = Math.floor(u.x), ty = Math.floor(u.y); if (inMap(tx, ty) && G.map.terr[idx(tx, ty)] === T_SHALLOW) s *= .8; }
   return s;
 }
 function armorOf(e) {
@@ -80,7 +80,7 @@ function applyHit(att, t, d, o) {
 }
 function addKi(P, n) { P.res.ki = Math.min(P.kiCap, P.res.ki + n); }
 function knockback(t, fx, fy, d) {
-  if (t.def.cls === 'titan' || t.def.cls === 'hero' || t.def.cls === 'building') return;
+  if (t.def.cls === 'titan' || t.def.cls === 'hero' || t.def.cls === 'building' || t.def.naval) return;
   const dx = t.x - fx, dy = t.y - fy, l = Math.hypot(dx, dy) || 1;
   const nx = t.x + dx / l * d, ny = t.y + dy / l * d;
   if (t.flying || walkableAt(nx, ny, teamOf(t.owner))) { t.x = nx; t.y = ny; t.path = null; t.wantPath = true; }
@@ -120,6 +120,7 @@ function kill(e, killer, o) {
   if (G.scn && G.scn.onKill) G.scn.onKill(e, killer);
   if (e.kind === 'unit') {
     if (e.carryBall) dropBall(e);
+    if (e.carryRelic) dropRelic(e);
     if (P && e.owner > 0) P.stats.lost++;
     if (e.def.cls === 'hero' && P) {
       P.heroDead[e.key] = e.form || true;
@@ -139,6 +140,12 @@ function kill(e, killer, o) {
     for (const bid of e.balls) { const b = G.balls.find(x => x.id === bid); if (b) { b.state = 'ground'; b.temple = 0; b.x = e.x + (rnd() - .5) * 2; b.y = e.y + (rnd() - .5) * 2; } }
     if (e.balls.length && P && P.human) toast('Your Temple fell. Its Dragon Balls spilled onto the ground!', 'warn');
     e.balls = [];
+    if (e.relics.length) {
+      for (const rid of e.relics) { const r = G.relics.find(x => x.id === rid); if (r) Object.assign(r, { state: 'ground', temple: 0, x: e.x + (rnd() - .5) * 2.4, y: e.y + (rnd() - .5) * 2.4 }); }
+      e.relics = [];
+      if (P) recomputeMods(P);
+      if (P && P.human) toast('Your Temple fell. Its relics lie in the rubble!', 'warn');
+    }
     if (e.farmer) { const f = byId(e.farmer); if (f) idleOrder(f); }
     G.ruins.push({ key: e.key, tx: e.tx, ty: e.ty, w: e.w, h: e.h, x: e.x, y: e.y, t: 0, fac: e.fac });
     fxPush({ type: 'boom', x: e.x, y: e.y, z: 0, t: 0, dur: 1, color: '#ffb347', r: e.w * .9 });
@@ -383,6 +390,52 @@ function castPower(P, key, x, y) {
   return true;
 }
 
+// ---------- relics ----------
+const relicsOf = pid => (G.relics || []).filter(r => r.state === 'temple' && byId(r.temple) && byId(r.temple).owner === pid);
+function setupRelics(bases) {
+  G.relics = [];
+  const keys = shuffle(Object.keys(RELICS)), n = Math.min(keys.length, 4 + 2 * (G.players.length - 1));
+  const home = bases && bases[0] ? regionAt(bases[0].x, bases[0].y) : 0;
+  const spots = [];
+  for (let t = 0; t < 4000 && spots.length < n; t++) {
+    const x = rint(4, MW - 5), y = rint(4, MH - 5);
+    if (G.map.block[idx(x, y)] || G.map.terr[idx(x, y)] === T_SHALLOW || G.map.settle[idx(x, y)]) continue;
+    if (home && G.region[idx(x, y)] !== home) continue;
+    if ((bases || []).some(b => dist(b.x, b.y, x, y) < 20) || G.camps.some(c => dist(c.x, c.y, x, y) < 6) || G.settlements.some(s => dist(s.tx + 2, s.ty + 2, x, y) < 6) || spots.some(s => dist(s.x, s.y, x, y) < 12)) continue;
+    if (G.korin && dist(x, y, MW / 2, MH / 2) < 8) continue;
+    spots.push({ x, y });
+  }
+  spots.forEach((s, i) => G.relics.push({ id: 910000 + i, key: keys[i], state: 'ground', x: s.x + .5, y: s.y + .5, holder: 0, temple: 0 }));
+}
+function pickUpRelic(u, r) {
+  r.state = 'carried'; r.holder = u.id; u.carryRelic = r.id;
+  if (G.players[u.owner].human) toast(`${stats(u).name} picked up the ${RELICS[r.key].name}. Bring it to a Temple: ${RELICS[r.key].desc}`, 'gold');
+  SFX.play('select', u.x, u.y);
+}
+function dropRelic(u) {
+  const r = G.relics.find(q => q.id === u.carryRelic);
+  u.carryRelic = 0;
+  if (!r) return;
+  let x = u.x, y = u.y;
+  if (!walkableAt(x, y, -2)) { const f = freeTileNear(clamp(Math.floor(x), 0, MW - 1), clamp(Math.floor(y), 0, MH - 1), 8); if (f) { x = f.x + .5; y = f.y + .5; } }
+  Object.assign(r, { state: 'ground', holder: 0, x, y });
+}
+function depositRelic(u, t) {
+  const r = G.relics.find(q => q.id === u.carryRelic);
+  if (!r) { u.carryRelic = 0; return; }
+  if (t.relics.length >= RELIC_CAP) { if (G.players[u.owner].human) toast(`${t.name} already holds ${RELIC_CAP} relics.`, 'warn'); return; }
+  u.carryRelic = 0;
+  Object.assign(r, { state: 'temple', temple: t.id, holder: 0 }); t.relics.push(r.id);
+  const P = G.players[t.owner];
+  recomputeMods(P);
+  if (P.human) toast(`${RELICS[r.key].name} placed in ${t.name}: ${RELICS[r.key].desc}`, 'good');
+  else if (G.me && isEnemy(G.me, P.id)) toast(`The enemy placed the ${RELICS[r.key].name} in a Temple.`, 'warn');
+  SFX.play('research', u.x, u.y);
+}
+function updateRelics() {
+  for (const r of G.relics) if (r.state === 'carried') { const h = byId(r.holder); if (h) { r.x = h.x; r.y = h.y; } else r.state = 'ground'; }
+}
+
 // ---------- Dragon Balls and Shenron ----------
 function setupBalls() {
   G.balls = [];
@@ -404,6 +457,7 @@ function spawnGuards() {
   });
 }
 function pickUpBall(u, ball) {
+  if (u.carryRelic) return;
   ball.state = 'carried'; ball.holder = u.id; u.carryBall = ball.id;
   const P = G.players[u.owner];
   if (P.human) toast(`${stats(u).name} picked up the ${ball.star}-Star Dragon Ball. Bring it to your Temple.`, 'gold');

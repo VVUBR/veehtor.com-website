@@ -1,5 +1,5 @@
 // =====================================================================
-// 14. CAMPAIGN: scenario engine, dialogue, objectives, seven missions
+// 14. CAMPAIGN: scenario engine, dialogue, objectives, nine missions
 // =====================================================================
 const SPEAKERS = {
   goku: ['Goku', () => FORMS.goku_base.look], gokussj: ['Goku', () => FORMS.goku_ssj1.look], piccolo: ['Piccolo', () => U.piccolo.look], krillin: ['Krillin', () => U.krillin.look],
@@ -7,6 +7,9 @@ const SPEAKERS = {
   vegeta: ['Vegeta', () => FORMS.vegeta_base.look], frieza: ['Frieza', () => FORMS.frieza_base.look], friezaf: ['Frieza', () => FORMS.frieza_final.look], kami: ['Kami', () => PATRON_LOOKS.kami],
   bulma: ['Bulma', () => PATRON_LOOKS.bulma], kingkai: ['King Kai', () => PATRON_LOOKS.kingkai], guru: ['Grand Elder Guru', () => ({ r: 'human', skin: '#6fbf4a', hair: 'none', antenna: true, top: '#f4f4f4', pants: '#f4f4f4', belt: '#ffcc33', build: 'bulky', keepColors: true })],
   dende: ['Dende', () => PATRON_LOOKS.dende], gero: ['Dr. Gero', () => PATRON_LOOKS.gero], a17: ['Android 17', () => U.a17.look], a18: ['Android 18', () => U.a18.look],
+  vegetassj: ['Vegeta', () => FORMS.vegeta_ssj.look], gokussj3: ['Goku', () => FORMS.goku_ssj3.look], supremekai: ['Supreme Kai', () => PATRON_LOOKS.supremekai],
+  babidi: ['Babidi', () => ({ r: 'human', skin: '#f0e2b8', hair: 'none', top: '#3a2a6a', pants: '#3a2a6a', belt: '#ffcc33', boots: '#5a3a1e', cape: '#5a2a8a', build: 'slim', keepColors: true })],
+  dabura: ['Dabura', () => U.ginyu.look], buu: ['Kid Buu', () => U.kidbuu.look],
   cell: ['Cell', () => FORMS.cell_perfect.look], dodoria: ['Dodoria', () => ({ r: 'brute' })], zarbon: ['Zarbon', () => PATRON_LOOKS.zarbon], blue: ['General Blue', () => U.blue.look],
 };
 // ---------- dialogue ----------
@@ -23,8 +26,8 @@ function showLine(l) {
   const c = $('dlg-portrait').getContext('2d'), L = sp[1]();
   c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, 152, 152);
   const g = c.createRadialGradient(76, 50, 6, 76, 76, 110); g.addColorStop(0, '#3a4a7a'); g.addColorStop(1, '#0b1124'); c.fillStyle = g; c.fillRect(0, 0, 152, 152);
-  const zoom = L.r === 'brute' ? 2.6 : 4.6;
-  c.save(); c.translate(68, L.r === 'brute' ? 160 : 214); c.scale(zoom, zoom); drawFigure(c, L, 'idle', 0, null); c.restore();
+  const zoom = L.r === 'brute' ? 2.6 : L.r === 'buu' ? 3.6 : 4.6;
+  c.save(); c.translate(68, L.r === 'brute' ? 160 : L.r === 'buu' ? 190 : 214); c.scale(zoom, zoom); drawFigure(c, L, 'idle', 0, null); c.restore();
   if (l.pause) { DLG.paused = true; G.paused = true; }
 }
 function nextLine() {
@@ -121,7 +124,7 @@ function makeScenario(m, diffKey) {
 }
 function startMission(idx, diffKey) {
   const m = CAMPAIGN[idx];
-  const opts = { map: m.biome, victory: 'conquest', resources: 'standard', dragonBalls: !!m.dragonBalls, players: m.players, seed: m.seed, campaign: idx };
+  const opts = { map: m.biome, mode: 'conquest', resources: 'standard', dragonBalls: !!m.dragonBalls, players: m.players, seed: m.seed, campaign: idx };
   resetState(opts);
   G.players = [gaiaPlayer()];
   m.players.forEach((p, i) => G.players.push(makePlayer(i + 1, Object.assign({ color: p.color || i + 1, team: p.team || i + 1 }, p))));
@@ -528,6 +531,132 @@ const CAMPAIGN = [
       S.when(() => G.players[1].stats.wishes > 0, () => S.setObj('shenron', 'done'));
     },
     check(S) { if (S.done('cell') && S.done('arena')) S.win(); lostCheck(S); },
-    win: 'Cell is gone. The Earth is at peace, protected by a new generation of heroes. Thank you for playing The Saga of the Dragon Balls!' },
+    win: 'Cell is gone. The Earth is at peace… for seven years. Then a wizard named Babidi lands on Earth.' },
+
+  { id: 'm8', saga: 'Buu Saga', title: "Babidi's Spaceship", biome: 'highlands', size: 96, seed: 808,
+    blurb: 'Destroy the wizard\'s ship before Majin Buu awakens.',
+    story: ['The wizard Babidi has landed his spaceship in the mountains. Inside sleeps Majin Buu, a monster that destroyed whole galaxies. Babidi feeds him the energy of every fight on Earth.', 'Dabura, the Demon King, guards the ship, and Babidi\'s spell can turn even the proudest warrior into his puppet. Strike fast: the longer the battle drags on, the closer Buu is to waking.'],
+    goals: ["Destroy Babidi's Spaceship before Buu's energy reaches 100%", 'Optional: defeat Dabura', 'Every unit you lose feeds Buu', 'Keep at least one Town Center or villager'],
+    cast: [['gokussj', 'gohan', 'piccolo'], ['babidi', 'dabura']],
+    players: [EARTH, { faction: 'ff', major: 'frieza', name: 'Babidi', team: 2, ai: 'normal', color: 3 }],
+    terrain(S) { S.nature({ ridges: 12, forests: 24, snow: true, keep: [[48, 82, 13], [46, 14, 17], [26, 48, 6], [70, 48, 6]] }); S.clear(48, 82, 10, T_ROAD); S.clear(46, 14, 13, T_DIRT); S.ridge([[8, 46], [30, 44]], 1.2); S.ridge([[62, 44], [88, 46]], 1.2); },
+    setup(S) {
+      S.tc(1, 48, 82); S.units('colonist', 1, 51, 85, 12); S.resAround(48, 82, { hunt: 'boar' });
+      for (const [k, x, y] of [['house', 42, 86], ['house', 54, 86], ['house', 40, 80], ['house', 57, 80], ['barracks', 40, 75], ['temple', 56, 75], ['stable', 59, 84], ['armory', 36, 84]]) S.bld(k, 1, x, y);
+      S.vars.goku = S.hero('goku', 1, 48, 74, 'goku_ssj1'); S.vars.gohan = S.hero('gohan', 1, 50, 74, 'gohan_base'); S.hero('piccolo', 1, 46, 74); S.hero('krillin', 1, 47, 72);
+      S.units('fighter', 1, 48, 70, 6); S.units('gunner', 1, 50, 69, 5); S.units('rider', 1, 46, 69, 3);
+      const P = G.players[1]; P.res = { food: 900, wood: 900, gold: 800, ki: 50 }; P.age = 3; P.minors = ['piccolo', 'kingkai']; P.techs.add('ssj1'); P.powers.beamcannon = { state: 'ready' }; P.powers.kaiosurge = { state: 'ready' }; recomputeMods(P);
+      const P2 = G.players[2];
+      S.vars.ship = S.bld('ship', 2, 44, 4); S.vars.ship.name = "Babidi's Spaceship";
+      S.vars.tc2 = S.tc(2, 48, 26); S.units('worker', 2, 46, 30, 12); S.resAround(48, 26, { hunt: 'boar' });
+      for (const k of ['house', 'house', 'house', 'house', 'barracks', 'barracks', 'granary', 'storehouse', 'tower', 'tower', 'temple', 'stable', 'armory']) S.bldNear(k, 2, S.vars.tc2, 4, 14);
+      P2.age = 3; P2.minors = ['dodoria', 'ginyu']; recomputeMods(P2); P2.res = { food: 800, wood: 800, gold: 800, ki: 60 };
+      S.vars.dabura = S.hero('ginyu', 2, 46, 14, null, 'Dabura'); S.vars.dabura.buffs.push({ until: 1e9, atk: 1.4 });
+      S.units('saiyan', 2, 44, 34, 6); S.units('soldier', 2, 50, 34, 6); S.units('brute', 2, 47, 36, 2);
+      S.ai(2, S.diffKey, { maxAge: 3, noExpand: true, noHunt: true, firstWave: { easy: 600, normal: 420, hard: 300 }[S.diffKey] });
+      S.maxAge = 4; S.lock('wonder');
+      ensureConnected({ x: 48, y: 82 }, [{ x: 48, y: 26 }, { x: 46, y: 12 }]);
+      S.vars.energy = 0;
+      S.onKill = (e, k) => { if (e.kind === 'unit' && e.owner === 1 && k && k.owner === 2) S.vars.energy += e.def.cls === 'hero' ? 4 : .5; };
+      S.obj('ship', "Destroy Babidi's Spaceship", { counter: () => `Buu ${Math.min(99, Math.floor(S.vars.energy))}%` });
+      S.obj('dabura', 'Defeat Dabura', { optional: true });
+      S.obj('vegeta', 'Break the spell on Vegeta', { hidden: true });
+    },
+    start(S) {
+      S.say('babidi', 'Papparapa! Fight, fight! Every drop of your energy goes to my Majin Buu!', { pause: true });
+      S.say('supremekai', 'Babidi\'s ship is on the mountain to the north. Destroy it before Buu is fully charged!');
+      S.say('kami', 'Advance to the Buu Saga (you need a Fortress) and Goku can learn Super Saiyan 3.');
+      S.mark(46, 8);
+      const rate = { easy: .075, normal: .1, hard: .125 }[S.diffKey];
+      S.every(1, () => { S.vars.energy += rate; });
+      S.when(() => S.vars.energy >= 50, () => S.say('babidi', 'Half full already! Keep fighting, keep fighting!'));
+      S.when(() => S.t > { easy: 480, normal: 360, hard: 300 }[S.diffKey] || (S.alive(S.vars.ship) && S.vars.ship.hp < maxHp(S.vars.ship) * .75), () => {
+        S.vars.mv = S.hero('vegeta', 2, 50, 12, 'vegeta_ssj', 'Majin Vegeta'); S.vars.mv.buffs.push({ until: 1e9, atk: 1.2 });
+        S.say('vegeta', 'Kakarot! Babidi\'s magic has freed me. Now we finish what we started.', { pause: true });
+        S.say('gokussj', 'Vegeta… you let him into your heart on purpose?!');
+        S.showObj('vegeta'); S.attack([S.vars.mv], 48, 78);
+        S.when(() => S.alive(S.vars.mv) && S.vars.mv.hp < maxHp(S.vars.mv) * .3, () => {
+          const v = S.vars.mv; v.owner = 1; v.nick = 'Vegeta'; v.hp = maxHp(v) * .7; v.buffs = []; idleOrder(v); G.sel = G.sel.filter(s => s !== v);
+          S.say('vegetassj', 'Enough… I am nobody\'s puppet. Babidi, your ship is mine to destroy!');
+          S.setObj('vegeta', 'done'); announce('Vegeta breaks free!');
+        });
+      });
+      S.when(() => !S.alive(S.vars.dabura), () => { S.setObj('dabura', 'done'); S.say('piccolo', 'The Demon King is down. Hit the ship!'); });
+      S.when(() => !S.alive(S.vars.ship), () => S.setObj('ship', 'done'));
+    },
+    check(S) {
+      if (S.done('ship')) S.win();
+      if (S.vars.energy >= 100 && !G.over) { S.setObj('ship', 'failed'); S.lose('Babidi collected enough energy. Majin Buu has awakened.'); }
+      lostCheck(S);
+    },
+    win: 'The ship is rubble, but in the dust a pink shape stirs. Majin Buu has escaped, and he is changing…' },
+
+  { id: 'm9', saga: 'Buu Saga', title: 'The Universal Spirit Bomb', biome: 'earth', size: 96, seed: 909,
+    blurb: 'Hold off Kid Buu while the Earth gathers its energy.',
+    story: ['Majin Buu has become Kid Buu, his pure and most dangerous form. He cannot be beaten by force: he regenerates from anything.', 'There is one hope. If enough people lend their energy to Kami\'s Lookout, Goku can throw the Universal Spirit Bomb. Keep villagers meditating, and keep Buu away from them.'],
+    goals: ['Fill the Spirit Bomb: keep villagers meditating at Kami\'s Lookout', 'Survive Kid Buu\'s rampages', 'Throw the Universal Spirit Bomb at Kid Buu', 'Keep at least one Town Center or villager'],
+    cast: [['gokussj', 'vegetassj', 'gohan'], ['buu']],
+    players: [EARTH, { faction: 'ff', major: 'frieza', name: 'Kid Buu', team: 2, ai: null, color: 3 }],
+    terrain(S) { S.nature({ lakes: 3, ridges: 6, forests: 22, dirt: true, keep: [[48, 66, 15], [48, 14, 8]] }); S.clear(48, 66, 11, T_ROAD); S.clear(48, 14, 6, T_DIRT); },
+    setup(S) {
+      S.tc(1, 48, 68); S.units('colonist', 1, 51, 71, 16); S.resAround(48, 68);
+      S.vars.temple = S.bld('temple', 1, 54, 60);
+      for (const [k, x, y] of [['house', 42, 72], ['house', 54, 72], ['house', 40, 66], ['house', 58, 66], ['house', 44, 76], ['barracks', 38, 60], ['stable', 60, 72], ['armory', 34, 70], ['fortress', 42, 56], ['tower', 50, 54], ['tower', 60, 56]]) S.bld(k, 1, x, y);
+      S.vars.goku = S.hero('goku', 1, 48, 60, 'goku_ssj1'); S.vars.vegeta = S.hero('vegeta', 1, 46, 60, 'vegeta_ssj', 'Vegeta'); S.vars.gohan = S.hero('gohan', 1, 50, 60, 'gohan_base'); S.hero('piccolo', 1, 52, 62);
+      S.units('fighter', 1, 46, 56, 6); S.units('gunner', 1, 50, 56, 6); S.units('rider', 1, 44, 58, 4);
+      const P = G.players[1]; P.res = { food: 1200, wood: 1000, gold: 1200, ki: 60 }; P.age = 4; P.minors = ['piccolo', 'kingkai', 'elderkai']; P.techs.add('ssj1');
+      P.powers.beamcannon = { state: 'ready' }; P.powers.kaiosurge = { state: 'ready' }; P.powers.potential = { state: 'ready' }; recomputeMods(P);
+      const P2 = G.players[2]; P2.age = 4;
+      S.vars.buu = S.units('kidbuu', 2, 48, 14, 1)[0]; S.vars.buu.home = { x: 48, y: 14 };
+      S.vars.buu.buffs.push({ until: 1e9, atk: { easy: .55, normal: .8, hard: 1 }[S.diffKey] });
+      S.lock('wonder', 'buu'); S.maxAge = 4;
+      ensureConnected({ x: 48, y: 68 }, [{ x: 48, y: 14 }]);
+      S.vars.spirit = 0;
+      S.obj('spirit', 'Gather energy for the Spirit Bomb', { counter: () => `${Math.min(100, Math.floor(S.vars.spirit))}%` });
+      S.obj('bomb', 'Throw the Universal Spirit Bomb at Kid Buu', { hidden: true });
+    },
+    start(S) {
+      S.say('buu', 'Hee hee hee! Boom! Boom! Everything goes boom!', { pause: true });
+      S.say('gokussj', "Everyone, I need your energy! Send villagers to meditate at Kami's Lookout. Vegeta, Gohan: we buy them time.");
+      S.say('kami', 'Right-click Kami\'s Lookout with villagers to meditate. The more of them, the faster the Spirit Bomb grows.');
+      const B0 = S.vars.buu;
+      let phase = 'rest';
+      const rampage = () => {
+        if (!S.alive(B0)) return false;
+        if (phase === 'rest') {
+          phase = 'attack';
+          const mine = G.blds.filter(b => b.owner === 1 && !b.dead);
+          const pick = S.vars.spirit > 40 && S.alive(S.vars.temple) && rnd() < .6 ? S.vars.temple : mine[Math.floor(rnd() * mine.length)];
+          if (pick) { fxPush({ type: 'flash', x: B0.x, y: B0.y, z: 20, t: 0, dur: .4, color: '#ff8fd0', r: 2 }); B0.x = pick.x + (rnd() - .5) * 8; B0.y = pick.y - 7; B0.px = B0.x; B0.py = B0.y; B0.path = null; S.attack([B0], pick.x, pick.y); S.say('buu', rnd() < .5 ? 'Found you!' : 'Buu is bored. Buu smashes!', { dur: 2.5 }); if (G.players[1].human) toast('Kid Buu is attacking!', 'warn'); }
+        } else {
+          phase = 'rest';
+          fxPush({ type: 'flash', x: B0.x, y: B0.y, z: 20, t: 0, dur: .4, color: '#ff8fd0', r: 2 });
+          B0.x = B0.home.x; B0.y = B0.home.y; B0.px = B0.x; B0.py = B0.y; idleOrder(B0); B0.hp = maxHp(B0);
+        }
+      };
+      S.after({ easy: 90, normal: 60, hard: 45 }[S.diffKey], () => { rampage(); S.every({ easy: 45, normal: 40, hard: 40 }[S.diffKey], rampage); });
+      S.every({ easy: 200, normal: 160, hard: 120 }[S.diffKey], () => { if (!S.alive(B0)) return false; S.wave(2, [['saibaman', 4 * S.d], ['brute', 1 * S.d]], 48, 18, 48, 64); });
+      S.every(1, () => {
+        let n = 0; for (const u of G.units) if (u.owner === 1 && u.meditating && u.order.type === 'meditate') n++;
+        S.vars.spirit += (.03 + Math.min(n, 20) * .028) * ({ easy: 1.3, normal: 1, hard: .85 }[S.diffKey]);
+        if (S.vars.spirit >= 100 && !S.vars.ready) {
+          S.vars.ready = true; S.setObj('spirit', 'done'); S.showObj('bomb');
+          G.players[1].powers.spiritbomb = { state: 'ready' }; powSig = '';
+          announce('The Spirit Bomb is ready!');
+          S.say('gokussj', 'Thank you, everyone! Use the Universal Spirit Bomb power on Kid Buu!', { pause: true });
+        }
+      });
+      S.when(() => S.vars.spirit >= 50, () => S.say('gohan', 'It\'s working! Half of the Earth is lending us its energy!'));
+      S.when(() => !S.alive(B0), () => { S.setObj('bomb', 'done'); S.setObj('spirit', 'done'); S.say('gokussj', "Goodbye, Buu. Come back as a good guy, okay? I'll be waiting."); });
+      S.every(2, () => {
+        if (!S.alive(B0)) return false;
+        const pw = G.players[1].powers.spiritbomb;
+        if (!S.vars.ready || !pw || pw.state !== 'used') { S.vars.missT = 0; return; }
+        if (!S.vars.missT) S.vars.missT = S.t;
+        else if (S.t - S.vars.missT > 6) { S.vars.missT = 0; G.players[1].powers.spiritbomb = { state: 'ready' }; powSig = ''; toast('The Spirit Bomb missed! The people of Earth lend their energy once more.', 'gold'); }
+      });
+    },
+    check(S) { if (S.done('bomb')) S.win(); lostCheck(S); },
+    win: 'Kid Buu is gone, and the universe is safe. Thank you for playing The Saga of the Dragon Balls!' },
 ];
 B.guru.trains.push('namekwarrior'); B.guru.drop = ['food', 'wood', 'gold']; B.guru.garrison = 10; B.guru.pop = 20;

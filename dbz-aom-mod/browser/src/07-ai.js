@@ -36,7 +36,7 @@ function aiThink(P, dt) {
   const tcs = blds.filter(b => b.key === 'tc');
   const tc = tcs.find(b => b.built) || tcs[0];
   const vills = units.filter(u => u.def.cls === 'villager' && !u.garrison);
-  const army = units.filter(u => u.def.cls !== 'villager' && u.def.cls !== 'hero' && !u.garrison);
+  const army = units.filter(u => u.def.cls !== 'villager' && u.def.cls !== 'hero' && !u.garrison && !u.def.naval);
   const heroes = units.filter(u => u.def.cls === 'hero');
   const hero = heroes.find(h => h.key === FACTIONS[P.faction].mainHero) || heroes[0];
   const count = k => blds.filter(b => b.key === k).length;
@@ -55,6 +55,12 @@ function aiThink(P, dt) {
     for (const b of blds) if (dist(e.x, e.y, b.x, b.y) < 12) { threatN++; if (!threat) threat = e; break; }
   }
 
+  // ---- no Town Center (Nomad start, or all lost): claim the nearest free Settlement
+  if (!tcs.length && vills.length && !(G.scn && G.scn.locked && G.scn.locked.has('tc'))) {
+    const s = freeSettlementNear(anchor, 999);
+    if (s && !buildCheck(P, 'tc') && aiBuild(P, 'tc', s, vills, Math.min(vills.length, 6))) return;
+    if (s && !canAfford(P, bcost('tc', P.faction))) { for (const r of ['wood', 'gold']) if (P.res[r] < bcost('tc', P.faction)[r]) { const v = vills.find(x => x.order.type === 'idle'); const n = v && findRes(v.x, v.y, r, 40, P.id, 0, v); if (n) setOrder(v, { type: 'gather', rid: n.id, rtype: r }); } }
+  }
   // ---- economy
   const ageKey = ['', 'age2', 'age3', 'age4'][P.age];
   const maxAge = F.maxAge || 4;
@@ -79,9 +85,10 @@ function aiThink(P, dt) {
     else if (P.age >= 3 && count('fortress') === 0) aiBuild(P, 'fortress', anchor, vills, 3, 6, 15);
     else if (P.age >= 3 && count('barracks') < 2) aiBuild(P, 'barracks', anchor, vills, 2, 6, 15);
     else if (P.age >= 3 && count('market') === 0) aiBuild(P, 'market', anchor, vills, 1, 6, 15);
-    else if (P.age >= 4 && G.opts.victory === 'wonder' && count('wonder') === 0 && A.diffKey !== 'easy') aiBuild(P, 'wonder', anchor, vills, 6, 7, 18);
+    else if (P.age >= 4 && modeHas('wonder') && count('wonder') === 0 && A.diffKey !== 'easy') aiBuild(P, 'wonder', anchor, vills, 6, 7, 18);
   }
   aiVillagers(P, A, vills, anchor, temple);
+  if (!F.noNavy) aiNavy(P, A, units, blds, vills, anchor, enemies);
   if (threat && threatN >= 4 && tc && tc.built) {
     for (const v of vills) if (!v.garrison && v.order.type !== 'garrison' && dist(v.x, v.y, tc.x, tc.y) < 10 && tc.garrisoned.length < B.tc.garrison) setOrder(v, { type: 'garrison', bid: tc.id });
     A.garrisoned = true;
@@ -89,6 +96,8 @@ function aiThink(P, dt) {
 
   // ---- ages and technologies
   const saving = ageKey && P.age < maxAge && tc && !tc.research && ((P.age === 1 && vills.length >= 12) || (P.age === 2 && vills.length >= 18 && built('barracks').length) || (P.age === 3 && army.length >= 8));
+  const needB = ageKey && TECH[ageKey].needB;
+  if (saving && needB && !F.noAge && count(needB) === 0 && vills.length) aiBuild(P, needB, anchor, vills, 2, 5, 14);
   if (ageKey && P.age < maxAge && tc && !tc.research && saving && !F.noAge) {
     const opts = FACTIONS[P.faction].minors[P.age + 1];
     startTech(P, tc, ageKey, A.patronPref && A.patronPref[P.age + 1] || opts[Math.floor(rnd() * opts.length)]);
@@ -156,12 +165,21 @@ function aiThink(P, dt) {
       if (A.powerCd <= 0) aiPowers(P, enemies, true);
     }
   }
+  if (G.koth && !threat && !F.noAttack) {
+    const k = byId(G.korin), held = G.koth.team === P.team;
+    if (k) {
+      const near = home.filter(u => dist(u.x, u.y, k.x, k.y) < 8);
+      if (!held && home.length >= Math.min(6, A.waveTarget) && now > 120) { for (const u of home) { A.wave.add(u.id); setOrder(u, { type: 'move', x: k.x + (rnd() - .5) * 4, y: k.y + (rnd() - .5) * 4, amove: true }); } A.lastWaveCmd = now; }
+      else if (held && near.length < 4) for (const u of home.filter(u => u.order.type === 'idle').slice(0, 4 - near.length)) setOrder(u, { type: 'move', x: k.x + (rnd() - .5) * 5, y: k.y + (rnd() - .5) * 5, amove: true });
+    }
+  }
   if (now - A.lastWaveCmd > 10 && A.wave.size) {
     A.lastWaveCmd = now;
     for (const id of A.wave) { const u = byId(id); if (u && u.order.type === 'idle') { const t = F.waveTo || aiTarget(P, u, enemies); if (t) setOrder(u, { type: 'move', x: t.x, y: t.y, amove: true }); } }
   }
   // ---- Dragon Balls, powers, Shenron, market
   if (hero && !G.stoneUntil && G.balls.length && !F.noHunt) aiHunt(P, hero, home, temple);
+  if (temple && G.relics.length && !F.noHunt && !threat) aiRelics(P, heroes, temple, anchor);
   if (P.powers.shenron && P.powers.shenron.state === 'ready') castPower(P, 'shenron', 0, 0);
   if (A.powerCd <= 0) aiPowers(P, enemies, false);
   if (A.tradeCd <= 0 && built('market').length) {
@@ -243,7 +261,7 @@ function aiArmyOnly(P, army, heroes, enemies) {
 }
 function aiHunt(P, hero, army, temple) {
   const A = P.ai;
-  if (!temple) return;
+  if (!temple || hero.carryRelic) return;
   if (hero.carryBall) { if (hero.order.type !== 'deposit') setOrder(hero, { type: 'deposit', bid: temple.id }); A.hunt = null; return; }
   if (A.hunt) {
     const ball = G.balls.find(b => b.id === A.hunt.ball);
@@ -265,6 +283,75 @@ function aiHunt(P, hero, army, temple) {
   const escorts = army.filter(u => !A.wave.has(u.id)).slice(0, 5).map(u => u.id);
   A.hunt = { ball: best.id, escorts, hero: hero.id };
   setOrder(hero, { type: 'move', x: best.x, y: best.y, amove: true, hunt: true });
+}
+// ---- navy: a Dock on the nearest real sea, fishing boats, and warships picked by counters
+function aiNavy(P, A, units, blds, vills, anchor, enemies) {
+  const now = G.time;
+  if (!A.sea || now - A.sea.t > 90) {
+    let best = null, bd = 34;
+    const cx = Math.floor(anchor.x), cy = Math.floor(anchor.y);
+    for (let y = cy - 34; y <= cy + 34; y += 1) for (let x = cx - 34; x <= cx + 34; x += 1) {
+      if (!inMap(x, y)) continue; const i = idx(x, y);
+      if (G.map.terr[i] !== T_WATER || !G.nregion[i] || G.nregionSize[G.nregion[i]] < 120) continue;
+      const d = dist(x, y, anchor.x, anchor.y); if (d < bd) { bd = d; best = { x, y, reg: G.nregion[i] }; }
+    }
+    A.sea = Object.assign({ t: now, reg: 0 }, best || {});
+  }
+  const reg = A.sea.reg; if (!reg) return;
+  const inSea = e => e.kind === 'unit' ? regionAt(e.x, e.y, true) === reg : regionsOf(e, true).includes(reg);
+  const fishN = G.ress.filter(r => r.key === 'fish' && G.nregion[idx(r.tx, r.ty)] === reg).length;
+  const docks = blds.filter(b => b.key === 'dock'), dock = docks.find(b => b.built);
+  const foeShips = G.units.filter(u => u.def.naval && !u.def.fisher && enemies.some(Q => Q.id === u.owner) && inSea(u));
+  const foeNaval = foeShips.length || G.units.some(u => u.def.fisher && enemies.some(Q => Q.id === u.owner) && inSea(u)) || G.blds.some(b => b.key === 'dock' && enemies.some(Q => Q.id === b.owner) && inSea(b));
+  if (!docks.length && vills.length >= 8 && now > 100 && (fishN >= 3 || foeNaval) && !buildCheck(P, 'dock')) {
+    // shore tile nearest home, next to this sea
+    let shore = null, bd = 1e9;
+    for (let y = A.sea.y - 10; y <= A.sea.y + 10; y++) for (let x = A.sea.x - 10; x <= A.sea.x + 10; x++) {
+      if (!inMap(x, y) || G.map.terr[idx(x, y)] === T_WATER || G.map.block[idx(x, y)]) continue;
+      if (![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => inMap(x + dx, y + dy) && G.nregion[idx(x + dx, y + dy)] === reg)) continue;
+      const d = dist(x, y, anchor.x, anchor.y); if (d < bd) { bd = d; shore = { x, y }; }
+    }
+    if (shore) aiBuild(P, 'dock', shore, vills, 2, 0, 6);
+  }
+  if (!dock) return;
+  const myShips = units.filter(u => u.def.naval);
+  const fishers = myShips.filter(u => u.def.fisher), war = myShips.filter(u => !u.def.fisher);
+  const kinds = {}; for (const k in U) if (U[k].faction === P.faction && U[k].ship) kinds[U[k].ship] = k;
+  const qn = k => dock.queue.filter(q => q.key === k).length;
+  if (fishers.length + qn(kinds.fish) < Math.min(fishN, 3 + P.age * 2, 10) && dock.queue.length < 2 && P.res.wood > 120 && P.pop < P.popCap) queueUnit(P, dock, kinds.fish);
+  for (const f of fishers) if (f.order.type === 'idle') { const r = findRes(f.x, f.y, 'food', 60, P.id, 0, f); if (r) setOrder(f, { type: 'gather', rid: r.id, rtype: 'food' }); }
+  if (!dock.research) for (const k of ['nets', 'hulls', 'navalguns']) if (!techCheck(P, dock, k) && P.res.wood > TECH[k].cost.wood + 150) { startTech(P, dock, k); break; }
+  // warships: answer enemy ships with their counter, otherwise keep a small fleet
+  const fc = { arrow: 0, hammer: 0, siege: 0 }; for (const s of foeShips) fc[s.def.ship]++;
+  const mc = { arrow: 0, hammer: 0, siege: 0 }; for (const s of war) mc[s.def.ship]++;
+  const want = Math.min(14, foeShips.length ? foeShips.length + 3 : foeNaval && P.age >= 2 ? 3 + P.age : 0);
+  if (war.length < want && dock.queue.length < 2 && P.pop < P.popCap - 2) {
+    const counter = { arrow: 'hammer', hammer: P.age >= 3 ? 'siege' : 'arrow', siege: 'arrow' };
+    let pick = 'arrow', score = -1e9;
+    for (const k of ['arrow', 'hammer', 'siege']) { if (k === 'siege' && P.age < 3) continue; let sc = -mc[k]; for (const e in fc) if (counter[e] === k) sc += fc[e] * 1.5; if (sc > score) { score = sc; pick = k; } }
+    if (kinds[pick] && !trainCheck(P, dock, kinds[pick]) && P.res.wood > U[kinds[pick]].cost.wood + 80) queueUnit(P, dock, kinds[pick]);
+  }
+  // fleet orders
+  const threat = foeShips.find(s => dist(s.x, s.y, dock.x, dock.y) < 26 || fishers.some(f => dist(f.x, f.y, s.x, s.y) < 10));
+  if (threat) { for (const s of war) if (s.order.type !== 'attack') setOrder(s, { type: 'move', x: threat.x, y: threat.y, amove: true }); return; }
+  if (war.length >= 4 && now - (A.fleetT || 0) > 70) {
+    A.fleetT = now;
+    let tgt = null, td = 1e9;
+    for (const e of [...G.blds.filter(b => enemies.some(Q => Q.id === b.owner) && inSea(b)), ...G.units.filter(u => u.def.naval && enemies.some(Q => Q.id === u.owner) && inSea(u))]) { const d = dist(e.x, e.y, dock.x, dock.y) + (e.kind === 'building' && e.key === 'dock' ? -10 : 0); if (d < td) { td = d; tgt = e; } }
+    if (tgt) for (const s of war) setOrder(s, { type: 'move', x: tgt.x, y: tgt.y, amove: true });
+  } else for (const s of war) if (s.order.type === 'idle' && dist(s.x, s.y, dock.x, dock.y) > 14) setOrder(s, { type: 'move', x: dock.x + (rnd() - .5) * 8, y: dock.y + (rnd() - .5) * 8 });
+}
+// A free hero fetches relics to the Temple, AoM style.
+function aiRelics(P, heroes, temple, anchor) {
+  const A = P.ai;
+  for (const h of heroes) if (h.carryRelic && h.order.type !== 'deposit') setOrder(h, { type: 'deposit', bid: temple.id });
+  if (heroes.some(h => h.order.type === 'pickup' && h.order.relic) || heroes.some(h => h.carryRelic)) return;
+  if (temple.relics.length >= RELIC_CAP) return;
+  const h = heroes.find(x => !(A.hunt && A.hunt.hero === x.id) && !A.wave.has(x.id) && x.order.type !== 'attack' && !x.carryBall && x.hp > maxHp(x) * .6);
+  if (!h) return;
+  let best = null, bd = 55;
+  for (const r of G.relics) if (r.state === 'ground') { const d = dist(r.x, r.y, anchor.x, anchor.y); if (d < bd && reachablePt(h, r.x, r.y)) { bd = d; best = r; } }
+  if (best) setOrder(h, { type: 'pickup', relic: best.id });
 }
 function aiPowers(P, enemies, attacking) {
   const A = P.ai;

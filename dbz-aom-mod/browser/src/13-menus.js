@@ -25,22 +25,31 @@ $('how-body').innerHTML = `
 <ul><li>Tap a unit to select it, then tap the ground, an enemy or a resource to order it. Drag to scroll, pinch to zoom, and turn on <b>Box select</b> to drag-select a group.</li></ul>
 <h4>Economy</h4>
 <ul><li>Villagers gather <b>Rations</b> (hunting, Senzu bushes, farms), <b>Capsule Alloy</b> (trees) and <b>Zeni</b> (veins) and carry them to a Town Center, Granary (Rations) or Storehouse (Alloy, Zeni). Build drop sites close to what you gather.</li>
-<li>Houses give 10 population (up to 10 houses) and Town Centers 15. From the Namek Saga you can build more Town Centers, but only on <b>Settlements</b> (the white H circles).</li>
+<li>Houses give 10 population (up to 10 houses) and Town Centers 15, up to 300 in total. From the Namek Saga you can build more Town Centers, but only on <b>Settlements</b> (the white H circles).</li>
+<li><b>Docks</b> go on a shore next to deep water. Fishing boats catch giant fish (Rations) and bring them back to the Dock.</li>
 <li><b>Ki</b> is this game's Favor. Earth villagers meditate at Kami's Lookout, the Red Ribbon builds Bio-Reactors, and the Frieza Force earns it by fighting.</li></ul>
 <h4>Sagas and patrons</h4>
 <p>You pick a <b>major patron</b> at the start (like an Age of Mythology god). Each time you advance a Saga at the Town Center you choose one of two <b>minor patrons</b>. Each patron grants a one-time <b>god power</b> (left column), a myth unit at the Temple, and a special technology.</p>
+<p>Like Age of Mythology, each advance needs a building first: a <b>Temple</b> for the Namek Saga, an <b>Armory</b> for the Android Saga and a <b>Fortress</b> for the Buu Saga.</p>
 <h4>Units and counters</h4>
 <ul><li>Infantry beats cavalry, cavalry beats ranged units and siege, ranged units beat infantry, and siege wrecks buildings.</li>
 <li>Heroes deal 4× damage to myth units (2.5× to Titans). Myth units deal 2.5× damage to human soldiers but only half to heroes. Only heroes can carry Dragon Balls.</li>
 <li>Heroes such as Goku, Vegeta and Frieza can fly (0.4 Ki per second each). At 0 Ki everyone lands. Special attacks fire automatically.</li>
-<li>Garrison villagers in Town Centers, towers and fortresses to protect them and add more shots.</li></ul>
+<li>Garrison villagers in Town Centers, towers and fortresses to protect them and add more shots.</li>
+<li>Ships have their own triangle: <b>arrow ships</b> beat siege ships, <b>siege ships</b> beat hammer ships (and wreck coastal buildings), and <b>hammer ships</b> beat arrow ships. Melee soldiers cannot reach ships; ranged units, towers and flying heroes can.</li></ul>
 <h4>Dragon Balls</h4>
 <p>Seven balls lie at guarded camps. Bring them to your Temple (each one trickles Ki and Zeni). Hold all seven and the <b>Summon Shenron</b> power appears: wish for Immortality, Ultimate Wealth or Restored Youth. Then the balls turn to stone for 3 minutes and scatter again.</p>
+<h4>Relics</h4>
+<p>Purple-glowing relics (the Power Pole, Z Sword, Dragon Radar, Senzu Seed Pouch and more) lie around the map. Right-click one with a hero, then right-click your Temple. Each relic kept there gives a permanent bonus. If the Temple falls, its relics spill out.</p>
+<h4>Game modes</h4>
+<ul><li><b>Supremacy</b>: win by conquest, by keeping a Wonder for 10 minutes, or by holding every Settlement for 5 minutes. <b>Conquest</b>: destroy every enemy.</li>
+<li><b>Deathmatch</b>: start with 5000 of everything. <b>Lightning</b>: double speed. <b>Nomad</b>: no Town Center; claim a Settlement first.</li>
+<li><b>King of the Hill</b>: keep units around Korin's Tower, with no enemies there, for 5 minutes. <b>Sudden Death</b>: lose your last Town Center and you have 2 minutes to rebuild.</li></ul>
 <h4>Cheat codes</h4>
 <p>Press <kbd>Enter</kbd> during a game (phone: Menu, then <b>Enter a cheat code</b>): <b>CAPSULE CORP</b> (+1000 Rations, Alloy and Zeni), <b>KAMI'S BLESSING</b> (full Ki), <b>SENZU BEAN</b> (heal your units), <b>INSTANT TRANSMISSION</b> (reveal the map), <b>SEVEN STARS</b> (all Dragon Balls to your Temple), <b>OVER 9000</b> (strongest hero form), <b>HYPERBOLIC TIME CHAMBER</b> (finish all your construction, training and research).</p>`;
 
 // ---------- skirmish setup ----------
-const SK = store.get('skirmish', null) || { map: 'earth', victory: 'conquest', resources: 'standard', slots: [
+const SK = store.get('skirmish', null) || { map: 'earth', mode: 'supremacy', resources: 'standard', slots: [
   { who: 'you', faction: 'earth', major: 'kami', team: 1, diff: 'normal' },
   { who: 'ai', faction: 'rr', major: 'gero', team: 2, diff: 'normal' },
   { who: 'closed', faction: 'ff', major: 'frieza', team: 2, diff: 'normal' },
@@ -50,11 +59,16 @@ function segSet(id, attr, val) { for (const b of $(id).querySelectorAll('button'
 function openSkirmish() {
   const ms = $('s-map'); ms.innerHTML = '';
   for (const k in MAPS) { const b = document.createElement('button'); b.dataset.m = k; b.textContent = MAPS[k].name; b.title = MAPS[k].desc; b.addEventListener('click', () => { SK.map = k; segSet('s-map', 'm', k); }); ms.appendChild(b); }
-  segSet('s-map', 'm', SK.map); segSet('s-victory', 'v', SK.victory); segSet('s-res', 'r', SK.resources);
+  if (!MODES[SK.mode]) SK.mode = SK.victory === 'conquest' ? 'conquest' : 'supremacy';
+  if (!MAPS[SK.map]) SK.map = 'earth';
+  $('s-mode').innerHTML = Object.keys(MODES).map(k => opt(k, MODES[k].name, SK.mode)).join('');
+  modeDesc();
+  segSet('s-map', 'm', SK.map); segSet('s-res', 'r', SK.resources);
   renderSlots();
   showScreen('scr-skirmish');
 }
-for (const b of $('s-victory').querySelectorAll('button')) b.addEventListener('click', () => { SK.victory = b.dataset.v; segSet('s-victory', 'v', SK.victory); });
+function modeDesc() { const M = MODES[SK.mode]; $('s-mode-desc').textContent = M.desc; $('s-res').style.opacity = M.res ? .4 : 1; $('s-res').title = M.res ? 'This mode sets its own starting resources.' : ''; }
+$('s-mode').addEventListener('change', () => { SK.mode = $('s-mode').value; modeDesc(); });
 for (const b of $('s-res').querySelectorAll('button')) b.addEventListener('click', () => { SK.resources = b.dataset.r; segSet('s-res', 'r', SK.resources); });
 function opt(v, label, sel) { return `<option value="${v}"${v === sel ? ' selected' : ''}>${esc(label)}</option>`; }
 function renderSlots() {
@@ -85,7 +99,7 @@ $('s-start').addEventListener('click', () => {
   store.set('skirmish', SK);
   const players = [];
   SK.slots.forEach((s, i) => { if (s.who === 'closed') return; players.push({ faction: s.faction, major: s.major, team: s.team, ai: s.who === 'ai' ? s.diff : null, color: i + 1, name: s.who === 'you' ? 'You' : PATRONS[s.major].name }); });
-  launch({ kind: 'skirmish', opts: { map: SK.map, victory: SK.victory, resources: SK.resources, dragonBalls: true, players } });
+  launch({ kind: 'skirmish', opts: { map: SK.map, mode: SK.mode, resources: SK.resources, dragonBalls: true, players } });
 });
 function toastMenu(msg) { alertBox(msg); }
 function alertBox(msg) { const t = document.createElement('div'); t.className = 'toast warn'; t.textContent = msg; t.style.cssText = 'position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:50'; document.body.appendChild(t); setTimeout(() => t.remove(), 3500); }
@@ -110,7 +124,7 @@ function enterPlay() {
   cam.z = vw < 820 ? .72 : 1;
   if (tc) centerOn(tc.x, tc.y);
   if (!G.scn) {
-    toast('Gather resources, train an army and destroy your enemies. Press P for help.', 'gold');
+    toast(G.opts.mode === 'nomad' ? 'Nomad: lead your villagers to a Settlement (the white H circles, the nearest one is marked on the minimap) and build a Town Center. Press P for help.' : G.opts.mode === 'koth' ? "King of the Hill: hold Korin's Tower in the middle of the map for 5 minutes. Press P for help." : `${MODES[G.opts.mode] ? MODES[G.opts.mode].name + ': g' : 'G'}ather resources, train an army and destroy your enemies. Press P for help.`, 'gold');
     G.sel = G.units.filter(u => u.owner === G.me && u.def.cls === 'villager');
     if (P) setTimeout(() => G.started && !G.over && toast(P.faction === 'earth' ? "Tip: build Kami's Lookout early and send villagers to meditate for Ki." : P.faction === 'rr' ? 'Tip: Bio-Reactors make your Ki. Cell hatches in the Android Saga.' : 'Tip: the Frieza Force earns Ki by fighting. Hunt the Dragon Balls with Vegeta.', ''), 4000);
   }
@@ -208,8 +222,8 @@ function showEnd(won, reason) {
   const P = humanP();
   $('end-title').textContent = won ? 'Victory!' : 'Defeat';
   const sub = G.scn ? (won ? G.scn.m.win : (G.scn.loseReason || 'The mission has failed.'))
-    : won ? (reason === 'wonder' ? 'Your Wonder stood for five minutes. The universe is yours.' : 'Every enemy has fallen. Peace returns… for now.')
-    : reason === 'resign' ? 'You resigned.' : 'Your forces have been wiped out. Train harder and try again.';
+    : won ? ({ wonder: 'Your Wonder stood for ten minutes. The universe is yours.', settlements: 'You held every Settlement. Nobody can challenge you now.', koth: "You held Korin's Tower. The whole world bows to you." }[reason] || 'Every enemy has fallen. Peace returns… for now.')
+    : reason === 'resign' ? 'You resigned.' : ({ wonder: 'An enemy Wonder stood for ten minutes.', settlements: 'The enemy held every Settlement for five minutes.', koth: "The enemy held Korin's Tower for five minutes." }[reason] || 'Your forces have been wiped out. Train harder and try again.');
   $('end-sub').textContent = sub;
   const st = P ? [['Time', fmtTime(G.time)], ['Saga reached', AGES[P.age]], ['Enemies defeated', P.stats.kills], ['Buildings destroyed', P.stats.killedB], ['Units lost', P.stats.lost], ['Resources gathered', Math.round(P.stats.gathered)], ['Dragon Balls secured', P.stats.balls], ['Wishes made', P.stats.wishes]] : [];
   $('end-stats').innerHTML = st.map(([a, b]) => `<div class="frame"><b>${b}</b><span>${a}</span></div>`).join('');

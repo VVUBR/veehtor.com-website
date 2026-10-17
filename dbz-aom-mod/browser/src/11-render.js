@@ -181,6 +181,7 @@ function render(alpha, realDt) {
   for (const e of G.ents) if (e.kind === 'deco' && !e.dead && exploredAt(e.x, e.y)) draws.push({ d: e.x + e.y, deco: e });
   for (const t of G.treeFall) if (exploredAt(t.x, t.y) && inViewIso(isoX(t.x, t.y), isoY(t.x, t.y), 40)) draws.push({ d: t.x + t.y - .3, stump: t });
   for (const b of G.balls) if (b.state === 'ground' && (G.revealAll || visibleAt(b.x, b.y))) draws.push({ d: b.x + b.y, ball: b });
+  for (const r of G.relics) if (r.state === 'ground' && (G.revealAll || exploredAt(r.x, r.y))) draws.push({ d: r.x + r.y, relic: r });
   draws.sort((a, b) => a.d - b.d);
   for (const o of draws) {
     if (o.u) drawUnit(o.u, o.x, o.y);
@@ -188,6 +189,7 @@ function render(alpha, realDt) {
     else if (o.r) drawRes(o.r);
     else if (o.deco) { const sp = sealedBallSprite(G.units.some(u => u.def.cls === 'titan')); drawSpr(sp, isoX(o.deco.x, o.deco.y), isoY(o.deco.x, o.deco.y)); }
     else if (o.stump) drawSpr(stumpSprite(), isoX(o.stump.x, o.stump.y), isoY(o.stump.x, o.stump.y));
+    else if (o.relic) drawRelic(o.relic, isoX(o.relic.x, o.relic.y), isoY(o.relic.x, o.relic.y), 1);
     else if (o.ball) drawBall(isoX(o.ball.x, o.ball.y), isoY(o.ball.x, o.ball.y) - 6 - Math.sin(G.time * 3 + o.ball.star) * 2, o.ball.star, 1, true);
   }
   for (const p of G.projs) if (inViewIso(isoX(p.x, p.y), isoY(p.x, p.y), 40)) drawProj(p);
@@ -227,7 +229,7 @@ function drawWater(dt) {
 }
 function drawUnitGround(u, x, y) {
   const ix = isoX(x, y), iy = isoY(x, y), r = u.r * 46 * (u.ape ? 1 : 1);
-  ctx.fillStyle = `rgba(0,0,0,${u.flying || u.def.alwaysFly ? .18 : .32})`;
+  ctx.fillStyle = `rgba(0,0,0,${u.def.naval ? .12 : u.flying || u.def.alwaysFly ? .18 : .32})`;
   ctx.beginPath(); ctx.ellipse(ix + 2, iy + 1, r * 1.1, r * .5, 0, 0, 7); ctx.fill();
   if (u.owner > 0) { ctx.strokeStyle = pcol(G.players[u.owner].color); ctx.lineWidth = 1.6; ctx.beginPath(); ctx.ellipse(ix, iy, r + 2, r * .5 + 1, 0, 0, 7); ctx.stroke(); }
   if (G.sel.includes(u)) { ctx.strokeStyle = '#7dff9c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(ix, iy, r + 5, r * .5 + 3, 0, 0, 7); ctx.stroke(); }
@@ -245,7 +247,8 @@ function unitPose(u) {
 }
 function drawUnit(u, x, y) {
   const ix = isoX(x, y), lift = u.leap ? u.lift * 34 : (u.lift || 0) * (u.def.alwaysFly ? 0 : 30) + (u.flying ? Math.sin(G.time * 3 + u.id) * 2 : 0);
-  const iy = isoY(x, y) - lift;
+  let iy = isoY(x, y) - lift;
+  if (u.def.naval) { iy += Math.sin(G.time * 2 + u.id) * 1.2; if (u.moving && frnd() < .5) partBurst(x - Math.cos(u.face) * u.r, y - Math.sin(u.face) * u.r, 1, 1, '#e8f6ff', .25, .7, false, 2.2); }
   const st = stats(u), L = unitLook(u);
   // auras
   const auraC = u.kaio ? '#ff3b3b' : L.aura || (u.buffs.length ? '#ffd166' : null);
@@ -260,6 +263,7 @@ function drawUnit(u, x, y) {
   if (u.stun > 0) { ctx.fillStyle = '#fff6a8'; for (let i = 0; i < 3; i++) { const a = G.time * 4 + i * 2.1; ctx.beginPath(); ctx.arc(ix + Math.cos(a) * 9, iy - 44 + Math.sin(a) * 3, 2, 0, 7); ctx.fill(); } }
   if (u.carryAmt > .5 && u.carry) { ctx.fillStyle = u.carry === 'wood' ? '#a8763c' : u.carry === 'gold' ? '#ffd34d' : '#86e07c'; ctx.beginPath(); ctx.ellipse(ix - (flip ? -6 : 6), iy - 20, 3.5, 3, 0, 0, 7); ctx.fill(); ctx.strokeStyle = 'rgba(0,0,0,.5)'; ctx.lineWidth = 1; ctx.stroke(); }
   if (u.carryBall) { const b = G.balls.find(q => q.id === u.carryBall); drawBall(ix, iy - 52 * (L.scale || 1), b ? b.star : 1, .8); }
+  if (u.carryRelic) { const r = G.relics.find(q => q.id === u.carryRelic); if (r) drawRelic(r, ix, iy - 40 * (L.scale || 1), .7, true); }
 }
 function drawCorpse(c) {
   const L = c.ape ? APE_LOOK : (c.form ? FORMS[c.form].look : U[c.key].look) || {};
@@ -285,6 +289,7 @@ function drawBuilding(b) {
   const hpk = b.hp / maxHp(b);
   if (hpk < .66 && frnd() < (hpk < .33 ? .5 : .2)) partBurst(b.tx + frnd() * b.w, b.ty + frnd() * b.h, 20 + frnd() * 30, 1, hpk < .33 ? '#ff7a2a' : '#5a5450', .3, 1.6, false, hpk < .33 ? 3 : 5);
   if (b.fac === 'rr' && (b.key === 'barracks' || b.key === 'tc') && frnd() < .06) partBurst(b.tx + .8, b.ty + .8, 70, 1, '#c8c8c8', .15, 2.4, false, 5);
+  if (b.relics.length) for (let i = 0; i < b.relics.length; i++) { const r = G.relics.find(q => q.id === b.relics[i]); if (r) drawSpr(relicSprite(r.key), isoX(b.x, b.y) - 24 + (i % 5) * 12, isoY(b.x, b.y) + 16 + Math.floor(i / 5) * 8, false, .55); }
   if (b.balls.length) for (let i = 0; i < b.balls.length; i++) { const bb = G.balls.find(q => q.id === b.balls[i]); drawBall(isoX(b.x, b.y) - 18 + i * 6, isoY(b.x, b.y) + 6, bb ? bb.star : 1, .55); }
   if (b.garrisoned.length && isAlly(b.owner, G.me)) { const [px, py] = [isoX(b.x, b.y), isoY(b.x, b.y) - 20]; ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(px - 10, py - 8, 20, 12); ctx.fillStyle = '#fff'; ctx.font = '700 9px "Chakra Petch", sans-serif'; ctx.textAlign = 'center'; ctx.fillText(b.garrisoned.length, px, py + 1); }
 }
@@ -294,7 +299,20 @@ function drawRes(r) {
   else if (r.key === 'gold') { const s = goldSprite(G.map.biome); drawSpr(s, ix, iy, false, .55 + .45 * Math.min(1, r.amount / 1200)); }
   else if (r.key === 'berry') drawSpr(berrySprite(), ix, iy);
   else if (r.key === 'carcass') drawSpr(carcassSprite(), ix, iy);
+  else if (r.key === 'fish') {
+    const t = G.time * 1.3 + r.v * 9, ox = Math.cos(t) * 3, oy = Math.sin(t * 1.4) * 1.5;
+    ctx.strokeStyle = `rgba(255,255,255,${.25 + .2 * Math.sin(t * 2)})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(ix, iy, 12 + Math.sin(t) * 2, 5, 0, 0, 7); ctx.stroke();
+    drawSpr(fishSprite(r.v), ix + ox, iy + oy, Math.cos(t) < 0);
+  }
   if (G.hover === r) { ctx.strokeStyle = 'rgba(255,255,255,.6)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.ellipse(ix, iy, 20 * r.w, 10 * r.w, 0, 0, 7); ctx.stroke(); }
+}
+function drawRelic(r, x, y, s, carried) {
+  const k = .5 + .5 * Math.sin(G.time * 2.4 + r.id);
+  const g = ctx.createRadialGradient(x, y - 8, 1, x, y - 8, 22 * s); g.addColorStop(0, `rgba(210,170,255,${.35 + k * .25})`); g.addColorStop(1, 'rgba(180,120,255,0)');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y - 8, 22 * s, 0, 7); ctx.fill();
+  if (!carried) { ctx.strokeStyle = `rgba(220,190,255,${.4 + k * .3})`; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.ellipse(x, y + 2, 13, 6, 0, 0, 7); ctx.stroke(); }
+  drawSpr(relicSprite(r.key), x, y - (carried ? 0 : 3 + k * 2), false, s);
+  if (!carried && G.hover && G.hover.kind === 'relic' && G.hover.relic === r) { ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.ellipse(x, y + 2, 16, 8, 0, 0, 7); ctx.stroke(); }
 }
 function drawBall(x, y, star, s, glow) {
   const r = 6 * s * (1 + .06 * Math.sin(G.time * 4 + star));
@@ -491,6 +509,7 @@ function renderMinimap() {
   for (const b of G.blds) if (seenBld(b)) { const col = pcol(G.players[b.owner].color); for (let y = b.ty; y < b.ty + b.h; y++) for (let x = b.tx; x < b.tx + b.w; x++) dot(x + .5, y + .5, 4, col); }
   for (const u of G.units) { if (u.garrison) continue; if (!G.revealAll && !isAlly(u.owner, G.me) && !visibleAt(u.x, u.y)) continue; dot(u.x, u.y, u.def.cls === 'hero' || u.def.cls === 'titan' ? 6 : 3.5, u.owner === 0 ? '#caa25b' : pcol(G.players[u.owner].color)); }
   if (!G.revealAll) { if (G.fogDirty) refreshFog(); mctx.save(); mctx.setTransform(HTW * miniScale, HTH * miniScale, -HTW * miniScale, HTH * miniScale, MH * HTW * miniScale, 0); mctx.imageSmoothingEnabled = true; mctx.drawImage(fogCanvas, -1, -1, MW + 2, MH + 2); mctx.restore(); }
+  for (const r of G.relics) if (r.state !== 'temple' && (G.revealAll || exploredAt(r.x, r.y))) { const [mx, my] = miniXY(r.x, r.y); mctx.fillStyle = '#c99aff'; mctx.fillRect(mx - 3, my - 3, 6, 6); mctx.strokeStyle = '#fff'; mctx.lineWidth = 1; mctx.strokeRect(mx - 3, my - 3, 6, 6); }
   if (Math.sin(G.time * 6) > -.2) for (const b of G.balls) if (b.state === 'ground' || b.state === 'carried') { const [mx, my] = miniXY(b.x, b.y); mctx.fillStyle = '#ff9a1e'; mctx.beginPath(); mctx.arc(mx, my, 4, 0, 7); mctx.fill(); mctx.strokeStyle = '#fff'; mctx.lineWidth = 1.5; mctx.stroke(); }
   for (const p of G.pings) { const k = (G.time - p.t) / 2.5; if (k > 1) continue; const [mx, my] = miniXY(p.x, p.y); mctx.strokeStyle = `rgba(255,90,95,${1 - k})`; mctx.lineWidth = 3; mctx.beginPath(); mctx.arc(mx, my, 6 + k * 22, 0, 7); mctx.stroke(); }
   if (G.objMarks) for (const p of G.objMarks) { const [mx, my] = miniXY(p.x, p.y); mctx.strokeStyle = '#ffe066'; mctx.lineWidth = 2; mctx.beginPath(); mctx.arc(mx, my, 6 + Math.sin(G.time * 4) * 2, 0, 7); mctx.stroke(); }

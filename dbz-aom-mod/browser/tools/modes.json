@@ -1,0 +1,8 @@
+[
+ { "mode": "supremacy", "map": "earth", "players": [{ "faction": "earth", "ai": "normal" }, { "faction": "ff", "ai": "normal" }], "seed": 51 },
+ { "mode": "deathmatch", "map": "wasteland", "players": [{ "faction": "rr", "ai": "normal" }, { "faction": "earth", "ai": "normal" }], "seed": 52 },
+ { "mode": "lightning", "map": "highlands", "players": [{ "faction": "ff", "ai": "normal" }, { "faction": "rr", "ai": "normal" }], "seed": 53 },
+ { "mode": "nomad", "map": "earth", "players": [{ "faction": "earth", "ai": "normal" }, { "faction": "rr", "ai": "normal" }, { "faction": "ff", "ai": "normal" }], "seed": 54 },
+ { "mode": "koth", "map": "namek", "players": [{ "faction": "ff", "ai": "normal" }, { "faction": "earth", "ai": "normal" }], "seed": 55 },
+ { "mode": "sudden", "map": "earth", "players": [{ "faction": "rr", "ai": "hard" }, { "faction": "ff", "ai": "normal" }], "seed": 56 }
+]

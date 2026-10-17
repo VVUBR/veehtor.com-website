@@ -4,7 +4,7 @@
 const TW = 64, TH = 32, HTW = TW / 2, HTH = TH / 2;  // isometric tile diamond at zoom 1
 const MT = 0.5;                                      // tiles per meter (one tile = 2 m, as in Age of Mythology)
 const STEP = 1 / 20;                                 // simulation tick
-const MAX_POP = 200;
+const MAX_POP = 300;
 const $ = id => document.getElementById(id);
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 const lerp = (a, b, t) => a + (b - a) * t;

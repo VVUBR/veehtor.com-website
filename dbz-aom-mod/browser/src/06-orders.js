@@ -12,7 +12,19 @@ function idleOrder(u) {
   u.order = { type: 'idle' }; u.path = null; u.wantPath = false; u.meditating = false;
 }
 function nextOrder(u) { const o = u.order; if (o.then) setOrder(u, o.then); else if (u.queue.length) { const q = u.queue.shift(); u.order = q; u.path = null; u.wantPath = true; } else idleOrder(u); }
-const isCombat = u => u.def.cls !== 'villager' && u.def.cls !== 'huntable';
+const isCombat = u => u.def.cls !== 'villager' && u.def.cls !== 'huntable' && !u.def.fisher;
+// Can this unit ever hit that target? Land fighters cannot reach ships at sea (ranged units and fliers can);
+// ships only hunt land targets they can get close to.
+function canTarget(u, e) {
+  const st = stats(u);
+  if (e.kind === 'unit' && e.def.naval) return !!(u.def.naval || u.flying || st.ranged || st.special);
+  if (u.def.naval) {
+    if (st.ranged) return true;
+    if (e.kind === 'unit') return !e.flying && regionAt(e.x, e.y, true) === regionAt(u.x, u.y, true);
+    return regionsOf(e, true).includes(regionAt(u.x, u.y, true));
+  }
+  return true;
+}
 
 function findEnemy(u, withBuildings, range) {
   const r = range || stats(u).los; let best = null, bd = 1e9;
@@ -23,36 +35,39 @@ function findEnemy(u, withBuildings, range) {
       const hb = e.lastHitBy && byId(e.lastHitBy);
       if (!(hb && hb.owner === u.owner && G.time - e.lastHitAt < 8) && !(e.order.type === 'attack' && byId(e.order.tid) && byId(e.order.tid).owner === u.owner)) return;
     }
+    if ((e.def.naval || u.def.naval) && !canTarget(u, e)) return;
     let d = Math.hypot(e.x - u.x, e.y - u.y);
     if (e.def.cls === 'villager') d += 2;
     if (d < bd) { bd = d; best = e; }
   });
-  if (!best && withBuildings) for (const b of G.blds) if (!b.dead && isEnemy(u.owner, b.owner)) { const d = edgeDist(u, b) + (B[b.key].wall ? 6 : 0); if (d < r && d < bd) { bd = d; best = b; } }
+  if (!best && withBuildings) for (const b of G.blds) if (!b.dead && isEnemy(u.owner, b.owner)) { const d = edgeDist(u, b) + (B[b.key].wall ? 6 : 0); if (d < r && d < bd && (!u.def.naval || canTarget(u, b))) { bd = d; best = b; } }
   return best;
 }
 function retaliateTarget(u) {
   if (!u.lastHitBy || G.time - u.lastHitAt > 3) return null;
   const a = byId(u.lastHitBy);
-  return a && a.kind !== 'building' && (isEnemy(u.owner, a.owner) || a.owner === 0) && Math.hypot(a.x - u.x, a.y - u.y) < stats(u).los * 1.4 ? a : null;
+  return a && a.kind !== 'building' && (isEnemy(u.owner, a.owner) || a.owner === 0) && Math.hypot(a.x - u.x, a.y - u.y) < stats(u).los * 1.4 && canTarget(u, a) ? a : null;
 }
 function nearestDrop(u, type) {
   let best = null, bd = 1e9;
-  for (const b of G.blds) if (!b.dead && b.owner === u.owner && b.built && B[b.key].drop && B[b.key].drop.includes(type)) { const d = edgeDist(u, b); if (d < bd) { bd = d; best = b; } }
+  const nav = !!u.def.naval;
+  for (const b of G.blds) if (!b.dead && b.owner === u.owner && b.built && B[b.key].drop && B[b.key].drop.includes(type) && !!B[b.key].navalDrop === nav && (!nav || regionsOf(b, true).includes(regionAt(u.x, u.y, true)))) { const d = edgeDist(u, b); if (d < bd) { bd = d; best = b; } }
   return best;
 }
 // Nearest resource of a type, avoiding crowded spots.
 function findRes(x, y, type, maxD, owner, skip, fromU) {
-  const reg = fromU && !fromU.flying ? regionAt(fromU.x, fromU.y) : regionAt(x, y);
+  const nav = !!(fromU && fromU.def.naval);
+  const reg = fromU && !fromU.flying ? regionAt(fromU.x, fromU.y, nav) : regionAt(x, y);
   const crowd = new Map();
   for (const u of G.units) if (u.owner === owner && (u.order.type === 'gather' || u.order.type === 'return') && u.order.rid) crowd.set(u.order.rid, (crowd.get(u.order.rid) || 0) + 1);
   let best = null, bd = maxD;
   for (const r of G.ress) {
-    if (r.dead || RES_DEF[r.key].type !== type || r.amount <= 0 || r.id === skip) continue;
+    if (r.dead || RES_DEF[r.key].type !== type || r.amount <= 0 || r.id === skip || !!RES_DEF[r.key].naval !== nav) continue;
     const c = crowd.get(r.id) || 0, cap = r.key === 'gold' ? 8 : r.key === 'tree' ? 2 : r.key === 'carcass' ? 5 : 3;
     const d = Math.hypot(r.x - x, r.y - y) + (c >= cap ? 60 : c * .8);
-    if (d < bd && (!reg || regionsOf(r).includes(reg))) { bd = d; best = r; }
+    if (d < bd && (!reg || regionsOf(r, nav).includes(reg))) { bd = d; best = r; }
   }
-  if (type === 'food') for (const b of G.blds) if (!b.dead && b.owner === owner && b.key === 'farm' && b.built && b.id !== skip && !(byId(b.farmer) && byId(b.farmer).order.rid === b.id)) { const d = Math.hypot(b.x - x, b.y - y); if (d < bd) { bd = d; best = b; } }
+  if (type === 'food' && !nav) for (const b of G.blds) if (!b.dead && b.owner === owner && b.key === 'farm' && b.built && b.id !== skip && !(byId(b.farmer) && byId(b.farmer).order.rid === b.id)) { const d = Math.hypot(b.x - x, b.y - y); if (d < bd) { bd = d; best = b; } }
   return best;
 }
 // Walk until within `reach` tiles of an entity's edge: path when far, steer straight in when close.
@@ -127,7 +142,7 @@ function updateUnit(u, dt) {
         P.res[u.carry] += u.carryAmt; P.stats.gathered += u.carryAmt; u.carryAmt = 0;
         const r = byId(o.rid);
         if (r && (r.kind === 'building' || r.amount > 0)) setOrder(u, { type: 'gather', rid: r.id, rtype: o.rtype });
-        else { const n = findRes(u.x, u.y, o.rtype, 14, u.owner); if (n) setOrder(u, { type: 'gather', rid: n.id, rtype: o.rtype }); else idleOrder(u); }
+        else { const n = findRes(u.x, u.y, o.rtype, 14, u.owner, 0, u); if (n) setOrder(u, { type: 'gather', rid: n.id, rtype: o.rtype }); else idleOrder(u); }
       }
       break;
     }
@@ -166,8 +181,16 @@ function updateUnit(u, dt) {
       break;
     }
     case 'pickup': {
+      if (o.relic) {
+        const r = G.relics.find(q => q.id === o.relic);
+        if (!r || r.state !== 'ground' || u.carryBall || u.carryRelic) { nextOrder(u); break; }
+        if (Math.hypot(u.x - r.x, u.y - r.y) <= u.r + .5) { pickUpRelic(u, r); nextOrder(u); break; }
+        if (u.wantPath) { goTo(u, r.x, r.y); if (!u.path) break; }
+        if (stepMove(u, dt) && Math.hypot(u.x - r.x, u.y - r.y) > u.r + .5) { if (Math.hypot(u.x - r.x, u.y - r.y) < 1.5) steerTo(u, r.x, r.y, dt); else u.wantPath = true; }
+        break;
+      }
       const ball = G.balls.find(b => b.id === o.ball);
-      if (!ball || ball.state !== 'ground' || u.carryBall) { nextOrder(u); break; }
+      if (!ball || ball.state !== 'ground' || u.carryBall || u.carryRelic) { nextOrder(u); break; }
       if (Math.hypot(u.x - ball.x, u.y - ball.y) <= u.r + .5) { pickUpBall(u, ball); nextOrder(u); break; }
       if (u.wantPath) { goTo(u, ball.x, ball.y); if (!u.path) break; }
       if (stepMove(u, dt) && Math.hypot(u.x - ball.x, u.y - ball.y) > u.r + .5) { if (Math.hypot(u.x - ball.x, u.y - ball.y) < 1.5) steerTo(u, ball.x, ball.y, dt); else u.wantPath = true; }
@@ -175,8 +198,8 @@ function updateUnit(u, dt) {
     }
     case 'deposit': {
       const t = byId(o.bid);
-      if (!t || !t.built || !u.carryBall) { nextOrder(u); break; }
-      if (approach(u, t, dt, .6)) { depositBall(u, t); nextOrder(u); }
+      if (!t || !t.built || (!u.carryBall && !u.carryRelic)) { nextOrder(u); break; }
+      if (approach(u, t, dt, .6)) { if (u.carryBall) depositBall(u, t); if (u.carryRelic && t.owner === u.owner) depositRelic(u, t); nextOrder(u); }
       break;
     }
   }
@@ -218,8 +241,8 @@ function gatherThink(u, o, dt, P) {
   const type = resType(r), sub = resSub(r);
   if (u.carry !== type) { u.carry = type; u.carryAmt = 0; }
   const aiMult = P.ai ? P.ai.diff.gather : 1, g = P.mods.gather;
-  const base = { hunt: .95, berry: .65, farm: .55, wood: .6, gold: .6 }[sub] || .6;
-  const rate = base * (g[sub] || 1) * (sub === 'hunt' || sub === 'berry' || sub === 'farm' ? g.food : 1) * g.all * aiMult;
+  const base = { hunt: .95, berry: .65, farm: .55, fish: .8, wood: .6, gold: .6 }[sub] || .6;
+  const rate = base * (g[sub] || 1) * (sub === 'hunt' || sub === 'berry' || sub === 'farm' || sub === 'fish' ? g.food : 1) * (u.def.fisher ? 1 : g.all) * aiMult;
   let amt = Math.min(rate * dt, cap - u.carryAmt);
   if (r.kind === 'res') { amt = Math.min(amt, r.amount); r.amount -= amt; if (r.amount <= 0) removeRes(r); }
   u.carryAmt += amt; u.anim = 'work';
@@ -277,7 +300,7 @@ function completeBuilding(b) {
   b.built = true; b.progress = 1; b.hp = Math.min(b.hp, maxHp(b));
   const P = G.players[b.owner]; P.stats.built++;
   if (P.human && !B[b.key].wall) { toast(`${b.name} complete.`, 'good'); SFX.play('build', b.x, b.y); }
-  if (b.key === 'wonder') { P.wonderSince = G.time; toast(`${P.human ? 'Your' : P.name + "'s"} Wonder stands! ${G.opts.victory === 'wonder' ? 'Defend it for 5 minutes to win.' : ''}`, P.human ? 'gold' : 'warn'); }
+  if (b.key === 'wonder') { P.wonderSince = G.time; toast(`${P.human ? 'Your' : P.name + "'s"} Wonder stands! ${modeHas('wonder') ? 'Defend it for 10 minutes to win.' : ''}`, P.human ? 'gold' : 'warn'); }
   if (G.scn && G.scn.onBuilt) G.scn.onBuilt(b);
 }
 function updateBuilding(b, dt) {
@@ -314,6 +337,7 @@ function updateBuilding(b, dt) {
         if (def.cls === 'hero') { delete P.heroDead[q.key]; if (P.human) { announce(stats(u).name + ' joins the fight!'); } }
         if (P.human) SFX.play('train', b.x, b.y);
         if (b.rally) issueRally(u, b.rally);
+        else if (u.def.fisher) { const r = findRes(u.x, u.y, 'food', 30, u.owner, 0, u); if (r) setOrder(u, { type: 'gather', rid: r.id, rtype: 'food' }); }
         if (G.scn && G.scn.onTrain) G.scn.onTrain(u, b);
       }
     }
@@ -326,7 +350,8 @@ function updateBuilding(b, dt) {
 }
 function issueRally(u, rally) {
   const t = rally.eid ? G.byId.get(rally.eid) : null;
-  if (t && !t.dead && (t.kind === 'res' || (t.kind === 'building' && t.key === 'farm')) && u.def.cls === 'villager') setOrder(u, { type: 'gather', rid: t.id, rtype: resType(t) });
+  if (t && !t.dead && (t.kind === 'res' || (t.kind === 'building' && t.key === 'farm')) && ((u.def.cls === 'villager' && !(t.kind === 'res' && RES_DEF[t.key].naval)) || (u.def.fisher && t.kind === 'res' && RES_DEF[t.key].naval))) setOrder(u, { type: 'gather', rid: t.id, rtype: resType(t) });
+  else if (u.def.fisher) { const r = findRes(rally.x, rally.y, 'food', 20, u.owner, 0, u); if (r) setOrder(u, { type: 'gather', rid: r.id, rtype: 'food' }); else setOrder(u, { type: 'move', x: rally.x, y: rally.y }); }
   else if (t && !t.dead && t.kind === 'building' && t.key === 'temple' && u.def.cls === 'villager' && G.players[u.owner].faction === 'earth') setOrder(u, { type: 'meditate', bid: t.id });
   else setOrder(u, { type: 'move', x: rally.x + (rnd() - .5) * .8, y: rally.y + (rnd() - .5) * .8, amove: isCombat(u) });
 }
@@ -403,6 +428,7 @@ function techCheck(P, b, key) {
   if (T.ageUp && T.age !== P.age) return 'Not available';
   if (!T.ageUp && T.age > P.age) return `Needs the ${AGES[T.age]}`;
   if (T.req && !P.techs.has(T.req)) return `Needs ${TECH[T.req].name}`;
+  if (T.needB && !G.blds.some(x => x.owner === P.id && x.key === T.needB && x.built)) return `Needs a finished ${bname(T.needB, P.faction)}`;
   if (!canAfford(P, T.cost)) return 'Not enough resources';
   return null;
 }
@@ -448,6 +474,7 @@ function economy(dt) {
       if (u.meditating && u.order.type === 'meditate') med++;
     }
     P.popCap = Math.min(MAX_POP, cap); P.pop = pop; P.qpop = qpop;
+    for (const r of relicsOf(P.id)) { const tr = RELICS[r.key].trickle; if (tr) for (const k in tr) { if (k === 'ki') addKi(P, tr[k] * dt); else P.res[k] += tr[k] * dt; } }
     if (P.faction === 'earth') addKi(P, Math.min(med, 10 * Math.max(1, temples.length)) * .18 * P.mods.kiRate * (P.ai ? P.ai.diff.gather : 1) * dt);
     const drain = (fliers * .4 + drainers) * dt;
     if (drain > 0) {
@@ -476,10 +503,47 @@ function checkVictory() {
     const hasProd = G.blds.some(b => b.owner === P.id && PRODUCTION.has(b.key) && b.built);
     if (!hasUnit && !hasProd) defeatPlayer(P);
   }
-  if (G.opts.victory === 'wonder') for (const P of G.players) if (P.id && !P.defeated && P.wonderSince && G.time - P.wonderSince >= 300) { endGame(P.team, 'wonder'); return; }
+  if (modeHas('sudden')) for (const P of G.players) {
+    if (!P.id || P.defeated) continue;
+    if (G.blds.some(b => b.owner === P.id && b.key === 'tc' && b.built)) { P.sdSince = 0; continue; }
+    if (!P.sdSince) { P.sdSince = G.time; if (P.human) { announce('Build a Town Center!'); toast('Sudden Death: you have no Town Center. Build one on a Settlement within 2 minutes or you lose.', 'warn'); } else if (G.me && isEnemy(G.me, P.id)) toast(`${P.name} lost every Town Center. Two minutes to rebuild, or they are out.`, 'good'); }
+    else if (G.time - P.sdSince >= SUDDEN_TIME) { if (P.human) toast('Sudden Death: no Town Center was rebuilt in time.', 'warn'); defeatPlayer(P); }
+  }
+  if (modeHas('wonder')) for (const P of G.players) if (P.id && !P.defeated && P.wonderSince && G.time - P.wonderSince >= WONDER_TIME) { endGame(P.team, 'wonder'); return; }
+  if (modeHas('settle') && G.settlements.length >= 3) {
+    const owners = new Set();
+    for (const s of G.settlements) { const tc = s.tc && byId(s.tc); owners.add(tc && tc.built ? G.players[tc.owner].team : 0); }
+    const team = owners.size === 1 && !owners.has(0) ? [...owners][0] : 0;
+    if (!team) G.settleHold = null;
+    else if (!G.settleHold || G.settleHold.team !== team) { G.settleHold = { team, since: G.time }; const P = humanP(); if (P) toast(P.team === team ? 'You hold every Settlement! Keep them for 5 minutes to win.' : 'The enemy holds every Settlement! Take one back within 5 minutes.', P.team === team ? 'gold' : 'warn'); }
+    else if (G.time - G.settleHold.since >= SETTLE_TIME) { endGame(team, 'settlements'); return; }
+  }
+  if (G.koth && G.koth.held >= KOTH_TIME) { endGame(G.koth.team, 'koth'); return; }
   const teams = new Set(G.players.filter(P => P.id && !P.defeated).map(P => P.team));
   if (teams.size <= 1) endGame([...teams][0] || 0, 'conquest');
   else if (humanP() && humanP().defeated && !G.over) endGame(-1, 'defeat');
+}
+function updateKoth(dt) {
+  const k = byId(G.korin); if (!k) return;
+  const teams = new Set();
+  forUnitsNear(k.x, k.y, 6.5, u => { if (u.owner > 0 && !u.garrison && u.def.cls !== 'villager') teams.add(G.players[u.owner].team); });
+  if (teams.size !== 1) return;
+  const t = [...teams][0];
+  if (G.koth.team !== t) {
+    G.koth = { team: t, held: 0 };
+    const P = humanP();
+    if (P) { if (P.team === t) { toast("You took Korin's Tower! Hold it for 5 minutes.", 'gold'); SFX.play('age'); } else toast("The enemy took Korin's Tower!", 'warn'); }
+  } else G.koth.held += dt;
+}
+// Victory countdowns for the HUD: [{ team, label, left }]
+function victoryTimers() {
+  const out = [];
+  if (modeHas('wonder')) for (const P of G.players) if (P.id && !P.defeated && P.wonderSince) out.push({ team: P.team, color: P.color, label: `${P.name}'s Wonder`, left: WONDER_TIME - (G.time - P.wonderSince) });
+  if (G.settleHold) { const P = G.players.find(Q => Q.id && Q.team === G.settleHold.team); out.push({ team: G.settleHold.team, color: P ? P.color : 0, label: `Team ${G.settleHold.team} holds every Settlement`, left: SETTLE_TIME - (G.time - G.settleHold.since) }); }
+  if (G.koth && G.koth.team) { const P = G.players.find(Q => Q.id && Q.team === G.koth.team); out.push({ team: G.koth.team, color: P ? P.color : 0, label: `${P && G.players.filter(Q => Q.id && Q.team === G.koth.team).length === 1 ? P.name : 'Team ' + G.koth.team} holds Korin's Tower`, left: KOTH_TIME - G.koth.held }); }
+  const me = humanP();
+  if (me && me.sdSince && !me.defeated) out.push({ team: -1, color: 2, label: 'Rebuild a Town Center', left: SUDDEN_TIME - (G.time - me.sdSince) });
+  return out;
 }
 function defeatPlayer(P) {
   if (P.defeated) return;
@@ -533,6 +597,8 @@ function tick(dt) {
   updateProjectiles(dt);
   for (let i = G.delayed.length - 1; i >= 0; i--) if (G.time >= G.delayed[i].at) { const d = G.delayed.splice(i, 1)[0]; d.fn(); }
   updateBalls(dt);
+  updateRelics();
+  if (G.koth) updateKoth(dt);
   for (const P of G.players) if (P.ai && !P.defeated) aiThink(P, dt);
   if (G.scn && G.scn.tick) G.scn.tick(dt);
   G.fogT -= dt; if (G.fogT <= 0) { G.fogT = .25; updateFog(); }
@@ -547,13 +613,13 @@ function tick(dt) {
 function separate(dt) {
   for (const u of G.units) {
     if (u.dead || u.leap || u.garrison) continue;
-    const ox = u.x, oy = u.y, team = teamOf(u.owner);
+    const ox = u.x, oy = u.y, team = moveTeam(u);
     forUnitsNear(u.x, u.y, u.r + .5, o => {
-      if (o === u || o.dead || o.flying !== u.flying || o.leap) return;
+      if (o === u || o.dead || o.flying !== u.flying || o.leap || !!o.def.naval !== !!u.def.naval) return;
       const dx = u.x - o.x, dy = u.y - o.y, d = Math.hypot(dx, dy) || .01, overlap = u.r + o.r - d;
       if (overlap > 0) { const push = Math.min(overlap * .5, .09) * (u.moving && !o.moving ? .35 : 1); u.x += dx / d * push; u.y += dy / d * push; }
     });
-    if (!u.flying && !walkableAt(u.x, u.y, team)) { u.x = ox; u.y = oy; if (!walkableAt(u.x, u.y, team)) { const f = freeTileNear(clamp(Math.floor(u.x), 0, MW - 1), clamp(Math.floor(u.y), 0, MH - 1), 5); if (f) { u.x = f.x + .5; u.y = f.y + .5; } } }
+    if (!u.flying && !walkableAt(u.x, u.y, team)) { u.x = ox; u.y = oy; if (!walkableAt(u.x, u.y, team)) { const f = freeTileNear(clamp(Math.floor(u.x), 0, MW - 1), clamp(Math.floor(u.y), 0, MH - 1), 5, false, team); if (f) { u.x = f.x + .5; u.y = f.y + .5; } } }
     u.x = clamp(u.x, .2, MW - .2); u.y = clamp(u.y, .2, MH - .2);
     if (u.flying && !u.def.alwaysFly) u.lift = Math.min(1, u.lift + dt * 2); else if (!u.def.alwaysFly && !u.leap) u.lift = Math.max(0, u.lift - dt * 3);
     if (u.path && u.order.type !== 'idle') {

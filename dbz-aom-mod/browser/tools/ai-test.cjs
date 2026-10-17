@@ -28,6 +28,6 @@ for (const cfg of configs) {
       }
     }
   } catch (e) { err = e; }
-  console.log(`== ${cfg.map} ${cfg.players.map(p => p.faction).join(' vs ')}: ${((Date.now() - t0) / 1000).toFixed(1)}s, over=${G.over}, winTeam=${G.winTeam}, time=${Math.round(G.time)}s`);
+  console.log(`== ${cfg.mode || cfg.victory || ''} ${cfg.map} ${cfg.players.map(p => p.faction).join(' vs ')}: reason=${G.endReason} koth=${JSON.stringify(G.koth)} ${((Date.now() - t0) / 1000).toFixed(1)}s, over=${G.over}, winTeam=${G.winTeam}, time=${Math.round(G.time)}s`);
   if (err) { console.log('ERROR', err.stack); process.exitCode = 1; }
 }

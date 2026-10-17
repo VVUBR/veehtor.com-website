@@ -40,7 +40,7 @@ function whoMatches(def, who) {
   return false;
 }
 function recomputeMods(P) {
-  const m = { gather: { food: 1, hunt: 1, farm: 1, berry: 1, wood: 1, gold: 1, all: 1 }, carry: 0, build: 1, kiRate: 1, templeHeal: 0, bld: {}, unit: [], forms: {} };
+  const m = { gather: { food: 1, hunt: 1, farm: 1, berry: 1, fish: 1, wood: 1, gold: 1, all: 1 }, carry: 0, build: 1, kiRate: 1, templeHeal: 0, bld: {}, unit: [], forms: {} };
   const apply = list => {
     for (const f of list || []) {
       if (f.t === 'gather') m.gather[f.res] *= f.mul;
@@ -55,6 +55,7 @@ function recomputeMods(P) {
   };
   apply(PATRONS[P.major].fx);
   for (const k of P.techs) apply(TECH[k] && TECH[k].fx);
+  for (const r of relicsOf(P.id)) apply(RELICS[r.key].fx);
   P.mods = m; P.statCache = {};
 }
 const bmod = (P, key, stat, base) => { const b = P && P.mods.bld[key]; if (!b) return base; return base * (b[stat] || 1) + (b[stat + '+'] || 0); };
@@ -164,7 +165,7 @@ function placeBuilding(key, owner, tx, ty, built) {
   const fac = P ? P.faction : 'earth';
   const b = addEnt({
     kind: 'building', key, owner, tx, ty, w: d.w, h: d.h, x: tx + d.w / 2, y: ty + d.h / 2, r: Math.max(d.w, d.h) * .5,
-    built: !!built, progress: built ? 1 : 0, queue: [], research: null, rally: null, balls: [], cdA: 0, farmer: 0, hitFlash: 0,
+    built: !!built, progress: built ? 1 : 0, queue: [], research: null, rally: null, balls: [], relics: [], cdA: 0, farmer: 0, hitFlash: 0,
     name: bname(key, fac), garrisoned: [], fac, smokeT: rnd() * 3,
   });
   b.hp = built ? maxHp(b) : maxHp(b) * .08;
@@ -178,7 +179,7 @@ function placeBuilding(key, owner, tx, ty, built) {
   G.regionDirty = true;
   if (!d.walk) for (const u of G.ents) if (u.kind === 'unit' && !u.dead && !u.flying && !u.garrison && u.x >= tx - .2 && u.x <= tx + d.w + .2 && u.y >= ty - .2 && u.y <= ty + d.h + .2) {
     if (d.gate && P && isAlly(owner, u.owner)) continue;
-    const f = freeTileNear(tOf(u.x), tOf(u.y), 8); if (f) { u.x = f.x + .5; u.y = f.y + .5; u.path = null; u.wantPath = true; }
+    const f = freeTileNear(tOf(u.x), tOf(u.y), 8, false, moveTeam(u)); if (f) { u.x = f.x + .5; u.y = f.y + .5; u.path = null; u.wantPath = true; }
   }
   return b;
 }
@@ -197,7 +198,8 @@ function canPlace(key, tx, ty, owner, opts) {
     const s = G.settlements.find(s => s.tx === tx && s.ty === ty && !s.tc);
     if (!s) return false;
     if (!footprintFree(tx, ty, d.w, d.h, { allowSettle: true })) return false;
-  } else if (!footprintFree(tx, ty, d.w, d.h, { shallow: false })) return false;
+  } else if (!footprintFree(tx, ty, d.w, d.h, { shallow: !!d.dock })) return false;
+  if (d.dock && !dockShore(tx, ty, d.w, d.h)) return false;
   const P = G.players[owner];
   if (P && P.human && !opts.ignoreFog) for (let y = ty; y < ty + d.h; y++) for (let x = tx; x < tx + d.w; x++) if (!G.vis[idx(x, y)]) return false;
   if (opts.spacing && !d.wall && !d.gate) {
@@ -209,30 +211,42 @@ function canPlace(key, tx, ty, owner, opts) {
   }
   return true;
 }
+// A Dock needs open deep water along its edge, part of a real sea (not a pond).
+function dockShore(tx, ty, w, h) {
+  if (!G.nregion) return false;
+  let n = 0, reg = 0;
+  for (let y = ty - 1; y <= ty + h; y++) for (let x = tx - 1; x <= tx + w; x++) {
+    if (!inMap(x, y) || (x >= tx && x < tx + w && y >= ty && y < ty + h)) continue;
+    const i = idx(x, y);
+    if (G.map.terr[i] === T_WATER && !navBlocked(i)) { n++; reg = G.nregion[i] || reg; }
+  }
+  return n >= 3 && reg && G.nregionSize[reg] >= 40;
+}
 // Snap a TC placement to the nearest free settlement.
 function snapSettlement(wx, wy) {
   let best = null, bd = 6;
   for (const s of G.settlements) { if (s.tc) continue; const d = dist(s.tx + 2, s.ty + 2, wx, wy); if (d < bd) { bd = d; best = s; } }
   return best;
 }
-function freeTileNear(tx, ty, maxR, flyingOk) {
+function freeTileNear(tx, ty, maxR, flyingOk, team) {
   for (let r = 0; r <= maxR; r++) {
     for (let y = ty - r; y <= ty + r; y++) for (let x = tx - r; x <= tx + r; x++) {
       if (Math.max(Math.abs(x - tx), Math.abs(y - ty)) !== r) continue;
-      if (inMap(x, y) && (flyingOk || !G.map.block[idx(x, y)])) return { x, y };
+      if (inMap(x, y) && (flyingOk || (team === NAVAL ? !navBlocked(idx(x, y)) : !G.map.block[idx(x, y)]))) return { x, y };
     }
   }
   return null;
 }
 function spawnNear(b, key, owner, form) {
   const target = b.rally ? { x: b.rally.x, y: b.rally.y } : { x: b.tx + b.w + 1, y: b.ty + b.h + 1 };
+  const nav = !!U[key].naval;
   let best = null, bd = 1e9;
   for (let y = b.ty - 1; y <= b.ty + b.h; y++) for (let x = b.tx - 1; x <= b.tx + b.w; x++) {
-    if (!inMap(x, y) || G.map.block[idx(x, y)]) continue;
+    if (!inMap(x, y) || (nav ? navBlocked(idx(x, y)) : G.map.block[idx(x, y)])) continue;
     if (x >= b.tx && x < b.tx + b.w && y >= b.ty && y < b.ty + b.h) continue;
     const d = dist(x + .5, y + .5, target.x, target.y); if (d < bd) { bd = d; best = { x, y }; }
   }
-  if (!best) best = freeTileNear(b.tx, b.ty, 10) || { x: b.tx, y: b.ty };
+  if (!best) best = freeTileNear(b.tx, b.ty, 10, false, nav ? NAVAL : undefined) || { x: b.tx, y: b.ty };
   return spawnUnit(key, owner, best.x + .5 + (rnd() - .5) * .4, best.y + .5 + (rnd() - .5) * .4, form);
 }
 
@@ -298,7 +312,7 @@ function genSkirmish(opts) {
   const seed = opts.seed;
   rand = mulberry32(seed);
   initMap(size, size, MAPS[opts.map].biome, seed);
-  const biome = G.map.biome, C = { x: size / 2, y: size / 2 };
+  const biome = G.map.biome, C = { x: size / 2, y: size / 2 }, sea = MAPS[opts.map].layout === 'sea', seaR = size * .25;
   const R = size * .36, a0 = n === 2 ? Math.PI * .75 : rnd() * Math.PI * 2;
   const bases = [];
   for (let i = 0; i < n; i++) { const a = a0 + i * Math.PI * 2 / n; bases.push({ x: Math.round(C.x + Math.cos(a) * R), y: Math.round(C.y + Math.sin(a) * R), a }); }
@@ -307,18 +321,19 @@ function genSkirmish(opts) {
   const resv = (x, y, r) => reserved.push({ x, y, r });
   const isRes = (x, y, pad) => reserved.some(c => dist(c.x, c.y, x, y) < c.r + (pad || 0));
   for (const b of bases) resv(b.x, b.y, 11);
+  if (opts.koth) resv(C.x, C.y, 7);
   // settlements: one near each base, plus central ones
   const settles = [];
-  for (const b of bases) { const a = b.a + Math.PI + .9; settles.push({ x: Math.round(b.x + Math.cos(a) * 17), y: Math.round(b.y + Math.sin(a) * 17) }); }
-  for (let i = 0; i < Math.max(2, n); i++) { const a = a0 + (i + .5) * Math.PI * 2 / Math.max(2, n); settles.push({ x: Math.round(C.x + Math.cos(a) * size * .16), y: Math.round(C.y + Math.sin(a) * size * .16) }); }
+  for (const b of bases) { const a = b.a + Math.PI + (sea ? 1.75 : .9); settles.push({ x: Math.round(b.x + Math.cos(a) * 17), y: Math.round(b.y + Math.sin(a) * 17) }); }
+  for (let i = 0; i < Math.max(2, n); i++) { const a = a0 + (i + .5) * Math.PI * 2 / Math.max(2, n), r = size * (sea ? .38 : .16); settles.push({ x: Math.round(C.x + Math.cos(a) * r - 2), y: Math.round(C.y + Math.sin(a) * r - 2) }); }
   for (const s of settles) resv(s.x, s.y, 4);
   // Dragon Ball camps
   const camps = [];
   let tries = 0;
   while (camps.length < 7 && tries++ < 6000) {
     const x = rint(8, size - 9), y = rint(8, size - 9);
-    if (bases.some(b => dist(b.x, b.y, x, y) < 24)) continue;
-    if (camps.some(c => dist(c.x, c.y, x, y) < 14) || settles.some(s => dist(s.x, s.y, x, y) < 8)) continue;
+    if (bases.some(b => dist(b.x, b.y, x, y) < 24) || (sea && dist(x, y, C.x, C.y) < seaR * 1.25 + 3)) continue;
+    if (camps.some(c => dist(c.x, c.y, x, y) < 14) || settles.some(s => dist(s.x, s.y, x, y) < 8) || isRes(x, y, 2)) continue;
     camps.push({ x, y });
   }
   while (camps.length < 7) camps.push({ x: C.x + rint(-10, 10), y: C.y + rint(-10, 10) });
@@ -327,7 +342,14 @@ function genSkirmish(opts) {
 
   // ---- terrain by biome
   const hg = G.map.hgt;
-  if (biome === 'earth') {
+  if (sea) {
+    // a great inland sea with shallow beaches
+    for (let i = 0; i < size * size; i++) {
+      const x = i % size, y = (i / size) | 0, r = seaR * (.86 + G.noise(x / 7 + 3, y / 7 - 5, 2) * .32), d = dist(x + .5, y + .5, C.x, C.y);
+      if (d < r) G.map.terr[i] = T_WATER; else if (d < r + 1.3) G.map.terr[i] = T_SHALLOW; else if (d < r + 2.6) G.map.terr[i] = T_SAND; else if (G.noise(x / 9 + 50, y / 9, 2) > .62) G.map.terr[i] = T_DIRT;
+    }
+    for (let k = 0; k < 3 + n; k++) cliffRidge(rint(6, size - 7), rint(6, size - 7), (x, y, pad) => isRes(x, y, pad) || dist(x, y, C.x, C.y) < seaR * 1.25 + 2);
+  } else if (biome === 'earth') {
     for (let i = 0; i < size * size; i++) { const x = i % size, y = (i / size) | 0; if (G.noise(x / 9 + 50, y / 9, 2) > .62) G.map.terr[i] = T_DIRT; }
     for (let k = 0; k < 4 + n; k++) { const x = rint(10, size - 11), y = rint(10, size - 11); if (isRes(x, y, 7)) continue; paintCircle(T_WATER, x, y, 2.5 + rnd() * 3, true); }
     for (let k = 0; k < 6 + n; k++) cliffRidge(rint(6, size - 7), rint(6, size - 7), isRes);
@@ -348,6 +370,8 @@ function genSkirmish(opts) {
   for (const b of bases) paintCircle(T_ROAD, b.x, b.y, 7.5, true);
   for (const s of settles) paintCircle(ground, s.x + 2, s.y + 2, 4.2, true);
   for (const c of camps) paintCircle(ground, c.x, c.y, 2.8, true);
+  if (opts.koth && sea) for (const b of bases) { const L = dist(b.x, b.y, C.x, C.y); for (let s = 0; s <= L; s += .5) { const x = C.x + (b.x - C.x) * s / L, y = C.y + (b.y - C.y) * s / L; for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1], [-1, 0], [0, -1]]) { const tx = Math.floor(x) + dx, ty = Math.floor(y) + dy; if (inMap(tx, ty) && G.map.terr[idx(tx, ty)] === T_WATER) G.map.terr[idx(tx, ty)] = T_SHALLOW; } } }
+  if (opts.koth) { paintCircle(T_ROAD, C.x, C.y, 4.5, true); for (let y = C.y - 6; y <= C.y + 6; y++) for (let x = C.x - 6; x <= C.x + 6; x++) if (inMap(x, y) && dist(x, y, C.x, C.y) < 6) { const t = G.map.terr[idx(x, y)]; if (t === T_WATER || t === T_ROCK || t === T_SHALLOW) G.map.terr[idx(x, y)] = ground; } }
   for (const b of bases) for (let y = b.y - 10; y <= b.y + 10; y++) for (let x = b.x - 10; x <= b.x + 10; x++) if (inMap(x, y) && dist(x, y, b.x, b.y) < 10) { const t = G.map.terr[idx(x, y)]; if (t === T_WATER || t === T_ROCK || t === T_SHALLOW) G.map.terr[idx(x, y)] = ground; }
   for (const s of settles) for (let y = s.y - 1; y <= s.y + 5; y++) for (let x = s.x - 1; x <= s.x + 5; x++) if (inMap(x, y)) { const t = G.map.terr[idx(x, y)]; if (t === T_WATER || t === T_ROCK || t === T_SHALLOW) G.map.terr[idx(x, y)] = ground; }
   for (const c of camps) for (let y = c.y - 2; y <= c.y + 2; y++) for (let x = c.x - 2; x <= c.x + 2; x++) if (inMap(x, y)) { const t = G.map.terr[idx(x, y)]; if (t === T_WATER || t === T_ROCK) G.map.terr[idx(x, y)] = ground; }
@@ -387,11 +411,31 @@ function genSkirmish(opts) {
   for (let y = 0; y < size; y++) for (const x of [0, 1, size - 1, size - 2]) if (rnd() < .6 && free(x, y)) addRes('tree', x, y);
   for (let k = 0; k < 4 + n * 2; k++) for (let t = 0; t < 60; t++) { const x = rint(8, size - 9), y = rint(8, size - 9); if (!isRes(x, y, 4) && freeArea(x, y, 2)) { addRes('gold', x, y, 3000 * goldMul); break; } }
   for (let k = 0; k < 3 + n; k++) for (let t = 0; t < 60; t++) { const x = rint(8, size - 9), y = rint(8, size - 9); if (!isRes(x, y, 5) && free(x, y) && free(x + 1, y)) { const ht = biome === 'namek' ? 'frog' : rnd() < .5 ? 'stego' : 'boar'; for (let j = 0; j < 3; j++) if (free(x + j, y)) spawnUnit(ht, 0, x + j + .5, y + .5); break; } }
-  if (biome === 'earth') { const cx = Math.round(C.x - 1), cy = Math.round(C.y - 1); if (free(cx, cy) && free(cx + 1, cy + 1)) addDeco('sealedball', cx, cy, 2); }
+  placeFish(bases, size);
+  if (biome === 'earth' && !opts.koth && !sea) { const cx = Math.round(C.x - 1), cy = Math.round(C.y - 1); if (free(cx, cy) && free(cx + 1, cy + 1)) addDeco('sealedball', cx, cy, 2); }
 
-  ensureConnected(bases[0], [...bases.slice(1), ...camps, ...settles.map(s => ({ x: s.x + 2, y: s.y + 2 }))]);
+  ensureConnected(bases[0], [...bases.slice(1), ...camps, ...settles.map(s => ({ x: s.x + 2, y: s.y + 2 })), ...(opts.koth ? [{ x: C.x + 3, y: C.y + 3 }] : [])]);
   scatterDecor();
   return bases;
+}
+// Giant fish in every real body of water, plus a fair group off each base's shore.
+function placeFish(bases, size) {
+  const n = MW * MH, comp = new Int32Array(n), sizes = [0], st = [];
+  const water = i => { const t = G.map.terr[i]; return (t === T_WATER || t === T_SHALLOW) && (G.map.block[i] === 0 || G.map.block[i] === 1); };
+  let id = 0;
+  for (let i = 0; i < n; i++) { if (comp[i] || !water(i)) continue; id++; comp[i] = id; st.push(i); let c = 0; while (st.length) { const k = st.pop(), x = k % MW, y = (k / MW) | 0; c++; for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy; if (!inMap(nx, ny)) continue; const j = idx(nx, ny); if (!comp[j] && water(j)) { comp[j] = id; st.push(j); } } } sizes[id] = c; }
+  const deep = (x, y) => { if (!inMap(x, y)) return false; for (let yy = y - 1; yy <= y + 1; yy++) for (let xx = x - 1; xx <= x + 1; xx++) if (!inMap(xx, yy) || G.map.terr[idx(xx, yy)] !== T_WATER) return false; return true; };
+  const fish = [], ok = (x, y) => deep(x, y) && sizes[comp[idx(x, y)]] >= 80 && !fish.some(f => dist(f.x, f.y, x, y) < 3);
+  const put = (x, y) => { fish.push({ x, y }); addRes('fish', x, y); };
+  for (const b of bases) {
+    let got = 0;
+    for (let r = 10; r <= 26 && got < 4; r++) for (let k = 0; k < 40 && got < 4; k++) { const a = rnd() * Math.PI * 2, x = Math.round(b.x + Math.cos(a) * r), y = Math.round(b.y + Math.sin(a) * r); if (ok(x, y)) { put(x, y); got++; } }
+  }
+  for (let c = 1; c <= id; c++) {
+    if (sizes[c] < 80) continue;
+    const want = Math.min(28, Math.floor(sizes[c] / 50));
+    for (let t = 0, got = 0; t < 3000 && got < want; t++) { const x = rint(2, MW - 3), y = rint(2, MH - 3); if (comp[idx(x, y)] === c && ok(x, y) && !bases.some(b => dist(b.x, b.y, x, y) < 9)) { put(x, y); got++; } }
+  }
 }
 function cliffRidge(x, y, isRes) {
   if (isRes(x, y, 5)) return;
