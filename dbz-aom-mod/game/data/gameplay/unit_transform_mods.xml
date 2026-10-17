@@ -1,0 +1,38 @@
+<unittransforms>
+	<!-- DRAGON BALL Z: AGE OF MYTHOLOGY | unit_transform_mods.xml | VERTICAL SLICE v0.1 -->
+	<!-- Every legal in-place proto swap. Stance swaps are two-way; saga transformations   -->
+	<!-- (SSJ1, SSJ3) and Cell's evolutions are one-way.                                    -->
+
+	<!-- Goku: Flying Nimbus -->
+	<transform><from>DBZ_GokuEarly</from><to>DBZ_GokuEarlyNimbus</to></transform>
+	<transform><from>DBZ_GokuEarlyNimbus</from><to>DBZ_GokuEarly</to></transform>
+	<!-- Goku: Kaio-ken -->
+	<transform><from>DBZ_GokuEarly</from><to>DBZ_GokuEarlyKaioken</to></transform>
+	<transform><from>DBZ_GokuEarlyKaioken</from><to>DBZ_GokuEarly</to></transform>
+	<!-- Goku: Super Saiyan Awakening (techtree) -->
+	<transform><from>DBZ_GokuEarly</from><to>DBZ_GokuSSJ1</to></transform>
+	<transform><from>DBZ_GokuEarlyKaioken</from><to>DBZ_GokuSSJ1</to></transform>
+	<transform><from>DBZ_GokuEarlyNimbus</from><to>DBZ_GokuSSJ1Air</to></transform>
+	<!-- Goku: SSJ1 flight -->
+	<transform><from>DBZ_GokuSSJ1</from><to>DBZ_GokuSSJ1Air</to></transform>
+	<transform><from>DBZ_GokuSSJ1Air</from><to>DBZ_GokuSSJ1</to></transform>
+	<!-- Goku: Super Saiyan 3 (techtree) -->
+	<transform><from>DBZ_GokuSSJ1</from><to>DBZ_GokuSSJ3</to></transform>
+	<transform><from>DBZ_GokuSSJ1Air</from><to>DBZ_GokuSSJ3Air</to></transform>
+	<!-- Goku: SSJ3 flight -->
+	<transform><from>DBZ_GokuSSJ3</from><to>DBZ_GokuSSJ3Air</to></transform>
+	<transform><from>DBZ_GokuSSJ3Air</from><to>DBZ_GokuSSJ3</to></transform>
+
+	<!-- Cell: flight per stage -->
+	<transform><from>DBZ_CellImperfect</from><to>DBZ_CellImperfectAir</to></transform>
+	<transform><from>DBZ_CellImperfectAir</from><to>DBZ_CellImperfect</to></transform>
+	<transform><from>DBZ_CellSemiPerfect</from><to>DBZ_CellSemiPerfectAir</to></transform>
+	<transform><from>DBZ_CellSemiPerfectAir</from><to>DBZ_CellSemiPerfect</to></transform>
+	<transform><from>DBZ_CellPerfect</from><to>DBZ_CellPerfectAir</to></transform>
+	<transform><from>DBZ_CellPerfectAir</from><to>DBZ_CellPerfect</to></transform>
+	<!-- Cell: Biomass evolution (dbz_core.xs) -->
+	<transform><from>DBZ_CellImperfect</from><to>DBZ_CellSemiPerfect</to></transform>
+	<transform><from>DBZ_CellImperfectAir</from><to>DBZ_CellSemiPerfectAir</to></transform>
+	<transform><from>DBZ_CellSemiPerfect</from><to>DBZ_CellPerfect</to></transform>
+	<transform><from>DBZ_CellSemiPerfectAir</from><to>DBZ_CellPerfectAir</to></transform>
+</unittransforms>

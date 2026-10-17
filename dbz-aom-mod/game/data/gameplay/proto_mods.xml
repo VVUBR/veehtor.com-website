@@ -1,0 +1,1938 @@
+<protomods>
+	<!--
+	=====================================================================================
+	  DRAGON BALL Z: AGE OF MYTHOLOGY  |  proto_mods.xml  |  VERTICAL SLICE v0.1
+	  Target: Age of Mythology: Retold (additive data mod, mergeMode="add")
+	  Install path: mods\local\DBZ_AoM\game\data\gameplay\proto_mods.xml
+
+	  Contents:
+	    Goku line ........ DBZ_GokuEarly, DBZ_GokuEarlyNimbus (air), DBZ_GokuEarlyKaioken,
+	                       DBZ_GokuSSJ1, DBZ_GokuSSJ1Air, DBZ_GokuSSJ3, DBZ_GokuSSJ3Air
+	    Cell line ........ DBZ_CellImperfect, DBZ_CellImperfectAir, DBZ_CellSemiPerfect,
+	                       DBZ_CellSemiPerfectAir, DBZ_CellPerfect, DBZ_CellPerfectAir
+	    Myth unit ........ DBZ_Saibaman
+	    Titan ............ DBZ_KidBuu
+	    Relics ........... DBZ_DragonBall1Star to DBZ_DragonBall7Star
+
+	  Design rules encoded here (see README for the full combat matrix):
+	    Hero vs non-titan myth = 5.0x (LogicalTypeMythUnitNotTitan), Hero vs Titan = 2.5x
+	    Myth vs HumanSoldier = 3.0x + Throw knockback, Myth vs Hero = 0.25x
+	    Air stance = twin proto: +25% MaxVelocity, Hack armor -0.15 ("cannot block melee"),
+	                 Ki upkeep handled by game\trigger\dbz\dbz_core.xs
+	    Relic carrying = Pickup/DropOff protoactions + external LogicalTypePickable containment
+	                     (the engine's real mechanism behind the spec's "CanPickUpRelics" flag)
+
+	  Visuals: every animfile/icon/soundset below is a vanilla Retold asset used as a
+	  stand-in until DBZ models are authored. Swap the three paths per unit when art lands.
+	=====================================================================================
+	-->
+
+	<!-- ============================================================================= -->
+	<!-- GOKU (EARLY) : SAIYAN SAGA, AGE I. MajorHero. Kamehameha, Kaio-ken, Nimbus    -->
+	<!-- ============================================================================= -->
+	<unit name="DBZ_GokuEarly" mergeMode="add">
+		<displaynameid>STR_DBZ_GOKU_EARLY_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_GOKU_EARLY_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_GOKU_EARLY_SR</shortrollovertextid>
+		<icon>resources\greek\player_color\units\heracles_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero</minimapicon>
+		<animfile>greek\units\hero\heracles\heracles.xml</animfile>
+		<soundsetfile>greek\vo\heracles\heracles.xml</soundsetfile>
+
+		<obstructionradiusx>0.4900</obstructionradiusx>
+		<obstructionradiusz>0.4900</obstructionradiusz>
+		<impacttype>Unarmoured</impacttype>
+		<unitaitype>HandCombative</unitaitype>
+		<autoattackrange>20.0000</autoattackrange>
+		<formationorder>4</formationorder>
+		<movementtype>land</movementtype>
+		<turnrate>18.0000</turnrate>
+
+		<initialhitpoints>450.0000</initialhitpoints>
+		<maxhitpoints>450.0000</maxhitpoints>
+		<trainpoints>30.0000</trainpoints>
+		<buildlimit>1</buildlimit>
+		<weightclass>7</weightclass>
+		<maxcontained>1</maxcontained>
+		<maxvelocity>4.6000</maxvelocity>
+		<los>18.0000</los>
+		<populationcount>3</populationcount>
+		<cost resourcetype="Food">200.0000</cost>
+		<cost resourcetype="Gold">150.0000</cost>
+
+		<armor type="Hack" value="0.4000"></armor>
+		<armor type="Pierce" value="0.5000"></armor>
+		<armor type="Crush" value="0.8000"></armor>
+
+		<unittype>LogicalTypeMinimapFilterMilitary</unittype>
+		<unittype>LogicalTypeHandUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeHandUnitsAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAttack</unittype>
+		<unittype>LogicalTypeValidMeteorTarget</unittype>
+		<unittype>LogicalTypeValidShockwaveTarget</unittype>
+		<unittype>LogicalTypeValidSpyTarget</unittype>
+		<unittype>LogicalTypeAffectedByRestoration</unittype>
+		<unittype>LogicalTypeHealed</unittype>
+		<unittype>LogicalTypeParticipatesInBattlecries</unittype>
+		<unittype>LogicalTypeLandMilitary</unittype>
+		<unittype>LogicalTypeNeededForVictory</unittype>
+		<unittype>LogicalTypeFindMilitaryHero</unittype>
+		<unittype>CountsTowardMilitaryScore</unittype>
+		<unittype>Unit</unittype>
+		<unittype>UnitClass</unittype>
+		<unittype>MilitaryUnit</unittype>
+		<unittype>Hero</unittype>
+		<unittype>MajorHero</unittype>
+
+		<flag>CollidesWithProjectiles</flag>
+		<flag>CorpseDecays</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>ObscuredByUnits</flag>
+		<flag>CommonCommands</flag>
+		<flag>MilitaryCommands</flag>
+		<flag>CreateUnitGroupAutomatically</flag>
+		<flag>HideGarrisonFlag</flag>
+		<flag>UnitTransformFree</flag>
+		<flag>UnitTransformBuildLimit</flag>
+
+		<contain external="1">LogicalTypePickable</contain>
+		<tactics>dbz_goku_early.tactics</tactics>
+
+		<protoaction>
+			<name>HandAttack</name>
+			<rof>1.000000</rof>
+			<damage type="Hack">22.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>0.800000</maxrange>
+			<defaultattack>1</defaultattack>
+		</protoaction>
+		<protoaction>
+			<name>RangedAttack</name>
+			<rof>2.500000</rof>
+			<damage type="Pierce">35.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>16.000000</maxrange>
+			<damagearea>3.000000</damagearea>
+			<damageflags>Enemy</damageflags>
+			<projectile>ProjectilePriestPharaoh</projectile>
+		</protoaction>
+		<protoaction>
+			<name>Pickup</name>
+			<type>Pickup</type>
+			<maxrange>1</maxrange>
+			<rate type="LogicalTypePickable">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>DropOff</name>
+			<type>DropOff</type>
+			<maxrange>1</maxrange>
+			<rate type="AbstractTemple">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>FlightTransform</name>
+			<type>DelayedTransform</type>
+			<modifyduration>1000</modifyduration>
+			<modifyprotoid>DBZ_GokuEarlyNimbus</modifyprotoid>
+		</protoaction>
+		<protoaction>
+			<name>KaiokenTransform</name>
+			<type>DelayedTransform</type>
+			<modifyduration>750</modifyduration>
+			<modifyprotoid>DBZ_GokuEarlyKaioken</modifyprotoid>
+		</protoaction>
+	</unit>
+
+	<!-- GOKU (EARLY) ON FLYING NIMBUS : air stance twin -->
+	<unit name="DBZ_GokuEarlyNimbus" mergeMode="add">
+		<displaynameid>STR_DBZ_GOKU_EARLY_NIMBUS_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_GOKU_EARLY_NIMBUS_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_GOKU_EARLY_NIMBUS_SR</shortrollovertextid>
+		<icon>resources\greek\player_color\units\heracles_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero</minimapicon>
+		<animfile>greek\units\hero\heracles\heracles.xml</animfile>
+		<soundsetfile>greek\vo\heracles\heracles.xml</soundsetfile>
+
+		<obstructionradiusx>0.4900</obstructionradiusx>
+		<obstructionradiusz>0.4900</obstructionradiusz>
+		<impacttype>Unarmoured</impacttype>
+		<unitaitype>HandCombative</unitaitype>
+		<autoattackrange>20.0000</autoattackrange>
+		<formationorder>4</formationorder>
+		<flag>FlyingUnit</flag>
+		<flag>NoTieToGround</flag>
+		<unittype>AbstractFlyingUnit</unittype>
+		<movementtype>air</movementtype>
+		<turnrate>18.0000</turnrate>
+
+		<initialhitpoints>450.0000</initialhitpoints>
+		<maxhitpoints>450.0000</maxhitpoints>
+		<trainpoints>30.0000</trainpoints>
+		<buildlimit>1</buildlimit>
+		<weightclass>7</weightclass>
+		<maxcontained>1</maxcontained>
+		<maxvelocity>5.7500</maxvelocity>
+		<los>18.0000</los>
+		<populationcount>3</populationcount>
+		<cost resourcetype="Food">200.0000</cost>
+		<cost resourcetype="Gold">150.0000</cost>
+
+		<armor type="Hack" value="0.2500"></armor>
+		<armor type="Pierce" value="0.5000"></armor>
+		<armor type="Crush" value="0.8000"></armor>
+
+		<unittype>LogicalTypeMinimapFilterMilitary</unittype>
+		<unittype>LogicalTypeHandUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeHandUnitsAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAttack</unittype>
+		<unittype>LogicalTypeValidMeteorTarget</unittype>
+		<unittype>LogicalTypeValidShockwaveTarget</unittype>
+		<unittype>LogicalTypeValidSpyTarget</unittype>
+		<unittype>LogicalTypeAffectedByRestoration</unittype>
+		<unittype>LogicalTypeHealed</unittype>
+		<unittype>LogicalTypeParticipatesInBattlecries</unittype>
+		<unittype>LogicalTypeNeededForVictory</unittype>
+		<unittype>LogicalTypeFindMilitaryHero</unittype>
+		<unittype>CountsTowardMilitaryScore</unittype>
+		<unittype>Unit</unittype>
+		<unittype>UnitClass</unittype>
+		<unittype>MilitaryUnit</unittype>
+		<unittype>Hero</unittype>
+		<unittype>MajorHero</unittype>
+
+		<flag>CollidesWithProjectiles</flag>
+		<flag>CorpseDecays</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>ObscuredByUnits</flag>
+		<flag>CommonCommands</flag>
+		<flag>MilitaryCommands</flag>
+		<flag>CreateUnitGroupAutomatically</flag>
+		<flag>HideGarrisonFlag</flag>
+		<flag>UnitTransformFree</flag>
+		<flag>UnitTransformBuildLimit</flag>
+
+		<contain external="1">LogicalTypePickable</contain>
+		<tactics>dbz_goku_early_nimbus.tactics</tactics>
+
+		<protoaction>
+			<name>HandAttack</name>
+			<rof>1.000000</rof>
+			<damage type="Hack">22.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>0.800000</maxrange>
+			<defaultattack>1</defaultattack>
+		</protoaction>
+		<protoaction>
+			<name>RangedAttack</name>
+			<rof>2.500000</rof>
+			<damage type="Pierce">35.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>16.000000</maxrange>
+			<damagearea>3.000000</damagearea>
+			<damageflags>Enemy</damageflags>
+			<projectile>ProjectilePriestPharaoh</projectile>
+		</protoaction>
+		<protoaction>
+			<name>Pickup</name>
+			<type>Pickup</type>
+			<maxrange>1</maxrange>
+			<rate type="LogicalTypePickable">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>DropOff</name>
+			<type>DropOff</type>
+			<maxrange>1</maxrange>
+			<rate type="AbstractTemple">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>FlightTransform</name>
+			<type>DelayedTransform</type>
+			<modifyduration>1000</modifyduration>
+			<modifyprotoid>DBZ_GokuEarly</modifyprotoid>
+		</protoaction>
+	</unit>
+
+	<!-- GOKU (EARLY) KAIO-KEN : +100% attack and speed, 5 HP/s strain applied by dbz_core.xs -->
+	<unit name="DBZ_GokuEarlyKaioken" mergeMode="add">
+		<displaynameid>STR_DBZ_GOKU_EARLY_KAIOKEN_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_GOKU_EARLY_KAIOKEN_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_GOKU_EARLY_KAIOKEN_SR</shortrollovertextid>
+		<icon>resources\greek\player_color\units\heracles_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero</minimapicon>
+		<animfile>greek\units\hero\heracles\heracles.xml</animfile>
+		<soundsetfile>greek\vo\heracles\heracles.xml</soundsetfile>
+
+		<obstructionradiusx>0.4900</obstructionradiusx>
+		<obstructionradiusz>0.4900</obstructionradiusz>
+		<impacttype>Unarmoured</impacttype>
+		<unitaitype>HandCombative</unitaitype>
+		<autoattackrange>20.0000</autoattackrange>
+		<formationorder>4</formationorder>
+		<movementtype>land</movementtype>
+		<turnrate>24.0000</turnrate>
+
+		<initialhitpoints>450.0000</initialhitpoints>
+		<maxhitpoints>450.0000</maxhitpoints>
+		<trainpoints>30.0000</trainpoints>
+		<buildlimit>1</buildlimit>
+		<weightclass>7</weightclass>
+		<maxcontained>1</maxcontained>
+		<maxvelocity>9.2000</maxvelocity>
+		<los>18.0000</los>
+		<populationcount>3</populationcount>
+		<cost resourcetype="Food">200.0000</cost>
+		<cost resourcetype="Gold">150.0000</cost>
+
+		<armor type="Hack" value="0.4000"></armor>
+		<armor type="Pierce" value="0.5000"></armor>
+		<armor type="Crush" value="0.8000"></armor>
+
+		<unittype>LogicalTypeMinimapFilterMilitary</unittype>
+		<unittype>LogicalTypeHandUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeHandUnitsAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAttack</unittype>
+		<unittype>LogicalTypeValidMeteorTarget</unittype>
+		<unittype>LogicalTypeValidShockwaveTarget</unittype>
+		<unittype>LogicalTypeValidSpyTarget</unittype>
+		<unittype>LogicalTypeAffectedByRestoration</unittype>
+		<unittype>LogicalTypeHealed</unittype>
+		<unittype>LogicalTypeParticipatesInBattlecries</unittype>
+		<unittype>LogicalTypeLandMilitary</unittype>
+		<unittype>LogicalTypeNeededForVictory</unittype>
+		<unittype>LogicalTypeFindMilitaryHero</unittype>
+		<unittype>CountsTowardMilitaryScore</unittype>
+		<unittype>Unit</unittype>
+		<unittype>UnitClass</unittype>
+		<unittype>MilitaryUnit</unittype>
+		<unittype>Hero</unittype>
+		<unittype>MajorHero</unittype>
+
+		<flag>CollidesWithProjectiles</flag>
+		<flag>CorpseDecays</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>ObscuredByUnits</flag>
+		<flag>CommonCommands</flag>
+		<flag>MilitaryCommands</flag>
+		<flag>CreateUnitGroupAutomatically</flag>
+		<flag>HideGarrisonFlag</flag>
+		<flag>UnitTransformFree</flag>
+		<flag>UnitTransformBuildLimit</flag>
+
+		<contain external="1">LogicalTypePickable</contain>
+		<tactics>dbz_goku_early_kaioken.tactics</tactics>
+
+		<protoaction>
+			<name>HandAttack</name>
+			<rof>1.000000</rof>
+			<damage type="Hack">44.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>0.800000</maxrange>
+			<defaultattack>1</defaultattack>
+		</protoaction>
+		<protoaction>
+			<name>RangedAttack</name>
+			<rof>2.500000</rof>
+			<damage type="Pierce">70.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>16.000000</maxrange>
+			<damagearea>3.000000</damagearea>
+			<damageflags>Enemy</damageflags>
+			<projectile>ProjectilePriestPharaoh</projectile>
+		</protoaction>
+		<protoaction>
+			<name>Pickup</name>
+			<type>Pickup</type>
+			<maxrange>1</maxrange>
+			<rate type="LogicalTypePickable">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>DropOff</name>
+			<type>DropOff</type>
+			<maxrange>1</maxrange>
+			<rate type="AbstractTemple">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>KaiokenTransform</name>
+			<type>DelayedTransform</type>
+			<modifyduration>500</modifyduration>
+			<modifyprotoid>DBZ_GokuEarly</modifyprotoid>
+		</protoaction>
+	</unit>
+
+	<!-- ============================================================================= -->
+	<!-- GOKU (SUPER SAIYAN 1) : FRIEZA SAGA, AGE II-III. Warp Kamehameha              -->
+	<!-- ============================================================================= -->
+	<unit name="DBZ_GokuSSJ1" mergeMode="add">
+		<displaynameid>STR_DBZ_GOKU_SSJ1_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_GOKU_SSJ1_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_GOKU_SSJ1_SR</shortrollovertextid>
+		<icon>resources\greek\player_color\units\heracles_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero</minimapicon>
+		<animfile>greek\units\hero\heracles\heracles.xml</animfile>
+		<soundsetfile>greek\vo\heracles\heracles.xml</soundsetfile>
+
+		<obstructionradiusx>0.4900</obstructionradiusx>
+		<obstructionradiusz>0.4900</obstructionradiusz>
+		<impacttype>Unarmoured</impacttype>
+		<unitaitype>HandCombative</unitaitype>
+		<autoattackrange>22.0000</autoattackrange>
+		<formationorder>4</formationorder>
+		<movementtype>land</movementtype>
+		<turnrate>18.0000</turnrate>
+
+		<initialhitpoints>950.0000</initialhitpoints>
+		<maxhitpoints>950.0000</maxhitpoints>
+		<trainpoints>45.0000</trainpoints>
+		<buildlimit>1</buildlimit>
+		<weightclass>8</weightclass>
+		<maxcontained>1</maxcontained>
+		<maxvelocity>5.0000</maxvelocity>
+		<los>20.0000</los>
+		<populationcount>4</populationcount>
+		<rechargetime>25</rechargetime>
+		<cost resourcetype="Food">300.0000</cost>
+		<cost resourcetype="Gold">250.0000</cost>
+		<cost resourcetype="Favor">15.0000</cost>
+
+		<armor type="Hack" value="0.6000"></armor>
+		<armor type="Pierce" value="0.6000"></armor>
+		<armor type="Crush" value="0.9000"></armor>
+
+		<unittype>LogicalTypeMinimapFilterMilitary</unittype>
+		<unittype>LogicalTypeHandUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeHandUnitsAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAttack</unittype>
+		<unittype>LogicalTypeValidMeteorTarget</unittype>
+		<unittype>LogicalTypeValidShockwaveTarget</unittype>
+		<unittype>LogicalTypeValidSpyTarget</unittype>
+		<unittype>LogicalTypeAffectedByRestoration</unittype>
+		<unittype>LogicalTypeHealed</unittype>
+		<unittype>LogicalTypeParticipatesInBattlecries</unittype>
+		<unittype>LogicalTypeLandMilitary</unittype>
+		<unittype>LogicalTypeNeededForVictory</unittype>
+		<unittype>LogicalTypeFindMilitaryHero</unittype>
+		<unittype>CountsTowardMilitaryScore</unittype>
+		<unittype>Unit</unittype>
+		<unittype>UnitClass</unittype>
+		<unittype>MilitaryUnit</unittype>
+		<unittype>Hero</unittype>
+		<unittype>MajorHero</unittype>
+
+		<flag>CollidesWithProjectiles</flag>
+		<flag>CorpseDecays</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>ObscuredByUnits</flag>
+		<flag>CommonCommands</flag>
+		<flag>MilitaryCommands</flag>
+		<flag>CreateUnitGroupAutomatically</flag>
+		<flag>HideGarrisonFlag</flag>
+		<flag>UnitTransformFree</flag>
+		<flag>UnitTransformBuildLimit</flag>
+
+		<contain external="1">LogicalTypePickable</contain>
+		<tactics>dbz_goku_ssj1.tactics</tactics>
+
+		<protoaction>
+			<name>HandAttack</name>
+			<rof>1.000000</rof>
+			<damage type="Hack">50.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>0.800000</maxrange>
+			<defaultattack>1</defaultattack>
+		</protoaction>
+		<protoaction>
+			<name>RangedAttack</name>
+			<rof>2.500000</rof>
+			<damage type="Pierce">60.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>18.000000</maxrange>
+			<damagearea>3.000000</damagearea>
+			<damageflags>Enemy</damageflags>
+			<projectile>ProjectileMirrorTowerLazer</projectile>
+		</protoaction>
+		<protoaction>
+			<name>WarpKamehameha</name>
+			<type>JumpAttack</type>
+			<rof>1.000000</rof>
+			<damage type="Pierce">150.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<damagearea>4.000000</damagearea>
+			<damageflags>Enemy</damageflags>
+			<minrange>4.000000</minrange>
+			<maxrange>20.000000</maxrange>
+			<onhiteffect type="Throw">
+				<target attacktype="HumanSoldier"></target>
+				<target attacktype="LogicalTypeVillagerNotHero"></target>
+				<target attacktype="LogicalTypeMythUnitNotTitan"></target>
+			</onhiteffect>
+		</protoaction>
+		<protoaction>
+			<name>Pickup</name>
+			<type>Pickup</type>
+			<maxrange>1</maxrange>
+			<rate type="LogicalTypePickable">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>DropOff</name>
+			<type>DropOff</type>
+			<maxrange>1</maxrange>
+			<rate type="AbstractTemple">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>FlightTransform</name>
+			<type>DelayedTransform</type>
+			<modifyduration>750</modifyduration>
+			<modifyprotoid>DBZ_GokuSSJ1Air</modifyprotoid>
+		</protoaction>
+	</unit>
+
+	<!-- GOKU (SUPER SAIYAN 1) : air stance twin -->
+	<unit name="DBZ_GokuSSJ1Air" mergeMode="add">
+		<displaynameid>STR_DBZ_GOKU_SSJ1_AIR_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_GOKU_SSJ1_AIR_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_GOKU_SSJ1_AIR_SR</shortrollovertextid>
+		<icon>resources\greek\player_color\units\heracles_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero</minimapicon>
+		<animfile>greek\units\hero\heracles\heracles.xml</animfile>
+		<soundsetfile>greek\vo\heracles\heracles.xml</soundsetfile>
+
+		<obstructionradiusx>0.4900</obstructionradiusx>
+		<obstructionradiusz>0.4900</obstructionradiusz>
+		<impacttype>Unarmoured</impacttype>
+		<unitaitype>HandCombative</unitaitype>
+		<autoattackrange>22.0000</autoattackrange>
+		<formationorder>4</formationorder>
+		<flag>FlyingUnit</flag>
+		<flag>NoTieToGround</flag>
+		<unittype>AbstractFlyingUnit</unittype>
+		<movementtype>air</movementtype>
+		<turnrate>18.0000</turnrate>
+
+		<initialhitpoints>950.0000</initialhitpoints>
+		<maxhitpoints>950.0000</maxhitpoints>
+		<trainpoints>45.0000</trainpoints>
+		<buildlimit>1</buildlimit>
+		<weightclass>8</weightclass>
+		<maxcontained>1</maxcontained>
+		<maxvelocity>6.2500</maxvelocity>
+		<los>20.0000</los>
+		<populationcount>4</populationcount>
+		<rechargetime>25</rechargetime>
+		<cost resourcetype="Food">300.0000</cost>
+		<cost resourcetype="Gold">250.0000</cost>
+		<cost resourcetype="Favor">15.0000</cost>
+
+		<armor type="Hack" value="0.4500"></armor>
+		<armor type="Pierce" value="0.6000"></armor>
+		<armor type="Crush" value="0.9000"></armor>
+
+		<unittype>LogicalTypeMinimapFilterMilitary</unittype>
+		<unittype>LogicalTypeHandUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeHandUnitsAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAttack</unittype>
+		<unittype>LogicalTypeValidMeteorTarget</unittype>
+		<unittype>LogicalTypeValidShockwaveTarget</unittype>
+		<unittype>LogicalTypeValidSpyTarget</unittype>
+		<unittype>LogicalTypeAffectedByRestoration</unittype>
+		<unittype>LogicalTypeHealed</unittype>
+		<unittype>LogicalTypeParticipatesInBattlecries</unittype>
+		<unittype>LogicalTypeNeededForVictory</unittype>
+		<unittype>LogicalTypeFindMilitaryHero</unittype>
+		<unittype>CountsTowardMilitaryScore</unittype>
+		<unittype>Unit</unittype>
+		<unittype>UnitClass</unittype>
+		<unittype>MilitaryUnit</unittype>
+		<unittype>Hero</unittype>
+		<unittype>MajorHero</unittype>
+
+		<flag>CollidesWithProjectiles</flag>
+		<flag>CorpseDecays</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>ObscuredByUnits</flag>
+		<flag>CommonCommands</flag>
+		<flag>MilitaryCommands</flag>
+		<flag>CreateUnitGroupAutomatically</flag>
+		<flag>HideGarrisonFlag</flag>
+		<flag>UnitTransformFree</flag>
+		<flag>UnitTransformBuildLimit</flag>
+
+		<contain external="1">LogicalTypePickable</contain>
+		<tactics>dbz_goku_ssj1.tactics</tactics>
+
+		<protoaction>
+			<name>HandAttack</name>
+			<rof>1.000000</rof>
+			<damage type="Hack">50.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>0.800000</maxrange>
+			<defaultattack>1</defaultattack>
+		</protoaction>
+		<protoaction>
+			<name>RangedAttack</name>
+			<rof>2.500000</rof>
+			<damage type="Pierce">60.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>18.000000</maxrange>
+			<damagearea>3.000000</damagearea>
+			<damageflags>Enemy</damageflags>
+			<projectile>ProjectileMirrorTowerLazer</projectile>
+		</protoaction>
+		<protoaction>
+			<name>WarpKamehameha</name>
+			<type>JumpAttack</type>
+			<rof>1.000000</rof>
+			<damage type="Pierce">150.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<damagearea>4.000000</damagearea>
+			<damageflags>Enemy</damageflags>
+			<minrange>4.000000</minrange>
+			<maxrange>20.000000</maxrange>
+			<onhiteffect type="Throw">
+				<target attacktype="HumanSoldier"></target>
+				<target attacktype="LogicalTypeVillagerNotHero"></target>
+				<target attacktype="LogicalTypeMythUnitNotTitan"></target>
+			</onhiteffect>
+		</protoaction>
+		<protoaction>
+			<name>Pickup</name>
+			<type>Pickup</type>
+			<maxrange>1</maxrange>
+			<rate type="LogicalTypePickable">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>DropOff</name>
+			<type>DropOff</type>
+			<maxrange>1</maxrange>
+			<rate type="AbstractTemple">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>FlightTransform</name>
+			<type>DelayedTransform</type>
+			<modifyduration>750</modifyduration>
+			<modifyprotoid>DBZ_GokuSSJ1</modifyprotoid>
+		</protoaction>
+	</unit>
+
+	<!-- ============================================================================= -->
+	<!-- GOKU (SUPER SAIYAN 3) : KID BUU SAGA, TITAN TIER. Super Dragon Fist.          -->
+	<!-- 1.5 Ki/s upkeep is applied by dbz_core.xs whether grounded or flying.          -->
+	<!-- ============================================================================= -->
+	<unit name="DBZ_GokuSSJ3" mergeMode="add">
+		<displaynameid>STR_DBZ_GOKU_SSJ3_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_GOKU_SSJ3_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_GOKU_SSJ3_SR</shortrollovertextid>
+		<icon>resources\greek\player_color\units\heracles_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero</minimapicon>
+		<animfile>greek\units\hero\heracles\heracles.xml</animfile>
+		<soundsetfile>greek\vo\heracles\heracles.xml</soundsetfile>
+
+		<obstructionradiusx>0.4900</obstructionradiusx>
+		<obstructionradiusz>0.4900</obstructionradiusz>
+		<impacttype>Unarmoured</impacttype>
+		<unitaitype>HandCombative</unitaitype>
+		<autoattackrange>24.0000</autoattackrange>
+		<formationorder>4</formationorder>
+		<movementtype>land</movementtype>
+		<turnrate>18.0000</turnrate>
+
+		<initialhitpoints>1500.0000</initialhitpoints>
+		<maxhitpoints>1500.0000</maxhitpoints>
+		<trainpoints>60.0000</trainpoints>
+		<buildlimit>1</buildlimit>
+		<weightclass>9</weightclass>
+		<maxcontained>1</maxcontained>
+		<maxvelocity>5.2000</maxvelocity>
+		<los>22.0000</los>
+		<populationcount>5</populationcount>
+		<rechargetime>30</rechargetime>
+		<cost resourcetype="Food">450.0000</cost>
+		<cost resourcetype="Gold">400.0000</cost>
+		<cost resourcetype="Favor">30.0000</cost>
+
+		<armor type="Hack" value="0.7000"></armor>
+		<armor type="Pierce" value="0.7000"></armor>
+		<armor type="Crush" value="0.9000"></armor>
+
+		<unittype>LogicalTypeMinimapFilterMilitary</unittype>
+		<unittype>LogicalTypeHandUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeHandUnitsAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAttack</unittype>
+		<unittype>LogicalTypeValidMeteorTarget</unittype>
+		<unittype>LogicalTypeValidShockwaveTarget</unittype>
+		<unittype>LogicalTypeValidSpyTarget</unittype>
+		<unittype>LogicalTypeAffectedByRestoration</unittype>
+		<unittype>LogicalTypeHealed</unittype>
+		<unittype>LogicalTypeParticipatesInBattlecries</unittype>
+		<unittype>LogicalTypeLandMilitary</unittype>
+		<unittype>LogicalTypeNeededForVictory</unittype>
+		<unittype>LogicalTypeFindMilitaryHero</unittype>
+		<unittype>CountsTowardMilitaryScore</unittype>
+		<unittype>Unit</unittype>
+		<unittype>UnitClass</unittype>
+		<unittype>MilitaryUnit</unittype>
+		<unittype>Hero</unittype>
+		<unittype>MajorHero</unittype>
+
+		<flag>CollidesWithProjectiles</flag>
+		<flag>CorpseDecays</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>ObscuredByUnits</flag>
+		<flag>CommonCommands</flag>
+		<flag>MilitaryCommands</flag>
+		<flag>CreateUnitGroupAutomatically</flag>
+		<flag>HideGarrisonFlag</flag>
+		<flag>UnitTransformFree</flag>
+		<flag>UnitTransformBuildLimit</flag>
+
+		<contain external="1">LogicalTypePickable</contain>
+		<tactics>dbz_goku_ssj3.tactics</tactics>
+
+		<protoaction>
+			<name>HandAttack</name>
+			<rof>1.000000</rof>
+			<damage type="Hack">80.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>0.800000</maxrange>
+			<defaultattack>1</defaultattack>
+		</protoaction>
+		<protoaction>
+			<name>RangedAttack</name>
+			<rof>2.500000</rof>
+			<damage type="Pierce">90.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>20.000000</maxrange>
+			<damagearea>4.000000</damagearea>
+			<damageflags>Enemy</damageflags>
+			<projectile>ProjectileMirrorTowerLazer</projectile>
+		</protoaction>
+		<protoaction>
+			<name>SuperDragonFist</name>
+			<type>JumpAttack</type>
+			<rof>1.000000</rof>
+			<damage type="Hack">240.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<damagearea>5.000000</damagearea>
+			<damageflags>Enemy</damageflags>
+			<minrange>3.000000</minrange>
+			<maxrange>18.000000</maxrange>
+			<onhiteffect type="Throw">
+				<target attacktype="HumanSoldier"></target>
+				<target attacktype="LogicalTypeVillagerNotHero"></target>
+				<target attacktype="LogicalTypeMythUnitNotTitan"></target>
+			</onhiteffect>
+		</protoaction>
+		<protoaction>
+			<name>Pickup</name>
+			<type>Pickup</type>
+			<maxrange>1</maxrange>
+			<rate type="LogicalTypePickable">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>DropOff</name>
+			<type>DropOff</type>
+			<maxrange>1</maxrange>
+			<rate type="AbstractTemple">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>FlightTransform</name>
+			<type>DelayedTransform</type>
+			<modifyduration>750</modifyduration>
+			<modifyprotoid>DBZ_GokuSSJ3Air</modifyprotoid>
+		</protoaction>
+	</unit>
+
+	<!-- GOKU (SUPER SAIYAN 3) : air stance twin -->
+	<unit name="DBZ_GokuSSJ3Air" mergeMode="add">
+		<displaynameid>STR_DBZ_GOKU_SSJ3_AIR_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_GOKU_SSJ3_AIR_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_GOKU_SSJ3_AIR_SR</shortrollovertextid>
+		<icon>resources\greek\player_color\units\heracles_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero</minimapicon>
+		<animfile>greek\units\hero\heracles\heracles.xml</animfile>
+		<soundsetfile>greek\vo\heracles\heracles.xml</soundsetfile>
+
+		<obstructionradiusx>0.4900</obstructionradiusx>
+		<obstructionradiusz>0.4900</obstructionradiusz>
+		<impacttype>Unarmoured</impacttype>
+		<unitaitype>HandCombative</unitaitype>
+		<autoattackrange>24.0000</autoattackrange>
+		<formationorder>4</formationorder>
+		<flag>FlyingUnit</flag>
+		<flag>NoTieToGround</flag>
+		<unittype>AbstractFlyingUnit</unittype>
+		<movementtype>air</movementtype>
+		<turnrate>18.0000</turnrate>
+
+		<initialhitpoints>1500.0000</initialhitpoints>
+		<maxhitpoints>1500.0000</maxhitpoints>
+		<trainpoints>60.0000</trainpoints>
+		<buildlimit>1</buildlimit>
+		<weightclass>9</weightclass>
+		<maxcontained>1</maxcontained>
+		<maxvelocity>6.5000</maxvelocity>
+		<los>22.0000</los>
+		<populationcount>5</populationcount>
+		<rechargetime>30</rechargetime>
+		<cost resourcetype="Food">450.0000</cost>
+		<cost resourcetype="Gold">400.0000</cost>
+		<cost resourcetype="Favor">30.0000</cost>
+
+		<armor type="Hack" value="0.5500"></armor>
+		<armor type="Pierce" value="0.7000"></armor>
+		<armor type="Crush" value="0.9000"></armor>
+
+		<unittype>LogicalTypeMinimapFilterMilitary</unittype>
+		<unittype>LogicalTypeHandUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeHandUnitsAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAttack</unittype>
+		<unittype>LogicalTypeValidMeteorTarget</unittype>
+		<unittype>LogicalTypeValidShockwaveTarget</unittype>
+		<unittype>LogicalTypeValidSpyTarget</unittype>
+		<unittype>LogicalTypeAffectedByRestoration</unittype>
+		<unittype>LogicalTypeHealed</unittype>
+		<unittype>LogicalTypeParticipatesInBattlecries</unittype>
+		<unittype>LogicalTypeNeededForVictory</unittype>
+		<unittype>LogicalTypeFindMilitaryHero</unittype>
+		<unittype>CountsTowardMilitaryScore</unittype>
+		<unittype>Unit</unittype>
+		<unittype>UnitClass</unittype>
+		<unittype>MilitaryUnit</unittype>
+		<unittype>Hero</unittype>
+		<unittype>MajorHero</unittype>
+
+		<flag>CollidesWithProjectiles</flag>
+		<flag>CorpseDecays</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>ObscuredByUnits</flag>
+		<flag>CommonCommands</flag>
+		<flag>MilitaryCommands</flag>
+		<flag>CreateUnitGroupAutomatically</flag>
+		<flag>HideGarrisonFlag</flag>
+		<flag>UnitTransformFree</flag>
+		<flag>UnitTransformBuildLimit</flag>
+
+		<contain external="1">LogicalTypePickable</contain>
+		<tactics>dbz_goku_ssj3.tactics</tactics>
+
+		<protoaction>
+			<name>HandAttack</name>
+			<rof>1.000000</rof>
+			<damage type="Hack">80.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>0.800000</maxrange>
+			<defaultattack>1</defaultattack>
+		</protoaction>
+		<protoaction>
+			<name>RangedAttack</name>
+			<rof>2.500000</rof>
+			<damage type="Pierce">90.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>20.000000</maxrange>
+			<damagearea>4.000000</damagearea>
+			<damageflags>Enemy</damageflags>
+			<projectile>ProjectileMirrorTowerLazer</projectile>
+		</protoaction>
+		<protoaction>
+			<name>SuperDragonFist</name>
+			<type>JumpAttack</type>
+			<rof>1.000000</rof>
+			<damage type="Hack">240.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<damagearea>5.000000</damagearea>
+			<damageflags>Enemy</damageflags>
+			<minrange>3.000000</minrange>
+			<maxrange>18.000000</maxrange>
+			<onhiteffect type="Throw">
+				<target attacktype="HumanSoldier"></target>
+				<target attacktype="LogicalTypeVillagerNotHero"></target>
+				<target attacktype="LogicalTypeMythUnitNotTitan"></target>
+			</onhiteffect>
+		</protoaction>
+		<protoaction>
+			<name>Pickup</name>
+			<type>Pickup</type>
+			<maxrange>1</maxrange>
+			<rate type="LogicalTypePickable">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>DropOff</name>
+			<type>DropOff</type>
+			<maxrange>1</maxrange>
+			<rate type="AbstractTemple">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>FlightTransform</name>
+			<type>DelayedTransform</type>
+			<modifyduration>750</modifyduration>
+			<modifyprotoid>DBZ_GokuSSJ3</modifyprotoid>
+		</protoaction>
+	</unit>
+
+	<!-- ============================================================================= -->
+	<!-- CELL (IMPERFECT) : ANDROIDS / CELL SAGA, AGE III. Red Ribbon (Egyptian).      -->
+	<!-- Namekian Regeneration 10 HP/s is native (unitregen). Tail Biomass Absorption  -->
+	<!-- and the 10-kill evolution chain are driven by dbz_core.xs.                    -->
+	<!-- ============================================================================= -->
+	<unit name="DBZ_CellImperfect" mergeMode="add">
+		<displaynameid>STR_DBZ_CELL_IMPERFECT_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_CELL_IMPERFECT_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_CELL_IMPERFECT_SR</shortrollovertextid>
+		<icon>resources\spc\player_color\units\kemsyt_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero</minimapicon>
+		<animfile>spc\units\kemsyt\kemsyt.xml</animfile>
+		<soundsetfile>egyptian\vo\mummy\mummy.xml</soundsetfile>
+
+		<obstructionradiusx>0.4900</obstructionradiusx>
+		<obstructionradiusz>0.4900</obstructionradiusz>
+		<impacttype>Armoured</impacttype>
+		<unitaitype>HandCombative</unitaitype>
+		<autoattackrange>20.0000</autoattackrange>
+		<formationorder>4</formationorder>
+		<movementtype>land</movementtype>
+		<turnrate>18.0000</turnrate>
+
+		<initialhitpoints>650.0000</initialhitpoints>
+		<maxhitpoints>650.0000</maxhitpoints>
+		<unitregen>10.0000</unitregen>
+		<trainpoints>40.0000</trainpoints>
+		<buildlimit>1</buildlimit>
+		<weightclass>7</weightclass>
+		<maxcontained>1</maxcontained>
+		<maxvelocity>4.4000</maxvelocity>
+		<los>18.0000</los>
+		<populationcount>4</populationcount>
+		<cost resourcetype="Food">175.0000</cost>
+		<cost resourcetype="Gold">175.0000</cost>
+		<cost resourcetype="Favor">10.0000</cost>
+
+		<armor type="Hack" value="0.4500"></armor>
+		<armor type="Pierce" value="0.5000"></armor>
+		<armor type="Crush" value="0.8000"></armor>
+
+		<unittype>LogicalTypeMinimapFilterMilitary</unittype>
+		<unittype>LogicalTypeHandUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeHandUnitsAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAttack</unittype>
+		<unittype>LogicalTypeValidMeteorTarget</unittype>
+		<unittype>LogicalTypeValidShockwaveTarget</unittype>
+		<unittype>LogicalTypeValidSpyTarget</unittype>
+		<unittype>LogicalTypeAffectedByRestoration</unittype>
+		<unittype>LogicalTypeHealed</unittype>
+		<unittype>LogicalTypeParticipatesInBattlecries</unittype>
+		<unittype>LogicalTypeLandMilitary</unittype>
+		<unittype>LogicalTypeNeededForVictory</unittype>
+		<unittype>LogicalTypeFindMilitaryHero</unittype>
+		<unittype>CountsTowardMilitaryScore</unittype>
+		<unittype>Unit</unittype>
+		<unittype>UnitClass</unittype>
+		<unittype>MilitaryUnit</unittype>
+		<unittype>Hero</unittype>
+		<unittype>MajorHero</unittype>
+
+		<flag>CollidesWithProjectiles</flag>
+		<flag>CorpseDecays</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>ObscuredByUnits</flag>
+		<flag>CommonCommands</flag>
+		<flag>MilitaryCommands</flag>
+		<flag>CreateUnitGroupAutomatically</flag>
+		<flag>HideGarrisonFlag</flag>
+		<flag>UnitTransformFree</flag>
+		<flag>UnitTransformBuildLimit</flag>
+
+		<contain external="1">LogicalTypePickable</contain>
+		<tactics>dbz_cell.tactics</tactics>
+
+		<protoaction>
+			<name>HandAttack</name>
+			<rof>1.000000</rof>
+			<damage type="Hack">34.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>1.200000</maxrange>
+			<defaultattack>1</defaultattack>
+		</protoaction>
+		<protoaction>
+			<name>RangedAttack</name>
+			<rof>2.500000</rof>
+			<damage type="Pierce">38.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>14.000000</maxrange>
+			<projectile>ProjectileLampadesBolt</projectile>
+		</protoaction>
+		<protoaction>
+			<name>Pickup</name>
+			<type>Pickup</type>
+			<maxrange>1</maxrange>
+			<rate type="LogicalTypePickable">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>DropOff</name>
+			<type>DropOff</type>
+			<maxrange>1</maxrange>
+			<rate type="AbstractTemple">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>FlightTransform</name>
+			<type>DelayedTransform</type>
+			<modifyduration>1000</modifyduration>
+			<modifyprotoid>DBZ_CellImperfectAir</modifyprotoid>
+		</protoaction>
+	</unit>
+
+	<!-- CELL (IMPERFECT) : air stance twin -->
+	<unit name="DBZ_CellImperfectAir" mergeMode="add">
+		<displaynameid>STR_DBZ_CELL_IMPERFECT_AIR_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_CELL_IMPERFECT_AIR_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_CELL_IMPERFECT_AIR_SR</shortrollovertextid>
+		<icon>resources\spc\player_color\units\kemsyt_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero</minimapicon>
+		<animfile>spc\units\kemsyt\kemsyt.xml</animfile>
+		<soundsetfile>egyptian\vo\mummy\mummy.xml</soundsetfile>
+
+		<obstructionradiusx>0.4900</obstructionradiusx>
+		<obstructionradiusz>0.4900</obstructionradiusz>
+		<impacttype>Armoured</impacttype>
+		<unitaitype>HandCombative</unitaitype>
+		<autoattackrange>20.0000</autoattackrange>
+		<formationorder>4</formationorder>
+		<flag>FlyingUnit</flag>
+		<flag>NoTieToGround</flag>
+		<unittype>AbstractFlyingUnit</unittype>
+		<movementtype>air</movementtype>
+		<turnrate>18.0000</turnrate>
+
+		<initialhitpoints>650.0000</initialhitpoints>
+		<maxhitpoints>650.0000</maxhitpoints>
+		<unitregen>10.0000</unitregen>
+		<trainpoints>40.0000</trainpoints>
+		<buildlimit>1</buildlimit>
+		<weightclass>7</weightclass>
+		<maxcontained>1</maxcontained>
+		<maxvelocity>5.5000</maxvelocity>
+		<los>18.0000</los>
+		<populationcount>4</populationcount>
+		<cost resourcetype="Food">175.0000</cost>
+		<cost resourcetype="Gold">175.0000</cost>
+		<cost resourcetype="Favor">10.0000</cost>
+
+		<armor type="Hack" value="0.3000"></armor>
+		<armor type="Pierce" value="0.5000"></armor>
+		<armor type="Crush" value="0.8000"></armor>
+
+		<unittype>LogicalTypeMinimapFilterMilitary</unittype>
+		<unittype>LogicalTypeHandUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeHandUnitsAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAttack</unittype>
+		<unittype>LogicalTypeValidMeteorTarget</unittype>
+		<unittype>LogicalTypeValidShockwaveTarget</unittype>
+		<unittype>LogicalTypeValidSpyTarget</unittype>
+		<unittype>LogicalTypeAffectedByRestoration</unittype>
+		<unittype>LogicalTypeHealed</unittype>
+		<unittype>LogicalTypeParticipatesInBattlecries</unittype>
+		<unittype>LogicalTypeNeededForVictory</unittype>
+		<unittype>LogicalTypeFindMilitaryHero</unittype>
+		<unittype>CountsTowardMilitaryScore</unittype>
+		<unittype>Unit</unittype>
+		<unittype>UnitClass</unittype>
+		<unittype>MilitaryUnit</unittype>
+		<unittype>Hero</unittype>
+		<unittype>MajorHero</unittype>
+
+		<flag>CollidesWithProjectiles</flag>
+		<flag>CorpseDecays</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>ObscuredByUnits</flag>
+		<flag>CommonCommands</flag>
+		<flag>MilitaryCommands</flag>
+		<flag>CreateUnitGroupAutomatically</flag>
+		<flag>HideGarrisonFlag</flag>
+		<flag>UnitTransformFree</flag>
+		<flag>UnitTransformBuildLimit</flag>
+
+		<contain external="1">LogicalTypePickable</contain>
+		<tactics>dbz_cell.tactics</tactics>
+
+		<protoaction>
+			<name>HandAttack</name>
+			<rof>1.000000</rof>
+			<damage type="Hack">34.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>1.200000</maxrange>
+			<defaultattack>1</defaultattack>
+		</protoaction>
+		<protoaction>
+			<name>RangedAttack</name>
+			<rof>2.500000</rof>
+			<damage type="Pierce">38.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>14.000000</maxrange>
+			<projectile>ProjectileLampadesBolt</projectile>
+		</protoaction>
+		<protoaction>
+			<name>Pickup</name>
+			<type>Pickup</type>
+			<maxrange>1</maxrange>
+			<rate type="LogicalTypePickable">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>DropOff</name>
+			<type>DropOff</type>
+			<maxrange>1</maxrange>
+			<rate type="AbstractTemple">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>FlightTransform</name>
+			<type>DelayedTransform</type>
+			<modifyduration>1000</modifyduration>
+			<modifyprotoid>DBZ_CellImperfect</modifyprotoid>
+		</protoaction>
+	</unit>
+
+	<!-- CELL (SEMI-PERFECT) : evolution stage 2 (10 biomass) -->
+	<unit name="DBZ_CellSemiPerfect" mergeMode="add">
+		<displaynameid>STR_DBZ_CELL_SEMIPERFECT_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_CELL_SEMIPERFECT_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_CELL_SEMIPERFECT_SR</shortrollovertextid>
+		<icon>resources\spc\player_color\units\kemsyt_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero</minimapicon>
+		<animfile>spc\units\kemsyt\kemsyt.xml</animfile>
+		<soundsetfile>egyptian\vo\mummy\mummy.xml</soundsetfile>
+
+		<obstructionradiusx>0.5500</obstructionradiusx>
+		<obstructionradiusz>0.5500</obstructionradiusz>
+		<impacttype>Armoured</impacttype>
+		<unitaitype>HandCombative</unitaitype>
+		<autoattackrange>22.0000</autoattackrange>
+		<formationorder>4</formationorder>
+		<movementtype>land</movementtype>
+		<turnrate>18.0000</turnrate>
+
+		<initialhitpoints>900.0000</initialhitpoints>
+		<maxhitpoints>900.0000</maxhitpoints>
+		<unitregen>10.0000</unitregen>
+		<trainpoints>50.0000</trainpoints>
+		<buildlimit>1</buildlimit>
+		<weightclass>8</weightclass>
+		<maxcontained>1</maxcontained>
+		<maxvelocity>4.6000</maxvelocity>
+		<los>20.0000</los>
+		<populationcount>4</populationcount>
+		<cost resourcetype="Food">250.0000</cost>
+		<cost resourcetype="Gold">250.0000</cost>
+		<cost resourcetype="Favor">15.0000</cost>
+
+		<armor type="Hack" value="0.5500"></armor>
+		<armor type="Pierce" value="0.5500"></armor>
+		<armor type="Crush" value="0.8500"></armor>
+
+		<unittype>LogicalTypeMinimapFilterMilitary</unittype>
+		<unittype>LogicalTypeHandUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeHandUnitsAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAttack</unittype>
+		<unittype>LogicalTypeValidMeteorTarget</unittype>
+		<unittype>LogicalTypeValidShockwaveTarget</unittype>
+		<unittype>LogicalTypeValidSpyTarget</unittype>
+		<unittype>LogicalTypeAffectedByRestoration</unittype>
+		<unittype>LogicalTypeHealed</unittype>
+		<unittype>LogicalTypeParticipatesInBattlecries</unittype>
+		<unittype>LogicalTypeLandMilitary</unittype>
+		<unittype>LogicalTypeNeededForVictory</unittype>
+		<unittype>LogicalTypeFindMilitaryHero</unittype>
+		<unittype>CountsTowardMilitaryScore</unittype>
+		<unittype>Unit</unittype>
+		<unittype>UnitClass</unittype>
+		<unittype>MilitaryUnit</unittype>
+		<unittype>Hero</unittype>
+		<unittype>MajorHero</unittype>
+
+		<flag>CollidesWithProjectiles</flag>
+		<flag>CorpseDecays</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>ObscuredByUnits</flag>
+		<flag>CommonCommands</flag>
+		<flag>MilitaryCommands</flag>
+		<flag>CreateUnitGroupAutomatically</flag>
+		<flag>HideGarrisonFlag</flag>
+		<flag>UnitTransformFree</flag>
+		<flag>UnitTransformBuildLimit</flag>
+
+		<contain external="1">LogicalTypePickable</contain>
+		<tactics>dbz_cell.tactics</tactics>
+
+		<protoaction>
+			<name>HandAttack</name>
+			<rof>1.000000</rof>
+			<damage type="Hack">46.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>1.200000</maxrange>
+			<defaultattack>1</defaultattack>
+		</protoaction>
+		<protoaction>
+			<name>RangedAttack</name>
+			<rof>2.500000</rof>
+			<damage type="Pierce">52.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>15.000000</maxrange>
+			<projectile>ProjectileLampadesBolt</projectile>
+		</protoaction>
+		<protoaction>
+			<name>Pickup</name>
+			<type>Pickup</type>
+			<maxrange>1</maxrange>
+			<rate type="LogicalTypePickable">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>DropOff</name>
+			<type>DropOff</type>
+			<maxrange>1</maxrange>
+			<rate type="AbstractTemple">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>FlightTransform</name>
+			<type>DelayedTransform</type>
+			<modifyduration>1000</modifyduration>
+			<modifyprotoid>DBZ_CellSemiPerfectAir</modifyprotoid>
+		</protoaction>
+	</unit>
+
+	<!-- CELL (SEMI-PERFECT) : air stance twin -->
+	<unit name="DBZ_CellSemiPerfectAir" mergeMode="add">
+		<displaynameid>STR_DBZ_CELL_SEMIPERFECT_AIR_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_CELL_SEMIPERFECT_AIR_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_CELL_SEMIPERFECT_AIR_SR</shortrollovertextid>
+		<icon>resources\spc\player_color\units\kemsyt_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero</minimapicon>
+		<animfile>spc\units\kemsyt\kemsyt.xml</animfile>
+		<soundsetfile>egyptian\vo\mummy\mummy.xml</soundsetfile>
+
+		<obstructionradiusx>0.5500</obstructionradiusx>
+		<obstructionradiusz>0.5500</obstructionradiusz>
+		<impacttype>Armoured</impacttype>
+		<unitaitype>HandCombative</unitaitype>
+		<autoattackrange>22.0000</autoattackrange>
+		<formationorder>4</formationorder>
+		<flag>FlyingUnit</flag>
+		<flag>NoTieToGround</flag>
+		<unittype>AbstractFlyingUnit</unittype>
+		<movementtype>air</movementtype>
+		<turnrate>18.0000</turnrate>
+
+		<initialhitpoints>900.0000</initialhitpoints>
+		<maxhitpoints>900.0000</maxhitpoints>
+		<unitregen>10.0000</unitregen>
+		<trainpoints>50.0000</trainpoints>
+		<buildlimit>1</buildlimit>
+		<weightclass>8</weightclass>
+		<maxcontained>1</maxcontained>
+		<maxvelocity>5.7500</maxvelocity>
+		<los>20.0000</los>
+		<populationcount>4</populationcount>
+		<cost resourcetype="Food">250.0000</cost>
+		<cost resourcetype="Gold">250.0000</cost>
+		<cost resourcetype="Favor">15.0000</cost>
+
+		<armor type="Hack" value="0.4000"></armor>
+		<armor type="Pierce" value="0.5500"></armor>
+		<armor type="Crush" value="0.8500"></armor>
+
+		<unittype>LogicalTypeMinimapFilterMilitary</unittype>
+		<unittype>LogicalTypeHandUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeHandUnitsAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAttack</unittype>
+		<unittype>LogicalTypeValidMeteorTarget</unittype>
+		<unittype>LogicalTypeValidShockwaveTarget</unittype>
+		<unittype>LogicalTypeValidSpyTarget</unittype>
+		<unittype>LogicalTypeAffectedByRestoration</unittype>
+		<unittype>LogicalTypeHealed</unittype>
+		<unittype>LogicalTypeParticipatesInBattlecries</unittype>
+		<unittype>LogicalTypeNeededForVictory</unittype>
+		<unittype>LogicalTypeFindMilitaryHero</unittype>
+		<unittype>CountsTowardMilitaryScore</unittype>
+		<unittype>Unit</unittype>
+		<unittype>UnitClass</unittype>
+		<unittype>MilitaryUnit</unittype>
+		<unittype>Hero</unittype>
+		<unittype>MajorHero</unittype>
+
+		<flag>CollidesWithProjectiles</flag>
+		<flag>CorpseDecays</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>ObscuredByUnits</flag>
+		<flag>CommonCommands</flag>
+		<flag>MilitaryCommands</flag>
+		<flag>CreateUnitGroupAutomatically</flag>
+		<flag>HideGarrisonFlag</flag>
+		<flag>UnitTransformFree</flag>
+		<flag>UnitTransformBuildLimit</flag>
+
+		<contain external="1">LogicalTypePickable</contain>
+		<tactics>dbz_cell.tactics</tactics>
+
+		<protoaction>
+			<name>HandAttack</name>
+			<rof>1.000000</rof>
+			<damage type="Hack">46.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>1.200000</maxrange>
+			<defaultattack>1</defaultattack>
+		</protoaction>
+		<protoaction>
+			<name>RangedAttack</name>
+			<rof>2.500000</rof>
+			<damage type="Pierce">52.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>15.000000</maxrange>
+			<projectile>ProjectileLampadesBolt</projectile>
+		</protoaction>
+		<protoaction>
+			<name>Pickup</name>
+			<type>Pickup</type>
+			<maxrange>1</maxrange>
+			<rate type="LogicalTypePickable">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>DropOff</name>
+			<type>DropOff</type>
+			<maxrange>1</maxrange>
+			<rate type="AbstractTemple">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>FlightTransform</name>
+			<type>DelayedTransform</type>
+			<modifyduration>1000</modifyduration>
+			<modifyprotoid>DBZ_CellSemiPerfect</modifyprotoid>
+		</protoaction>
+	</unit>
+
+	<!-- CELL (PERFECT) : evolution stage 3 (20 biomass). Solar Kamehameha. -->
+	<unit name="DBZ_CellPerfect" mergeMode="add">
+		<displaynameid>STR_DBZ_CELL_PERFECT_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_CELL_PERFECT_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_CELL_PERFECT_SR</shortrollovertextid>
+		<icon>resources\spc\player_color\units\kemsyt_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero</minimapicon>
+		<animfile>spc\units\kemsyt\kemsyt.xml</animfile>
+		<soundsetfile>egyptian\vo\mummy\mummy.xml</soundsetfile>
+
+		<obstructionradiusx>0.5500</obstructionradiusx>
+		<obstructionradiusz>0.5500</obstructionradiusz>
+		<impacttype>Armoured</impacttype>
+		<unitaitype>HandCombative</unitaitype>
+		<autoattackrange>24.0000</autoattackrange>
+		<formationorder>4</formationorder>
+		<movementtype>land</movementtype>
+		<turnrate>18.0000</turnrate>
+
+		<initialhitpoints>1350.0000</initialhitpoints>
+		<maxhitpoints>1350.0000</maxhitpoints>
+		<unitregen>10.0000</unitregen>
+		<trainpoints>60.0000</trainpoints>
+		<buildlimit>1</buildlimit>
+		<weightclass>9</weightclass>
+		<maxcontained>1</maxcontained>
+		<maxvelocity>5.0000</maxvelocity>
+		<los>22.0000</los>
+		<populationcount>5</populationcount>
+		<rechargetime>35</rechargetime>
+		<cost resourcetype="Food">350.0000</cost>
+		<cost resourcetype="Gold">350.0000</cost>
+		<cost resourcetype="Favor">25.0000</cost>
+
+		<armor type="Hack" value="0.6500"></armor>
+		<armor type="Pierce" value="0.6500"></armor>
+		<armor type="Crush" value="0.9000"></armor>
+
+		<unittype>LogicalTypeMinimapFilterMilitary</unittype>
+		<unittype>LogicalTypeHandUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeHandUnitsAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAttack</unittype>
+		<unittype>LogicalTypeValidMeteorTarget</unittype>
+		<unittype>LogicalTypeValidShockwaveTarget</unittype>
+		<unittype>LogicalTypeValidSpyTarget</unittype>
+		<unittype>LogicalTypeAffectedByRestoration</unittype>
+		<unittype>LogicalTypeHealed</unittype>
+		<unittype>LogicalTypeParticipatesInBattlecries</unittype>
+		<unittype>LogicalTypeLandMilitary</unittype>
+		<unittype>LogicalTypeNeededForVictory</unittype>
+		<unittype>LogicalTypeFindMilitaryHero</unittype>
+		<unittype>CountsTowardMilitaryScore</unittype>
+		<unittype>Unit</unittype>
+		<unittype>UnitClass</unittype>
+		<unittype>MilitaryUnit</unittype>
+		<unittype>Hero</unittype>
+		<unittype>MajorHero</unittype>
+
+		<flag>CollidesWithProjectiles</flag>
+		<flag>CorpseDecays</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>ObscuredByUnits</flag>
+		<flag>CommonCommands</flag>
+		<flag>MilitaryCommands</flag>
+		<flag>CreateUnitGroupAutomatically</flag>
+		<flag>HideGarrisonFlag</flag>
+		<flag>UnitTransformFree</flag>
+		<flag>UnitTransformBuildLimit</flag>
+
+		<contain external="1">LogicalTypePickable</contain>
+		<tactics>dbz_cell_perfect.tactics</tactics>
+
+		<protoaction>
+			<name>HandAttack</name>
+			<rof>1.000000</rof>
+			<damage type="Hack">62.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>1.200000</maxrange>
+			<defaultattack>1</defaultattack>
+		</protoaction>
+		<protoaction>
+			<name>RangedAttack</name>
+			<rof>2.500000</rof>
+			<damage type="Pierce">70.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>16.000000</maxrange>
+			<damagearea>2.000000</damagearea>
+			<damageflags>Enemy</damageflags>
+			<projectile>ProjectileLampadesBolt</projectile>
+		</protoaction>
+		<protoaction>
+			<name>SolarKamehameha</name>
+			<rof>1.000000</rof>
+			<damage type="Pierce">220.000000</damage>
+			<damage type="Crush">80.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>22.000000</maxrange>
+			<damagearea>6.000000</damagearea>
+			<damageflags>Enemy</damageflags>
+			<projectile>ProjectileLightningLazer</projectile>
+			<instantballistics>1</instantballistics>
+			<onhiteffect type="Throw">
+				<target attacktype="HumanSoldier"></target>
+				<target attacktype="LogicalTypeVillagerNotHero"></target>
+				<target attacktype="LogicalTypeMythUnitNotTitan"></target>
+			</onhiteffect>
+		</protoaction>
+		<protoaction>
+			<name>Pickup</name>
+			<type>Pickup</type>
+			<maxrange>1</maxrange>
+			<rate type="LogicalTypePickable">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>DropOff</name>
+			<type>DropOff</type>
+			<maxrange>1</maxrange>
+			<rate type="AbstractTemple">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>FlightTransform</name>
+			<type>DelayedTransform</type>
+			<modifyduration>750</modifyduration>
+			<modifyprotoid>DBZ_CellPerfectAir</modifyprotoid>
+		</protoaction>
+	</unit>
+
+	<!-- CELL (PERFECT) : air stance twin -->
+	<unit name="DBZ_CellPerfectAir" mergeMode="add">
+		<displaynameid>STR_DBZ_CELL_PERFECT_AIR_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_CELL_PERFECT_AIR_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_CELL_PERFECT_AIR_SR</shortrollovertextid>
+		<icon>resources\spc\player_color\units\kemsyt_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero</minimapicon>
+		<animfile>spc\units\kemsyt\kemsyt.xml</animfile>
+		<soundsetfile>egyptian\vo\mummy\mummy.xml</soundsetfile>
+
+		<obstructionradiusx>0.5500</obstructionradiusx>
+		<obstructionradiusz>0.5500</obstructionradiusz>
+		<impacttype>Armoured</impacttype>
+		<unitaitype>HandCombative</unitaitype>
+		<autoattackrange>24.0000</autoattackrange>
+		<formationorder>4</formationorder>
+		<flag>FlyingUnit</flag>
+		<flag>NoTieToGround</flag>
+		<unittype>AbstractFlyingUnit</unittype>
+		<movementtype>air</movementtype>
+		<turnrate>18.0000</turnrate>
+
+		<initialhitpoints>1350.0000</initialhitpoints>
+		<maxhitpoints>1350.0000</maxhitpoints>
+		<unitregen>10.0000</unitregen>
+		<trainpoints>60.0000</trainpoints>
+		<buildlimit>1</buildlimit>
+		<weightclass>9</weightclass>
+		<maxcontained>1</maxcontained>
+		<maxvelocity>6.2500</maxvelocity>
+		<los>22.0000</los>
+		<populationcount>5</populationcount>
+		<rechargetime>35</rechargetime>
+		<cost resourcetype="Food">350.0000</cost>
+		<cost resourcetype="Gold">350.0000</cost>
+		<cost resourcetype="Favor">25.0000</cost>
+
+		<armor type="Hack" value="0.5000"></armor>
+		<armor type="Pierce" value="0.6500"></armor>
+		<armor type="Crush" value="0.9000"></armor>
+
+		<unittype>LogicalTypeMinimapFilterMilitary</unittype>
+		<unittype>LogicalTypeHandUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeHandUnitsAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAttack</unittype>
+		<unittype>LogicalTypeValidMeteorTarget</unittype>
+		<unittype>LogicalTypeValidShockwaveTarget</unittype>
+		<unittype>LogicalTypeValidSpyTarget</unittype>
+		<unittype>LogicalTypeAffectedByRestoration</unittype>
+		<unittype>LogicalTypeHealed</unittype>
+		<unittype>LogicalTypeParticipatesInBattlecries</unittype>
+		<unittype>LogicalTypeNeededForVictory</unittype>
+		<unittype>LogicalTypeFindMilitaryHero</unittype>
+		<unittype>CountsTowardMilitaryScore</unittype>
+		<unittype>Unit</unittype>
+		<unittype>UnitClass</unittype>
+		<unittype>MilitaryUnit</unittype>
+		<unittype>Hero</unittype>
+		<unittype>MajorHero</unittype>
+
+		<flag>CollidesWithProjectiles</flag>
+		<flag>CorpseDecays</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>ObscuredByUnits</flag>
+		<flag>CommonCommands</flag>
+		<flag>MilitaryCommands</flag>
+		<flag>CreateUnitGroupAutomatically</flag>
+		<flag>HideGarrisonFlag</flag>
+		<flag>UnitTransformFree</flag>
+		<flag>UnitTransformBuildLimit</flag>
+
+		<contain external="1">LogicalTypePickable</contain>
+		<tactics>dbz_cell_perfect.tactics</tactics>
+
+		<protoaction>
+			<name>HandAttack</name>
+			<rof>1.000000</rof>
+			<damage type="Hack">62.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>1.200000</maxrange>
+			<defaultattack>1</defaultattack>
+		</protoaction>
+		<protoaction>
+			<name>RangedAttack</name>
+			<rof>2.500000</rof>
+			<damage type="Pierce">70.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>16.000000</maxrange>
+			<damagearea>2.000000</damagearea>
+			<damageflags>Enemy</damageflags>
+			<projectile>ProjectileLampadesBolt</projectile>
+		</protoaction>
+		<protoaction>
+			<name>SolarKamehameha</name>
+			<rof>1.000000</rof>
+			<damage type="Pierce">220.000000</damage>
+			<damage type="Crush">80.000000</damage>
+			<damagebonus type="LogicalTypeMythUnitNotTitan">5.000000</damagebonus>
+			<damagebonus type="AbstractTitan">2.500000</damagebonus>
+			<maxrange>22.000000</maxrange>
+			<damagearea>6.000000</damagearea>
+			<damageflags>Enemy</damageflags>
+			<projectile>ProjectileLightningLazer</projectile>
+			<instantballistics>1</instantballistics>
+			<onhiteffect type="Throw">
+				<target attacktype="HumanSoldier"></target>
+				<target attacktype="LogicalTypeVillagerNotHero"></target>
+				<target attacktype="LogicalTypeMythUnitNotTitan"></target>
+			</onhiteffect>
+		</protoaction>
+		<protoaction>
+			<name>Pickup</name>
+			<type>Pickup</type>
+			<maxrange>1</maxrange>
+			<rate type="LogicalTypePickable">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>DropOff</name>
+			<type>DropOff</type>
+			<maxrange>1</maxrange>
+			<rate type="AbstractTemple">1.00000</rate>
+		</protoaction>
+		<protoaction>
+			<name>FlightTransform</name>
+			<type>DelayedTransform</type>
+			<modifyduration>750</modifyduration>
+			<modifyprotoid>DBZ_CellPerfect</modifyprotoid>
+		</protoaction>
+	</unit>
+
+	<!-- ============================================================================= -->
+	<!-- SAIBAMAN : SAIYAN SAGA, AGE I MYTH UNIT. Saiyan Empire (Norse).               -->
+	<!-- Acid spit + Self-Destruct Leap (120 Hack + 150 Crush, 4m). The leap is a      -->
+	<!-- native JumpAttack; dbz_core.xs detonates (kills) the Saibaman on landing.     -->
+	<!-- ============================================================================= -->
+	<unit name="DBZ_Saibaman" mergeMode="add">
+		<displaynameid>STR_DBZ_SAIBAMAN_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_SAIBAMAN_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_SAIBAMAN_SR</shortrollovertextid>
+		<icon>resources\atlantean\player_color\units\dryad_icon.png</icon>
+		<animfile>atlantean\units\myth\dryad\dryad.xml</animfile>
+		<soundsetfile>atlantean\vo\dryad\dryad.xml</soundsetfile>
+
+		<obstructionradiusx>0.4000</obstructionradiusx>
+		<obstructionradiusz>0.4000</obstructionradiusz>
+		<impacttype>Unarmoured</impacttype>
+		<unitaitype>RangedCombative</unitaitype>
+		<autoattackrange>14.0000</autoattackrange>
+		<formationorder>2</formationorder>
+		<movementtype>land</movementtype>
+		<turnrate>18.0000</turnrate>
+
+		<initialhitpoints>180.0000</initialhitpoints>
+		<maxhitpoints>180.0000</maxhitpoints>
+		<trainpoints>12.0000</trainpoints>
+		<weightclass>4</weightclass>
+		<maxvelocity>5.0000</maxvelocity>
+		<los>14.0000</los>
+		<populationcount>2</populationcount>
+		<rechargetime>2</rechargetime>
+		<cost resourcetype="Gold">30.0000</cost>
+		<cost resourcetype="Favor">4.0000</cost>
+
+		<armor type="Hack" value="0.2500"></armor>
+		<armor type="Pierce" value="0.2000"></armor>
+		<armor type="Crush" value="0.5000"></armor>
+
+		<unittype>LogicalTypeMinimapFilterMilitary</unittype>
+		<unittype>LogicalTypeHandUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeHandUnitsAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAttack</unittype>
+		<unittype>LogicalTypeValidBoltTarget</unittype>
+		<unittype>LogicalTypeValidMeteorTarget</unittype>
+		<unittype>LogicalTypeValidShockwaveTarget</unittype>
+		<unittype>LogicalTypeValidTornadoAttack</unittype>
+		<unittype>LogicalTypeValidSpyTarget</unittype>
+		<unittype>LogicalTypeValidTraitorTarget</unittype>
+		<unittype>LogicalTypeAffectedByRestoration</unittype>
+		<unittype>LogicalTypeHealed</unittype>
+		<unittype>LogicalTypeArchaicMythUnit</unittype>
+		<unittype>LogicalTypeMythUnitNotTitan</unittype>
+		<unittype>LogicalTypeLandMilitary</unittype>
+		<unittype>CountsTowardMilitaryScore</unittype>
+		<unittype>Unit</unittype>
+		<unittype>UnitClass</unittype>
+		<unittype>MilitaryUnit</unittype>
+		<unittype>MythUnit</unittype>
+
+		<flag>CollidesWithProjectiles</flag>
+		<flag>CorpseDecays</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>CommonCommands</flag>
+		<flag>MilitaryCommands</flag>
+		<flag>CreateUnitGroupAutomatically</flag>
+		<flag>GroupSelection</flag>
+
+		<tactics>dbz_saibaman.tactics</tactics>
+
+		<protoaction>
+			<name>RangedAttack</name>
+			<rof>1.500000</rof>
+			<damage type="Pierce">14.000000</damage>
+			<damagebonus type="HumanSoldier">3.000000</damagebonus>
+			<damagebonus type="Hero">0.250000</damagebonus>
+			<maxrange>8.000000</maxrange>
+			<projectile>ProjectileWadjetSpit</projectile>
+			<defaultattack>1</defaultattack>
+		</protoaction>
+		<protoaction>
+			<name>SelfDestructLeap</name>
+			<type>JumpAttack</type>
+			<rof>1.000000</rof>
+			<damage type="Hack">120.000000</damage>
+			<damage type="Crush">150.000000</damage>
+			<damagebonus type="HumanSoldier">3.000000</damagebonus>
+			<damagebonus type="Hero">0.250000</damagebonus>
+			<damagearea>4.000000</damagearea>
+			<damageflags>Enemy</damageflags>
+			<minrange>2.000000</minrange>
+			<maxrange>9.000000</maxrange>
+			<onhiteffect type="Throw">
+				<target attacktype="HumanSoldier"></target>
+				<target attacktype="LogicalTypeVillagerNotHero"></target>
+			</onhiteffect>
+		</protoaction>
+	</unit>
+
+	<!-- ============================================================================= -->
+	<!-- KID BUU (PURE MAJIN) : TITAN. Babidi's Cabal (Atlantean) Titan Gate output.   -->
+	<!-- 40 HP/s regeneration is native (unitregen). The "cannot drop below 1 HP"      -->
+	<!-- clause and the Titan Gate swap are driven by dbz_core.xs.                     -->
+	<!-- ============================================================================= -->
+	<unit name="DBZ_KidBuu" mergeMode="add">
+		<displaynameid>STR_DBZ_KID_BUU_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_KID_BUU_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_KID_BUU_SR</shortrollovertextid>
+		<icon>resources\chinese\player_color\units\titan_chinese_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero_spc</minimapicon>
+		<animfile>chinese\units\myth\titan\titan_xing_tian.xml</animfile>
+		<soundsetfile>chinese\vo\titan_xing_tian\titan_xing_tian.xml</soundsetfile>
+
+		<obstructionradiusx>2.5000</obstructionradiusx>
+		<obstructionradiusz>2.5000</obstructionradiusz>
+		<selectionradiusx>3.0000</selectionradiusx>
+		<selectionradiusz>3.0000</selectionradiusz>
+		<impacttype>Unarmoured</impacttype>
+		<unitaitype>HandCombative</unitaitype>
+		<autoattackrange>30.0000</autoattackrange>
+		<formationorder>5</formationorder>
+		<movementtype>land</movementtype>
+		<turnrate>12.0000</turnrate>
+
+		<initialhitpoints>7000.0000</initialhitpoints>
+		<maxhitpoints>7000.0000</maxhitpoints>
+		<unitregen>40.0000</unitregen>
+		<trainpoints>1.0000</trainpoints>
+		<buildlimit>1</buildlimit>
+		<weightclass>150</weightclass>
+		<maxvelocity>4.8000</maxvelocity>
+		<los>24.0000</los>
+		<populationcount>0</populationcount>
+
+		<armor type="Hack" value="0.8500"></armor>
+		<armor type="Pierce" value="0.8500"></armor>
+		<armor type="Crush" value="0.9500"></armor>
+
+		<unittype>LogicalTypeMinimapFilterMilitary</unittype>
+		<unittype>LogicalTypeHandUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeHandUnitsAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAutoAttack</unittype>
+		<unittype>LogicalTypeRangedUnitsAttack</unittype>
+		<unittype>LogicalTypeLandMilitary</unittype>
+		<unittype>LogicalTypeNeededForVictory</unittype>
+		<unittype>CountsTowardMilitaryScore</unittype>
+		<unittype>Unit</unittype>
+		<unittype>UnitClass</unittype>
+		<unittype>MilitaryUnit</unittype>
+		<unittype>MythUnit</unittype>
+		<unittype>AbstractTitan</unittype>
+
+		<flag>CollidesWithProjectiles</flag>
+		<flag>CorpseDecays</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>NotPushable</flag>
+		<flag>CommonCommands</flag>
+		<flag>MilitaryCommands</flag>
+		<flag>CreateUnitGroupAutomatically</flag>
+
+		<tactics>dbz_kidbuu.tactics</tactics>
+
+		<protoaction>
+			<name>HandAttack</name>
+			<rof>1.500000</rof>
+			<damage type="Hack">120.000000</damage>
+			<damage type="Crush">200.000000</damage>
+			<damagebonus type="HumanSoldier">3.000000</damagebonus>
+			<damagebonus type="Hero">0.250000</damagebonus>
+			<damagearea>3.000000</damagearea>
+			<damageflags>Enemy</damageflags>
+			<maxrange>2.500000</maxrange>
+			<defaultattack>1</defaultattack>
+			<onhiteffect type="Throw">
+				<target attacktype="HumanSoldier"></target>
+				<target attacktype="LogicalTypeVillagerNotHero"></target>
+			</onhiteffect>
+		</protoaction>
+	</unit>
+
+	<!-- ============================================================================= -->
+	<!-- THE 7 DRAGON BALLS : Gaia-owned invulnerable pickables. Only units with the   -->
+	<!-- Pickup action (heroes above) can carry them; DropOff deposits them into any   -->
+	<!-- AbstractTemple. Passive trickle + Shenron unlock: dbz_core.xs.                -->
+	<!-- ============================================================================= -->
+	<unit name="DBZ_DragonBall1Star" mergeMode="add">
+		<displaynameid>STR_DBZ_DB_1STAR_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_DB_1STAR_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_DB_1STAR_SR</shortrollovertextid>
+		<icon>resources\chinese\player_color\units\sky_lantern_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero_spc</minimapicon>
+		<animfile>chinese\units\attachments\sky_lantern\sky_lantern.xml</animfile>
+		<obstructionradiusx>0.3000</obstructionradiusx>
+		<obstructionradiusz>0.3000</obstructionradiusz>
+		<impacttype>Stone</impacttype>
+		<unitaitype>Passive</unitaitype>
+		<movementtype>land</movementtype>
+		<initialhitpoints>1.0000</initialhitpoints>
+		<maxhitpoints>1.0000</maxhitpoints>
+		<los>4.0000</los>
+		<unittype>LogicalTypePickable</unittype>
+		<flag>Invulnerable</flag>
+		<flag>NotPushable</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>VisibleUnderFogIfNature</flag>
+	</unit>
+	<unit name="DBZ_DragonBall2Star" mergeMode="add">
+		<displaynameid>STR_DBZ_DB_2STAR_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_DB_2STAR_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_DB_2STAR_SR</shortrollovertextid>
+		<icon>resources\chinese\player_color\units\sky_lantern_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero_spc</minimapicon>
+		<animfile>chinese\units\attachments\sky_lantern\sky_lantern.xml</animfile>
+		<obstructionradiusx>0.3000</obstructionradiusx>
+		<obstructionradiusz>0.3000</obstructionradiusz>
+		<impacttype>Stone</impacttype>
+		<unitaitype>Passive</unitaitype>
+		<movementtype>land</movementtype>
+		<initialhitpoints>1.0000</initialhitpoints>
+		<maxhitpoints>1.0000</maxhitpoints>
+		<los>4.0000</los>
+		<unittype>LogicalTypePickable</unittype>
+		<flag>Invulnerable</flag>
+		<flag>NotPushable</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>VisibleUnderFogIfNature</flag>
+	</unit>
+	<unit name="DBZ_DragonBall3Star" mergeMode="add">
+		<displaynameid>STR_DBZ_DB_3STAR_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_DB_3STAR_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_DB_3STAR_SR</shortrollovertextid>
+		<icon>resources\chinese\player_color\units\sky_lantern_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero_spc</minimapicon>
+		<animfile>chinese\units\attachments\sky_lantern\sky_lantern.xml</animfile>
+		<obstructionradiusx>0.3000</obstructionradiusx>
+		<obstructionradiusz>0.3000</obstructionradiusz>
+		<impacttype>Stone</impacttype>
+		<unitaitype>Passive</unitaitype>
+		<movementtype>land</movementtype>
+		<initialhitpoints>1.0000</initialhitpoints>
+		<maxhitpoints>1.0000</maxhitpoints>
+		<los>4.0000</los>
+		<unittype>LogicalTypePickable</unittype>
+		<flag>Invulnerable</flag>
+		<flag>NotPushable</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>VisibleUnderFogIfNature</flag>
+	</unit>
+	<unit name="DBZ_DragonBall4Star" mergeMode="add">
+		<displaynameid>STR_DBZ_DB_4STAR_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_DB_4STAR_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_DB_4STAR_SR</shortrollovertextid>
+		<icon>resources\chinese\player_color\units\sky_lantern_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero_spc</minimapicon>
+		<animfile>chinese\units\attachments\sky_lantern\sky_lantern.xml</animfile>
+		<obstructionradiusx>0.3000</obstructionradiusx>
+		<obstructionradiusz>0.3000</obstructionradiusz>
+		<impacttype>Stone</impacttype>
+		<unitaitype>Passive</unitaitype>
+		<movementtype>land</movementtype>
+		<initialhitpoints>1.0000</initialhitpoints>
+		<maxhitpoints>1.0000</maxhitpoints>
+		<los>4.0000</los>
+		<unittype>LogicalTypePickable</unittype>
+		<flag>Invulnerable</flag>
+		<flag>NotPushable</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>VisibleUnderFogIfNature</flag>
+	</unit>
+	<unit name="DBZ_DragonBall5Star" mergeMode="add">
+		<displaynameid>STR_DBZ_DB_5STAR_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_DB_5STAR_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_DB_5STAR_SR</shortrollovertextid>
+		<icon>resources\chinese\player_color\units\sky_lantern_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero_spc</minimapicon>
+		<animfile>chinese\units\attachments\sky_lantern\sky_lantern.xml</animfile>
+		<obstructionradiusx>0.3000</obstructionradiusx>
+		<obstructionradiusz>0.3000</obstructionradiusz>
+		<impacttype>Stone</impacttype>
+		<unitaitype>Passive</unitaitype>
+		<movementtype>land</movementtype>
+		<initialhitpoints>1.0000</initialhitpoints>
+		<maxhitpoints>1.0000</maxhitpoints>
+		<los>4.0000</los>
+		<unittype>LogicalTypePickable</unittype>
+		<flag>Invulnerable</flag>
+		<flag>NotPushable</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>VisibleUnderFogIfNature</flag>
+	</unit>
+	<unit name="DBZ_DragonBall6Star" mergeMode="add">
+		<displaynameid>STR_DBZ_DB_6STAR_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_DB_6STAR_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_DB_6STAR_SR</shortrollovertextid>
+		<icon>resources\chinese\player_color\units\sky_lantern_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero_spc</minimapicon>
+		<animfile>chinese\units\attachments\sky_lantern\sky_lantern.xml</animfile>
+		<obstructionradiusx>0.3000</obstructionradiusx>
+		<obstructionradiusz>0.3000</obstructionradiusz>
+		<impacttype>Stone</impacttype>
+		<unitaitype>Passive</unitaitype>
+		<movementtype>land</movementtype>
+		<initialhitpoints>1.0000</initialhitpoints>
+		<maxhitpoints>1.0000</maxhitpoints>
+		<los>4.0000</los>
+		<unittype>LogicalTypePickable</unittype>
+		<flag>Invulnerable</flag>
+		<flag>NotPushable</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>VisibleUnderFogIfNature</flag>
+	</unit>
+	<unit name="DBZ_DragonBall7Star" mergeMode="add">
+		<displaynameid>STR_DBZ_DB_7STAR_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_DB_7STAR_LR</rollovertextid>
+		<shortrollovertextid>STR_DBZ_DB_7STAR_SR</shortrollovertextid>
+		<icon>resources\chinese\player_color\units\sky_lantern_icon.png</icon>
+		<minimapicon>ui\minimap\minimap_hero_spc</minimapicon>
+		<animfile>chinese\units\attachments\sky_lantern\sky_lantern.xml</animfile>
+		<obstructionradiusx>0.3000</obstructionradiusx>
+		<obstructionradiusz>0.3000</obstructionradiusz>
+		<impacttype>Stone</impacttype>
+		<unitaitype>Passive</unitaitype>
+		<movementtype>land</movementtype>
+		<initialhitpoints>1.0000</initialhitpoints>
+		<maxhitpoints>1.0000</maxhitpoints>
+		<los>4.0000</los>
+		<unittype>LogicalTypePickable</unittype>
+		<flag>Invulnerable</flag>
+		<flag>NotPushable</flag>
+		<flag>DontRotateObstruction</flag>
+		<flag>VisibleUnderFogIfNature</flag>
+	</unit>
+</protomods>

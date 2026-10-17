@@ -1,0 +1,64 @@
+<powersmod>
+	<!--
+	=====================================================================================
+	  DRAGON BALL Z: AGE OF MYTHOLOGY  |  powers_mods.xml  |  VERTICAL SLICE v0.1
+	  Unit abilities (UnitAction powers bound to named protoactions) and the
+	  Shenron god power. All entries are additive (mergeMode="add").
+	=====================================================================================
+	-->
+
+	<!-- FLIGHT STANCE TOGGLE: fires the caster's own "FlightTransform" DelayedTransform.
+	     Every land proto points FlightTransform at its air twin and vice versa, so one
+	     power toggles both directions. Ki drain while airborne: dbz_core.xs. -->
+	<power name="DBZ_AbilityToggleFlight" type="UnitAction" mergeMode="add">
+		<displaynameid>STR_DBZ_ABILITY_FLIGHT_NAME</displaynameid>
+		<rolloverid>STR_DBZ_ABILITY_FLIGHT_LR</rolloverid>
+		<icon>egyptian\static_color\abilities\roc_ability_icon.png</icon>
+		<activetime>1</activetime>
+		<radius>1.0</radius>
+		<placement ally="">Unit</placement>
+		<abstractplacementtargettype>DBZ_GokuEarly</abstractplacementtargettype>
+		<abstractplacementtargettype>DBZ_GokuEarlyNimbus</abstractplacementtargettype>
+		<abstractplacementtargettype>DBZ_GokuSSJ1</abstractplacementtargettype>
+		<abstractplacementtargettype>DBZ_GokuSSJ1Air</abstractplacementtargettype>
+		<abstractplacementtargettype>DBZ_GokuSSJ3</abstractplacementtargettype>
+		<abstractplacementtargettype>DBZ_GokuSSJ3Air</abstractplacementtargettype>
+		<abstractplacementtargettype>DBZ_CellImperfect</abstractplacementtargettype>
+		<abstractplacementtargettype>DBZ_CellImperfectAir</abstractplacementtargettype>
+		<abstractplacementtargettype>DBZ_CellSemiPerfect</abstractplacementtargettype>
+		<abstractplacementtargettype>DBZ_CellSemiPerfectAir</abstractplacementtargettype>
+		<abstractplacementtargettype>DBZ_CellPerfect</abstractplacementtargettype>
+		<abstractplacementtargettype>DBZ_CellPerfectAir</abstractplacementtargettype>
+		<unitaction>FlightTransform</unitaction>
+		<allowduringnorush>1</allowduringnorush>
+	</power>
+
+	<!-- KAIO-KEN TOGGLE: fires "KaiokenTransform" (DBZ_GokuEarly <-> DBZ_GokuEarlyKaioken).
+	     5 HP/s strain and the 10% HP safety release: dbz_core.xs. -->
+	<power name="DBZ_AbilityKaioken" type="UnitAction" mergeMode="add">
+		<displaynameid>STR_DBZ_ABILITY_KAIOKEN_NAME</displaynameid>
+		<rolloverid>STR_DBZ_ABILITY_KAIOKEN_LR</rolloverid>
+		<icon>greek\static_color\god_powers\bolt_icon.png</icon>
+		<activetime>1</activetime>
+		<radius>1.0</radius>
+		<placement ally="">Unit</placement>
+		<abstractplacementtargettype>DBZ_GokuEarly</abstractplacementtargettype>
+		<abstractplacementtargettype>DBZ_GokuEarlyKaioken</abstractplacementtargettype>
+		<unitaction>KaiokenTransform</unitaction>
+		<allowduringnorush>1</allowduringnorush>
+	</power>
+
+	<!-- SUMMON THE ETERNAL DRAGON: granted by dbz_core.xs to the player whose Temples hold
+	     all 7 Dragon Balls. The cast itself is instant and inert; dbz_core.xs watches
+	     kbGodPowerGetNumUsedTimes() and opens the 3-wish dialog on cast. -->
+	<power name="DBZ_SummonEternalDragon" type="GeneralEffect" mergeMode="add">
+		<displaynameid>STR_DBZ_POWER_SHENRON_NAME</displaynameid>
+		<rolloverid>STR_DBZ_POWER_SHENRON_LR</rolloverid>
+		<icon>egyptian\static_color\god_powers\meteor_icon.png</icon>
+		<placement>Skip</placement>
+		<powerplayerrelation>Player</powerplayerrelation>
+		<effect type="MaximumVelocity" amount="0.00" relativity="Absolute">
+			<target type="ProtoUnit">Unit</target>
+		</effect>
+	</power>
+</powersmod>

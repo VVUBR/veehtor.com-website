@@ -1,0 +1,51 @@
+<abilities>
+	<!--
+	  DRAGON BALL Z: AGE OF MYTHOLOGY  |  abilities_mods.xml  |  VERTICAL SLICE v0.1
+	  Binds the UnitAction powers from powers_mods.xml to unit command cards.
+	  rof = cooldown in seconds. castonself/noautocast make them manual self-casts.
+	-->
+
+	<!-- GOKU LINE -->
+	<DBZ_GokuEarly>
+		<ability>DBZ_AbilityToggleFlight<rof>3</rof><castonself>true</castonself><noautocast>true</noautocast></ability>
+		<ability>DBZ_AbilityKaioken<rof>5</rof><castonself>true</castonself><noautocast>true</noautocast></ability>
+	</DBZ_GokuEarly>
+	<DBZ_GokuEarlyNimbus>
+		<ability>DBZ_AbilityToggleFlight<rof>3</rof><castonself>true</castonself><noautocast>true</noautocast></ability>
+	</DBZ_GokuEarlyNimbus>
+	<DBZ_GokuEarlyKaioken>
+		<ability>DBZ_AbilityKaioken<rof>5</rof><castonself>true</castonself><noautocast>true</noautocast></ability>
+	</DBZ_GokuEarlyKaioken>
+	<DBZ_GokuSSJ1>
+		<ability>DBZ_AbilityToggleFlight<rof>3</rof><castonself>true</castonself><noautocast>true</noautocast></ability>
+	</DBZ_GokuSSJ1>
+	<DBZ_GokuSSJ1Air>
+		<ability>DBZ_AbilityToggleFlight<rof>3</rof><castonself>true</castonself><noautocast>true</noautocast></ability>
+	</DBZ_GokuSSJ1Air>
+	<DBZ_GokuSSJ3>
+		<ability>DBZ_AbilityToggleFlight<rof>3</rof><castonself>true</castonself><noautocast>true</noautocast></ability>
+	</DBZ_GokuSSJ3>
+	<DBZ_GokuSSJ3Air>
+		<ability>DBZ_AbilityToggleFlight<rof>3</rof><castonself>true</castonself><noautocast>true</noautocast></ability>
+	</DBZ_GokuSSJ3Air>
+
+	<!-- CELL LINE -->
+	<DBZ_CellImperfect>
+		<ability>DBZ_AbilityToggleFlight<rof>3</rof><castonself>true</castonself><noautocast>true</noautocast></ability>
+	</DBZ_CellImperfect>
+	<DBZ_CellImperfectAir>
+		<ability>DBZ_AbilityToggleFlight<rof>3</rof><castonself>true</castonself><noautocast>true</noautocast></ability>
+	</DBZ_CellImperfectAir>
+	<DBZ_CellSemiPerfect>
+		<ability>DBZ_AbilityToggleFlight<rof>3</rof><castonself>true</castonself><noautocast>true</noautocast></ability>
+	</DBZ_CellSemiPerfect>
+	<DBZ_CellSemiPerfectAir>
+		<ability>DBZ_AbilityToggleFlight<rof>3</rof><castonself>true</castonself><noautocast>true</noautocast></ability>
+	</DBZ_CellSemiPerfectAir>
+	<DBZ_CellPerfect>
+		<ability>DBZ_AbilityToggleFlight<rof>3</rof><castonself>true</castonself><noautocast>true</noautocast></ability>
+	</DBZ_CellPerfect>
+	<DBZ_CellPerfectAir>
+		<ability>DBZ_AbilityToggleFlight<rof>3</rof><castonself>true</castonself><noautocast>true</noautocast></ability>
+	</DBZ_CellPerfectAir>
+</abilities>

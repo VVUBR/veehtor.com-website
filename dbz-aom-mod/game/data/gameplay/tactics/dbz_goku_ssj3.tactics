@@ -1,0 +1,51 @@
+<tactics>
+  <!-- DBZ_GokuSSJ3 and DBZ_GokuSSJ3Air: Super Dragon Fist is a charged JumpAttack (unit rechargetime 30s). -->
+  <action>
+    <name stringid="STR_ACTION_HAND">HandAttack</name>
+    <type>Attack</type>
+    <rate type="LogicalTypeHandUnitsAttack">1.0</rate>
+    <attackaction>1</attackaction>
+    <handlogic>1</handlogic>
+    <anim>HandAttack</anim>
+    <impacteffect>effects\impacts\hack</impacteffect>
+  </action>
+  <action>
+    <name stringid="STR_ACTION_RANGED">RangedAttack</name>
+    <type>Attack</type>
+    <rate type="LogicalTypeRangedUnitsAttack">1.0</rate>
+    <attackaction>1</attackaction>
+    <rangedlogic>1</rangedlogic>
+    <anim>RangedAttack</anim>
+    <accuracy>1.0</accuracy>
+    <maxspread>0</maxspread>
+    <trackrating>99.0</trackrating>
+    <perfectaccuracy>1</perfectaccuracy>
+    <impacteffect>effects\impacts\pierce</impacteffect>
+  </action>
+  <action>
+    <name>SuperDragonFist</name>
+    <type>JumpAttack</type>
+    <rate type="Unit">1.0</rate>
+    <rate type="Building">0.0</rate>
+    <attackaction>1</attackaction>
+    <handlogic>1</handlogic>
+    <chargeaction>1</chargeaction>
+    <anim>JumpAttack</anim>
+    <impacteffect>effects\impacts\hack</impacteffect>
+  </action>
+  <action>
+    <name>FlightTransform</name>
+    <type>DelayedTransform</type>
+    <anim>Transform</anim>
+  </action>
+  <tactic>Default
+    <action priority="110">SuperDragonFist</action>
+    <action priority="100">HandAttack</action>
+    <action priority="90">RangedAttack</action>
+    <action>FlightTransform</action>
+    <attacktype>LogicalTypeHandUnitsAttack</attacktype>
+    <autoattacktype>LogicalTypeHandUnitsAutoAttack</autoattacktype>
+    <attackresponsetype>LogicalTypeHandUnitsAttack</attackresponsetype>
+    <attackmovetype>AbstractWall</attackmovetype>
+  </tactic>
+</tactics>

@@ -1,0 +1,37 @@
+<tactics>
+  <!-- DBZ_Saibaman: acid spit, then a charged Self-Destruct Leap. dbz_core.xs kills the Saibaman when the leap lands. -->
+  <action>
+    <name stringid="STR_ACTION_RANGED">RangedAttack</name>
+    <type>Attack</type>
+    <rate type="LogicalTypeRangedUnitsAttack">1.0</rate>
+    <attackaction>1</attackaction>
+    <rangedlogic>1</rangedlogic>
+    <anim>RangedAttack</anim>
+    <accuracy>0.85</accuracy>
+    <maxspread>3.0</maxspread>
+    <spreadfactor>0.25</spreadfactor>
+    <trackrating>1.0</trackrating>
+    <impacteffect>effects\impacts\pierce</impacteffect>
+  </action>
+  <action>
+    <name>SelfDestructLeap</name>
+    <type>JumpAttack</type>
+    <rate type="HumanSoldier">1.0</rate>
+    <rate type="LogicalTypeVillagerNotHero">1.0</rate>
+    <rate type="Hero">1.0</rate>
+    <rate type="LogicalTypeMythUnitNotTitan">1.0</rate>
+    <attackaction>1</attackaction>
+    <handlogic>1</handlogic>
+    <chargeaction>1</chargeaction>
+    <anim>JumpAttack</anim>
+    <impacteffect>effects\impacts\hack</impacteffect>
+  </action>
+  <tactic>Default
+    <action priority="110">SelfDestructLeap</action>
+    <action priority="100">RangedAttack</action>
+    <attacktype>LogicalTypeRangedUnitsAttack</attacktype>
+    <autoattacktype>LogicalTypeRangedUnitsAutoAttack</autoattacktype>
+    <attackresponsetype>LogicalTypeRangedUnitsAttack</attackresponsetype>
+    <attackmovetype>AbstractWall</attackmovetype>
+  </tactic>
+</tactics>

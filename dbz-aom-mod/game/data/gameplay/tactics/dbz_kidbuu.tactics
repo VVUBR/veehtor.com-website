@@ -1,0 +1,20 @@
+<tactics>
+  <!-- DBZ_KidBuu: area melee against everything (units and buildings). HP floor and regen rules: dbz_core.xs. -->
+  <action>
+    <name stringid="STR_ACTION_HAND">HandAttack</name>
+    <type>Attack</type>
+    <rate type="All">1.0</rate>
+    <attackaction>1</attackaction>
+    <handlogic>1</handlogic>
+    <forceareaattacktarget>1</forceareaattacktarget>
+    <anim>HandAttack</anim>
+    <impacteffect>effects\impacts\crush</impacteffect>
+  </action>
+  <tactic>Default
+    <action priority="100">HandAttack</action>
+    <attacktype>LogicalTypeHandUnitsAttack</attacktype>
+    <autoattacktype>LogicalTypeHandUnitsAutoAttack</autoattacktype>
+    <attackresponsetype>LogicalTypeHandUnitsAttack</attackresponsetype>
+    <attackmovetype>AbstractWall</attackmovetype>
+  </tactic>
+</tactics>

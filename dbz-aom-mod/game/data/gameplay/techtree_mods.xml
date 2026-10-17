@@ -1,0 +1,133 @@
+<techtreemods>
+	<!--
+	=====================================================================================
+	  DRAGON BALL Z: AGE OF MYTHOLOGY  |  techtree_mods.xml  |  VERTICAL SLICE v0.1
+	  Culture mapping used by this mod:
+	    Greek      = Earth and Other World Defenders   (Goku line)
+	    Norse      = Frieza Force and Saiyan Empire    (Saibamen)
+	    Egyptian   = Red Ribbon and Bio-Tech Collective (Cell line)
+	    Atlantean  = Babidi's Cabal and Makyo Realm    (Kid Buu via Titan Gate, dbz_core.xs)
+	  Each culture's Archaic Age tech switches on a DBZ bootstrap tech that enables the
+	  slice's units and places their buttons. Button slots use row 2 to stay clear of
+	  vanilla rows 0 and 1.
+	=====================================================================================
+	-->
+
+	<!-- ============================ CULTURE HOOKS ============================ -->
+	<tech name="ArchaicAgeGreek"><effects><effect type="TechStatus" status="active" mergeMode="add">DBZ_EarthDefendersBootstrap</effect></effects></tech>
+	<tech name="ArchaicAgeNorse"><effects><effect type="TechStatus" status="active" mergeMode="add">DBZ_SaiyanEmpireBootstrap</effect></effects></tech>
+	<tech name="ArchaicAgeEgyptian"><effects><effect type="TechStatus" status="active" mergeMode="add">DBZ_RedRibbonBootstrap</effect></effects></tech>
+
+	<!-- ===================== EARTH DEFENDERS (GREEK) ===================== -->
+	<tech name="DBZ_EarthDefendersBootstrap">
+		<status>UNOBTAINABLE</status>
+		<flag>NoTextMessage</flag>
+		<flag>HideFromDialogs</flag>
+		<researchpoints>0.0000</researchpoints>
+		<effects>
+			<effect type="Data" amount="1.00" subtype="Enable" relativity="Absolute"><target type="ProtoUnit">DBZ_GokuEarly</target></effect>
+			<effect type="Data" amount="1.00" subtype="CommandAdd" proto="DBZ_GokuEarly" row="2" column="4" relativity="Assign"><target type="ProtoUnit">TownCenter</target></effect>
+			<effect type="Data" amount="1.00" subtype="CommandAdd" tech="DBZ_SuperSaiyanAwakening" row="2" column="0" relativity="Assign"><target type="ProtoUnit">Temple</target></effect>
+			<effect type="Data" amount="1.00" subtype="CommandAdd" tech="DBZ_SuperSaiyan3" row="2" column="1" relativity="Assign"><target type="ProtoUnit">Temple</target></effect>
+			<effect type="TechStatus" status="obtainable">DBZ_SuperSaiyanAwakening</effect>
+		</effects>
+	</tech>
+
+	<!-- SUPER SAIYAN AWAKENING (Frieza Saga, Age III): every Early Goku form becomes SSJ1,
+	     and the Town Center's Goku button now (re)trains the SSJ1 form. -->
+	<tech name="DBZ_SuperSaiyanAwakening">
+		<displaynameid>STR_DBZ_TECH_SSJ1_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_TECH_SSJ1_LR</rollovertextid>
+		<icon>greek\static_color\god_powers\bolt_icon.png</icon>
+		<cost resourcetype="Gold">300.0000</cost>
+		<cost resourcetype="Favor">30.0000</cost>
+		<researchpoints>40.0000</researchpoints>
+		<status>UNOBTAINABLE</status>
+		<flag>MythTech</flag>
+		<flag>CountsTowardMilitaryScore</flag>
+		<prereqs>
+			<specificage>HeroicAgeGreek</specificage>
+		</prereqs>
+		<effects>
+			<effect type="TransformUnit" toprotoid="DBZ_GokuSSJ1" fromprotoid="DBZ_GokuEarly" includequeued="true"></effect>
+			<effect type="TransformUnit" toprotoid="DBZ_GokuSSJ1" fromprotoid="DBZ_GokuEarlyKaioken" includequeued="true"></effect>
+			<effect type="TransformUnit" toprotoid="DBZ_GokuSSJ1Air" fromprotoid="DBZ_GokuEarlyNimbus" includequeued="true"></effect>
+			<effect type="Data" amount="1.00" subtype="Enable" relativity="Absolute"><target type="ProtoUnit">DBZ_GokuSSJ1</target></effect>
+			<effect type="Data" amount="1.00" subtype="CommandRemove" proto="DBZ_GokuEarly" relativity="Assign"><target type="ProtoUnit">TownCenter</target></effect>
+			<effect type="Data" amount="1.00" subtype="CommandAdd" proto="DBZ_GokuSSJ1" row="2" column="4" relativity="Assign"><target type="ProtoUnit">TownCenter</target></effect>
+			<effect type="TechStatus" status="obtainable">DBZ_SuperSaiyan3</effect>
+		</effects>
+	</tech>
+
+	<!-- SUPER SAIYAN 3 (Kid Buu Saga, Mythic Age / Titan tier): SSJ1 forms become SSJ3. -->
+	<tech name="DBZ_SuperSaiyan3">
+		<displaynameid>STR_DBZ_TECH_SSJ3_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_TECH_SSJ3_LR</rollovertextid>
+		<icon>greek\static_color\god_powers\bolt_icon.png</icon>
+		<cost resourcetype="Food">400.0000</cost>
+		<cost resourcetype="Gold">600.0000</cost>
+		<cost resourcetype="Favor">60.0000</cost>
+		<researchpoints>60.0000</researchpoints>
+		<status>UNOBTAINABLE</status>
+		<flag>MythTech</flag>
+		<flag>CountsTowardMilitaryScore</flag>
+		<prereqs>
+			<specificage>MythicAgeGreek</specificage>
+			<techstatus status="Active">DBZ_SuperSaiyanAwakening</techstatus>
+		</prereqs>
+		<effects>
+			<effect type="TransformUnit" toprotoid="DBZ_GokuSSJ3" fromprotoid="DBZ_GokuSSJ1" includequeued="true"></effect>
+			<effect type="TransformUnit" toprotoid="DBZ_GokuSSJ3Air" fromprotoid="DBZ_GokuSSJ1Air" includequeued="true"></effect>
+			<effect type="Data" amount="1.00" subtype="Enable" relativity="Absolute"><target type="ProtoUnit">DBZ_GokuSSJ3</target></effect>
+			<effect type="Data" amount="1.00" subtype="CommandRemove" proto="DBZ_GokuSSJ1" relativity="Assign"><target type="ProtoUnit">TownCenter</target></effect>
+			<effect type="Data" amount="1.00" subtype="CommandAdd" proto="DBZ_GokuSSJ3" row="2" column="4" relativity="Assign"><target type="ProtoUnit">TownCenter</target></effect>
+		</effects>
+	</tech>
+
+	<!-- ===================== SAIYAN EMPIRE (NORSE) ===================== -->
+	<tech name="DBZ_SaiyanEmpireBootstrap">
+		<status>UNOBTAINABLE</status>
+		<flag>NoTextMessage</flag>
+		<flag>HideFromDialogs</flag>
+		<researchpoints>0.0000</researchpoints>
+		<effects>
+			<effect type="Data" amount="1.00" subtype="Enable" relativity="Absolute"><target type="ProtoUnit">DBZ_Saibaman</target></effect>
+			<effect type="Data" amount="1.00" subtype="CommandAdd" proto="DBZ_Saibaman" row="2" column="0" relativity="Assign"><target type="ProtoUnit">Temple</target></effect>
+		</effects>
+	</tech>
+
+	<!-- ===================== RED RIBBON (EGYPTIAN) ===================== -->
+	<tech name="DBZ_RedRibbonBootstrap">
+		<status>UNOBTAINABLE</status>
+		<flag>NoTextMessage</flag>
+		<flag>HideFromDialogs</flag>
+		<researchpoints>0.0000</researchpoints>
+		<effects>
+			<effect type="Data" amount="1.00" subtype="CommandAdd" tech="DBZ_CellIncubation" row="2" column="0" relativity="Assign"><target type="ProtoUnit">Temple</target></effect>
+			<effect type="TechStatus" status="obtainable">DBZ_CellIncubation</effect>
+		</effects>
+	</tech>
+
+	<!-- CELL INCUBATION (Androids Saga, Age III): Dr. Gero's chamber hatches Imperfect Cell.
+	     After this, dbz_core.xs keeps the Temple's Cell button in sync with his current stage. -->
+	<tech name="DBZ_CellIncubation">
+		<displaynameid>STR_DBZ_TECH_CELL_INCUBATION_NAME</displaynameid>
+		<rollovertextid>STR_DBZ_TECH_CELL_INCUBATION_LR</rollovertextid>
+		<icon>resources\spc\player_color\units\kemsyt_icon.png</icon>
+		<cost resourcetype="Gold">250.0000</cost>
+		<cost resourcetype="Favor">25.0000</cost>
+		<researchpoints>35.0000</researchpoints>
+		<status>UNOBTAINABLE</status>
+		<flag>MythTech</flag>
+		<flag>CountsTowardMilitaryScore</flag>
+		<prereqs>
+			<specificage>HeroicAgeEgyptian</specificage>
+		</prereqs>
+		<effects>
+			<effect type="Data" amount="1.00" subtype="Enable" relativity="Absolute"><target type="ProtoUnit">DBZ_CellImperfect</target></effect>
+			<effect type="Data" amount="1.00" subtype="Enable" relativity="Absolute"><target type="ProtoUnit">DBZ_CellSemiPerfect</target></effect>
+			<effect type="Data" amount="1.00" subtype="Enable" relativity="Absolute"><target type="ProtoUnit">DBZ_CellPerfect</target></effect>
+			<effect type="Data" amount="1.00" subtype="CommandAdd" proto="DBZ_CellImperfect" row="2" column="1" relativity="Assign"><target type="ProtoUnit">Temple</target></effect>
+		</effects>
+	</tech>
+</techtreemods>

@@ -1,0 +1,39 @@
+<tactics>
+  <!-- DBZ_GokuEarlyKaioken: doubled attack/speed. KaiokenTransform returns to DBZ_GokuEarly. HP strain: dbz_core.xs. -->
+  <action>
+    <name stringid="STR_ACTION_HAND">HandAttack</name>
+    <type>Attack</type>
+    <rate type="LogicalTypeHandUnitsAttack">1.0</rate>
+    <attackaction>1</attackaction>
+    <handlogic>1</handlogic>
+    <anim>HandAttack</anim>
+    <impacteffect>effects\impacts\hack</impacteffect>
+  </action>
+  <action>
+    <name stringid="STR_ACTION_RANGED">RangedAttack</name>
+    <type>Attack</type>
+    <rate type="LogicalTypeRangedUnitsAttack">1.0</rate>
+    <attackaction>1</attackaction>
+    <rangedlogic>1</rangedlogic>
+    <anim>RangedAttack</anim>
+    <accuracy>1.0</accuracy>
+    <maxspread>0</maxspread>
+    <trackrating>99.0</trackrating>
+    <perfectaccuracy>1</perfectaccuracy>
+    <impacteffect>effects\impacts\pierce</impacteffect>
+  </action>
+  <action>
+    <name>KaiokenTransform</name>
+    <type>DelayedTransform</type>
+    <anim>Transform</anim>
+  </action>
+  <tactic>Default
+    <action priority="100">HandAttack</action>
+    <action priority="90">RangedAttack</action>
+    <action>KaiokenTransform</action>
+    <attacktype>LogicalTypeHandUnitsAttack</attacktype>
+    <autoattacktype>LogicalTypeHandUnitsAutoAttack</autoattacktype>
+    <attackresponsetype>LogicalTypeHandUnitsAttack</attackresponsetype>
+    <attackmovetype>AbstractWall</attackmovetype>
+  </tactic>
+</tactics>
