@@ -22,28 +22,53 @@ overwrite vanilla files and can sit next to other mods.
 
 ## Play in the browser (no game needed)
 
-`browser/dragon-ball-hunt.html` is a standalone version of the same design that runs in
-any modern browser, on desktop or phone. Open the file, pick a side and an opponent
-difficulty, and play a skirmish on the Dragon Ball Hunt map against the computer.
+`browser/dragon-ball-hunt.html` is a standalone real-time strategy game built on the same
+design. It plays like Age of Mythology and runs in any modern browser, on desktop or
+phone. Open the file and pick **Campaign** or **Skirmish**.
 
-- **Earth Defenders**: Goku (flight, Kaio-ken, Super Saiyan 1 and 3), Turtle School
-  Fighters, Crane School Ki Gunners and the Giant Namekian Guardian. Ki comes from
-  villagers meditating at Kami's Lookout.
-- **Red Ribbon Bio-Tech**: Cell (absorbs wounded enemies to reach his Perfect form),
-  Troopers, Battle Jackets and Saibamen. Ki comes from Bio-Reactors.
-- **Rules carried over from the mod**: the four resources, four Sagas, the combat
-  multipliers, the flight Ki drain, the seven guarded Dragon Balls that only heroes can
-  carry, Shenron's three wishes, the Kid Buu Titan and the god powers.
-- **Win** by destroying the enemy Town Center.
-- **Cheat codes**: press Enter during a game (on a phone: Pause, then "Enter a cheat
-  code") and type `CAPSULE CORP` (+1000 Rations, Alloy and Zeni), `KAMI'S BLESSING`
-  (full Ki), `SENZU BEAN` (heal all your units), `INSTANT TRANSMISSION` (reveal the map,
-  type again to undo), `SEVEN STARS` (all seven Dragon Balls into your Temple) or
-  `OVER 9000` (your hero's strongest form).
+- **Campaign**: seven story missions from Raditz's landing to the Cell Games, with
+  briefings, objectives, character dialogue and scripted boss events (Great Ape Vegeta,
+  Frieza's final form, Goku and Gohan going Super Saiyan, Super Perfect Cell). Each win
+  unlocks the next mission. Easy, Normal and Hard difficulty.
+- **Skirmish**: 2 to 4 players with teams, against computer opponents, on four maps
+  (Earth, Planet Namek, Wasteland, Highlands). Win by conquest or by holding a Wonder.
+- **Three factions**:
+  - **Earth Defenders**: Ki from villagers meditating at Kami's Lookout.
+  - **Red Ribbon Army**: Ki from Bio-Reactors.
+  - **Frieza Force**: Ki from fighting.
 
-It is one self-contained HTML file with no downloads, accounts or plugins. It is an
-original browser game built on this mod's rules. It does not use Age of Mythology's
-engine or assets.
+  Each has its own villager, buildings, army, heroes with transformations, and myth
+  units.
+- **Age of Mythology rules**:
+  - Four resources plus Ki.
+  - Four Ages (Sagas). You pick a major patron at the start and a minor patron at each
+    age-up; each patron unlocks myth units, technologies and a one-use god power.
+  - Town Centers only on Settlements; houses; walls and gates; garrisoning; market
+    trading; armory upgrades.
+  - Counter triangle: infantry beats cavalry, cavalry beats ranged, ranged beats
+    infantry. Heroes beat myth units.
+  - Control groups, shift-queued orders and attack-move.
+- **Dragon Balls**: seven guarded balls that only heroes can carry. Bring them all to
+  your Temple to summon Shenron for one of three wishes.
+- **Cheat codes**: press Enter during a game (on a phone: Menu, then "Enter a cheat
+  code") and type one of these:
+  - `CAPSULE CORP`: +1000 Rations, Alloy and Zeni.
+  - `KAMI'S BLESSING`: full Ki.
+  - `SENZU BEAN`: heal all your units.
+  - `INSTANT TRANSMISSION`: reveal the map.
+  - `SEVEN STARS`: all seven Dragon Balls into your Temple.
+  - `OVER 9000`: your hero's strongest form.
+  - `HYPERBOLIC TIME CHAMBER`: finish all your construction, training and research.
+
+It is one self-contained HTML file with no downloads, accounts or plugins. All graphics
+and sounds are drawn and synthesized by code. It is an original browser game built on
+this mod's rules. It does not use Age of Mythology's engine or assets, or official Dragon
+Ball artwork.
+
+The source code is in `browser/src/`. Running `python3 browser/tools/build.py` rebuilds
+the HTML file. `browser/tools/` also has automated tests: `ai-test.cjs` plays
+computer-vs-computer games in Node, while `ui-test.cjs` and `campaign-test.cjs` click
+through the game in Playwright.
 
 ## Install and play
 

@@ -1,0 +1,392 @@
+// =====================================================================
+// 2. GAME DATA  (meters and m/s; converted to tiles at runtime)
+// =====================================================================
+const RES = ['food', 'wood', 'gold', 'ki'];
+const RES_NAME = { food: 'Rations', wood: 'Capsule Alloy', gold: 'Zeni', ki: 'Ki' };
+const AGES = ['', 'Saiyan Saga', 'Namek Saga', 'Android Saga', 'Buu Saga'];
+const AGE_SHORT = ['', 'I', 'II', 'III', 'IV'];
+const PCOL = [
+  { name: 'Nature', main: '#c9a25b', dark: '#7b5f2c', light: '#ecd7a2' },
+  { name: 'Blue', main: '#2f8cff', dark: '#174c96', light: '#9fd0ff' },
+  { name: 'Red', main: '#ff3f3f', dark: '#8f1717', light: '#ffb0a6' },
+  { name: 'Green', main: '#2fd06a', dark: '#14703a', light: '#a8f5c2' },
+  { name: 'Yellow', main: '#ffcc22', dark: '#8f6b00', light: '#fff0a8' },
+];
+
+const FACTIONS = {
+  earth: {
+    name: 'Earth Defenders', villager: 'colonist', mainHero: 'goku', ki: 'meditate', kiCap: 100,
+    blurb: "Kami's warriors. Villagers meditate at Kami's Lookout for Ki. Goku can fly, use Kaio-ken and awaken Super Saiyan 1 and 3.",
+    majors: ['kami', 'roshi'], minors: { 2: ['piccolo', 'bulma'], 3: ['dende', 'kingkai'], 4: ['supremekai', 'elderkai'] },
+  },
+  rr: {
+    name: 'Red Ribbon Army', villager: 'drone', mainHero: 'blue', ki: 'reactor', kiCap: 100,
+    blurb: "Dr. Gero's war machine. Bio-Reactors generate Ki. Mechs, androids, and Cell, who absorbs the wounded to reach his Perfect form.",
+    majors: ['gero', 'red'], minors: { 2: ['genblue', 'silver'], 3: ['a16', 'a20'], 4: ['perfectcell', 'super13p'] },
+  },
+  ff: {
+    name: 'Frieza Force', villager: 'worker', mainHero: 'vegeta', ki: 'combat', kiCap: 100,
+    blurb: 'The galactic empire of Frieza and the last Saiyans. Earns Ki by fighting. Great Apes, Saibamen and the Ginyu Force.',
+    majors: ['frieza', 'kingvegeta'], minors: { 2: ['nappa', 'dodoria'], 3: ['ginyu', 'zarbon'], 4: ['kingcold', 'cooler'] },
+  },
+};
+
+// Patrons are this game's gods: one major at the start, one minor at each new Saga.
+const PATRONS = {
+  // ---- Earth Defenders
+  kami: { faction: 'earth', major: true, name: 'Kami', title: 'Guardian of Earth', power: 'sacredwater', look: 'kami',
+    desc: "Temples heal nearby units 3 HP/s. Meditation makes 25% more Ki.", fx: [{ t: 'templeHeal', add: 3 }, { t: 'kiRate', mul: 1.25 }] },
+  roshi: { faction: 'earth', major: true, name: 'Master Roshi', title: 'The Turtle Hermit', power: 'maxkame', look: 'roshi',
+    desc: 'Infantry +15% HP and attack. Villagers hunt 20% faster.', fx: [{ t: 'stat', who: 'cls:infantry', stat: 'hp', mul: 1.15 }, { t: 'stat', who: 'cls:infantry', stat: 'atk', mul: 1.15 }, { t: 'gather', res: 'hunt', mul: 1.2 }] },
+  piccolo: { faction: 'earth', age: 2, name: 'Piccolo', title: 'Demon King turned ally', power: 'beamcannon', myth: 'namekwarrior', tech: 'nameksregen', look: 'piccolo', desc: 'Namekian Warriors. Special Beam Cannon.' },
+  bulma: { faction: 'earth', age: 2, name: 'Bulma', title: 'Capsule Corp genius', power: 'capsuledrop', myth: 'capsulemech', tech: 'capsulestorage', look: 'bulma', desc: 'Capsule Battle Mechs. Capsule Drop.' },
+  dende: { faction: 'earth', age: 3, name: 'Dende', title: 'Young Namekian healer', power: 'restoration', myth: 'healer', tech: 'healinghands', look: 'dende', desc: 'Namekian Healers. Restoration heals everything you own.' },
+  kingkai: { faction: 'earth', age: 3, name: 'King Kai', title: 'Lord of the North', power: 'kaiosurge', myth: 'kaiodisciple', tech: 'gravitytraining', look: 'kingkai', desc: 'Kaio Disciples. Kaio-ken Surge.' },
+  supremekai: { faction: 'earth', age: 4, name: 'Supreme Kai', title: 'Overseer of the universe', power: 'spiritbomb', myth: 'spiritwarrior', tech: 'potara', look: 'supremekai', desc: 'Spirit Warriors. Universal Spirit Bomb.' },
+  elderkai: { faction: 'earth', age: 4, name: 'Elder Kai', title: 'Keeper of the Z-Sword', power: 'potential', myth: 'zchampion', tech: 'mysticawakening', look: 'elderkai', desc: 'Z-Sword Champions. Unlock Potential.' },
+  // ---- Red Ribbon Army
+  gero: { faction: 'rr', major: true, name: 'Dr. Gero', title: 'Mad genius of the Red Ribbon', power: 'repair', look: 'gero',
+    desc: 'Mechanical units +15% HP. Labor Drones build 25% faster.', fx: [{ t: 'stat', who: 'tag:Mech', stat: 'hp', mul: 1.15 }, { t: 'build', mul: 1.25 }] },
+  red: { faction: 'rr', major: true, name: 'Commander Red', title: 'Supreme commander', power: 'airstrike', look: 'red',
+    desc: 'Human soldiers cost 10% less and train 15% faster.', fx: [{ t: 'stat', who: 'human', stat: 'cost', mul: .9 }, { t: 'stat', who: 'human', stat: 'train', mul: 1.15 }] },
+  genblue: { faction: 'rr', age: 2, name: 'General Blue', title: 'Elite officer', power: 'paralysis', myth: 'pirate', tech: 'bluediscipline', look: 'blue', desc: 'Pirate Robots. Paralysis.' },
+  silver: { faction: 'rr', age: 2, name: 'Colonel Silver', title: 'Logistics chief', power: 'supplydrop', myth: 'jacket', tech: 'silverlogistics', look: 'silver', desc: 'Battle Jackets. Supply Drop.' },
+  a16: { faction: 'rr', age: 3, name: 'Android 16', title: 'The gentle giant', power: 'hellflash', myth: 'eighter', tech: 'gentlegiants', look: 'a16', desc: "Android 8 units. Hell's Flash." },
+  a20: { faction: 'rr', age: 3, name: 'Android 20', title: 'Dr. Gero, reborn', power: 'energydrain', myth: 'absorber', tech: 'absorbtech', look: 'gero', desc: 'Absorber Drones. Energy Drain.' },
+  perfectcell: { faction: 'rr', age: 4, name: 'Perfect Cell', title: 'The ultimate android', power: 'solarkame', myth: 'celljr', tech: 'cellgames', look: 'cellp', desc: 'Cell Juniors. Solar Kamehameha.' },
+  super13p: { faction: 'rr', age: 4, name: 'Android 13', title: "Gero's last masterpiece", power: 'assembly', myth: 'super13', tech: 'fusioncore', look: 'a13', desc: 'Super Android 13. Android Assembly.' },
+  // ---- Frieza Force
+  frieza: { faction: 'ff', major: true, name: 'Lord Frieza', title: 'Emperor of the universe', power: 'deathbeam', look: 'frieza',
+    desc: 'Ranged soldiers +15% attack. Ki from combat +25%.', fx: [{ t: 'stat', who: 'cls:ranged', stat: 'atk', mul: 1.15 }, { t: 'kiRate', mul: 1.25 }] },
+  kingvegeta: { faction: 'ff', major: true, name: 'King Vegeta', title: 'King of all Saiyans', power: 'fullmoon', look: 'kingvegeta',
+    desc: 'Saiyan Warriors +15% HP. Heroes regenerate 2 HP/s.', fx: [{ t: 'stat', who: 'unit:saiyan', stat: 'hp', mul: 1.15 }, { t: 'stat', who: 'hero', stat: 'regen', add: 2 }] },
+  nappa: { faction: 'ff', age: 2, name: 'Nappa', title: 'Saiyan elite', power: 'saibaharvest', myth: 'saibaman', tech: 'saiyanpride', look: 'nappa', desc: 'Saibamen. Saibamen Harvest.' },
+  dodoria: { faction: 'ff', age: 2, name: 'Dodoria', title: "Frieza's enforcer", power: 'mouthcannon', myth: 'brute', tech: 'bruteforce', look: 'dodoria', desc: 'Dodorian Brutes. Mouth Cannon.' },
+  ginyu: { faction: 'ff', age: 3, name: 'Captain Ginyu', title: 'Leader of the Ginyu Force', power: 'bodychange', myth: 'ginyu', tech: 'specialposes', look: 'ginyu', desc: 'Ginyu Elites. Body Change takes control of an enemy.' },
+  zarbon: { faction: 'ff', age: 3, name: 'Zarbon', title: 'The beautiful monster', power: 'elegant', myth: 'ape', tech: 'monsterform', look: 'zarbon', desc: 'Great Apes. Elegant Blaster.' },
+  kingcold: { faction: 'ff', age: 4, name: 'King Cold', title: "Frieza's father", power: 'fleet', myth: 'arcosian', tech: 'lineage', look: 'kingcold', desc: 'Arcosian Warriors. Imperial Fleet.' },
+  cooler: { faction: 'ff', age: 4, name: 'Cooler', title: "Frieza's elder brother", power: 'supernova', myth: 'armored', tech: 'squadron', look: 'cooler', desc: 'Armored Squadron. Supernova.' },
+};
+
+// Damage is Hack / Pierce / Crush (and Divine, which ignores armor). armor = [hack, pierce, crush].
+const H_ARM = [.35, .3, .3];
+const U = {
+  // ================= EARTH DEFENDERS =================
+  colonist: { faction: 'earth', cls: 'villager', name: 'Capsule Colonist', tags: ['Human', 'Biological', 'Villager'], hp: 75, armor: [.05, .05, .3], melee: { hack: 3, range: .8, rof: 1.5 }, speed: 3.8, los: 14, cost: { food: 50 }, time: 12, pop: 1, at: 'tc', size: .45, build: 1,
+    look: { r: 'human', skin: '#f2c9a0', hair: 'short', hairC: '#3a2a1a', top: '#e8dcc0', pants: '#5d6f8f', boots: '#5a3a1e', tool: 'wrench' }, desc: "Gathers, builds and repairs. Meditates at Kami's Lookout for Ki." },
+  fighter: { faction: 'earth', cls: 'infantry', name: 'Turtle School Fighter', tags: ['Human', 'Biological', 'Infantry'], hp: 115, armor: H_ARM, melee: { hack: 9, range: .8, rof: 1.4, bonus: { cavalry: 2 } }, speed: 4.2, los: 16, cost: { food: 50, gold: 40 }, time: 12, pop: 1, at: 'barracks', size: .45,
+    look: { r: 'human', skin: '#f2c9a0', hair: 'spiky', hairC: '#1a1a1a', top: '#ff8a1e', pants: '#ff8a1e', belt: '#1e4fa0', boots: '#1e4fa0', band: '#1e4fa0' }, desc: 'Infantry. Strong against cavalry (×2).' },
+  gunner: { faction: 'earth', cls: 'ranged', name: 'Crane School Ki Gunner', tags: ['Human', 'Biological', 'Ranged'], hp: 70, armor: [.1, .4, .3], ranged: { pierce: 7, range: 16, rof: 1.5, proj: 'ki', bonus: { infantry: 1.5 } }, speed: 4.1, los: 20, cost: { wood: 40, gold: 45 }, time: 12, pop: 1, at: 'barracks', size: .45,
+    look: { r: 'human', skin: '#f2c9a0', hair: 'bald', hairC: '#1a1a1a', top: '#3c78c8', pants: '#e8e2d2', belt: '#d33a3a', boots: '#3a2a1a', band: '#d33a3a' }, desc: 'Ranged Ki blasts. Strong against infantry (×1.5).' },
+  rider: { faction: 'earth', cls: 'cavalry', name: 'Hover-Bike Rider', tags: ['Human', 'Biological', 'Cavalry'], hp: 160, armor: [.2, .35, .3], melee: { hack: 10, range: 1, rof: 1.3, bonus: { ranged: 2, siege: 2 } }, speed: 6.3, los: 20, cost: { food: 70, gold: 60 }, time: 15, pop: 2, at: 'stable', age: 2, size: .7,
+    look: { r: 'vehicle', kind: 'bike', body: '#f5f5f0', trim: '#ff8a1e', rider: '#3c78c8' }, desc: 'Fast cavalry. Strong against ranged units and siege (×2).' },
+  cannon: { faction: 'earth', cls: 'siege', name: 'Capsule Cannon', tags: ['Mech', 'Siege'], hp: 260, armor: [.6, .85, .3], ranged: { crush: 45, range: 24, minRange: 6, rof: 4.5, aoe: 1.5, proj: 'shell', bonus: { building: 3 } }, speed: 2.8, los: 22, cost: { wood: 250, gold: 150 }, time: 25, pop: 3, at: 'fortress', age: 3, size: .8,
+    look: { r: 'vehicle', kind: 'cannon', body: '#e8e4da', trim: '#ff8a1e' }, desc: 'Siege. Triple damage against buildings.' },
+  goku: { faction: 'earth', cls: 'hero', hero: true, name: 'Goku', tags: ['Human', 'Biological', 'Hero', 'Saiyan'], at: 'tc', cost: { food: 200, gold: 150 }, time: 25, pop: 3, size: .5, flyer: true, abilities: ['fly', 'kaioken'],
+    forms: { base: 'goku_base', ssj1: 'goku_ssj1', ssj3: 'goku_ssj3' }, desc: 'Major Hero. Flies, uses Kaio-ken, and awakens Super Saiyan 1 and 3 at the Temple.' },
+  krillin: { faction: 'earth', cls: 'hero', hero: true, name: 'Krillin', tags: ['Human', 'Biological', 'Hero'], hp: 380, armor: [.4, .5, .8], melee: { hack: 18, range: .8, rof: 1 }, ranged: { pierce: 22, range: 15, rof: 2.2, proj: 'ki' }, speed: 4.8, los: 20, at: 'tc', age: 2, cost: { food: 150, gold: 150 }, time: 25, pop: 2, size: .45, flyer: true, abilities: ['fly'],
+    special: { key: 'disc', name: 'Destructo Disc', cd: 22, range: 18, type: 'line', dmg: { hack: 280 }, width: 1.2, color: '#ffe066' },
+    look: { r: 'human', skin: '#f2c9a0', hair: 'bald', hairC: '#000', top: '#ff8a1e', pants: '#ff8a1e', belt: '#1e4fa0', boots: '#1e4fa0', band: '#1e4fa0', dots: true }, desc: 'Hero. Destructo Disc cuts through a line of enemies.' },
+  piccolo: { faction: 'earth', cls: 'hero', hero: true, name: 'Piccolo', tags: ['Biological', 'Hero', 'Namekian'], hp: 560, armor: [.45, .5, .8], melee: { hack: 24, range: 1.5, rof: 1 }, ranged: { pierce: 26, range: 16, rof: 2.4, proj: 'ki' }, speed: 4.8, los: 22, regen: 6, at: 'temple', age: 2, cost: { food: 175, gold: 175 }, time: 28, pop: 3, size: .55, flyer: true, abilities: ['fly'],
+    special: { key: 'sbc', name: 'Special Beam Cannon', cd: 28, range: 24, type: 'bolt', dmg: { pierce: 480 }, color: '#ffe066' },
+    look: { r: 'human', skin: '#6fbf4a', hair: 'turban', hairC: '#f4f4f4', top: '#6a3aa0', pants: '#6a3aa0', belt: '#4fb0d8', boots: '#7a4a2a', cape: '#f4f4f4', antenna: true, build: 'tall' }, desc: 'Hero. Regenerates. Special Beam Cannon pierces one target.' },
+  gohan: { faction: 'earth', cls: 'hero', hero: true, name: 'Gohan', tags: ['Human', 'Biological', 'Hero', 'Saiyan'], at: 'temple', age: 3, cost: { food: 200, gold: 200 }, time: 28, pop: 3, size: .45, flyer: true, abilities: ['fly'],
+    forms: { base: 'gohan_base', ssj2: 'gohan_ssj2' }, desc: 'Hero. Masenko volley. Awakens Super Saiyan 2 at the Temple.' },
+  namekwarrior: { faction: 'earth', cls: 'myth', name: 'Namekian Warrior', tags: ['Biological', 'MythUnit', 'Namekian'], hp: 520, armor: [.45, .4, .7], melee: { hack: 28, crush: 16, range: 4, rof: 2 }, speed: 4, los: 18, regen: 4, cost: { gold: 110, ki: 15 }, time: 20, pop: 3, at: 'temple', age: 2, size: .9, abilities: ['grab'],
+    look: { r: 'human', skin: '#6fbf4a', hair: 'none', top: '#6a3aa0', pants: '#6a3aa0', belt: '#4fb0d8', boots: '#7a4a2a', antenna: true, scale: 1.8, build: 'bulky' }, desc: 'Myth unit. Regenerates. Its long arms pull flying enemies down.' },
+  capsulemech: { faction: 'earth', cls: 'myth', name: 'Capsule Battle Mech', tags: ['Mech', 'MythUnit'], hp: 600, armor: [.5, .45, .3], ranged: { pierce: 15, range: 15, rof: 1.2, proj: 'bullet', bonus: { building: 1.5 } }, speed: 3.6, los: 18, cost: { gold: 120, ki: 16 }, time: 20, pop: 3, at: 'temple', age: 2, size: .9,
+    look: { r: 'mech', kind: 'capsule', body: '#f2f2ee', trim: '#ff8a1e', glass: '#7fd3ff' }, desc: 'Myth unit. A walking Capsule Corp mech with twin cannons.' },
+  healer: { faction: 'earth', cls: 'myth', name: 'Namekian Healer', tags: ['Biological', 'MythUnit', 'Namekian'], hp: 320, armor: [.3, .3, .5], ranged: { pierce: 10, range: 12, rof: 2, proj: 'ki' }, speed: 4.2, los: 18, cost: { gold: 120, ki: 18 }, time: 18, pop: 2, at: 'temple', age: 3, size: .45, heal: { rate: 7, radius: 10 },
+    look: { r: 'human', skin: '#6fbf4a', hair: 'none', top: '#f4f4f4', pants: '#f4f4f4', belt: '#6a3aa0', boots: '#7a4a2a', antenna: true, build: 'slim', scale: .9 }, desc: 'Myth unit. Heals every wounded ally nearby.' },
+  kaiodisciple: { faction: 'earth', cls: 'myth', name: 'Kaio Disciple', tags: ['Biological', 'MythUnit'], hp: 430, armor: [.4, .45, .6], melee: { hack: 30, range: .9, rof: 1 }, speed: 6, los: 20, cost: { gold: 140, ki: 20 }, time: 20, pop: 3, at: 'temple', age: 3, size: .5, flyer: true,
+    look: { r: 'human', skin: '#f2c9a0', hair: 'spiky', hairC: '#1a1a1a', top: '#1b1b2b', pants: '#1b1b2b', belt: '#ff8a1e', boots: '#ffffff', band: '#ff8a1e', halo: true, aura: '#ff6b6b' }, desc: 'Myth unit. A fast Other World martial artist.' },
+  spiritwarrior: { faction: 'earth', cls: 'myth', name: 'Spirit Warrior', tags: ['MythUnit'], hp: 900, armor: [.55, .55, .8], melee: { hack: 48, crush: 20, range: 1.2, rof: 1.4 }, speed: 4.6, los: 20, regen: 5, cost: { gold: 220, ki: 30 }, time: 26, pop: 4, at: 'temple', age: 4, size: .7,
+    look: { r: 'human', skin: '#bfe7ff', hair: 'spiky', hairC: '#e6f6ff', top: '#7aa7ff', pants: '#3d5aa8', belt: '#ffffff', boots: '#ffffff', halo: true, ghost: true, scale: 1.3 }, desc: 'Myth unit. A legendary fighter from Other World. Regenerates.' },
+  zchampion: { faction: 'earth', cls: 'myth', name: 'Z-Sword Champion', tags: ['Human', 'MythUnit'], hp: 800, armor: [.5, .5, .7], melee: { hack: 70, range: 1.4, rof: 1.6, bonus: { myth: 1.5 } }, speed: 4.4, los: 20, cost: { gold: 250, ki: 32 }, time: 26, pop: 4, at: 'temple', age: 4, size: .55,
+    look: { r: 'human', skin: '#f2c9a0', hair: 'gohan', hairC: '#1a1a1a', top: '#3d2a6a', pants: '#3d2a6a', belt: '#ff3333', boots: '#ff3333', sword: true, scale: 1.1 }, desc: 'Myth unit. Wields the Z-Sword. Bonus against myth units.' },
+
+  // ================= RED RIBBON ARMY =================
+  drone: { faction: 'rr', cls: 'villager', name: 'RR Labor Drone', tags: ['Mech', 'Villager'], hp: 85, armor: [.1, .1, .3], melee: { hack: 3, range: .8, rof: 1.5 }, speed: 3.7, los: 14, cost: { food: 50 }, time: 12, pop: 1, at: 'tc', size: .45, build: .85,
+    look: { r: 'mech', kind: 'drone', body: '#8a919c', trim: '#d33a3a', glass: '#ff5a5a' }, desc: 'Gathers and builds (a little slower than other workers).' },
+  shocktrooper: { faction: 'rr', cls: 'infantry', name: 'RR Shock Trooper', tags: ['Human', 'Biological', 'Infantry'], hp: 120, armor: [.4, .3, .3], melee: { hack: 8, range: .9, rof: 1.4, bonus: { cavalry: 2 } }, speed: 4, los: 16, cost: { food: 55, gold: 35 }, time: 12, pop: 1, at: 'barracks', size: .45,
+    look: { r: 'human', skin: '#f2c9a0', hair: 'helmet', hairC: '#3d4a36', top: '#5b6b52', pants: '#3d4a36', belt: '#d33a3a', boots: '#222', baton: true, shield: '#9aa0aa' }, desc: 'Infantry with riot shields. Strong against cavalry (×2).' },
+  rifleman: { faction: 'rr', cls: 'ranged', name: 'RR Rifleman', tags: ['Human', 'Biological', 'Ranged'], hp: 75, armor: [.1, .35, .3], ranged: { pierce: 8, range: 18, rof: 1.7, proj: 'bullet', bonus: { infantry: 1.5 } }, speed: 4, los: 20, cost: { food: 40, wood: 30, gold: 30 }, time: 12, pop: 1, at: 'barracks', size: .45,
+    look: { r: 'human', skin: '#f2c9a0', hair: 'cap', hairC: '#3d4a36', top: '#5b6b52', pants: '#5b6b52', belt: '#d33a3a', boots: '#222', gun: 'rifle' }, desc: 'Ranged riflemen. Strong against infantry (×1.5).' },
+  buggy: { faction: 'rr', cls: 'cavalry', name: 'RR Assault Buggy', tags: ['Mech', 'Cavalry'], hp: 175, armor: [.3, .3, .25], melee: { hack: 10, range: 1, rof: 1.3, bonus: { ranged: 2, siege: 2 } }, speed: 6.5, los: 20, cost: { food: 60, wood: 20, gold: 60 }, time: 15, pop: 2, at: 'stable', age: 2, size: .75,
+    look: { r: 'vehicle', kind: 'buggy', body: '#6b7a5a', trim: '#d33a3a' }, desc: 'Fast cavalry. Strong against ranged units and siege (×2).' },
+  tank: { faction: 'rr', cls: 'siege', name: 'RR Battle Tank', tags: ['Mech', 'Siege'], hp: 340, armor: [.65, .8, .3], ranged: { crush: 48, range: 22, minRange: 5, rof: 4.8, aoe: 1.8, proj: 'shell', bonus: { building: 3 } }, speed: 3, los: 22, cost: { wood: 220, gold: 180 }, time: 26, pop: 3, at: 'fortress', age: 3, size: .9,
+    look: { r: 'vehicle', kind: 'tank', body: '#5b6b52', trim: '#d33a3a' }, desc: 'Siege. Triple damage against buildings.' },
+  blue: { faction: 'rr', cls: 'hero', hero: true, name: 'General Blue', tags: ['Human', 'Biological', 'Hero'], hp: 420, armor: [.4, .45, .7], melee: { hack: 20, range: .9, rof: 1 }, ranged: { pierce: 18, range: 14, rof: 1.8, proj: 'bullet' }, speed: 4.8, los: 20, at: 'tc', cost: { food: 175, gold: 150 }, time: 25, pop: 3, size: .45,
+    special: { key: 'stare', name: 'Paralysis Stare', cd: 18, range: 12, type: 'stun', radius: 3, dur: 5, color: '#9fe8ff' },
+    look: { r: 'human', skin: '#f2c9a0', hair: 'bob', hairC: '#ffd84a', top: '#2f6fd0', pants: '#2f6fd0', belt: '#222', boots: '#222', gun: 'pistol' }, desc: 'Major Hero. His Paralysis Stare freezes a group of enemies.' },
+  a18: { faction: 'rr', cls: 'hero', hero: true, name: 'Android 18', tags: ['Biological', 'Hero', 'Android'], hp: 700, armor: [.5, .55, .85], melee: { hack: 32, range: .9, rof: .9 }, ranged: { pierce: 34, range: 16, rof: 2, proj: 'ki' }, speed: 5.2, los: 22, at: 'fortress', age: 3, cost: { food: 200, gold: 250 }, time: 30, pop: 3, size: .45, flyer: true, abilities: ['fly'],
+    special: { key: 'volley', name: 'Energy Volley', cd: 24, range: 18, type: 'strike', radius: 4, dmg: { pierce: 230 }, color: '#9fe8ff' },
+    look: { r: 'human', skin: '#f6d2b0', hair: 'bob', hairC: '#ffe17a', top: '#2a3a7a', pants: '#3b69c8', belt: '#222', boots: '#3b2a1a', vest: '#222' }, desc: 'Hero. Never tires. Energy Volley blasts an area.' },
+  a17: { faction: 'rr', cls: 'hero', hero: true, name: 'Android 17', tags: ['Biological', 'Hero', 'Android'], hp: 760, armor: [.5, .55, .85], melee: { hack: 34, range: .9, rof: .9 }, ranged: { pierce: 30, range: 16, rof: 2, proj: 'ki' }, speed: 5.2, los: 22, at: 'fortress', age: 3, cost: { food: 200, gold: 250 }, time: 30, pop: 3, size: .45, flyer: true, abilities: ['fly'],
+    special: { key: 'barrier', name: 'Barrier Burst', cd: 22, range: 2, type: 'nova', radius: 4.5, dmg: { pierce: 200 }, color: '#7dff9c' },
+    look: { r: 'human', skin: '#f6d2b0', hair: 'long', hairC: '#111', top: '#1b1b2b', pants: '#2f4f8f', belt: '#ff8a1e', boots: '#3b2a1a', scarf: '#ff8a1e' }, desc: 'Hero. Barrier Burst knocks back everything around him.' },
+  cell: { faction: 'rr', cls: 'hero', hero: true, name: 'Cell', tags: ['Biological', 'Hero', 'Android'], at: 'temple', age: 3, req: 'incubation', cost: { food: 175, gold: 175, ki: 10 }, time: 30, pop: 4, size: .55, flyer: true, abilities: ['fly', 'absorb'],
+    forms: { base: 'cell_imperfect', semi: 'cell_semi', perfect: 'cell_perfect' }, desc: 'Hero. Absorbs badly wounded enemies to evolve into his Perfect form.' },
+  pirate: { faction: 'rr', cls: 'myth', name: 'Pirate Robot', tags: ['Mech', 'MythUnit'], hp: 650, armor: [.5, .45, .3], melee: { hack: 30, crush: 18, range: 1.5, rof: 2 }, speed: 3.4, los: 16, cost: { gold: 120, ki: 16 }, time: 20, pop: 3, at: 'temple', age: 2, size: 1,
+    look: { r: 'mech', kind: 'pirate', body: '#5d6470', trim: '#d33a3a', glass: '#ff5a5a' }, desc: 'Myth unit. A hulking robot guardian with a cutlass arm.' },
+  jacket: { faction: 'rr', cls: 'myth', name: 'Battle Jacket', tags: ['Mech', 'MythUnit'], hp: 420, armor: [.45, .4, .3], ranged: { pierce: 16, range: 14, rof: 1.1, proj: 'bullet' }, speed: 3.8, los: 18, cost: { gold: 100, ki: 14 }, time: 18, pop: 2, at: 'temple', age: 2, size: .7,
+    look: { r: 'mech', kind: 'jacket', body: '#7d8796', trim: '#d33a3a', glass: '#9fe8ff' }, desc: 'Myth unit. Armored walker with rotary guns.' },
+  eighter: { faction: 'rr', cls: 'myth', name: 'Android 8', tags: ['Mech', 'MythUnit', 'Android'], hp: 950, armor: [.5, .5, .5], melee: { hack: 24, crush: 40, range: 1.6, rof: 2.2 }, speed: 3.6, los: 18, regen: 2, cost: { gold: 170, ki: 25 }, time: 24, pop: 4, at: 'temple', age: 3, size: 1,
+    look: { r: 'human', skin: '#f2c9a0', hair: 'mohawk', hairC: '#1a1a1a', top: '#2f8f4a', pants: '#3b5a8f', belt: '#d33a3a', boots: '#3b2a1a', scale: 2, build: 'bulky' }, desc: 'Myth unit. A gentle giant with huge fists.' },
+  absorber: { faction: 'rr', cls: 'myth', name: 'Absorber Drone', tags: ['Mech', 'MythUnit', 'Flying'], hp: 380, armor: [.4, .4, .4], ranged: { pierce: 20, range: 14, rof: 1.5, proj: 'ki', lifesteal: .3 }, speed: 5, los: 20, cost: { gold: 140, ki: 20 }, time: 20, pop: 2, at: 'temple', age: 3, size: .55, alwaysFly: true,
+    look: { r: 'vehicle', kind: 'drone', body: '#cfd3da', trim: '#d33a3a', glass: '#ffd84a' }, desc: 'Myth unit. Flies, and heals itself with 30% of the damage it deals.' },
+  celljr: { faction: 'rr', cls: 'myth', name: 'Cell Junior', tags: ['Biological', 'MythUnit'], hp: 520, armor: [.45, .5, .7], melee: { hack: 52, range: .9, rof: .9 }, speed: 6.5, los: 20, cost: { gold: 180, ki: 24 }, time: 22, pop: 3, at: 'temple', age: 4, size: .4, flyer: true,
+    look: { r: 'cell', form: 'jr' }, desc: 'Myth unit. Small, fast and vicious.' },
+  super13: { faction: 'rr', cls: 'myth', name: 'Super Android 13', tags: ['Mech', 'MythUnit', 'Android'], hp: 1400, armor: [.55, .55, .6], melee: { hack: 60, crush: 40, range: 1.4, rof: 1.6 }, speed: 4.2, los: 20, cost: { gold: 280, ki: 36 }, time: 30, pop: 5, at: 'temple', age: 4, size: .9,
+    look: { r: 'human', skin: '#6aa8d8', hair: 'mohawk', hairC: '#ff4d4d', top: '#1b1b2b', pants: '#1b1b2b', belt: '#ffd84a', boots: '#ffd84a', scale: 1.6, build: 'bulky' }, desc: 'Myth unit. Fused from three androids. Crushes everything.' },
+  sentry: { cls: 'guard', name: 'Red Ribbon Sentry Mech', tags: ['Mech'], hp: 400, armor: [.5, .4, .2], ranged: { pierce: 14, range: 12, rof: 2, proj: 'bullet' }, speed: 3, los: 14, size: .7,
+    look: { r: 'mech', kind: 'sentry', body: '#8a8f98', trim: '#d33a3a', glass: '#ff3030' }, desc: 'Abandoned machine guarding a Dragon Ball.' },
+
+  // ================= FRIEZA FORCE =================
+  worker: { faction: 'ff', cls: 'villager', name: 'Planet Trade Worker', tags: ['Biological', 'Villager'], hp: 80, armor: [.05, .05, .3], melee: { hack: 3, range: .8, rof: 1.5 }, speed: 3.8, los: 14, cost: { food: 50 }, time: 12, pop: 1, at: 'tc', size: .45, build: 1,
+    look: { r: 'human', skin: '#9fd6a8', hair: 'none', top: '#c9c3e0', pants: '#4a3f6f', boots: '#2b2440', armor: { chest: '#e8e8f0', pad: '#c9b45a' }, tool: 'wrench', alien: true }, desc: 'Gathers and builds. Frieza Force earns Ki by fighting, not working.' },
+  saiyan: { faction: 'ff', cls: 'infantry', name: 'Saiyan Warrior', tags: ['Human', 'Biological', 'Infantry', 'Saiyan'], hp: 130, armor: [.4, .3, .3], melee: { hack: 10, range: .8, rof: 1.4, bonus: { cavalry: 1.8 } }, speed: 4.4, los: 16, cost: { food: 60, gold: 40 }, time: 12, pop: 1, at: 'barracks', size: .45,
+    look: { r: 'human', skin: '#e8b88f', hair: 'spiky', hairC: '#111', top: '#2b2b52', pants: '#2b2b52', boots: '#f4f4f4', band: '#f4f4f4', armor: { chest: '#f4f4f4', pad: '#c9a24a' }, tail: true }, desc: 'Infantry. Strong against cavalry (×1.8). Can become a Great Ape under a Full Moon.' },
+  soldier: { faction: 'ff', cls: 'ranged', name: 'Frieza Soldier', tags: ['Human', 'Biological', 'Ranged'], hp: 80, armor: [.15, .35, .3], ranged: { pierce: 8, range: 17, rof: 1.6, proj: 'ki', bonus: { infantry: 1.5 } }, speed: 4.1, los: 22, cost: { food: 45, wood: 20, gold: 35 }, time: 12, pop: 1, at: 'barracks', size: .45,
+    look: { r: 'human', skin: '#b8d77a', hair: 'none', top: '#3a2a6a', pants: '#3a2a6a', boots: '#f4f4f4', band: '#f4f4f4', armor: { chest: '#f4f4f4', pad: '#7a6bb0' }, scouter: true, alien: true }, desc: 'Ranged Ki blasters with scouters. Strong against infantry (×1.5).' },
+  glider: { faction: 'ff', cls: 'cavalry', name: 'Hover Glider', tags: ['Biological', 'Cavalry'], hp: 150, armor: [.2, .35, .3], melee: { hack: 9, range: 1, rof: 1.2, bonus: { ranged: 2, siege: 2 } }, speed: 6.6, los: 20, cost: { food: 70, gold: 60 }, time: 15, pop: 2, at: 'stable', age: 2, size: .7,
+    look: { r: 'vehicle', kind: 'glider', body: '#e8e8f0', trim: '#8a5ad8', rider: '#b8d77a' }, desc: 'Fast cavalry on hover sleds. Strong against ranged units and siege (×2).' },
+  launcher: { faction: 'ff', cls: 'siege', name: 'Pod Launcher', tags: ['Mech', 'Siege'], hp: 280, armor: [.6, .8, .3], ranged: { crush: 46, range: 23, minRange: 6, rof: 4.6, aoe: 1.6, proj: 'pod', bonus: { building: 3 } }, speed: 2.9, los: 22, cost: { wood: 230, gold: 170 }, time: 25, pop: 3, at: 'fortress', age: 3, size: .85,
+    look: { r: 'vehicle', kind: 'launcher', body: '#e8e8f0', trim: '#8a5ad8' }, desc: 'Siege. Fires attack pods. Triple damage against buildings.' },
+  vegeta: { faction: 'ff', cls: 'hero', hero: true, name: 'Vegeta', tags: ['Human', 'Biological', 'Hero', 'Saiyan'], at: 'tc', cost: { food: 200, gold: 150 }, time: 25, pop: 3, size: .48, flyer: true, abilities: ['fly'],
+    forms: { base: 'vegeta_base', ssj: 'vegeta_ssj' }, desc: 'Major Hero. Prince of all Saiyans. Galick Gun. Awakens Super Saiyan at the Temple.' },
+  raditz: { faction: 'ff', cls: 'hero', hero: true, name: 'Raditz', tags: ['Human', 'Biological', 'Hero', 'Saiyan'], hp: 460, armor: [.45, .45, .75], melee: { hack: 22, range: .9, rof: 1 }, ranged: { pierce: 22, range: 14, rof: 2.2, proj: 'ki' }, speed: 4.8, los: 20, at: 'tc', age: 2, cost: { food: 150, gold: 150 }, time: 25, pop: 3, size: .5, flyer: true, abilities: ['fly'],
+    special: { key: 'sunday', name: 'Double Sunday', cd: 22, range: 16, type: 'strike', radius: 3.5, dmg: { pierce: 240 }, color: '#d08aff' },
+    look: { r: 'human', skin: '#e8b88f', hair: 'raditz', hairC: '#111', top: '#2b2b52', pants: '#2b2b52', boots: '#f4f4f4', band: '#d33a3a', armor: { chest: '#2b2b2b', pad: '#5a4a2a' }, scouter: true, tail: true }, desc: "Hero. Goku's brother. Double Sunday blasts an area." },
+  nappa: { faction: 'ff', cls: 'hero', hero: true, name: 'Nappa', tags: ['Human', 'Biological', 'Hero', 'Saiyan'], hp: 700, armor: [.55, .5, .8], melee: { hack: 30, crush: 10, range: 1, rof: 1.2 }, ranged: { pierce: 26, range: 14, rof: 2.4, proj: 'ki' }, speed: 4.4, los: 20, at: 'fortress', age: 3, cost: { food: 200, gold: 200 }, time: 28, pop: 4, size: .6, flyer: true, abilities: ['fly'],
+    special: { key: 'bomber', name: 'Bomber DX', cd: 30, range: 2, type: 'nova', radius: 6, dmg: { pierce: 280, crush: 60 }, color: '#ffb347' },
+    look: { r: 'human', skin: '#e8b88f', hair: 'bald', hairC: '#111', mustache: true, top: '#2b2b52', pants: '#2b2b52', boots: '#f4f4f4', band: '#f4f4f4', armor: { chest: '#f4f4f4', pad: '#7a5a2a' }, scouter: true, tail: true, build: 'bulky', scale: 1.15 }, desc: 'Hero. Bomber DX erupts around him.' },
+  frieza: { faction: 'ff', cls: 'hero', hero: true, name: 'Frieza', tags: ['Biological', 'Hero', 'Arcosian'], at: 'temple', age: 3, cost: { food: 250, gold: 250, ki: 15 }, time: 32, pop: 4, size: .45, flyer: true, abilities: ['fly'],
+    forms: { base: 'frieza_base', final: 'frieza_final' }, desc: 'Hero. Death Beam. His Final Form is unlocked at the Temple.' },
+  saibaman: { faction: 'ff', cls: 'myth', name: 'Saibaman', tags: ['Biological', 'MythUnit'], hp: 170, armor: [.25, .2, .5], ranged: { pierce: 13, range: 8, rof: 1.5, proj: 'acid' }, speed: 5, los: 14, cost: { gold: 40, ki: 6 }, time: 9, pop: 1, at: 'temple', age: 2, size: .38,
+    leap: { hack: 110, crush: 140, aoe: 4, range: 9 }, look: { r: 'saiba' }, desc: 'Myth unit. Spits acid, then leaps onto groups and self-destructs (110 Hack + 140 Crush).' },
+  brute: { faction: 'ff', cls: 'myth', name: 'Dodorian Brute', tags: ['Biological', 'MythUnit'], hp: 620, armor: [.5, .4, .6], melee: { hack: 30, crush: 12, range: 1.2, rof: 1.8 }, speed: 3.8, los: 16, cost: { gold: 120, ki: 16 }, time: 20, pop: 3, at: 'temple', age: 2, size: .85,
+    look: { r: 'brute' }, desc: 'Myth unit. A spiked pink bruiser.' },
+  ginyu: { faction: 'ff', cls: 'myth', name: 'Ginyu Elite', tags: ['Biological', 'MythUnit'], hp: 520, armor: [.45, .5, .65], melee: { hack: 38, range: 1, rof: 1.1 }, speed: 5.6, los: 20, cost: { gold: 150, ki: 22 }, time: 20, pop: 3, at: 'temple', age: 3, size: .55,
+    look: { r: 'human', skin: '#a77de0', hair: 'none', horns: true, top: '#1b1b2b', pants: '#1b1b2b', boots: '#f4f4f4', band: '#f4f4f4', armor: { chest: '#f4f4f4', pad: '#ffcc33' }, scouter: true, build: 'bulky', scale: 1.15 }, desc: 'Myth unit. An elite special forces fighter.' },
+  ape: { faction: 'ff', cls: 'myth', name: 'Great Ape', tags: ['Biological', 'MythUnit', 'Saiyan'], hp: 1300, armor: [.45, .45, .5], melee: { hack: 30, crush: 45, range: 2.5, rof: 2.2, aoe: 2.5 }, speed: 3.2, los: 22, cost: { gold: 260, ki: 36 }, time: 30, pop: 5, at: 'temple', age: 3, size: 1.5,
+    look: { r: 'ape' }, desc: 'Myth unit. A towering Oozaru that smashes groups.' },
+  arcosian: { faction: 'ff', cls: 'myth', name: 'Arcosian Warrior', tags: ['Biological', 'MythUnit', 'Arcosian'], hp: 900, armor: [.5, .55, .75], melee: { hack: 30, range: 1, rof: 1.2 }, ranged: { pierce: 40, range: 18, rof: 2, proj: 'beam' }, speed: 4.6, los: 22, cost: { gold: 230, ki: 30 }, time: 26, pop: 4, at: 'temple', age: 4, size: .6, flyer: true,
+    look: { r: 'frieza', form: 'arcosian' }, desc: "Myth unit. A warrior of Frieza's race. Fires Death Beams." },
+  armored: { faction: 'ff', cls: 'myth', name: 'Armored Squadron', tags: ['Biological', 'MythUnit'], hp: 760, armor: [.65, .65, .75], melee: { hack: 50, range: 1.1, rof: 1.2 }, speed: 4.8, los: 20, cost: { gold: 220, ki: 28 }, time: 24, pop: 4, at: 'temple', age: 4, size: .55,
+    look: { r: 'human', skin: '#7fbfd8', hair: 'long', hairC: '#f4f4f4', top: '#1b1b2b', pants: '#1b1b2b', boots: '#8a5ad8', armor: { chest: '#8a5ad8', pad: '#f4f4f4' }, scouter: true, scale: 1.15 }, desc: "Myth unit. Cooler's armored elite." },
+
+  // ================= NEUTRAL =================
+  kidbuu: { cls: 'titan', name: 'Kid Buu', tags: ['MythUnit', 'Titan', 'Biological'], hp: 7000, armor: [.85, .85, .95], melee: { hack: 120, crush: 200, range: 2.5, rof: 1.5, aoe: 3 }, speed: 4.8, los: 24, regen: 40, pop: 0, size: .9,
+    look: { r: 'buu' }, desc: "Titan. Regenerates 40 HP/s. Only a hero's ultimate attack or a god power can finish him." },
+  trex: { cls: 'guard', name: 'Wild T-Rex', tags: ['Creature', 'Biological'], hp: 450, armor: [.3, .3, .5], melee: { hack: 24, range: 1.5, rof: 1.5 }, speed: 4.5, los: 12, size: 1, carcass: 400, look: { r: 'beast', kind: 'trex' }, desc: 'Guards a Dragon Ball. Leaves 400 Rations.' },
+  stego: { cls: 'huntable', name: 'Stegosaurus', tags: ['Creature', 'Biological', 'Huntable'], hp: 140, armor: [0, 0, 0], speed: 2.2, los: 6, size: .8, carcass: 350, look: { r: 'beast', kind: 'stego' }, desc: 'Huntable. Villagers hunt it for 350 Rations.' },
+  boar: { cls: 'huntable', name: 'Giant Boar', tags: ['Creature', 'Biological', 'Huntable'], hp: 180, armor: [.1, .1, .1], melee: { hack: 6, range: .8, rof: 1.5 }, speed: 2.6, los: 6, size: .6, carcass: 300, fights: true, look: { r: 'beast', kind: 'boar' }, desc: 'Huntable, but it fights back. 300 Rations.' },
+  frog: { cls: 'huntable', name: 'Namekian Frog-Ox', tags: ['Creature', 'Biological', 'Huntable'], hp: 110, armor: [0, 0, 0], speed: 2.4, los: 6, size: .6, carcass: 250, look: { r: 'beast', kind: 'frog' }, desc: 'Huntable. 250 Rations.' },
+  villagerNPC: { cls: 'villager', name: 'Townsfolk', tags: ['Human', 'Biological', 'Villager'], hp: 60, armor: [0, 0, 0], speed: 3.4, los: 10, size: .45, pop: 0,
+    look: { r: 'human', skin: '#f2c9a0', hair: 'short', hairC: '#6a4a2a', top: '#d8a0c8', pants: '#5d6f8f', boots: '#5a3a1e' }, desc: 'A frightened townsperson.' },
+  namekNPC: { cls: 'villager', name: 'Namekian Villager', tags: ['Biological', 'Villager', 'Namekian'], hp: 70, armor: [0, 0, 0], speed: 3.4, los: 10, size: .45, pop: 0,
+    look: { r: 'human', skin: '#6fbf4a', hair: 'none', top: '#f4f4f4', pants: '#f4f4f4', belt: '#6a3aa0', boots: '#7a4a2a', antenna: true }, desc: 'A peaceful Namekian.' },
+};
+for (const k in U) {
+  const d = U[k]; d.key = k; d.tagset = new Set(d.tags || []);
+  if (d.cls) d.tagset.add('cls:' + d.cls);
+  if (d.forms && !d.hp) Object.assign(d, { hp: 1, armor: [0, 0, 0], speed: 4, los: 18 }); // real stats live in FORMS
+}
+
+// Hero forms (stats and look); a form replaces the unit's base stats.
+const FORMS = {
+  goku_base: { name: 'Goku', hp: 450, armor: [.4, .5, .8], melee: { hack: 22, range: .8, rof: 1 }, ranged: { pierce: 35, range: 16, rof: 2.5, aoe: 1.5, proj: 'kame' }, speed: 4.6, los: 20, kaioken: true,
+    look: { r: 'human', skin: '#f2c9a0', hair: 'goku', hairC: '#151515', top: '#ff8a1e', pants: '#ff8a1e', top2: '#1e4fa0', belt: '#1e4fa0', boots: '#1e4fa0', band: '#1e4fa0' } },
+  goku_ssj1: { name: 'Goku (Super Saiyan)', hp: 950, armor: [.6, .6, .9], melee: { hack: 50, range: .8, rof: 1 }, ranged: { pierce: 60, range: 18, rof: 2.5, aoe: 1.5, proj: 'kame' }, speed: 5, los: 22,
+    special: { key: 'warp', name: 'Instant Kamehameha', cd: 25, range: 20, type: 'strike', radius: 2, dmg: { pierce: 160 }, warp: true, color: '#7fe0ff' },
+    look: { r: 'human', skin: '#f2c9a0', hair: 'ssj', hairC: '#ffd84a', top: '#ff8a1e', pants: '#ff8a1e', top2: '#1e4fa0', belt: '#1e4fa0', boots: '#1e4fa0', band: '#1e4fa0', aura: '#ffd84a', eyes: '#2fbfa0' } },
+  goku_ssj3: { name: 'Goku (Super Saiyan 3)', hp: 1500, armor: [.7, .7, .9], melee: { hack: 80, range: .8, rof: 1 }, ranged: { pierce: 90, range: 20, rof: 2.5, aoe: 2, proj: 'kame' }, speed: 5.2, los: 24, kiDrain: 1.2,
+    special: { key: 'fist', name: 'Dragon Fist', cd: 30, range: 18, type: 'line', dmg: { hack: 260 }, width: 1.3, dash: true, color: '#ffd84a' },
+    look: { r: 'human', skin: '#f2c9a0', hair: 'ssj3', hairC: '#ffd84a', top: '#ff8a1e', pants: '#ff8a1e', top2: '#1e4fa0', belt: '#1e4fa0', boots: '#1e4fa0', band: '#1e4fa0', aura: '#ffd84a', eyes: '#2fbfa0', nobrows: true } },
+  gohan_base: { name: 'Gohan', hp: 480, armor: [.4, .5, .8], melee: { hack: 26, range: .8, rof: 1 }, ranged: { pierce: 30, range: 16, rof: 2.3, proj: 'ki' }, speed: 4.8, los: 20,
+    special: { key: 'masenko', name: 'Masenko', cd: 22, range: 18, type: 'strike', radius: 2.5, dmg: { pierce: 220 }, color: '#ffe066' },
+    look: { r: 'human', skin: '#f2c9a0', hair: 'gohan', hairC: '#151515', top: '#6a3aa0', pants: '#6a3aa0', belt: '#ff3333', boots: '#7a4a2a', band: '#ff3333' } },
+  gohan_ssj2: { name: 'Gohan (Super Saiyan 2)', hp: 1400, armor: [.7, .7, .9], melee: { hack: 75, range: .8, rof: .9 }, ranged: { pierce: 80, range: 18, rof: 2.3, aoe: 1.5, proj: 'kame' }, speed: 5.4, los: 24,
+    special: { key: 'fatherson', name: 'Father-Son Kamehameha', cd: 32, range: 22, type: 'line', dmg: { pierce: 420 }, width: 2.2, color: '#7fe0ff' },
+    look: { r: 'human', skin: '#f2c9a0', hair: 'ssj', hairC: '#ffd84a', top: '#6a3aa0', pants: '#6a3aa0', belt: '#ff3333', boots: '#7a4a2a', band: '#ff3333', aura: '#ffd84a', sparks: true, eyes: '#2fbfa0' } },
+  cell_imperfect: { name: 'Imperfect Cell', hp: 650, armor: [.45, .5, .8], melee: { hack: 34, range: 1.2, rof: 1 }, ranged: { pierce: 38, range: 14, rof: 2.5, proj: 'cellki' }, speed: 4.4, los: 20, regen: 10, absorb: true, look: { r: 'cell', form: 'imperfect' } },
+  cell_semi: { name: 'Semi-Perfect Cell', hp: 900, armor: [.55, .55, .85], melee: { hack: 46, range: 1.2, rof: 1 }, ranged: { pierce: 52, range: 15, rof: 2.5, proj: 'cellki' }, speed: 4.6, los: 22, regen: 10, absorb: true, look: { r: 'cell', form: 'semi' } },
+  cell_perfect: { name: 'Perfect Cell', hp: 1350, armor: [.65, .65, .9], melee: { hack: 62, range: 1.2, rof: 1 }, ranged: { pierce: 70, range: 16, rof: 2.5, aoe: 1, proj: 'cellki' }, speed: 5, los: 24, regen: 10, absorb: true,
+    special: { key: 'solar', name: 'Solar Kamehameha', cd: 35, range: 22, type: 'strike', radius: 3, dmg: { pierce: 240, crush: 80 }, color: '#d7ff6b' }, look: { r: 'cell', form: 'perfect' } },
+  vegeta_base: { name: 'Vegeta', hp: 480, armor: [.45, .5, .8], melee: { hack: 24, range: .8, rof: 1 }, ranged: { pierce: 32, range: 16, rof: 2.4, proj: 'ki' }, speed: 4.8, los: 20,
+    special: { key: 'galick', name: 'Galick Gun', cd: 25, range: 20, type: 'line', dmg: { pierce: 260 }, width: 1.8, color: '#d08aff' },
+    look: { r: 'human', skin: '#e8b88f', hair: 'vegeta', hairC: '#151515', top: '#1e3a8a', pants: '#1e3a8a', boots: '#f4f4f4', band: '#f4f4f4', armor: { chest: '#f4f4f4', pad: '#d9b44a' }, scouter: true, tail: true } },
+  vegeta_ssj: { name: 'Vegeta (Super Saiyan)', hp: 1100, armor: [.62, .62, .9], melee: { hack: 58, range: .8, rof: 1 }, ranged: { pierce: 62, range: 18, rof: 2.4, proj: 'ki' }, speed: 5.1, los: 22,
+    special: { key: 'finalflash', name: 'Final Flash', cd: 30, range: 22, type: 'line', dmg: { pierce: 380 }, width: 2.2, color: '#fff27a' },
+    look: { r: 'human', skin: '#e8b88f', hair: 'vegetassj', hairC: '#ffd84a', top: '#1e3a8a', pants: '#1e3a8a', boots: '#f4f4f4', band: '#f4f4f4', armor: { chest: '#f4f4f4', pad: '#d9b44a' }, aura: '#ffd84a', eyes: '#2fbfa0' } },
+  frieza_base: { name: 'Frieza', hp: 800, armor: [.55, .6, .85], melee: { hack: 30, range: 1, rof: 1 }, ranged: { pierce: 40, range: 18, rof: 2.2, proj: 'beam' }, speed: 4.6, los: 22,
+    special: { key: 'deathbeam', name: 'Death Beam', cd: 20, range: 22, type: 'bolt', dmg: { pierce: 380 }, color: '#ff4dd2' }, look: { r: 'frieza', form: 'base' } },
+  frieza_final: { name: 'Frieza (Final Form)', hp: 1700, armor: [.7, .7, .9], melee: { hack: 70, range: 1, rof: 1 }, ranged: { pierce: 75, range: 20, rof: 2.2, proj: 'beam' }, speed: 5.2, los: 24,
+    special: { key: 'deathball', name: 'Death Ball', cd: 35, range: 22, type: 'strike', radius: 5, dmg: { pierce: 420, crush: 120 }, color: '#ff8a3a' }, look: { r: 'frieza', form: 'final' } },
+};
+for (const k in FORMS) FORMS[k].key = k;
+const CELL_FORMS = ['cell_imperfect', 'cell_semi', 'cell_perfect'];
+
+// ---------- buildings ----------
+const B = {
+  tc: { w: 4, h: 4, hp: 2600, armor: [.8, .8, .2], pop: 15, drop: ['food', 'wood', 'gold'], cost: { wood: 300, gold: 300 }, time: 80, age: 1, attack: { pierce: 6, range: 18, rof: 2, arrows: 1 }, los: 22, garrison: 15, settlement: true,
+    names: { earth: 'Capsule Command Dome', rr: 'RR Central Bunker', ff: 'Frieza Force Command Pod' }, desc: 'Trains villagers and your first hero, advances the Saga. Must be built on a Settlement.' },
+  house: { w: 2, h: 2, hp: 600, armor: [.6, .6, .1], pop: 10, cost: { wood: 50 }, byF: { rr: { cost: { wood: 30 } } }, time: 15, age: 1, limit: 10, los: 8,
+    names: { earth: 'Capsule House', rr: 'RR Housing Unit', ff: 'Saiyan Pod Hut' }, desc: '+10 population (up to 10 houses).' },
+  granary: { w: 2, h: 2, hp: 800, armor: [.6, .6, .1], drop: ['food'], cost: { wood: 50 }, time: 15, age: 1, los: 10,
+    names: { earth: 'Senzu Granary', rr: 'RR Ration Depot', ff: 'Supply Pod' }, desc: 'Drop-off for Rations. Research farming and hunting upgrades.' },
+  storehouse: { w: 2, h: 2, hp: 800, armor: [.6, .6, .1], drop: ['wood', 'gold'], cost: { wood: 50 }, time: 15, age: 1, los: 10,
+    names: { earth: 'Capsule Storehouse', rr: 'RR Material Depot', ff: 'Salvage Bay' }, desc: 'Drop-off for Capsule Alloy and Zeni. Research gathering upgrades.' },
+  farm: { w: 3, h: 3, hp: 400, armor: [.2, .2, .1], cost: { wood: 100 }, time: 15, age: 1, los: 6, walk: true, farm: true,
+    names: { earth: 'Hydro-Farm', rr: 'Nutrient Vat Farm', ff: 'Alien Crop Field' }, desc: 'Endless Rations for one villager.' },
+  barracks: { w: 3, h: 3, hp: 1600, armor: [.65, .65, .2], cost: { wood: 150 }, time: 30, age: 1, los: 12,
+    names: { earth: 'Turtle & Crane Dojo', rr: 'RR Assembly Plant', ff: 'Saiyan Training Ground' }, desc: 'Trains infantry and ranged soldiers.' },
+  stable: { w: 3, h: 3, hp: 1500, armor: [.65, .65, .2], cost: { wood: 150, gold: 50 }, time: 30, age: 2, los: 12,
+    names: { earth: 'Hover-Bike Garage', rr: 'RR Motor Pool', ff: 'Glider Hangar' }, desc: 'Trains cavalry.' },
+  armory: { w: 2, h: 2, hp: 1000, armor: [.65, .65, .2], cost: { wood: 120 }, time: 25, age: 2, los: 10,
+    names: { earth: 'Capsule Armory', rr: 'RR Weapons Lab', ff: 'Armor Forge' }, desc: 'Weapon and armor upgrades for all human units.' },
+  temple: { w: 3, h: 3, hp: 1800, armor: [.65, .65, .2], cost: { wood: 100, gold: 100 }, time: 35, age: 1, los: 14, vault: true,
+    names: { earth: "Kami's Lookout", rr: 'Cell Games Arena', ff: "Frieza's Throne Dome" }, desc: 'Myth units, heroes, hero transformations, and the Dragon Ball vault.' },
+  tower: { w: 2, h: 2, hp: 900, armor: [.7, .75, .2], cost: { wood: 80, gold: 40 }, byF: { rr: { cost: { wood: 50, gold: 60 } } }, time: 25, age: 1, attack: { pierce: 9, range: 18, rof: 2, arrows: 1 }, los: 20, garrison: 5,
+    names: { earth: 'Ki Turret', rr: 'RR Gun Turret', ff: 'Scouter Spire' }, desc: 'Defensive tower. Garrison villagers for more shots.' },
+  market: { w: 3, h: 3, hp: 1400, armor: [.6, .6, .2], cost: { wood: 200, gold: 50 }, time: 35, age: 3, los: 12, limit: 1,
+    names: { earth: 'West City Market', rr: 'RR Supply Exchange', ff: 'Planet Trade Exchange' }, desc: 'Buy and sell Rations and Capsule Alloy for Zeni.' },
+  fortress: { w: 4, h: 4, hp: 3600, armor: [.8, .8, .25], cost: { wood: 300, gold: 400 }, time: 60, age: 3, attack: { pierce: 10, range: 20, rof: 1.8, arrows: 2 }, los: 22, garrison: 10,
+    names: { earth: 'Capsule Corp HQ', rr: 'RR Fortress', ff: 'Frieza Force Citadel' }, desc: 'Trains siege weapons and elite heroes. Shoots at enemies.' },
+  wall: { w: 1, h: 1, hp: 700, armor: [.85, .9, .2], cost: { wood: 5 }, time: 4, age: 1, los: 4, wall: true,
+    names: { earth: 'Capsule Wall', rr: 'RR Barricade', ff: 'Energy Fence' }, desc: 'Blocks enemies. Drag to build a line of wall.' },
+  gate: { w: 1, h: 1, hp: 900, armor: [.85, .9, .2], cost: { wood: 20 }, time: 8, age: 1, los: 6, gate: true,
+    names: { earth: 'Gate', rr: 'Gate', ff: 'Gate' }, desc: 'Your units and allies can pass. Enemies cannot.' },
+  reactor: { w: 2, h: 2, hp: 800, armor: [.6, .6, .1], cost: { wood: 60, gold: 60 }, time: 25, age: 1, los: 8, ki: .2, limit: 6, faction: 'rr',
+    names: { rr: 'Bio-Reactor' }, desc: '+0.2 Ki per second (up to 6 reactors).' },
+  wonder: { w: 5, h: 5, hp: 7000, armor: [.85, .85, .3], cost: { food: 1000, wood: 1000, gold: 1000, ki: 50 }, time: 300, age: 4, los: 16, limit: 1, wonder: true,
+    names: { earth: "Kami's Palace", rr: 'Red Ribbon Tower', ff: "Frieza's Flagship" }, desc: 'A monument to your power. If it stands for 5 minutes, you win.' },
+  // scenario-only
+  attackpod: { w: 1, h: 1, hp: 500, armor: [.7, .8, .3], los: 6, special: true, names: { ff: 'Saiyan Attack Pod', earth: 'Attack Pod', rr: 'Attack Pod' }, desc: 'A Saiyan space pod.' },
+  lab: { w: 4, h: 4, hp: 4000, armor: [.8, .8, .3], los: 14, special: true, attack: { pierce: 12, range: 18, rof: 1.5, arrows: 2 }, names: { rr: "Dr. Gero's Laboratory", earth: 'Laboratory', ff: 'Laboratory' }, desc: "Dr. Gero's hidden laboratory, where the androids sleep." },
+  ship: { w: 5, h: 5, hp: 5500, armor: [.8, .85, .3], los: 16, special: true, attack: { pierce: 14, range: 20, rof: 1.4, arrows: 3 }, names: { ff: "Frieza's Spaceship", earth: 'Spaceship', rr: 'Spaceship' }, desc: "Frieza's personal spaceship." },
+  guru: { w: 3, h: 3, hp: 2500, armor: [.7, .7, .3], los: 14, special: true, vault: true, names: { earth: "Guru's House", rr: "Guru's House", ff: "Guru's House" }, desc: "The Grand Elder's home. Bring Dragon Balls here." },
+  hut: { w: 2, h: 2, hp: 500, armor: [.5, .5, .1], los: 6, special: true, names: { earth: 'Village Hut', rr: 'Village Hut', ff: 'Village Hut' }, desc: 'A village home.' },
+};
+for (const k in B) { B[k].key = k; B[k].trains = []; B[k].techs = []; }
+const bname = (key, faction) => B[key].names[faction] || B[key].names.earth || Object.values(B[key].names)[0];
+const bcost = (key, faction) => (B[key].byF && B[key].byF[faction] && B[key].byF[faction].cost) || B[key].cost || {};
+const BUILD_MENU = {
+  earth: ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'tower', 'wall', 'gate', 'stable', 'armory', 'market', 'fortress', 'tc', 'wonder'],
+  rr: ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'reactor', 'tower', 'wall', 'gate', 'stable', 'armory', 'market', 'fortress', 'tc', 'wonder'],
+  ff: ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'tower', 'wall', 'gate', 'stable', 'armory', 'market', 'fortress', 'tc', 'wonder'],
+};
+for (const k in U) { const d = U[k]; if (d.at && B[d.at]) B[d.at].trains.push(k); }
+
+// ---------- technologies ----------
+const TECH = {
+  age2: { name: 'Advance to the Namek Saga', at: 'tc', cost: { food: 400 }, time: 45, age: 1, ageUp: 2, desc: 'Choose a new patron, unlock cavalry, the Armory and more.' },
+  age3: { name: 'Advance to the Android Saga', at: 'tc', cost: { food: 800, gold: 500 }, time: 60, age: 2, ageUp: 3, desc: 'Choose a new patron, unlock siege, the Fortress and the Market.' },
+  age4: { name: 'Advance to the Buu Saga', at: 'tc', cost: { food: 1000, gold: 1000 }, time: 75, age: 3, ageUp: 4, desc: 'Choose a new patron, unlock Wonders, the Titan and the strongest transformations.' },
+  // economy
+  hunting: { name: 'Hunting Scouters', at: 'granary', age: 1, cost: { food: 50, wood: 50 }, time: 20, fx: [{ t: 'gather', res: 'hunt', mul: 1.25 }], desc: 'Villagers hunt 25% faster.', icon: 'hunt' },
+  plow: { name: 'Capsule Plows', at: 'granary', age: 1, cost: { food: 75, wood: 100 }, time: 25, fx: [{ t: 'gather', res: 'farm', mul: 1.2 }, { t: 'gather', res: 'berry', mul: 1.2 }], desc: 'Farms and Senzu crops +20%.', icon: 'farm' },
+  hydro: { name: 'Hydroponics', at: 'granary', age: 2, req: 'plow', cost: { food: 250, wood: 150 }, time: 35, fx: [{ t: 'gather', res: 'farm', mul: 1.2 }], desc: 'Farms +20%.', icon: 'farm' },
+  saws: { name: 'Capsule Saws', at: 'storehouse', age: 1, cost: { food: 50, wood: 50 }, time: 20, fx: [{ t: 'gather', res: 'wood', mul: 1.2 }], desc: 'Capsule Alloy gathering +20%.', icon: 'wood' },
+  drills: { name: 'Ki Drills', at: 'storehouse', age: 1, cost: { food: 50, wood: 75 }, time: 20, fx: [{ t: 'gather', res: 'gold', mul: 1.2 }], desc: 'Zeni mining +20%.', icon: 'gold' },
+  lasersaws: { name: 'Laser Saws', at: 'storehouse', age: 2, req: 'saws', cost: { food: 200, wood: 150 }, time: 30, fx: [{ t: 'gather', res: 'wood', mul: 1.2 }], desc: 'Capsule Alloy gathering +20%.', icon: 'wood' },
+  deepcore: { name: 'Deep-Core Mining', at: 'storehouse', age: 2, req: 'drills', cost: { food: 200, wood: 200 }, time: 30, fx: [{ t: 'gather', res: 'gold', mul: 1.2 }], desc: 'Zeni mining +20%.', icon: 'gold' },
+  hovercarts: { name: 'Hover Carts', at: 'storehouse', age: 3, cost: { food: 300, gold: 200 }, time: 40, fx: [{ t: 'carry', add: 5 }], desc: 'Villagers carry 5 more of everything.', icon: 'cart' },
+  fortifiedtc: { name: 'Fortified Town Center', at: 'tc', age: 3, cost: { wood: 300, gold: 300 }, time: 45, fx: [{ t: 'bld', who: 'tc', stat: 'hp', mul: 1.5 }, { t: 'bld', who: 'tc', stat: 'arrows', add: 2 }], desc: 'Town Centers +50% HP and fire 2 extra shots.', icon: 'tower' },
+  towerup: { name: 'Scouter Targeting', at: 'tower', age: 2, cost: { wood: 100, gold: 100 }, time: 30, fx: [{ t: 'bld', who: 'tower', stat: 'range', add: 4 }, { t: 'bld', who: 'tower', stat: 'hp', mul: 1.3 }], desc: 'Towers +4 m range and +30% HP.', icon: 'tower' },
+  // armory
+  wpn1: { name: 'Ki Control I', at: 'armory', age: 2, cost: { food: 100, gold: 100 }, time: 30, fx: [{ t: 'stat', who: 'human', stat: 'atk', mul: 1.1 }], desc: 'Human soldiers +10% attack.', icon: 'sword' },
+  wpn2: { name: 'Ki Control II', at: 'armory', age: 3, req: 'wpn1', cost: { food: 200, gold: 200 }, time: 40, fx: [{ t: 'stat', who: 'human', stat: 'atk', mul: 1.1 }], desc: 'Human soldiers +10% attack.', icon: 'sword' },
+  wpn3: { name: 'Ki Control III', at: 'armory', age: 4, req: 'wpn2', cost: { food: 300, gold: 300 }, time: 50, fx: [{ t: 'stat', who: 'human', stat: 'atk', mul: 1.1 }], desc: 'Human soldiers +10% attack.', icon: 'sword' },
+  arm1: { name: 'Battle Armor I', at: 'armory', age: 2, cost: { food: 100, wood: 100 }, time: 30, fx: [{ t: 'stat', who: 'human', stat: 'armor', add: .05 }], desc: 'Human soldiers +5% Hack and Pierce armor.', icon: 'shield' },
+  arm2: { name: 'Battle Armor II', at: 'armory', age: 3, req: 'arm1', cost: { food: 200, wood: 200 }, time: 40, fx: [{ t: 'stat', who: 'human', stat: 'armor', add: .05 }], desc: 'Human soldiers +5% Hack and Pierce armor.', icon: 'shield' },
+  arm3: { name: 'Battle Armor III', at: 'armory', age: 4, req: 'arm2', cost: { food: 300, wood: 300 }, time: 50, fx: [{ t: 'stat', who: 'human', stat: 'armor', add: .05 }], desc: 'Human soldiers +5% Hack and Pierce armor.', icon: 'shield' },
+  // unit lines
+  inf2: { name: 'Veteran Infantry', at: 'barracks', age: 2, cost: { food: 200, gold: 100 }, time: 35, fx: [{ t: 'stat', who: 'cls:infantry', stat: 'hp', mul: 1.15 }, { t: 'stat', who: 'cls:infantry', stat: 'atk', mul: 1.15 }], desc: 'Infantry +15% HP and attack.', icon: 'inf' },
+  inf3: { name: 'Elite Infantry', at: 'barracks', age: 3, req: 'inf2', cost: { food: 400, gold: 250 }, time: 45, fx: [{ t: 'stat', who: 'cls:infantry', stat: 'hp', mul: 1.15 }, { t: 'stat', who: 'cls:infantry', stat: 'atk', mul: 1.15 }], desc: 'Infantry +15% HP and attack.', icon: 'inf' },
+  rng2: { name: 'Veteran Gunners', at: 'barracks', age: 2, cost: { wood: 150, gold: 150 }, time: 35, fx: [{ t: 'stat', who: 'cls:ranged', stat: 'hp', mul: 1.15 }, { t: 'stat', who: 'cls:ranged', stat: 'atk', mul: 1.15 }], desc: 'Ranged soldiers +15% HP and attack.', icon: 'rng' },
+  rng3: { name: 'Elite Gunners', at: 'barracks', age: 3, req: 'rng2', cost: { wood: 300, gold: 300 }, time: 45, fx: [{ t: 'stat', who: 'cls:ranged', stat: 'hp', mul: 1.15 }, { t: 'stat', who: 'cls:ranged', stat: 'atk', mul: 1.15 }, { t: 'stat', who: 'cls:ranged', stat: 'range', add: 2 }], desc: 'Ranged soldiers +15% HP and attack, +2 m range.', icon: 'rng' },
+  cav2: { name: 'Veteran Riders', at: 'stable', age: 2, cost: { food: 200, gold: 150 }, time: 35, fx: [{ t: 'stat', who: 'cls:cavalry', stat: 'hp', mul: 1.15 }, { t: 'stat', who: 'cls:cavalry', stat: 'atk', mul: 1.15 }], desc: 'Cavalry +15% HP and attack.', icon: 'cav' },
+  cav3: { name: 'Elite Riders', at: 'stable', age: 3, req: 'cav2', cost: { food: 400, gold: 300 }, time: 45, fx: [{ t: 'stat', who: 'cls:cavalry', stat: 'hp', mul: 1.15 }, { t: 'stat', who: 'cls:cavalry', stat: 'atk', mul: 1.15 }, { t: 'stat', who: 'cls:cavalry', stat: 'speed', mul: 1.08 }], desc: 'Cavalry +15% HP and attack, +8% speed.', icon: 'cav' },
+  siege2: { name: 'Heavy Siege', at: 'fortress', age: 4, cost: { wood: 400, gold: 300 }, time: 50, fx: [{ t: 'stat', who: 'cls:siege', stat: 'hp', mul: 1.2 }, { t: 'stat', who: 'cls:siege', stat: 'atk', mul: 1.2 }], desc: 'Siege +20% HP and attack.', icon: 'siege' },
+  // heroes and temple
+  ssj1: { name: 'Super Saiyan Awakening', faction: 'earth', at: 'temple', age: 3, cost: { gold: 300, ki: 25 }, time: 40, fx: [{ t: 'form', unit: 'goku', form: 'goku_ssj1' }], desc: 'Goku becomes a Super Saiyan: 950 HP and Instant Kamehameha.', icon: 'ssj' },
+  ssj3: { name: 'Super Saiyan 3', faction: 'earth', at: 'temple', age: 4, req: 'ssj1', cost: { food: 400, gold: 500, ki: 40 }, time: 55, fx: [{ t: 'form', unit: 'goku', form: 'goku_ssj3' }], desc: 'Goku reaches Super Saiyan 3: 1500 HP and Dragon Fist. Drains 1.2 Ki/s.', icon: 'ssj' },
+  ssj2: { name: 'Super Saiyan 2', faction: 'earth', at: 'temple', age: 4, cost: { food: 300, gold: 400, ki: 30 }, time: 50, fx: [{ t: 'form', unit: 'gohan', form: 'gohan_ssj2' }], desc: 'Gohan becomes a Super Saiyan 2: 1400 HP and the Father-Son Kamehameha.', icon: 'ssj' },
+  incubation: { name: 'Cell Incubation', faction: 'rr', at: 'temple', age: 3, cost: { gold: 250, ki: 20 }, time: 35, desc: 'Hatches Cell. Train him at the Cell Games Arena.', icon: 'cell' },
+  vegetassj: { name: "Prince's Pride", faction: 'ff', at: 'temple', age: 3, cost: { gold: 300, ki: 25 }, time: 40, fx: [{ t: 'form', unit: 'vegeta', form: 'vegeta_ssj' }], desc: 'Vegeta becomes a Super Saiyan: 1100 HP and Final Flash.', icon: 'ssj' },
+  finalform: { name: 'Final Form', faction: 'ff', at: 'temple', age: 4, cost: { food: 400, gold: 500, ki: 40 }, time: 55, fx: [{ t: 'form', unit: 'frieza', form: 'frieza_final' }], desc: 'Frieza reaches his Final Form: 1700 HP and the Death Ball.', icon: 'ssj' },
+  buu: { name: 'Unseal Majin Buu', at: 'temple', age: 4, cost: { food: 1000, gold: 1000, ki: 80 }, time: 60, desc: 'Breaks the Sealed Ball. Kid Buu (Titan, 7000 HP) fights for you.', icon: 'buu' },
+  // patron technologies (shown at the Temple once the patron is chosen)
+  nameksregen: { name: 'Namekian Regeneration', patron: 'piccolo', at: 'temple', age: 2, cost: { food: 150, gold: 150 }, time: 30, fx: [{ t: 'stat', who: 'myth', stat: 'regen', add: 3 }], desc: 'Myth units regenerate 3 HP/s.', icon: 'heal' },
+  capsulestorage: { name: 'Capsule Storage', patron: 'bulma', at: 'temple', age: 2, cost: { food: 150, wood: 150 }, time: 30, fx: [{ t: 'carry', add: 5 }, { t: 'bld', who: 'house', stat: 'pop', add: 2 }], desc: 'Villagers carry +5. Houses +2 population.', icon: 'cart' },
+  healinghands: { name: 'Healing Hands', patron: 'dende', at: 'temple', age: 3, cost: { gold: 250, ki: 15 }, time: 35, fx: [{ t: 'templeHeal', add: 4 }, { t: 'stat', who: 'unit:healer', stat: 'heal', mul: 1.5 }], desc: 'Temples heal 4 HP/s more. Healers heal 50% more.', icon: 'heal' },
+  gravitytraining: { name: 'Gravity Training', patron: 'kingkai', at: 'temple', age: 3, cost: { food: 300, gold: 200 }, time: 40, fx: [{ t: 'stat', who: 'human', stat: 'hp', mul: 1.2 }], desc: 'Human soldiers +20% HP.', icon: 'inf' },
+  potara: { name: 'Potara Earrings', patron: 'supremekai', at: 'temple', age: 4, cost: { gold: 400, ki: 30 }, time: 45, fx: [{ t: 'stat', who: 'hero', stat: 'atk', mul: 1.25 }], desc: 'Heroes +25% attack.', icon: 'ssj' },
+  mysticawakening: { name: 'Mystic Awakening', patron: 'elderkai', at: 'temple', age: 4, cost: { gold: 400, ki: 30 }, time: 45, fx: [{ t: 'stat', who: 'hero', stat: 'hp', mul: 1.25 }, { t: 'stat', who: 'hero', stat: 'regen', add: 4 }], desc: 'Heroes +25% HP and regenerate 4 HP/s.', icon: 'ssj' },
+  bluediscipline: { name: "Blue's Discipline", patron: 'genblue', at: 'temple', age: 2, cost: { food: 200, gold: 100 }, time: 30, fx: [{ t: 'stat', who: 'cls:infantry', stat: 'speed', mul: 1.15 }], desc: 'Infantry +15% speed.', icon: 'inf' },
+  silverlogistics: { name: 'Silver Logistics', patron: 'silver', at: 'temple', age: 2, cost: { food: 150, wood: 150 }, time: 30, fx: [{ t: 'gather', res: 'all', mul: 1.08 }], desc: 'All gathering +8%.', icon: 'cart' },
+  gentlegiants: { name: 'Gentle Giants', patron: 'a16', at: 'temple', age: 3, cost: { gold: 250, ki: 15 }, time: 35, fx: [{ t: 'stat', who: 'myth', stat: 'hp', mul: 1.2 }], desc: 'Myth units +20% HP.', icon: 'heal' },
+  absorbtech: { name: 'Absorption Tech', patron: 'a20', at: 'temple', age: 3, cost: { gold: 250, wood: 150 }, time: 35, fx: [{ t: 'bld', who: 'reactor', stat: 'ki', mul: 1.5 }], desc: 'Bio-Reactors make 50% more Ki.', icon: 'ki' },
+  cellgames: { name: 'The Cell Games', patron: 'perfectcell', at: 'temple', age: 4, cost: { gold: 400, ki: 30 }, time: 45, fx: [{ t: 'stat', who: 'hero', stat: 'hp', mul: 1.25 }], desc: 'Heroes +25% HP.', icon: 'ssj' },
+  fusioncore: { name: 'Fusion Core', patron: 'super13p', at: 'temple', age: 4, cost: { gold: 400, wood: 300 }, time: 45, fx: [{ t: 'stat', who: 'tag:Mech', stat: 'atk', mul: 1.2 }], desc: 'Mechanical units +20% attack.', icon: 'sword' },
+  saiyanpride: { name: 'Saiyan Pride', patron: 'nappa', at: 'temple', age: 2, cost: { food: 200, gold: 100 }, time: 30, fx: [{ t: 'stat', who: 'tag:Saiyan', stat: 'atk', mul: 1.1 }], desc: 'Saiyans +10% attack.', icon: 'sword' },
+  bruteforce: { name: 'Brute Force', patron: 'dodoria', at: 'temple', age: 2, cost: { gold: 200, ki: 10 }, time: 30, fx: [{ t: 'stat', who: 'myth', stat: 'atk', mul: 1.15 }], desc: 'Myth units +15% attack.', icon: 'sword' },
+  specialposes: { name: 'Special Poses', patron: 'ginyu', at: 'temple', age: 3, cost: { gold: 250, ki: 15 }, time: 35, fx: [{ t: 'stat', who: 'hero', stat: 'speed', mul: 1.15 }, { t: 'stat', who: 'myth', stat: 'speed', mul: 1.1 }], desc: 'Heroes +15% speed, myth units +10% speed.', icon: 'cav' },
+  monsterform: { name: 'Monster Form', patron: 'zarbon', at: 'temple', age: 3, cost: { gold: 300, ki: 15 }, time: 35, fx: [{ t: 'stat', who: 'unit:ape', stat: 'hp', mul: 1.2 }, { t: 'stat', who: 'unit:brute', stat: 'hp', mul: 1.2 }], desc: 'Great Apes and Brutes +20% HP.', icon: 'heal' },
+  lineage: { name: 'Arcosian Lineage', patron: 'kingcold', at: 'temple', age: 4, cost: { gold: 400, ki: 30 }, time: 45, fx: [{ t: 'stat', who: 'tag:Arcosian', stat: 'hp', mul: 1.25 }, { t: 'stat', who: 'tag:Arcosian', stat: 'atk', mul: 1.15 }], desc: 'Frieza and Arcosians +25% HP, +15% attack.', icon: 'ssj' },
+  squadron: { name: 'Armored Squadron', patron: 'cooler', at: 'temple', age: 4, cost: { gold: 400, wood: 300 }, time: 45, fx: [{ t: 'stat', who: 'human', stat: 'armor', add: .08 }], desc: 'Human soldiers +8% Hack and Pierce armor.', icon: 'shield' },
+};
+for (const k in TECH) { TECH[k].key = k; if (B[TECH[k].at]) B[TECH[k].at].techs.push(k); }
+
+// ---------- god powers ----------
+const POW = {
+  sacredwater: { name: 'Sacred Water', type: 'heal', radius: 14, desc: 'Fully heals every unit you own in a 14 m circle.', color: '#7fe0ff' },
+  maxkame: { name: 'MAX Power Kamehameha', type: 'line', length: 34, width: 3, dmg: { pierce: 260 }, delay: 1.2, desc: 'A giant Kamehameha sweeps a 34 m line: 260 damage.', color: '#7fe0ff' },
+  beamcannon: { name: 'Special Beam Cannon', type: 'bolt', dmg: 900, desc: 'Pierces one enemy unit for 900 damage.', color: '#ffe066' },
+  capsuledrop: { name: 'Capsule Drop', type: 'summon', units: [['fighter', 5], ['gunner', 3]], desc: 'Capsules burst open: 5 Turtle School Fighters and 3 Ki Gunners.', color: '#ff8a1e' },
+  restoration: { name: "Dende's Restoration", type: 'globalHeal', desc: 'Heals every unit and building you own.', color: '#9cff8a' },
+  kaiosurge: { name: 'Kaio-ken Surge', type: 'buff', radius: 14, atk: 1.5, spd: 1.4, dur: 25, desc: 'Your units in a 14 m circle get +50% attack and +40% speed for 25 seconds.', color: '#ff5a5a' },
+  spiritbomb: { name: 'Universal Spirit Bomb', type: 'strike', radius: 14, dmg: { divine: 650 }, delay: 3.2, titanKill: true, visual: 'spiritbomb', desc: 'After 3 seconds: 650 damage in a 14 m circle. Destroys Titans.', color: '#9fe8ff' },
+  potential: { name: 'Unlock Potential', type: 'heroBuff', atk: 1.6, dur: 60, desc: 'All your heroes are fully healed and get +60% attack for 60 seconds.', color: '#ffe066' },
+  repair: { name: 'Emergency Repair', type: 'repair', radius: 16, desc: 'Fully repairs your machines and buildings in a 16 m circle.', color: '#ffd166' },
+  airstrike: { name: 'Air Strike', type: 'bombs', count: 6, length: 26, dmg: { crush: 110, pierce: 40 }, aoe: 3.5, desc: 'Bombers drop six bombs along a 26 m line.', color: '#ffb347' },
+  paralysis: { name: 'Paralysis', type: 'stun', radius: 12, dur: 7, desc: 'Freezes every enemy in a 12 m circle for 7 seconds.', color: '#9fe8ff' },
+  supplydrop: { name: 'Supply Drop', type: 'grant', res: { food: 400, wood: 300, gold: 200 }, desc: '+400 Rations, +300 Capsule Alloy, +200 Zeni.', color: '#ffd34d' },
+  hellflash: { name: "Hell's Flash", type: 'strike', radius: 7, dmg: { pierce: 420 }, delay: 1, desc: '420 damage in a 7 m circle.', color: '#ffb347' },
+  energydrain: { name: 'Energy Drain', type: 'drain', radius: 12, frac: .4, desc: 'Enemies in a 12 m circle lose 40% of their HP. You gain Ki.', color: '#d7ff6b' },
+  solarkame: { name: 'Solar Kamehameha', type: 'strike', radius: 12, dmg: { pierce: 600, crush: 150 }, delay: 1.6, desc: '750 damage in a 12 m circle.', color: '#d7ff6b' },
+  assembly: { name: 'Android Assembly', type: 'summon', units: [['jacket', 4], ['rifleman', 4]], desc: '4 Battle Jackets and 4 Riflemen roll out.', color: '#d33a3a' },
+  deathbeam: { name: 'Death Beam', type: 'bolt', dmg: 9999, heroDmg: 600, desc: 'Kills one enemy unit (600 damage to heroes and Titans).', color: '#ff4dd2' },
+  fullmoon: { name: 'Full Moon', type: 'apes', radius: 14, dur: 40, desc: 'Your Saiyans in a 14 m circle become Great Apes for 40 seconds: double HP and attack.', color: '#fff3c4' },
+  saibaharvest: { name: 'Saibamen Harvest', type: 'summon', units: [['saibaman', 7]], desc: 'Seven Saibamen sprout from the ground.', color: '#9cff57' },
+  mouthcannon: { name: 'Mouth Cannon', type: 'line', length: 26, width: 2.5, dmg: { pierce: 220 }, delay: .8, desc: 'A 26 m blast: 220 damage.', color: '#ff7ab8' },
+  bodychange: { name: 'Body Change', type: 'convert', desc: 'Take control of one enemy unit (not heroes or Titans).', color: '#d08aff' },
+  elegant: { name: 'Elegant Blaster', type: 'strike', radius: 6, dmg: { pierce: 400 }, delay: .8, desc: '400 damage in a 6 m circle.', color: '#7dff9c' },
+  fleet: { name: 'Imperial Fleet', type: 'summon', units: [['soldier', 6], ['saiyan', 4]], desc: '6 Frieza Soldiers and 4 Saiyan Warriors land.', color: '#8a5ad8' },
+  supernova: { name: 'Supernova', type: 'strike', radius: 13, dmg: { pierce: 550, crush: 200 }, delay: 2.5, desc: 'After 2.5 seconds: 750 damage in a 13 m circle.', color: '#ff8a3a' },
+  shenron: { name: 'Summon Shenron', type: 'shenron', desc: 'All seven Dragon Balls are yours. Make a wish.', color: '#6dff9c' },
+};
+for (const k in POW) POW[k].key = k;
+
+const RES_DEF = {
+  tree: { amount: 150, type: 'wood', sub: 'wood', block: true },
+  gold: { amount: 2500, type: 'gold', sub: 'gold', block: true, big: true },
+  berry: { amount: 150, type: 'food', sub: 'berry', block: false },
+  carcass: { amount: 350, type: 'food', sub: 'hunt', block: false },
+};
+
+const SPECIAL_NAMES = { tree: 'Capsule Alloy Grove', gold: 'Zeni Vein', berry: 'Senzu Bush', carcass: 'Dinosaur Rations' };
+
+const MAPS = {
+  earth: { name: 'Dragon Ball Hunt', biome: 'earth', desc: 'Green hills, lakes and forests. Seven guarded Dragon Balls.' },
+  namek: { name: 'Planet Namek', biome: 'namek', desc: 'Blue-green islands joined by shallow water. Few trees, rich in Zeni.' },
+  wasteland: { name: 'Android Wasteland', biome: 'wasteland', desc: 'A rocky desert of mesas and canyons. Lots of Zeni, little wood.' },
+  highlands: { name: "Kami's Highlands", biome: 'highlands', desc: 'Snowy peaks and pine forests around a central plateau.' },
+};
+const DIFF = {
+  easy: { gather: .7, maxVill: 16, firstWave: 600, waveGap: 240, waveGrow: 2, wave: 6, bonus: 0, think: 1.4, powers: .4 },
+  normal: { gather: 1, maxVill: 24, firstWave: 420, waveGap: 180, waveGrow: 3, wave: 9, bonus: 0, think: 1, powers: 1 },
+  hard: { gather: 1.25, maxVill: 32, firstWave: 320, waveGap: 150, waveGrow: 4, wave: 12, bonus: 200, think: .8, powers: 1 },
+};
