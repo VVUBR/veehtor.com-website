@@ -3638,6 +3638,12 @@ function buildingIcon(key, fac, pc, size) {
     const s = buildingSprite(key, fac, pc), d = B[key];
     const fit = Math.min((size - 4) / s.w, (size - 4) / s.h) * (key === 'wall' || key === 'gate' ? .8 : 1);
     c.drawImage(s.c, (size - s.w * fit) / 2, (size - s.h * fit) / 2 + 1, s.w * fit, s.h * fit);
+    if (['barracks', 'stable', 'fortress'].includes(key)) {
+      // crossed swords badge: tells military buildings apart from look-alike economy ones
+      const r = size * .15, x = r + 2, y = size - r - 2;
+      c.fillStyle = '#7a1d1d'; c.strokeStyle = '#ffd34d'; c.lineWidth = 1.5; c.beginPath(); c.arc(x, y, r, 0, 7); c.fill(); c.stroke();
+      limb(c, x - r * .55, y + r * .55, x + r * .55, y - r * .55, 1.6, '#e8eef7'); limb(c, x + r * .55, y + r * .55, x - r * .55, y - r * .55, 1.6, '#e8eef7');
+    }
   });
 }
 const TECH_GLYPH = {
@@ -4449,7 +4455,7 @@ function getCommands() {
   const heroes = units.filter(u => u.def.cls === 'hero');
   if (vills.length && vills.length === units.length) {
     const page = G.cmdPage === 'mil' ? 'mil' : 'main';
-    const eco = BUILD_MENU[P.faction].filter(k => ['house', 'granary', 'storehouse', 'farm', 'temple', 'reactor', 'tower', 'wall', 'gate', 'tc'].includes(k));
+    const eco = BUILD_MENU[P.faction].filter(k => ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'reactor', 'tower', 'wall', 'tc'].includes(k));
     const mil = BUILD_MENU[P.faction].filter(k => !eco.includes(k));
     for (const k of page === 'main' ? eco : mil) {
       const d = B[k], why = buildCheck(P, k), c = bcost(k, P.faction);
@@ -4457,8 +4463,8 @@ function getCommands() {
       out.push({ id: 'build-' + k, icon: buildingIcon(k, P.faction, P.color), name: bname(k, P.faction), cost: c, why, on: G.placing === k, desc: d.desc + (k === 'wall' ? ' Click and drag to draw a wall.' : ''), run: () => { if (why) { toast(why, 'warn'); SFX.play('error'); return; } G.placing = k; G.wallStart = null; G.targeting = null; } });
     }
     out.push(page === 'main'
-      ? { id: 'page-mil', icon: cmdIcon('buildmil'), name: 'Military buildings', desc: 'Barracks, stables, armory, market, fortress, Wonder.', run: () => { G.cmdPage = 'mil'; cmdSig = ''; } }
-      : { id: 'page-main', icon: cmdIcon('back'), name: 'Economic buildings', desc: 'Back to houses, drop sites, farms and towers.', run: () => { G.cmdPage = 'main'; cmdSig = ''; } });
+      ? { id: 'page-mil', icon: cmdIcon('buildmil'), name: 'More buildings', desc: mil.map(k => bname(k, P.faction)).join(', ') + '.', run: () => { G.cmdPage = 'mil'; cmdSig = ''; } }
+      : { id: 'page-main', icon: cmdIcon('back'), name: 'Back to basic buildings', desc: eco.map(k => bname(k, P.faction)).join(', ') + '.', run: () => { G.cmdPage = 'main'; cmdSig = ''; } });
     if (P.faction === 'earth') { const t = nearestOwn(P, 'temple', vills[0]); if (t) out.push({ id: 'meditate', icon: cmdIcon('meditate'), name: "Meditate at Kami's Lookout", desc: 'Villagers meditating at a Temple make Ki (up to 10 per Temple).', run: () => { for (const v of vills) setOrder(v, { type: 'meditate', bid: t.id }); } }); }
   }
   for (const h of heroes.slice(0, 2)) {
@@ -5262,7 +5268,7 @@ const CAMPAIGN = [
       S.say('piccolo', 'A Saiyan. His power is beyond either of us. We need an army, Goku.', { pause: true });
       S.say('kami', 'Select your villagers and right-click the trees to gather Capsule Alloy. Right-click Senzu bushes and dinosaurs for Rations.');
       S.mark(56, 14);
-      S.when(() => G.players[1].res.wood >= 250 || G.blds.some(b => b.owner === 1 && b.key === 'barracks'), () => { S.setObj('wood', 'done'); S.say('kami', 'Now select a villager, open "Military buildings" in the command panel and place a Turtle & Crane Dojo.'); });
+      S.when(() => G.players[1].res.wood >= 250 || G.blds.some(b => b.owner === 1 && b.key === 'barracks'), () => { S.setObj('wood', 'done'); S.say('kami', 'Now select a villager, click the Turtle & Crane Dojo button in the command panel (bottom right) and place it on clear ground.'); });
       S.when(() => G.blds.some(b => b.owner === 1 && b.key === 'barracks' && b.built), () => { S.setObj('wood', 'done'); S.setObj('dojo', 'done'); S.say('kami', 'Select the Dojo and train Turtle School Fighters. Infantry are strong against cavalry. Houses raise your population limit.'); });
       S.when(() => S.count(1, u => u.key === 'fighter') >= 5, () => { S.setObj('army', 'done'); S.say('goku', "That's a team! Let's pay my so-called brother a visit."); S.say('kami', 'Select your army (press M), then press A and click near the Attack Pod in the north-east to attack-move.'); S.reveal(56, 14, 8, 20); });
       S.after(60 * (S.diffKey === 'easy' ? 11 : S.diffKey === 'hard' ? 6 : 8), () => { if (S.alive(S.vars.raditz)) { S.say('raditz', 'Kakarot! Join me, or watch this pathetic village burn!'); S.attack([S.vars.raditz, ...S.vars.squad], 14, 58); } });

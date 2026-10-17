@@ -225,7 +225,7 @@ const CAMPAIGN = [
       S.say('piccolo', 'A Saiyan. His power is beyond either of us. We need an army, Goku.', { pause: true });
       S.say('kami', 'Select your villagers and right-click the trees to gather Capsule Alloy. Right-click Senzu bushes and dinosaurs for Rations.');
       S.mark(56, 14);
-      S.when(() => G.players[1].res.wood >= 250 || G.blds.some(b => b.owner === 1 && b.key === 'barracks'), () => { S.setObj('wood', 'done'); S.say('kami', 'Now select a villager, open "Military buildings" in the command panel and place a Turtle & Crane Dojo.'); });
+      S.when(() => G.players[1].res.wood >= 250 || G.blds.some(b => b.owner === 1 && b.key === 'barracks'), () => { S.setObj('wood', 'done'); S.say('kami', 'Now select a villager, click the Turtle & Crane Dojo button in the command panel (bottom right) and place it on clear ground.'); });
       S.when(() => G.blds.some(b => b.owner === 1 && b.key === 'barracks' && b.built), () => { S.setObj('wood', 'done'); S.setObj('dojo', 'done'); S.say('kami', 'Select the Dojo and train Turtle School Fighters. Infantry are strong against cavalry. Houses raise your population limit.'); });
       S.when(() => S.count(1, u => u.key === 'fighter') >= 5, () => { S.setObj('army', 'done'); S.say('goku', "That's a team! Let's pay my so-called brother a visit."); S.say('kami', 'Select your army (press M), then press A and click near the Attack Pod in the north-east to attack-move.'); S.reveal(56, 14, 8, 20); });
       S.after(60 * (S.diffKey === 'easy' ? 11 : S.diffKey === 'hard' ? 6 : 8), () => { if (S.alive(S.vars.raditz)) { S.say('raditz', 'Kakarot! Join me, or watch this pathetic village burn!'); S.attack([S.vars.raditz, ...S.vars.squad], 14, 58); } });

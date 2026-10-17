@@ -299,6 +299,12 @@ function buildingIcon(key, fac, pc, size) {
     const s = buildingSprite(key, fac, pc), d = B[key];
     const fit = Math.min((size - 4) / s.w, (size - 4) / s.h) * (key === 'wall' || key === 'gate' ? .8 : 1);
     c.drawImage(s.c, (size - s.w * fit) / 2, (size - s.h * fit) / 2 + 1, s.w * fit, s.h * fit);
+    if (['barracks', 'stable', 'fortress'].includes(key)) {
+      // crossed swords badge: tells military buildings apart from look-alike economy ones
+      const r = size * .15, x = r + 2, y = size - r - 2;
+      c.fillStyle = '#7a1d1d'; c.strokeStyle = '#ffd34d'; c.lineWidth = 1.5; c.beginPath(); c.arc(x, y, r, 0, 7); c.fill(); c.stroke();
+      limb(c, x - r * .55, y + r * .55, x + r * .55, y - r * .55, 1.6, '#e8eef7'); limb(c, x + r * .55, y + r * .55, x - r * .55, y - r * .55, 1.6, '#e8eef7');
+    }
   });
 }
 const TECH_GLYPH = {

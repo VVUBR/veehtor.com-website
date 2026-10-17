@@ -224,7 +224,7 @@ function getCommands() {
   const heroes = units.filter(u => u.def.cls === 'hero');
   if (vills.length && vills.length === units.length) {
     const page = G.cmdPage === 'mil' ? 'mil' : 'main';
-    const eco = BUILD_MENU[P.faction].filter(k => ['house', 'granary', 'storehouse', 'farm', 'temple', 'reactor', 'tower', 'wall', 'gate', 'tc'].includes(k));
+    const eco = BUILD_MENU[P.faction].filter(k => ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'reactor', 'tower', 'wall', 'tc'].includes(k));
     const mil = BUILD_MENU[P.faction].filter(k => !eco.includes(k));
     for (const k of page === 'main' ? eco : mil) {
       const d = B[k], why = buildCheck(P, k), c = bcost(k, P.faction);
@@ -232,8 +232,8 @@ function getCommands() {
       out.push({ id: 'build-' + k, icon: buildingIcon(k, P.faction, P.color), name: bname(k, P.faction), cost: c, why, on: G.placing === k, desc: d.desc + (k === 'wall' ? ' Click and drag to draw a wall.' : ''), run: () => { if (why) { toast(why, 'warn'); SFX.play('error'); return; } G.placing = k; G.wallStart = null; G.targeting = null; } });
     }
     out.push(page === 'main'
-      ? { id: 'page-mil', icon: cmdIcon('buildmil'), name: 'Military buildings', desc: 'Barracks, stables, armory, market, fortress, Wonder.', run: () => { G.cmdPage = 'mil'; cmdSig = ''; } }
-      : { id: 'page-main', icon: cmdIcon('back'), name: 'Economic buildings', desc: 'Back to houses, drop sites, farms and towers.', run: () => { G.cmdPage = 'main'; cmdSig = ''; } });
+      ? { id: 'page-mil', icon: cmdIcon('buildmil'), name: 'More buildings', desc: mil.map(k => bname(k, P.faction)).join(', ') + '.', run: () => { G.cmdPage = 'mil'; cmdSig = ''; } }
+      : { id: 'page-main', icon: cmdIcon('back'), name: 'Back to basic buildings', desc: eco.map(k => bname(k, P.faction)).join(', ') + '.', run: () => { G.cmdPage = 'main'; cmdSig = ''; } });
     if (P.faction === 'earth') { const t = nearestOwn(P, 'temple', vills[0]); if (t) out.push({ id: 'meditate', icon: cmdIcon('meditate'), name: "Meditate at Kami's Lookout", desc: 'Villagers meditating at a Temple make Ki (up to 10 per Temple).', run: () => { for (const v of vills) setOrder(v, { type: 'meditate', bid: t.id }); } }); }
   }
   for (const h of heroes.slice(0, 2)) {
