@@ -165,6 +165,13 @@ kbd{background:var(--deck-2);border:1px solid var(--edge);border-bottom-width:2p
 .endstats div{background:var(--deck);border:1px solid var(--edge);border-radius:9px;padding:8px 10px}
 .endstats b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
 .endstats span{color:var(--dim);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+#cheatbox{position:absolute;z-index:30;left:50%;top:26%;transform:translateX(-50%);width:min(440px, calc(100% - 32px));display:flex;flex-direction:column;gap:8px;background:var(--deck);border:1px solid var(--zeni);border-radius:12px;padding:10px;box-shadow:0 12px 40px rgba(0,0,0,.55)}
+#cheatbox label{font-family:var(--f-display);font-size:20px;letter-spacing:.04em;color:var(--zeni)}
+#cheatbox .crow{display:flex;gap:6px}
+#cheatbox input{flex:1;min-width:0;background:var(--void);border:1px solid var(--edge);border-radius:8px;color:var(--text);font:600 16px var(--f-ui);padding:8px 10px;text-transform:uppercase;letter-spacing:.04em}
+#cheatbox input:focus{outline:2px solid var(--ki);outline-offset:1px}
+.ghost{background:var(--deck-2);border:1px solid var(--edge);border-radius:10px;padding:8px 16px;font-size:14px;font-weight:600;cursor:pointer;min-height:40px}
+.ghost:hover{border-color:var(--zeni)}
 @media (prefers-reduced-motion: reduce){.pow.shenron{animation:none}.toast{animation:none}#announce{transition:none}}
 </style>
 
@@ -208,6 +215,14 @@ kbd{background:var(--deck-2);border:1px solid var(--edge);border-bottom-width:2p
     </div>
   </div>
   <div id="announce"></div>
+  <form id="cheatbox" hidden autocomplete="off">
+    <label for="cheat-in">Cheat code</label>
+    <div class="crow">
+      <input id="cheat-in" type="text" maxlength="40" spellcheck="false" autocapitalize="characters" placeholder="e.g. CAPSULE CORP">
+      <button class="tbtn" type="submit">Enter</button>
+      <button class="tbtn" type="button" id="cheat-cancel">Cancel</button>
+    </div>
+  </form>
 
   <div class="screen" id="scr-start">
     <div class="card">
@@ -240,13 +255,21 @@ kbd{background:var(--deck-2);border:1px solid var(--edge);border-bottom-width:2p
         <ul><li>Left-click or drag a box to select. Double-click selects every unit of that type on screen.</li>
         <li>Right-click to command: move, attack, gather, build, carry a Dragon Ball, deposit it at your Temple.</li>
         <li>Arrow keys or screen edges scroll; mouse wheel zooms; click the minimap to jump.</li>
-        <li>Keys: <kbd>H</kbd> hero, <kbd>M</kbd> army, <kbd>I</kbd> idle villager, <kbd>A</kbd> attack-move, <kbd>P</kbd> pause, <kbd>Esc</kbd> cancel. Command buttons show their key.</li></ul>
+        <li>Keys: <kbd>H</kbd> hero, <kbd>M</kbd> army, <kbd>I</kbd> idle villager, <kbd>A</kbd> attack-move, <kbd>P</kbd> pause, <kbd>Enter</kbd> cheat code, <kbd>Esc</kbd> cancel. Command buttons show their key.</li></ul>
         <h4>Touch</h4>
         <ul><li>Tap your unit to select it. With units selected, tap the ground, an enemy or a resource to give the order.</li>
         <li>Drag to scroll, pinch to zoom. Turn on <b>Box select</b> to drag-select a group.</li></ul>
         <h4>Combat rules</h4>
         <ul><li>Heroes deal 5× damage to myth units (2.5× to Titans). Myth units deal 3× to human soldiers and knock them back, but only 0.25× to heroes. Human soldiers deal 1.25× to heroes.</li>
         <li>Flying costs 0.5 Ki per second per fighter. At 0 Ki everyone drops to the ground.</li></ul>
+        <h4>Cheat codes</h4>
+        <p>Press <kbd>Enter</kbd> during a game (on a phone: Pause, then <b>Enter a cheat code</b>), type a code and confirm. Capitals and apostrophes don't matter.</p>
+        <ul><li><b>CAPSULE CORP</b>: +1000 Rations, Capsule Alloy and Zeni</li>
+        <li><b>KAMI'S BLESSING</b>: Ki filled to your maximum</li>
+        <li><b>SENZU BEAN</b>: fully heals all your units</li>
+        <li><b>INSTANT TRANSMISSION</b>: reveals the whole map (type it again to bring the fog back)</li>
+        <li><b>SEVEN STARS</b>: all seven Dragon Balls go into your Temple, so you can summon Shenron</li>
+        <li><b>OVER 9000</b>: your hero jumps to his strongest form (Super Saiyan 3 Goku or Perfect Cell), appearing at your base if he isn't on the field</li></ul>
       </details>
     </div>
   </div>
@@ -277,7 +300,7 @@ kbd{background:var(--deck-2);border:1px solid var(--edge);border-bottom-width:2p
       <h1 class="logo" style="font-size:clamp(40px,8vw,64px)">Paused</h1>
       <p class="tag">Press <kbd>P</kbd> or Resume to continue.</p>
       <div class="how" id="help-body"></div>
-      <div class="row"><button class="go" id="btn-resume">Resume</button></div>
+      <div class="row"><button class="go" id="btn-resume">Resume</button><button class="ghost" id="btn-cheat">Enter a cheat code</button></div>
     </div>
   </div>
 </div>
@@ -1760,6 +1783,7 @@ function updateProjectiles(dt) {
 }
 function updateFog() {
   const vis = G.vis;
+  if (G.spectate) { vis.fill(2); G.fogDirty = true; return; }
   for (let i = 0; i < vis.length; i++) if (vis[i] === 2) vis[i] = 1;
   const reveal = (x, y, r) => {
     const tx = tOf(x), ty = tOf(y), rt = Math.ceil(r / TILE);
@@ -2496,6 +2520,7 @@ window.addEventListener('keydown', e => {
   keys.add(e.key);
   const k = e.key.toLowerCase();
   if (e.key === 'Escape') { G.placing = null; G.targeting = null; cmdSig = ''; if (!$('scr-help').hidden) togglePause(false); return; }
+  if (e.key === 'Enter') { e.preventDefault(); openCheat(); return; }
   if (k === 'p') { togglePause(); return; }
   if (G.paused) return;
   if (k === 'h') { selectHero(); return; }
@@ -2522,6 +2547,7 @@ $('btn-speed').addEventListener('click', () => { G.speed = G.speed >= 3 ? 1 : G.
 $('btn-pause').addEventListener('click', () => togglePause());
 $('btn-resume').addEventListener('click', () => togglePause(false));
 function togglePause(force) {
+  if (!$('cheatbox').hidden) $('cheatbox').hidden = true;
   const want = force === undefined ? !G.paused : force;
   if (G.wishPending && !want) return;
   G.paused = want;
@@ -2533,6 +2559,69 @@ document.querySelectorAll('.wish').forEach(b => b.addEventListener('click', () =
   $('scr-wish').hidden = true; G.paused = false;
   grantWish(P1(), b.dataset.w);
 }));
+
+// =====================================================================
+// 17b. CHEAT CODES  (always for the human player)
+// =====================================================================
+const CHEATS = {
+  'CAPSULE CORP': P => { P.res.food += 1000; P.res.wood += 1000; P.res.gold += 1000; return '+1000 Rations, Capsule Alloy and Zeni.'; },
+  'KAMIS BLESSING': P => { P.res.ki = FACTION[P.faction].kiCap; return 'Ki filled to the maximum.'; },
+  'SENZU BEAN': P => {
+    let n = 0;
+    for (const u of G.units) if (u.owner === P.id && !u.dead) { u.hp = maxHp(u); u.stun = 0; n++; G.fx.push({ type: 'ring', x: u.x, y: u.y, t: 0, dur: .6, color: '#86e07c', r: u.r + 10 }); }
+    return `${n} unit${n === 1 ? '' : 's'} fully healed.`;
+  },
+  'INSTANT TRANSMISSION': () => { G.spectate = !G.spectate; updateFog(); return G.spectate ? 'The whole map is revealed.' : 'The fog of war is back.'; },
+  'SEVEN STARS': P => {
+    const t = G.blds.find(b => !b.dead && b.owner === P.id && b.key === 'temple' && b.built);
+    if (!t) return { fail: `Build a ${B.temple.names[P.faction]} first: the Dragon Balls need a Temple.` };
+    G.stoneUntil = 0;
+    for (const b of G.balls) {
+      if (b.state === 'carried') { const h = G.byId.get(b.holder); if (h) h.carryBall = 0; }
+      if (b.state === 'temple') { const o = G.byId.get(b.temple); if (o) o.balls = o.balls.filter(x => x !== b.id); }
+      b.state = 'temple'; b.temple = t.id; b.holder = 0; b.x = t.x; b.y = t.y; t.balls.push(b.id);
+    }
+    return `All seven Dragon Balls are in ${t.name}. Summon Shenron when the sky darkens.`;
+  },
+  'OVER 9000': P => {
+    const key = FACTION[P.faction].hero, form = key === 'goku' ? 'goku_ssj3' : 'cell_perfect';
+    const home = G.blds.find(b => !b.dead && b.owner === P.id && b.key === 'temple' && b.built) || G.blds.find(b => !b.dead && b.owner === P.id && b.key === 'tc');
+    let u = G.units.find(x => x.owner === P.id && x.key === key && !x.dead);
+    if (!u && !home) return { fail: 'Your hero has nowhere to appear.' };
+    if (key === 'goku') { P.techs.add('ssj1'); P.techs.add('ssj3'); } else { P.techs.add('incubation'); P.cellStage = 2; }
+    // cancel (and refund) anything this cheat makes pointless
+    for (const b of G.blds) if (b.owner === P.id && !b.dead) {
+      if (b.research && ['ssj1', 'ssj3', 'incubation'].includes(b.research.key)) { for (const k in TECH[b.research.key].cost) P.res[k] += TECH[b.research.key].cost[k]; b.research = null; }
+      b.queue = b.queue.filter(q => { if (q.key !== key) return true; for (const k in U[key].cost) P.res[k] += U[key].cost[k]; return false; });
+    }
+    if (!u) { u = spawnNear(home, key, P.id, form); P.heroDead = null; }
+    setForm(u, form, true);
+    if (key === 'cell') u.biomass = 20;
+    announce('Over 9000!');
+    selectEntities([u], false); centerOn(u.x, u.y);
+    return `${FORMS[form].name} is ready.${key === 'goku' ? ' This form drains 1.5 Ki per second.' : ''}`;
+  },
+};
+function runCheat(raw) {
+  const code = String(raw).toUpperCase().replace(/[^A-Z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+  if (!code) return;
+  const fn = CHEATS[code];
+  if (!fn) { toast(`"${String(raw).trim().slice(0, 40)}" is not a cheat code.`, 'warn'); return; }
+  const r = fn(P1());
+  if (r && r.fail) toast(r.fail, 'warn'); else toast(`Cheat ${code}: ${r}`, 'gold');
+  cmdSig = ''; $('powers').dataset.sig = '';
+}
+let cheatWasPaused = false;
+function openCheat() {
+  if (!G.started || G.over || !$('scr-wish').hidden || !$('cheatbox').hidden) return;
+  cheatWasPaused = G.paused; G.paused = true;
+  $('cheat-in').value = ''; $('cheatbox').hidden = false; $('cheat-in').focus();
+}
+function closeCheat() { $('cheatbox').hidden = true; G.paused = cheatWasPaused; $('cheat-in').blur(); }
+$('cheatbox').addEventListener('submit', e => { e.preventDefault(); const v = $('cheat-in').value; closeCheat(); runCheat(v); });
+$('cheat-in').addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); closeCheat(); } });
+$('cheat-cancel').addEventListener('click', closeCheat);
+$('btn-cheat').addEventListener('click', () => { togglePause(false); openCheat(); });
 
 // =====================================================================
 // 18. GAME FLOW

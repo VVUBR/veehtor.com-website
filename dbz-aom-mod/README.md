@@ -35,6 +35,11 @@ difficulty, and play a skirmish on the Dragon Ball Hunt map against the computer
   multipliers, the flight Ki drain, the seven guarded Dragon Balls that only heroes can
   carry, Shenron's three wishes, the Kid Buu Titan and the god powers.
 - **Win** by destroying the enemy Town Center.
+- **Cheat codes**: press Enter during a game (on a phone: Pause, then "Enter a cheat
+  code") and type `CAPSULE CORP` (+1000 Rations, Alloy and Zeni), `KAMI'S BLESSING`
+  (full Ki), `SENZU BEAN` (heal all your units), `INSTANT TRANSMISSION` (reveal the map,
+  type again to undo), `SEVEN STARS` (all seven Dragon Balls into your Temple) or
+  `OVER 9000` (your hero's strongest form).
 
 It is one self-contained HTML file with no downloads, accounts or plugins. It is an
 original browser game built on this mod's rules. It does not use Age of Mythology's
