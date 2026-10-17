@@ -20,6 +20,26 @@ cultures as Dragon Ball Z factions. This slice contains:
 Everything is **additive** (`*_mods.xml` files with `mergeMode="add"`), so it does not
 overwrite vanilla files and can sit next to other mods.
 
+## Play in the browser (no game needed)
+
+`browser/dragon-ball-hunt.html` is a standalone version of the same design that runs in
+any modern browser, on desktop or phone. Open the file, pick a side and an opponent
+difficulty, and play a skirmish on the Dragon Ball Hunt map against the computer.
+
+- **Earth Defenders**: Goku (flight, Kaio-ken, Super Saiyan 1 and 3), Turtle School
+  Fighters, Crane School Ki Gunners and the Giant Namekian Guardian. Ki comes from
+  villagers meditating at Kami's Lookout.
+- **Red Ribbon Bio-Tech**: Cell (absorbs wounded enemies to reach his Perfect form),
+  Troopers, Battle Jackets and Saibamen. Ki comes from Bio-Reactors.
+- **Rules carried over from the mod**: the four resources, four Sagas, the combat
+  multipliers, the flight Ki drain, the seven guarded Dragon Balls that only heroes can
+  carry, Shenron's three wishes, the Kid Buu Titan and the god powers.
+- **Win** by destroying the enemy Town Center.
+
+It is one self-contained HTML file with no downloads, accounts or plugins. It is an
+original browser game built on this mod's rules. It does not use Age of Mythology's
+engine or assets.
+
 ## Install and play
 
 Nothing has to be extracted from the game. You need Age of Mythology: Retold on a PC.
