@@ -19,7 +19,7 @@ $('how-body').innerHTML = `
 <ul><li>Left-click or drag a box to select. Double-click (or Ctrl-click) selects all units of that type on screen. Shift adds to the selection.</li>
 <li>Right-click to act: move, attack, gather, build or repair, carry a Dragon Ball, deposit it in your Temple. Shift + right-click queues orders.</li>
 <li>Arrow keys or screen edges scroll, mouse wheel zooms, middle or right drag pans, and the minimap jumps the camera.</li>
-<li><kbd>Q W E R T</kbd> / <kbd>A S D F G</kbd> / <kbd>Z X C V B</kbd> press the command buttons. <kbd>Ctrl</kbd>+<kbd>1-9</kbd> makes a control group, <kbd>1-9</kbd> selects it (twice to jump to it).</li>
+<li><kbd>Q W E R T Y U</kbd> / <kbd>A S D F G J K</kbd> / <kbd>Z X C V B N L</kbd> press the command buttons (each button shows its key). Buildings you cannot build yet are greyed out with the Saga that unlocks them (II, III, IV). <kbd>Ctrl</kbd>+<kbd>1-9</kbd> makes a control group, <kbd>1-9</kbd> selects it (twice to jump to it).</li>
 <li><kbd>.</kbd> idle villager, <kbd>M</kbd> army, <kbd>H</kbd> heroes, <kbd>Home</kbd> Town Center, <kbd>Space</kbd> center on selection, <kbd>Delete</kbd> delete, <kbd>P</kbd> pause, <kbd>Enter</kbd> cheat code.</li></ul>
 <h4>Touch</h4>
 <ul><li>Tap a unit to select it, then tap the ground, an enemy or a resource to order it. Drag to scroll, pinch to zoom, and turn on <b>Box select</b> to drag-select a group.</li></ul>

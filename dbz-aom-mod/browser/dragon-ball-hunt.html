@@ -134,9 +134,11 @@ kbd{background:var(--deck-2);border:1px solid var(--edge);border-bottom-width:2p
 .queue{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
 .queue .mini{width:34px;height:34px}
 .queue .mini span{position:absolute;left:0;bottom:0;height:3px;background:var(--ki)}
-#cmds{display:grid;grid-template-columns:repeat(5,52px);grid-auto-rows:52px;gap:5px;align-content:start;overflow:auto}
+#cmds{display:grid;grid-template-columns:repeat(7,52px);grid-auto-rows:52px;gap:5px;align-content:start;overflow:auto}
+@media (max-width:1180px) and (min-width:821px){#cmds{grid-template-columns:repeat(7,44px);grid-auto-rows:44px;gap:4px}}
 .cmd{position:relative;padding:0;border-radius:7px;border:1px solid var(--edge);background:#0b1124;cursor:pointer;overflow:hidden}
 .cmd canvas{width:100%;height:100%;display:block}
+.cmd .need{position:absolute;right:2px;bottom:2px;font-size:10px;font-weight:700;line-height:1;padding:2px 4px;border-radius:4px;background:rgba(10,14,30,.85);color:#ffd34d;border:1px solid rgba(255,211,77,.5);z-index:1}
 .cmd .k{position:absolute;right:3px;top:1px;font-size:10px;font-weight:700;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
 .cmd .q{position:absolute;left:3px;bottom:1px;font-size:10px;font-weight:700;color:var(--zeni);text-shadow:0 1px 2px #000}
 .cmd:hover{border-color:var(--bronze-hi)}
@@ -162,7 +164,7 @@ kbd{background:var(--deck-2);border:1px solid var(--edge);border-bottom-width:2p
   #selinfo{grid-area:sel;max-height:120px}
   #portrait{width:64px;height:64px}
   #selbody h3{font-size:18px}
-  #cmds{grid-area:cmd;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));grid-auto-rows:46px;max-height:100px}
+  #cmds{grid-area:cmd;grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-rows:44px;gap:4px;max-height:140px}
   #top{padding:4px 8px;gap:4px 10px}
   .res .val{font-size:13.5px}
   .res svg{width:15px;height:15px}
@@ -4898,7 +4900,7 @@ function placeNow(keep) {
 }
 
 // ---------- command card ----------
-const HOTKEYS = 'QWERTASDFGZXCVB';
+const HOTKEYS = 'QWERTYUASDFGJKZXCVBNL';
 let cmdSig = '', cmdList = [];
 function costLine(c) { return Object.keys(c || {}).filter(k => c[k] > 0).map(k => `<span class="c-${k}">${Math.ceil(c[k])} ${RES_NAME[k]}</span>`).join(''); }
 function getCommands() {
@@ -4923,15 +4925,16 @@ function getCommands() {
       if (def.cls === 'hero' && (why === 'Already on the field' || why === 'Already training')) continue;
       if (def.req && !P.techs.has(def.req)) continue;
       const qn = b.queue.filter(q => q.key === k).length;
-      out.push({ id: 'train-' + k, icon: unitIcon(k, def.forms ? (P.mods.forms[k] || def.forms.base) : null, P.color), hero: def.cls === 'hero', name: (def.cls === 'hero' ? '★ ' : '') + (def.forms ? FORMS[P.mods.forms[k] || def.forms.base].name : def.name), cost: unitCost(P, k), why: why === 'Queue full' ? null : why, q: qn, desc: unitDesc(P, k), run: () => { const w = queueUnit(P, b, k); if (w) { toast(w, 'warn'); SFX.play('error'); } else SFX.play('click'); } });
+      out.push({ id: 'train-' + k, icon: unitIcon(k, def.forms ? (P.mods.forms[k] || def.forms.base) : null, P.color), need: (def.age || 1) > P.age ? def.age : 0, hero: def.cls === 'hero', name: (def.cls === 'hero' ? '★ ' : '') + (def.forms ? FORMS[P.mods.forms[k] || def.forms.base].name : def.name), cost: unitCost(P, k), why: why === 'Queue full' ? null : why, q: qn, desc: unitDesc(P, k), run: () => { const w = queueUnit(P, b, k); if (w) { toast(w, 'warn'); SFX.play('error'); } else SFX.play('click'); } });
     }
     for (const k of d.techs) {
       const T = TECH[k];
       if (T.ageUp || P.techs.has(k) || !techAvailable(P, k)) continue;
       const why = techCheck(P, b, k);
       if (why === 'Researching') continue;
-      if (T.age > P.age + 1) continue;
-      out.push({ id: 'tech-' + k, icon: techIcon(k), name: T.name, cost: T.cost, why, desc: T.desc, run: () => { const w = startTech(P, b, k); if (w) { toast(w, 'warn'); SFX.play('error'); } else SFX.play('click'); } });
+      // each upgrade line shows its next level once the previous one is done or under way
+      if (T.req && !P.techs.has(T.req) && !G.blds.some(x => x.owner === G.me && x.research && x.research.key === T.req)) continue;
+      out.push({ id: 'tech-' + k, icon: techIcon(k), name: T.name, cost: T.cost, why, need: T.age > P.age ? T.age : 0, desc: T.desc, run: () => { const w = startTech(P, b, k); if (w) { toast(w, 'warn'); SFX.play('error'); } else SFX.play('click'); } });
     }
     if (b.key === 'market') for (const r of ['food', 'wood']) {
       out.push({ id: 'buy-' + r, icon: cmdIcon('market'), name: `Buy 100 ${RES_NAME[r]}`, cost: { gold: P.market[r] }, desc: 'Prices rise as you buy.', run: () => { const w = marketTrade(P, r, true); if (w) toast(w, 'warn'); else SFX.play('click'); } });
@@ -4946,17 +4949,12 @@ function getCommands() {
   const vills = units.filter(u => u.def.cls === 'villager');
   const heroes = units.filter(u => u.def.cls === 'hero');
   if (vills.length && vills.length === units.length) {
-    const page = G.cmdPage === 'mil' ? 'mil' : 'main';
-    const eco = BUILD_MENU[P.faction].filter(k => ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'reactor', 'dock', 'tower', 'wall', 'tc'].includes(k));
-    const mil = BUILD_MENU[P.faction].filter(k => !eco.includes(k));
-    for (const k of page === 'main' ? eco : mil) {
+    // every building on one panel, as in Age of Mythology; locked ones show the Saga that unlocks them
+    const order = ['house', 'granary', 'storehouse', 'farm', 'reactor', 'dock', 'tc', 'barracks', 'temple', 'tower', 'wall', 'gate', 'stable', 'armory', 'market', 'fortress', 'wonder'];
+    for (const k of order.filter(k => BUILD_MENU[P.faction].includes(k))) {
       const d = B[k], why = buildCheck(P, k), c = bcost(k, P.faction);
-      if (d.age > P.age + 1 && page === 'main') continue;
-      out.push({ id: 'build-' + k, icon: buildingIcon(k, P.faction, P.color), name: bname(k, P.faction), cost: c, why, on: G.placing === k, desc: d.desc + (k === 'wall' ? ' Click and drag to draw a wall.' : ''), run: () => { if (why) { toast(why, 'warn'); SFX.play('error'); return; } G.placing = k; G.wallStart = null; G.targeting = null; } });
+      out.push({ id: 'build-' + k, icon: buildingIcon(k, P.faction, P.color), name: bname(k, P.faction), cost: c, why, need: d.age > P.age ? d.age : 0, on: G.placing === k, desc: d.desc + (k === 'wall' ? ' Click and drag to draw a wall.' : ''), run: () => { if (why) { toast(why, 'warn'); SFX.play('error'); return; } G.placing = k; G.wallStart = null; G.targeting = null; } });
     }
-    out.push(page === 'main'
-      ? { id: 'page-mil', icon: cmdIcon('buildmil'), name: 'More buildings', desc: mil.map(k => bname(k, P.faction)).join(', ') + '.', run: () => { G.cmdPage = 'mil'; cmdSig = ''; } }
-      : { id: 'page-main', icon: cmdIcon('back'), name: 'Back to basic buildings', desc: eco.map(k => bname(k, P.faction)).join(', ') + '.', run: () => { G.cmdPage = 'main'; cmdSig = ''; } });
     if (P.faction === 'earth') { const t = nearestOwn(P, 'temple', vills[0]); if (t) out.push({ id: 'meditate', icon: cmdIcon('meditate'), name: "Meditate at Kami's Lookout", desc: 'Villagers meditating at a Temple make Ki (up to 10 per Temple).', run: () => { for (const v of vills) setOrder(v, { type: 'meditate', bid: t.id }); } }); }
   }
   for (const h of heroes.slice(0, 2)) {
@@ -4997,6 +4995,7 @@ function renderCommands() {
     btn.appendChild(cv);
     if (HOTKEYS[i]) { const k = document.createElement('span'); k.className = 'k'; k.textContent = HOTKEYS[i]; btn.appendChild(k); }
     if (c.q) { const q = document.createElement('span'); q.className = 'q'; q.textContent = c.q; btn.appendChild(q); }
+    if (c.need) { const n = document.createElement('span'); n.className = 'need'; n.textContent = ['', 'I', 'II', 'III', 'IV'][c.need]; n.title = AGES[c.need]; btn.appendChild(n); }
     btn.addEventListener('click', ev => { ev.stopPropagation(); const cur = cmdList[i]; if (cur) { SFX.unlock(); cur.run(); cmdSig = ''; renderCommands(); showTip(btn, cur); } });
     btn.addEventListener('pointerenter', () => showTip(btn, cmdList[i]));
     btn.addEventListener('pointerleave', hideTip);
@@ -5329,7 +5328,7 @@ $('how-body').innerHTML = `
 <ul><li>Left-click or drag a box to select. Double-click (or Ctrl-click) selects all units of that type on screen. Shift adds to the selection.</li>
 <li>Right-click to act: move, attack, gather, build or repair, carry a Dragon Ball, deposit it in your Temple. Shift + right-click queues orders.</li>
 <li>Arrow keys or screen edges scroll, mouse wheel zooms, middle or right drag pans, and the minimap jumps the camera.</li>
-<li><kbd>Q W E R T</kbd> / <kbd>A S D F G</kbd> / <kbd>Z X C V B</kbd> press the command buttons. <kbd>Ctrl</kbd>+<kbd>1-9</kbd> makes a control group, <kbd>1-9</kbd> selects it (twice to jump to it).</li>
+<li><kbd>Q W E R T Y U</kbd> / <kbd>A S D F G J K</kbd> / <kbd>Z X C V B N L</kbd> press the command buttons (each button shows its key). Buildings you cannot build yet are greyed out with the Saga that unlocks them (II, III, IV). <kbd>Ctrl</kbd>+<kbd>1-9</kbd> makes a control group, <kbd>1-9</kbd> selects it (twice to jump to it).</li>
 <li><kbd>.</kbd> idle villager, <kbd>M</kbd> army, <kbd>H</kbd> heroes, <kbd>Home</kbd> Town Center, <kbd>Space</kbd> center on selection, <kbd>Delete</kbd> delete, <kbd>P</kbd> pause, <kbd>Enter</kbd> cheat code.</li></ul>
 <h4>Touch</h4>
 <ul><li>Tap a unit to select it, then tap the ground, an enemy or a resource to order it. Drag to scroll, pinch to zoom, and turn on <b>Box select</b> to drag-select a group.</li></ul>

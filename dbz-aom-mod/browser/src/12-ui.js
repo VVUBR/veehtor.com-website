@@ -181,7 +181,7 @@ function placeNow(keep) {
 }
 
 // ---------- command card ----------
-const HOTKEYS = 'QWERTASDFGZXCVB';
+const HOTKEYS = 'QWERTYUASDFGJKZXCVBNL';
 let cmdSig = '', cmdList = [];
 function costLine(c) { return Object.keys(c || {}).filter(k => c[k] > 0).map(k => `<span class="c-${k}">${Math.ceil(c[k])} ${RES_NAME[k]}</span>`).join(''); }
 function getCommands() {
@@ -206,15 +206,16 @@ function getCommands() {
       if (def.cls === 'hero' && (why === 'Already on the field' || why === 'Already training')) continue;
       if (def.req && !P.techs.has(def.req)) continue;
       const qn = b.queue.filter(q => q.key === k).length;
-      out.push({ id: 'train-' + k, icon: unitIcon(k, def.forms ? (P.mods.forms[k] || def.forms.base) : null, P.color), hero: def.cls === 'hero', name: (def.cls === 'hero' ? '★ ' : '') + (def.forms ? FORMS[P.mods.forms[k] || def.forms.base].name : def.name), cost: unitCost(P, k), why: why === 'Queue full' ? null : why, q: qn, desc: unitDesc(P, k), run: () => { const w = queueUnit(P, b, k); if (w) { toast(w, 'warn'); SFX.play('error'); } else SFX.play('click'); } });
+      out.push({ id: 'train-' + k, icon: unitIcon(k, def.forms ? (P.mods.forms[k] || def.forms.base) : null, P.color), need: (def.age || 1) > P.age ? def.age : 0, hero: def.cls === 'hero', name: (def.cls === 'hero' ? '★ ' : '') + (def.forms ? FORMS[P.mods.forms[k] || def.forms.base].name : def.name), cost: unitCost(P, k), why: why === 'Queue full' ? null : why, q: qn, desc: unitDesc(P, k), run: () => { const w = queueUnit(P, b, k); if (w) { toast(w, 'warn'); SFX.play('error'); } else SFX.play('click'); } });
     }
     for (const k of d.techs) {
       const T = TECH[k];
       if (T.ageUp || P.techs.has(k) || !techAvailable(P, k)) continue;
       const why = techCheck(P, b, k);
       if (why === 'Researching') continue;
-      if (T.age > P.age + 1) continue;
-      out.push({ id: 'tech-' + k, icon: techIcon(k), name: T.name, cost: T.cost, why, desc: T.desc, run: () => { const w = startTech(P, b, k); if (w) { toast(w, 'warn'); SFX.play('error'); } else SFX.play('click'); } });
+      // each upgrade line shows its next level once the previous one is done or under way
+      if (T.req && !P.techs.has(T.req) && !G.blds.some(x => x.owner === G.me && x.research && x.research.key === T.req)) continue;
+      out.push({ id: 'tech-' + k, icon: techIcon(k), name: T.name, cost: T.cost, why, need: T.age > P.age ? T.age : 0, desc: T.desc, run: () => { const w = startTech(P, b, k); if (w) { toast(w, 'warn'); SFX.play('error'); } else SFX.play('click'); } });
     }
     if (b.key === 'market') for (const r of ['food', 'wood']) {
       out.push({ id: 'buy-' + r, icon: cmdIcon('market'), name: `Buy 100 ${RES_NAME[r]}`, cost: { gold: P.market[r] }, desc: 'Prices rise as you buy.', run: () => { const w = marketTrade(P, r, true); if (w) toast(w, 'warn'); else SFX.play('click'); } });
@@ -229,17 +230,12 @@ function getCommands() {
   const vills = units.filter(u => u.def.cls === 'villager');
   const heroes = units.filter(u => u.def.cls === 'hero');
   if (vills.length && vills.length === units.length) {
-    const page = G.cmdPage === 'mil' ? 'mil' : 'main';
-    const eco = BUILD_MENU[P.faction].filter(k => ['house', 'granary', 'storehouse', 'farm', 'barracks', 'temple', 'reactor', 'dock', 'tower', 'wall', 'tc'].includes(k));
-    const mil = BUILD_MENU[P.faction].filter(k => !eco.includes(k));
-    for (const k of page === 'main' ? eco : mil) {
+    // every building on one panel, as in Age of Mythology; locked ones show the Saga that unlocks them
+    const order = ['house', 'granary', 'storehouse', 'farm', 'reactor', 'dock', 'tc', 'barracks', 'temple', 'tower', 'wall', 'gate', 'stable', 'armory', 'market', 'fortress', 'wonder'];
+    for (const k of order.filter(k => BUILD_MENU[P.faction].includes(k))) {
       const d = B[k], why = buildCheck(P, k), c = bcost(k, P.faction);
-      if (d.age > P.age + 1 && page === 'main') continue;
-      out.push({ id: 'build-' + k, icon: buildingIcon(k, P.faction, P.color), name: bname(k, P.faction), cost: c, why, on: G.placing === k, desc: d.desc + (k === 'wall' ? ' Click and drag to draw a wall.' : ''), run: () => { if (why) { toast(why, 'warn'); SFX.play('error'); return; } G.placing = k; G.wallStart = null; G.targeting = null; } });
+      out.push({ id: 'build-' + k, icon: buildingIcon(k, P.faction, P.color), name: bname(k, P.faction), cost: c, why, need: d.age > P.age ? d.age : 0, on: G.placing === k, desc: d.desc + (k === 'wall' ? ' Click and drag to draw a wall.' : ''), run: () => { if (why) { toast(why, 'warn'); SFX.play('error'); return; } G.placing = k; G.wallStart = null; G.targeting = null; } });
     }
-    out.push(page === 'main'
-      ? { id: 'page-mil', icon: cmdIcon('buildmil'), name: 'More buildings', desc: mil.map(k => bname(k, P.faction)).join(', ') + '.', run: () => { G.cmdPage = 'mil'; cmdSig = ''; } }
-      : { id: 'page-main', icon: cmdIcon('back'), name: 'Back to basic buildings', desc: eco.map(k => bname(k, P.faction)).join(', ') + '.', run: () => { G.cmdPage = 'main'; cmdSig = ''; } });
     if (P.faction === 'earth') { const t = nearestOwn(P, 'temple', vills[0]); if (t) out.push({ id: 'meditate', icon: cmdIcon('meditate'), name: "Meditate at Kami's Lookout", desc: 'Villagers meditating at a Temple make Ki (up to 10 per Temple).', run: () => { for (const v of vills) setOrder(v, { type: 'meditate', bid: t.id }); } }); }
   }
   for (const h of heroes.slice(0, 2)) {
@@ -280,6 +276,7 @@ function renderCommands() {
     btn.appendChild(cv);
     if (HOTKEYS[i]) { const k = document.createElement('span'); k.className = 'k'; k.textContent = HOTKEYS[i]; btn.appendChild(k); }
     if (c.q) { const q = document.createElement('span'); q.className = 'q'; q.textContent = c.q; btn.appendChild(q); }
+    if (c.need) { const n = document.createElement('span'); n.className = 'need'; n.textContent = ['', 'I', 'II', 'III', 'IV'][c.need]; n.title = AGES[c.need]; btn.appendChild(n); }
     btn.addEventListener('click', ev => { ev.stopPropagation(); const cur = cmdList[i]; if (cur) { SFX.unlock(); cur.run(); cmdSig = ''; renderCommands(); showTip(btn, cur); } });
     btn.addEventListener('pointerenter', () => showTip(btn, cmdList[i]));
     btn.addEventListener('pointerleave', hideTip);
