@@ -89,3 +89,10 @@ ID = "STR_DBZ_TECH_SSJ3_NAME"   ;   Str = "Super Saiyan 3"
 ID = "STR_DBZ_TECH_SSJ3_LR"   ;   Str = "Goku ascends to Super Saiyan 3: enormous power, but a constant 1.5 Ki per second drain."
 ID = "STR_DBZ_TECH_CELL_INCUBATION_NAME"   ;   Str = "Cell Incubation Chamber"
 ID = "STR_DBZ_TECH_CELL_INCUBATION_LR"   ;   Str = "Dr. Gero's underground chamber hatches Imperfect Cell. Unlocks Cell at the Temple."
+
+// RANDOM MAPS
+ID = "STR_MAP_SET_DBZ_NAME"   ;   Str = "Dragon Ball Z"
+ID = "STR_MAP_SET_DBZ_DESC"   ;   Str = "Maps built for the Dragon Ball Z: Age of Mythology mod."
+ID = "STR_MAP_DBZ_DRAGON_BALL_HUNT_NAME"   ;   Str = "Dragon Ball Hunt"
+ID = "STR_MAP_DBZ_DRAGON_BALL_HUNT_DESC"   ;   Str = "Open fields with seven guarded Dragon Balls. Only heroes can carry them. Bring all seven to your Temples to summon Shenron."
+ID = "STR_MAP_DBZ_DRAGON_BALL_HUNT_DESC_LOAD"   ;   Str = "Seven Dragon Balls lie scattered across the land, guarded by wild beasts and old Red Ribbon machines. Gather them all and make your wish."

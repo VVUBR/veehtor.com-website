@@ -15,29 +15,31 @@ cultures as Dragon Ball Z factions. This slice contains:
 | Culture hooks, SSJ1/SSJ3 techs, Cell Incubation | `techtree_mods.xml` |
 | Names and tooltips | `game/data/strings/english/stringmods.txt` |
 | Ki upkeep, Cell evolution, Dragon Balls/Shenron, Saibaman, Kid Buu | `game/trigger/dbz/dbz_core.xs` |
+| "Dragon Ball Hunt" random map and the "Dragon Ball Z" map set | `game/random_maps/` |
 
 Everything is **additive** (`*_mods.xml` files with `mergeMode="add"`), so it does not
 overwrite vanilla files and can sit next to other mods.
 
-## Install and test
+## Install and play
 
-1. Copy this folder's `game` directory into
-   `%USERPROFILE%\Games\Age of Mythology Retold\<your id>\mods\local\DBZ_AoM\`
-   so you end up with `...\mods\local\DBZ_AoM\game\data\gameplay\proto_mods.xml` and so on.
-2. Make a test map that loads the trigger library:
-   1. Extract the vanilla `game\random_maps\mediterranean.xs` and `mediterranean.xml`
-      (Resource Manager or CryBarEditor, with "convert .xmb to .xml" on).
-   2. Save them as `...\DBZ_AoM\game\random_maps\dbz_test_mediterranean.xs` / `.xml`.
-   3. Inside `void generate()` of the `.xs`, add these two lines (anywhere before the end):
-      ```c
-      rmTriggerAddScriptInclude("dbz/dbz_core.xs");
-      rmTriggerAddScriptLine("rule _dbzMapConfig active highFrequency { gDBZMapLightingSet = \"rm_mediterranean01\"; xsDisableSelf(); }");
-      ```
-   4. If the map does not appear in the lobby list, add `<map>dbz_test_mediterranean</map>`
-      to a copy of the vanilla `randommaps.set` in the same folder.
-3. Turn on data validation and the debug output in `user.cfg` so load errors are reported.
-4. Enable the mod in the in-game Mods menu, start a skirmish on the test map, and run the
-   checklist at the bottom of this file.
+Nothing has to be extracted from the game. You need Age of Mythology: Retold on a PC.
+
+1. Unzip `DBZ_AoM.zip`. You get a folder called `DBZ_AoM`.
+2. Copy the whole `DBZ_AoM` folder into your Retold local mods folder:
+   `C:\Users\<YourName>\Games\Age of Mythology Retold\<YourSteamID>\mods\local\`
+   (create `local` if it does not exist). The result must look like
+   `...\mods\local\DBZ_AoM\game\data\gameplay\proto_mods.xml`.
+3. Start the game, open **Mods**, and make sure **DBZ_AoM** is enabled.
+4. Start a **Skirmish**. In the map list, choose the **Dragon Ball Z** map set, then the
+   **Dragon Ball Hunt** map.
+5. Pick Greek (Goku), Norse (Saibamen), Egyptian (Cell) or Atlantean (Kid Buu) and play.
+   Run the checklist at the bottom of this file to see what works.
+
+The **Dragon Ball Hunt** map (`game\random_maps\dbz_dragon_ball_hunt.xs`) is an original
+open-field map with a normal start for every culture and seven guarded Dragon Ball sites.
+Each site has broken columns, two crocodiles (the "dinosaurs") and an Automaton (a Red Ribbon
+mech stand-in), all owned by Mother Nature. The map loads the trigger script and passes it
+the site positions, so each Dragon Ball appears inside its guarded camp.
 
 Culture mapping used by the slice:
 
@@ -82,7 +84,7 @@ Change any of these in the tunables block at the top of `dbz_core.xs` or in the 
 - **After a wish**: the balls turn to stone and are gone for 180 seconds, then respawn scattered across the map.
 - **Unanswered Shenron**: a human who does not pick within 60 seconds gets Ultimate Wealth. AI players pick Immortality if they have fallen heroes, otherwise Wealth.
 - **Restored Youth**: refreshes every spent god power the player has held, Age I included (the brief says Ages I to IV). Shenron himself is excluded.
-- **Fallback Dragon Ball placement**: if the map script placed no balls, they appear on a ring at 32% of the map size around the centre. The random map module will place them properly, with guards.
+- **Dragon Ball placement**: on Dragon Ball Hunt each ball spawns in one of the seven guarded camps (after a wish they come back to the camps in a shuffled order). On any other map that loads the trigger script without sites, they appear on a ring at 32% of the map size around the centre.
 - **Stand-in visuals**: Goku uses Heracles, Cell uses Kemsyt, the Saibaman uses the Dryad, Kid Buu uses the Xing Tian Titan, and the Dragon Balls use the sky lantern. Swap `animfile`, `icon` and `soundsetfile` when DBZ art exists.
 
 ## Verification status
@@ -96,23 +98,28 @@ Checked in this repository, without the game:
 - Every cross-reference resolves: proto names, tactics files, tactic action names vs protoactions,
   transform pairs, ability-to-power bindings, tech names and string IDs.
 - File formats, tag names and folder layout follow a published, working Retold mod (MCMT by akinizer).
+- Every identifier in the map script is an engine function, an engine constant, or a library helper
+  that the published maps use, and every call has the same argument shape as in those maps.
 
 **Not checked: the mod has not been loaded in Age of Mythology: Retold yet.** Expect a short fix
 pass after the first launch. The parts most likely to need adjustment:
 
-1. Retold XS syntax for typed arrays (`string[]`, `float[]`, `new string(0, "")`). Only `int[]` is
+1. `rmTriggerAddScriptInclude("dbz/dbz_core.xs")` in the map. The function is in the official list,
+   but no published map I could check uses it. If the game starts but no Dragon Balls appear and
+   flying costs no Ki, the trigger script did not load, and this include path is the first suspect.
+2. Retold XS syntax for typed arrays (`string[]`, `float[]`, `new string(0, "")`). Only `int[]` is
    confirmed by a published example.
-2. Whether two differently named `DelayedTransform` actions on one unit (Goku Early's
+3. Whether two differently named `DelayedTransform` actions on one unit (Goku Early's
    `FlightTransform` and `KaiokenTransform`) both work. If not, move Kaio-ken to a
    `ChargedModify` protoaction.
-3. Whether the Dragon Balls can be picked up with only `LogicalTypePickable`. If heroes ignore them,
+4. Whether the Dragon Balls can be picked up with only `LogicalTypePickable`. If heroes ignore them,
    copy the unit types and flags from the vanilla `Relic` entry in the extracted `proto.xml`.
-4. `trShowChoiceDialogForPlayer` and its event handlers. Test in single player first; multiplayer
+5. `trShowChoiceDialogForPlayer` and its event handlers. Test in single player first; multiplayer
    sync of the player's choice is a separate, later test.
-5. `UnitTransformBuildLimit`: confirm you cannot train a second Goku while the first is flying or
+6. `UnitTransformBuildLimit`: confirm you cannot train a second Goku while the first is flying or
    in Kaio-ken. If you can, the fix is a small XS rule that hides the Town Center button while
    any Goku form is alive.
-6. Animation names (`Transform`, `JumpAttack`) on the stand-in models. A missing animation
+7. Animation names (`Transform`, `JumpAttack`) on the stand-in models. A missing animation
    should not break the action, but it will look wrong until DBZ models exist.
 
 ### First-launch checklist
@@ -126,7 +133,8 @@ pass after the first launch. The parts most likely to need adjustment:
 - [ ] Egyptian, Heroic Age: Cell Incubation, then Cell absorbs wounded enemies and evolves at 10 and 20.
 - [ ] Atlantean: the Titan from the Titan Gate becomes Kid Buu and cannot be killed without a Major
       Hero nearby.
-- [ ] 7 Dragon Balls appear. A hero carries one into a Temple, Favor and Gold trickle in. With all 7,
+- [ ] Dragon Ball Hunt appears under the Dragon Ball Z map set and generates without errors.
+- [ ] 7 Dragon Balls appear, one inside each guarded camp. A hero carries one into a Temple, Favor and Gold trickle in. With all 7,
       the sky darkens and Summon the Eternal Dragon appears; casting it opens the wish dialog;
       the balls scatter and return after 3 minutes.
 
@@ -145,7 +153,7 @@ rather than ripping models or audio out of Dragon Ball games, and don't sell the
 4. Faction 4: Babidi's Cabal and Makyo Demon Realm.
 5. `techtree_mods.xml`: ages, major deities and minor patrons, upgrades, saga transformations.
 6. `powers_mods.xml`: every Saga god power.
-7. Random map scripts: Dragon Ball maps with guarded relic placement.
+7. More random maps: Namek, the Other World, water and Cell Games arena layouts (Dragon Ball Hunt is done).
 8. Faction economy rules in XS: Ki from combat (Frieza), Bio-Reactors (Red Ribbon),
    teleporting resources (Majin), hero revival halos (Earth).
 9. AI script support for the new units and powers.

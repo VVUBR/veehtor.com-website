@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<randomMaps
+  displayNameID="STR_MAP_SET_DBZ_NAME"
+  imagepath="resources\maps\all_maps.png"
+  helpTextID="STR_MAP_SET_DBZ_DESC"
+  cannotReplace="">
+
+  <map>dbz_dragon_ball_hunt</map>
+</randomMaps>

@@ -11,12 +11,14 @@
 //   Slice support:      Saibaman self-destruct on landing, Kid Buu Titan Gate swap
 //                       and HP floor.
 //
-// Load it from a random map script (path is relative to game\trigger\):
+// The bundled map game\random_maps\dbz_dragon_ball_hunt.xs loads this file and
+// configures it. Any other random map can do the same (path is relative to
+// game\trigger\):
 //   rmTriggerAddScriptInclude("dbz/dbz_core.xs");
-//
-// The map script may also tell the library which lighting set to restore after
-// Shenron leaves (defaults to "default"):
-//   rmTriggerAddScriptLine("rule _dbzMapConfig active highFrequency { gDBZMapLightingSet = \"rm_mediterranean01\"; xsDisableSelf(); }");
+// and then, from a generated rule, optionally:
+//   gDBZMapLightingSet = "<the map's lighting set>";   (restored after Shenron)
+//   dbzSetBallSite(<0-6>, <x meters>, <z meters>);       (guarded ball sites)
+// Without sites, the balls appear on a ring around the map centre.
 //
 // API reference: AoM Retold XS function list (JeHathor/AoM-Retold, "reference"
 // branch) and MythTRConstants.txt. Unit types, unit stats, action types and
@@ -108,6 +110,7 @@ int gDBZNextBuuScanMs = 0;
 // Dragon Balls.
 string[] gDBZBallProtos = default;
 int[] gDBZBallIDs = default;
+bool gDBZBallsPlaced = false;
 int gDBZBallRespawnAtSec = -1;
 int gDBZShenronPowerID = -1;
 int gDBZShenronOwner = -1;
@@ -205,7 +208,7 @@ void dbzNotify(int playerID = -1, string message = "")
 
 void dbzNotifyAll(string message = "")
 {
-   for (int p = 1; p < cNumberPlayers; p++)
+   for (int p = 1; p <= cNumberPlayers; p++)
    {
       trChatSendToPlayer(0, p, message);
    }
@@ -271,7 +274,7 @@ void dbzRefreshHeroRegistry()
       gDBZHeroRegAlive[r] = 0;
    }
 
-   for (int p = 1; p < cNumberPlayers; p++)
+   for (int p = 1; p <= cNumberPlayers; p++)
    {
       xsSetContextPlayer(p);
       count = dbzRunQuery(gDBZQueryA, p, cUnitTypeHero);
@@ -329,7 +332,7 @@ void dbzRefreshPowerLedger()
 {
    int powerID = -1;
    string powerName = "";
-   for (int p = 1; p < cNumberPlayers; p++)
+   for (int p = 1; p <= cNumberPlayers; p++)
    {
       for (int s = 0; s < cDBZGodPowerSlotsScanned; s++)
       {
@@ -419,7 +422,7 @@ rule dbzKiUpkeep
    int due = 0;
    int available = 0;
 
-   for (int p = 1; p < cNumberPlayers; p++)
+   for (int p = 1; p <= cNumberPlayers; p++)
    {
       airborne = 0.0;
       for (int i = 0; i < gDBZAirProtoIDs.size(); i++)
@@ -469,7 +472,7 @@ rule dbzKaiokenStrain
    int unitID = -1;
    int previous = xsGetContextPlayer();
 
-   for (int p = 1; p < cNumberPlayers; p++)
+   for (int p = 1; p <= cNumberPlayers; p++)
    {
       xsSetContextPlayer(p);
       count = dbzRunQuery(gDBZQueryA, p, gDBZProtoGokuKaioken);
@@ -646,7 +649,7 @@ rule dbzCellBiomass
    vector cellPos = cInvalidVector;
    int previous = xsGetContextPlayer();
 
-   for (int p = 1; p < cNumberPlayers; p++)
+   for (int p = 1; p <= cNumberPlayers; p++)
    {
       if (xsGetTimeMS() >= gDBZCellNextAbsorbMs[p])
       {
@@ -754,7 +757,7 @@ rule dbzSaibamanDetonation
    }
 
    // Track Saibamen that have just started a leap.
-   for (int p = 1; p < cNumberPlayers; p++)
+   for (int p = 1; p <= cNumberPlayers; p++)
    {
       xsSetContextPlayer(p);
       count = dbzRunQuery(gDBZQueryA, p, gDBZProtoSaibaman);
@@ -794,7 +797,7 @@ rule dbzKidBuu
    gDBZNextBuuScanMs = xsGetTimeMS() + cDBZKidBuuScanMs;
    vulnerable = (trQuestVarGet("dbzTitanVulnerableUntilMs") > xsGetTimeMS());
 
-   for (int p = 1; p < cNumberPlayers; p++)
+   for (int p = 1; p <= cNumberPlayers; p++)
    {
       xsSetContextPlayer(p);
 
@@ -847,10 +850,27 @@ int dbzLocateDragonBall(int index = -1)
    return(found);
 }
 
-// Fallback placement on a ring around the map centre. A Dragon Ball random map
-// script places guarded balls itself; this only fills in any that are missing.
-int dbzSpawnDragonBall(int index = -1, float angle = 0.0)
+// A random map hands over its guarded Dragon Ball sites through a generated rule
+// that calls this (see game\random_maps\dbz_dragon_ball_hunt.xs). Quest vars are
+// used so the call works before dbzInit has allocated any arrays.
+void dbzSetBallSite(int site = -1, float x = 0.0, float z = 0.0)
 {
+   trQuestVarSet("dbzBallSiteSet" + site, 1.0);
+   trQuestVarSet("dbzBallSiteX" + site, x);
+   trQuestVarSet("dbzBallSiteZ" + site, z);
+}
+
+bool dbzHasBallSite(int site = -1)
+{
+   return(trQuestVarGet("dbzBallSiteSet" + site) == 1.0);
+}
+
+// Spawns ball `index` at map site `site` when the map provided one, otherwise on a
+// ring around the map centre at `angle`.
+int dbzSpawnDragonBall(int index = -1, int site = -1, float angle = 0.0)
+{
+   float x = 0.0;
+   float z = 0.0;
    float mapX = kbGetMapXSize();
    float mapZ = kbGetMapZSize();
    float radius = cDBZBallRingRatio * mapX;
@@ -858,24 +878,42 @@ int dbzSpawnDragonBall(int index = -1, float angle = 0.0)
    {
       radius = cDBZBallRingRatio * mapZ;
    }
-   float x = (mapX * 0.5) + (radius * cos(angle));
-   float z = (mapZ * 0.5) + (radius * sin(angle));
+   if (dbzHasBallSite(site) == true)
+   {
+      x = trQuestVarGet("dbzBallSiteX" + site);
+      z = trQuestVarGet("dbzBallSiteZ" + site);
+   }
+   else
+   {
+      x = (mapX * 0.5) + (radius * cos(angle));
+      z = (mapZ * 0.5) + (radius * sin(angle));
+   }
    int unitID = trUnitCreate(gDBZBallProtos[index], x, 0.0, z, 0, 0, true);
    gDBZBallIDs[index] = unitID;
    return(unitID);
 }
 
+// Respawn after the stone year: the balls are rotated across the sites so the
+// One-Star ball does not always come back to the same spot.
 void dbzSpawnDragonBalls()
 {
    float step = cTwoPi / cDBZBallCount;
    float angle = xsRandFloat(0.0, cTwoPi);
+   int offset = xsRandInt(0, cDBZBallCount - 1);
+   int site = 0;
    for (int i = 0; i < cDBZBallCount; i++)
    {
-      dbzSpawnDragonBall(i, angle);
+      site = i + offset;
+      if (site >= cDBZBallCount)
+      {
+         site = site - cDBZBallCount;
+      }
+      dbzSpawnDragonBall(i, site, angle);
       angle = angle + step;
    }
 }
 
+// First placement: keep any ball that already exists, place the rest.
 void dbzEnsureDragonBalls()
 {
    float step = cTwoPi / cDBZBallCount;
@@ -885,7 +923,7 @@ void dbzEnsureDragonBalls()
       gDBZBallIDs[i] = dbzLocateDragonBall(i);
       if (gDBZBallIDs[i] < 0)
       {
-         dbzSpawnDragonBall(i, angle);
+         dbzSpawnDragonBall(i, i, angle);
       }
       angle = angle + step;
    }
@@ -1098,6 +1136,17 @@ rule dbzDragonBalls
    int grant = 0;
    int previous = xsGetContextPlayer();
 
+   // First placement waits one second so the map's site rule has already run.
+   if (gDBZBallsPlaced == false)
+   {
+      if (xsGetTime() < 1)
+      {
+         return;
+      }
+      dbzEnsureDragonBalls();
+      gDBZBallsPlaced = true;
+   }
+
    // A human who never answers Shenron gets Ultimate Wealth.
    if (gDBZWishPending == true)
    {
@@ -1121,7 +1170,7 @@ rule dbzDragonBalls
    }
 
    // Count balls deposited in each player's Temples.
-   for (int p = 0; p < cNumberPlayers; p++)
+   for (int p = 0; p <= cNumberPlayers; p++)
    {
       gDBZBallsHeld[p] = 0;
    }
@@ -1134,7 +1183,7 @@ rule dbzDragonBalls
          unitID = dbzLocateDragonBall(i);
          if (unitID < 0)
          {
-            unitID = dbzSpawnDragonBall(i, xsRandFloat(0.0, cTwoPi));
+            unitID = dbzSpawnDragonBall(i, i, xsRandFloat(0.0, cTwoPi));
          }
          gDBZBallIDs[i] = unitID;
       }
@@ -1144,7 +1193,7 @@ rule dbzDragonBalls
          if (kbUnitIsType(containerID, cUnitTypeAbstractTemple) == true)
          {
             owner = kbUnitGetPlayerID(containerID);
-            if ((owner > 0) && (owner < cNumberPlayers))
+            if ((owner > 0) && (owner <= cNumberPlayers))
             {
                gDBZBallsHeld[owner] = gDBZBallsHeld[owner] + 1;
             }
@@ -1154,7 +1203,7 @@ rule dbzDragonBalls
    xsSetContextPlayer(previous);
 
    // Passive trickle per deposited ball.
-   for (int q = 1; q < cNumberPlayers; q++)
+   for (int q = 1; q <= cNumberPlayers; q++)
    {
       if (gDBZBallsHeld[q] > 0)
       {
@@ -1178,7 +1227,7 @@ rule dbzDragonBalls
    // Shenron state machine: Idle -> Ready (7 held) -> Wish (power cast) -> Scattered.
    if (gDBZShenronOwner < 0)
    {
-      for (int s = 1; s < cNumberPlayers; s++)
+      for (int s = 1; s <= cNumberPlayers; s++)
       {
          if ((gDBZShenronOwner < 0) && (gDBZBallsHeld[s] >= cDBZBallCount))
          {
@@ -1203,7 +1252,7 @@ rule dbzImmortalRegen
 {
    int count = 0;
    int previous = xsGetContextPlayer();
-   for (int p = 1; p < cNumberPlayers; p++)
+   for (int p = 1; p <= cNumberPlayers; p++)
    {
       if (gDBZImmortal[p] == 1)
       {
@@ -1270,13 +1319,13 @@ rule dbzInit
    gDBZProtoAndroid17 = kbProtoUnitGetID("DBZ_Android17");
    gDBZProtoAndroid18 = kbProtoUnitGetID("DBZ_Android18");
 
-   gDBZKiDebt = new float(cNumberPlayers, 0.0);
-   gDBZBallKiAcc = new float(cNumberPlayers, 0.0);
-   gDBZBallZeniAcc = new float(cNumberPlayers, 0.0);
-   gDBZBallsHeld = new int(cNumberPlayers, 0);
-   gDBZCellBiomass = new int(cNumberPlayers, 0);
-   gDBZCellNextAbsorbMs = new int(cNumberPlayers, 0);
-   gDBZImmortal = new int(cNumberPlayers, 0);
+   gDBZKiDebt = new float(cNumberPlayersPlusNature, 0.0);
+   gDBZBallKiAcc = new float(cNumberPlayersPlusNature, 0.0);
+   gDBZBallZeniAcc = new float(cNumberPlayersPlusNature, 0.0);
+   gDBZBallsHeld = new int(cNumberPlayersPlusNature, 0);
+   gDBZCellBiomass = new int(cNumberPlayersPlusNature, 0);
+   gDBZCellNextAbsorbMs = new int(cNumberPlayersPlusNature, 0);
+   gDBZImmortal = new int(cNumberPlayersPlusNature, 0);
    gDBZSaibaLeaping = new int(0, -1);
 
    gDBZHeroRegPlayer = new int(0, -1);
@@ -1296,7 +1345,6 @@ rule dbzInit
    gDBZBallProtos.add("DBZ_DragonBall7Star");
    gDBZBallIDs = new int(cDBZBallCount, -1);
    gDBZShenronPowerID = kbGodPowerGetID(cDBZShenronPower);
-   dbzEnsureDragonBalls();
 
    trEventSetHandler(cDBZEventWishImmortality, "dbzWishImmortality");
    trEventSetHandler(cDBZEventWishMore, "dbzWishMore");
