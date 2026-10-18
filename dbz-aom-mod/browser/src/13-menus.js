@@ -27,9 +27,12 @@ $('how-body').innerHTML = `
 <ul><li>Villagers gather <b>Rations</b> (hunting, Senzu bushes, farms), <b>Capsule Alloy</b> (trees) and <b>Zeni</b> (veins) and carry them to a Town Center, Granary (Rations) or Storehouse (Alloy, Zeni). Build drop sites close to what you gather.</li>
 <li>Houses give 10 population (up to 10 houses) and Town Centers 15, up to 300 in total. From the Namek Saga you can build more Town Centers, but only on <b>Settlements</b> (the white H circles).</li>
 <li><b>Docks</b> go on a shore next to deep water. Fishing boats catch giant fish (Rations) and bring them back to the Dock.</li>
-<li><b>Ki</b> is this game's Favor. Earth villagers meditate at Kami's Lookout, the Red Ribbon builds Bio-Reactors, and the Frieza Force earns it by fighting.</li></ul>
+<li><b>Ki</b> is this game's Favor. Earth villagers meditate at Kami's Lookout, the Red Ribbon builds Bio-Reactors, and the Frieza Force earns it by fighting.</li>
+<li>Like Age of Mythology's cultures, the factions gather differently: Frieza Force workers are 10% slower but <b>Supply Pods</b> carry the drop-off point to them, and Red Ribbon drones are 5% slower but <b>Officer Black</b> empowers a building (25% faster, and resources dropped off there count 20% more).</li>
+<li>In team games, the <b>Tribute</b> button (top bar) sends resources to an ally. The courier keeps 10%.</li></ul>
 <h4>Sagas and patrons</h4>
 <p>You pick a <b>major patron</b> at the start (like an Age of Mythology god). Each time you advance a Saga at the Town Center you choose one of two <b>minor patrons</b>. Each patron grants a one-time <b>god power</b> (left column), a myth unit at the Temple, and a special technology.</p>
+<p>As in Age of Mythology, every minor patron brings a gift of free myth units to your Temple and three upgrades you research there.</p>
 <p>Like Age of Mythology, each advance needs a building first: a <b>Temple</b> for the Namek Saga, an <b>Armory</b> for the Android Saga and a <b>Fortress</b> for the Buu Saga.</p>
 <h4>Units and counters</h4>
 <ul><li>Infantry beats cavalry, cavalry beats ranged units and siege, ranged units beat infantry, and siege wrecks buildings.</li>
@@ -39,6 +42,8 @@ $('how-body').innerHTML = `
 <li>Ships have their own triangle: <b>arrow ships</b> beat siege ships, <b>siege ships</b> beat hammer ships (and wreck coastal buildings), and <b>hammer ships</b> beat arrow ships. Melee soldiers cannot reach ships; ranged units, towers and flying heroes can.</li></ul>
 <h4>Dragon Balls</h4>
 <p>Seven balls lie at guarded camps. Bring them to your Temple (each one trickles Ki and Zeni). Hold all seven and the <b>Summon Shenron</b> power appears: wish for Immortality, Ultimate Wealth or Restored Youth. Then the balls turn to stone for 3 minutes and scatter again.</p>
+<h4>Campaign</h4>
+<p>Thirteen missions follow the saga from Raditz to Kid Buu, with story scenes before and after each one (click or press Space to continue, Esc to skip). As in Age of Mythology's campaign, your story heroes are never killed: a knocked-out hero gets back up when one of your units stands next to them and no enemy soldier is near.</p>
 <h4>Relics</h4>
 <p>Purple-glowing relics (the Power Pole, Z Sword, Dragon Radar, Senzu Seed Pouch and more) lie around the map. Right-click one with a hero, then right-click your Temple. Each relic kept there gives a permanent bonus. If the Temple falls, its relics spill out.</p>
 <h4>Game modes</h4>
@@ -81,7 +86,7 @@ function renderSlots() {
       `<select data-k="faction" aria-label="Faction"${closed ? ' disabled' : ''}>${Object.keys(FACTIONS).map(f => opt(f, FACTIONS[f].name, s.faction)).join('')}</select>` +
       `<select data-k="major" aria-label="Major patron"${closed ? ' disabled' : ''}>${FACTIONS[s.faction].majors.map(m => opt(m, PATRONS[m].name, s.major)).join('')}</select>` +
       `<select data-k="team" aria-label="Team"${closed ? ' disabled' : ''}>${[1, 2, 3, 4].map(t => opt(String(t), 'Team ' + t, String(s.team))).join('')}</select>` +
-      (i === 0 ? '<span></span>' : `<select data-k="diff" aria-label="Difficulty"${closed ? ' disabled' : ''}>${opt('easy', 'Easy', s.diff)}${opt('normal', 'Normal', s.diff)}${opt('hard', 'Hard', s.diff)}</select>`) +
+      (i === 0 ? '<span></span>' : `<select data-k="diff" aria-label="Difficulty"${closed ? ' disabled' : ''}>${opt('easy', 'Easy', s.diff)}${opt('normal', 'Normal', s.diff)}${opt('hard', 'Hard', s.diff)}${opt('titan', 'Titan', s.diff)}</select>`) +
       `<div class="patron-info">${closed ? '' : `<b style="color:var(--gi)">${esc(PATRONS[s.major].name)}</b>, ${esc(PATRONS[s.major].title)}. ${esc(PATRONS[s.major].desc)} Power: <b>${esc(POW[PATRONS[s.major].power].name)}</b>. <span style="opacity:.8">${esc(FACTIONS[s.faction].blurb)}</span>`}</div>`;
     for (const sel of row.querySelectorAll('select')) sel.addEventListener('change', () => {
       const k = sel.dataset.k; s[k] = k === 'team' ? +sel.value : sel.value;
@@ -111,11 +116,13 @@ function launch(spec) {
   if (spec.kind === 'skirmish') startSkirmish(spec.opts);
   else startMission(spec.mission, spec.diff);
   enterPlay();
+  if (spec.kind === 'mission' && CAMPAIGN[spec.mission].intro) playScene(CAMPAIGN[spec.mission].intro);
 }
 function enterPlay() {
   resize(); resetRenderCaches();
   $('hud').hidden = false; $('cheatbox').hidden = true; $('dialogue').hidden = true; $('toasts').innerHTML = ''; $('announce').classList.remove('on');
   $('btn-obj').hidden = !G.scn; $('objectives').hidden = !G.scn || vw < 820;
+  $('btn-trib').hidden = !myAllies().length; $('tribute').hidden = true;
   $('btn-speed').textContent = '1×';
   cmdSig = ''; powSig = ''; selSig = ''; lastPortrait = ''; G.cmdPage = 'main';
   parts.length = 0;
@@ -219,6 +226,7 @@ for (const b of document.querySelectorAll('.wish')) b.addEventListener('click', 
 // ---------- end screen ----------
 function showEnd(won, reason) {
   if (!G.started) return;
+  if (won && G.scn && G.scn.m.outro && !G.scn.outroDone) { G.scn.outroDone = true; playScene(G.scn.m.outro, () => showEnd(won, reason)); return; }
   const P = humanP();
   $('end-title').textContent = won ? 'Victory!' : 'Defeat';
   const sub = G.scn ? (won ? G.scn.m.win : (G.scn.loseReason || 'The mission has failed.'))
@@ -241,4 +249,25 @@ function showEnd(won, reason) {
   SFX.play(won ? 'win' : 'lose');
   $('hud').hidden = true;
   showScreen('scr-end');
+  recordHistory(); G.endGraph = 's'; drawEndGraph();
 }
+function drawEndGraph() {
+  const g = G.endGraph || 's';
+  for (const b of document.querySelectorAll('.etab')) b.classList.toggle('on', b.dataset.g === g);
+  const H = (G.history || []).map(h => ({ t: h.t, s: h[g] || [] })), cv = $('end-graph'), c = cv.getContext('2d'), W = cv.width, Hh = cv.height, pad = 50;
+  c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, W, Hh);
+  const players = G.players.filter(P => P.id);
+  const maxS = Math.max(10, ...H.map(h => Math.max(...h.s))), maxT = Math.max(60, H.length ? H[H.length - 1].t : 60);
+  c.strokeStyle = 'rgba(154,167,203,.25)'; c.lineWidth = 2; c.font = '22px Chakra Petch, sans-serif'; c.fillStyle = '#9aa7cb';
+  for (let i = 0; i <= 4; i++) { const y = Hh - pad - (Hh - pad * 1.6) * i / 4; c.beginPath(); c.moveTo(pad, y); c.lineTo(W - 10, y); c.stroke(); c.fillText(String(Math.round(maxS * i / 4)), 4, y + 8); }
+  for (let m = 0; m <= maxT / 60; m += Math.max(1, Math.ceil(maxT / 60 / 8))) { const x = pad + (W - pad - 10) * m * 60 / maxT; c.fillText(m + 'm', Math.min(x - 10, W - 44), Hh - 12); }
+  for (const P of players) {
+    c.strokeStyle = pcol(P.color); c.lineWidth = 5; c.beginPath();
+    H.forEach((h, i) => { const x = pad + (W - pad - 10) * h.t / maxT, y = Hh - pad - (Hh - pad * 1.6) * (h.s[P.id] || 0) / maxS; if (i) c.lineTo(x, y); else c.moveTo(x, y); });
+    c.stroke();
+  }
+  const last = (G.history || [])[(G.history || []).length - 1] || { s: [] };
+  $('end-table').innerHTML = `<table><tr><th>Player</th><th>Score</th><th>Economy</th><th>Military</th><th>Technology</th><th>Mythology</th><th>Saga</th><th>Kills</th><th>Lost</th><th>Buildings razed</th><th>Gathered</th><th>Techs</th><th>Relics</th><th>Trade</th></tr>${players.map(P => `<tr><td><span style="color:${pcol(P.color)}">■</span> ${esc(P.name)} <span style="color:var(--dim)">(${esc(FACTIONS[P.faction].name)})</span>${P.defeated ? ' <span style="color:var(--danger)">✗</span>' : ''}</td><td><b>${last.s[P.id] || 0}</b></td>${(sp => `<td>${sp.economy}</td><td>${sp.military}</td><td>${sp.technology}</td><td>${sp.mythology}</td>`)(scoreParts(P))}<td>${['', 'I', 'II', 'III', 'IV'][P.age]}</td><td>${P.stats.kills}</td><td>${P.stats.lost}</td><td>${P.stats.killedB}</td><td>${Math.round(P.stats.gathered)}</td><td>${P.techs.size}</td><td>${relicsOf(P.id).length}</td><td>${Math.round(P.stats.trade || 0)}</td></tr>`).join('')}</table>`;
+}
+
+for (const b of document.querySelectorAll('.etab')) b.addEventListener('click', () => { G.endGraph = b.dataset.g; drawEndGraph(); });

@@ -75,6 +75,10 @@ function applyHit(att, t, d, o) {
     if (att.def.abilities && att.def.abilities.includes('grab') && t.flying && !t.def.alwaysFly) { land(t, true); t.stun = Math.max(t.stun, 1); floatText(t.x, t.y, 30, 'Grabbed!', '#a6ff8f'); }
     if (t.def.fights && t.order.type === 'idle' || (t.def.cls === 'huntable' && t.def.fights && t.order.type !== 'attack')) setOrder(t, { type: 'attack', tid: att.id });
   }
+  if (t.kind === 'unit' && t.def.hurtForm && !t.hurtFormed && t.hp > 0 && t.hp < maxHp(t) * t.def.hurtForm.at) {
+    t.hurtFormed = true; setForm(t, t.def.hurtForm.form, false); t.hp = Math.min(maxHp(t), t.hp + maxHp(t) * (t.def.hurtForm.heal || 0));
+    floatText(t.x, t.y, 44, t.def.hurtForm.shout || 'Transform!', '#ffe066');
+  }
   if (t.hp <= 0) kill(t, att, o);
   return amt;
 }
@@ -89,7 +93,8 @@ function aoeHit(att, owner, x, y, radius, d, o) {
   o = o || {};
   let n = 0;
   forUnitsNear(x, y, radius, u => {
-    const enemy = isEnemy(owner, u.owner) || (u.owner === 0 && u.def.cls !== 'huntable' && o.gaia !== false) || (o.all && u.owner !== owner);
+    // area attacks also hit wild creatures (camp guards), but never the townsfolk you are protecting
+    const enemy = isEnemy(owner, u.owner) || (u.owner === 0 && u.def.cls !== 'huntable' && u.def.cls !== 'villager' && o.gaia !== false) || (o.all && u.owner !== owner);
     if (enemy) { applyHit(att, u, d, o); n++; }
   });
   for (const b of G.blds) if (!b.dead && isEnemy(owner, b.owner) && !o.noBuildings) {
@@ -101,7 +106,7 @@ function aoeHit(att, owner, x, y, radius, d, o) {
 function lineHit(att, owner, ax, ay, bx, by, width, d, o) {
   const len = Math.hypot(bx - ax, by - ay) || 1;
   forUnitsNear((ax + bx) / 2, (ay + by) / 2, len / 2 + width, u => {
-    if (!isEnemy(owner, u.owner) && !(u.owner === 0 && u.def.cls !== 'huntable')) return;
+    if (!isEnemy(owner, u.owner) && !(u.owner === 0 && u.def.cls !== 'huntable' && u.def.cls !== 'villager')) return;
     const t = clamp(((u.x - ax) * (bx - ax) + (u.y - ay) * (by - ay)) / (len * len), 0, 1);
     if (Math.hypot(ax + (bx - ax) * t - u.x, ay + (by - ay) * t - u.y) <= width + u.r) applyHit(att, u, d, o);
   });
@@ -110,9 +115,49 @@ function lineHit(att, owner, ax, ay, bx, by, width, d, o) {
     if (Math.hypot(ax + (bx - ax) * t - b.x, ay + (by - ay) * t - b.y) <= width + b.r) applyHit(att, b, d, o);
   }
 }
+// Campaign heroes are never killed, as in Age of Mythology's campaign: they are knocked out, and get back up
+// when one of their own units stands next to them while no enemy soldier is close.
+function knockOut(e, killer) {
+  e.dead = true; e.ko = true; e.koT = 0; e.hp = 0;
+  if (e.carryBall) dropBall(e);
+  if (e.carryRelic) dropRelic(e);
+  const KP = killer && killer.owner > 0 ? G.players[killer.owner] : null;
+  if (KP && e.owner !== killer.owner) KP.stats.kills++;
+  if (G.scn && G.scn.onKill) G.scn.onKill(e, killer);
+  G.kos.push(e);
+  fxPush({ type: 'puff', x: e.x, y: e.y, z: 0, t: 0, dur: .6, color: '#ffffff', r: e.r * 3 });
+  SFX.play('death', e.x, e.y);
+  G.sel = G.sel.filter(s => s !== e);
+  if (!G.headless) barkDeath(e);
+  const P = G.players[e.owner];
+  if (P && P.human && !G.headless) toast(`${stats(e).name} is knocked out! Move one of your units next to them to revive them.`, 'warn');
+}
+function updateKOs(dt) {
+  for (let i = G.kos.length - 1; i >= 0; i--) {
+    const e = G.kos[i];
+    if (!e.ko) { G.kos.splice(i, 1); continue; }
+    e.koT += dt;
+    if (e.koT < 4) continue;
+    let friend = false, foe = false;
+    forUnitsNear(e.x, e.y, 6, u => {
+      if (u.dead || u.garrison) return;
+      if (u.owner === e.owner && Math.hypot(u.x - e.x, u.y - e.y) < 2.2) friend = true;
+      else if (isEnemy(u.owner, e.owner) && isCombat(u)) foe = true;
+    });
+    if (!friend || foe) continue;
+    G.kos.splice(i, 1);
+    Object.assign(e, { dead: false, ko: false, hp: maxHp(e) * .35, order: { type: 'idle' }, queue: [], path: null, wantPath: false, stun: 0, meditating: false, flying: !!e.def.alwaysFly, lift: e.def.alwaysFly ? 1 : 0 });
+    if (!G.byId.has(e.id)) G.byId.set(e.id, e);
+    if (!G.ents.includes(e)) G.ents.push(e);
+    fxPush({ type: 'aura', uid: e.id, x: e.x, y: e.y, z: 0, t: 0, dur: 1, color: '#ffe066' });
+    if (!G.headless) { floatText(e.x, e.y, 30, 'Back on their feet!', '#ffe066'); if (G.players[e.owner] && G.players[e.owner].human) toast(`${stats(e).name} is back in the fight!`, 'good'); }
+  }
+}
 function kill(e, killer, o) {
   if (e.dead) return;
   o = o || {};
+  if (e.unkillable && !o.force) { e.hp = Math.max(1, e.hp); return; }   // scripted bosses leave the story on their own terms
+  if (e.koable && e.kind === 'unit' && !o.force) { knockOut(e, killer); return; }
   e.dead = true;
   const P = G.players[e.owner];
   const KP = killer && killer.owner > 0 ? G.players[killer.owner] : null;
@@ -123,6 +168,7 @@ function kill(e, killer, o) {
     if (e.carryRelic) dropRelic(e);
     if (P && e.owner > 0) P.stats.lost++;
     if (e.def.cls === 'hero' && P) {
+      if (!G.headless) barkDeath(e);
       P.heroDead[e.key] = e.form || true;
       if (P.human) toast(`${stats(e).name} has fallen. You can train ${e.def.name} again.`, 'warn');
       else if (G.me && isEnemy(G.me, e.owner)) toast(`Enemy hero ${stats(e).name} has fallen!`, 'good');
@@ -227,7 +273,15 @@ function doSpecial(u, t, sp) {
     if (sp.dash) { const fx = u.x + Math.cos(a) * L * .9, fy = u.y + Math.sin(a) * L * .9; if (u.flying || walkableAt(fx, fy, teamOf(u.owner))) { u.x = fx; u.y = fy; } }
   } else if (sp.type === 'bolt') {
     fxPush({ type: 'beam', x1: u.x, y1: u.y, z1: u.flying ? 46 : 24, x2: t.x, y2: t.y, z2: 16, t: 0, dur: .5, color: col, w: 6, spiral: sp.key === 'sbc' });
+    if (sp.lifesteal) o.lifesteal = sp.lifesteal;
     applyHit(u, t, d, o);
+  } else if (sp.type === 'convert') {
+    // Body Change: take over an ordinary enemy unit
+    if (t.def.cls === 'hero' || t.def.cls === 'titan' || t.def.naval) { u.spCd = 3; return; }
+    fxPush({ type: 'beam', x1: u.x, y1: u.y, z1: 30, x2: t.x, y2: t.y, z2: 20, t: 0, dur: .5, color: col, w: 8 });
+    fxPush({ type: 'aura', uid: t.id, x: t.x, y: t.y, z: 0, t: 0, dur: 1.4, color: col });
+    if (t.carryBall) dropBall(t); if (t.carryRelic) dropRelic(t);
+    t.owner = u.owner; idleOrder(t); t.queue = []; G.sel = G.sel.filter(s => s !== t);
   } else if (sp.type === 'stun') {
     fxPush({ type: 'flash', x: t.x, y: t.y, z: 10, t: 0, dur: .6, color: col, r: sp.radius * MT * 2 });
     forUnitsNear(t.x, t.y, sp.radius * MT * 2, e => { if (isEnemy(u.owner, e.owner) && e.def.cls !== 'titan') e.stun = Math.max(e.stun, sp.dur); });
@@ -298,6 +352,7 @@ function cellAbsorb(u, dt) {
   u.hp = Math.min(maxHp(u), u.hp + heal);
   u.biomass++; u.absCd = 4;
   floatText(u.x, u.y, 40, '+1 Biomass', '#b8ff6b');
+  if (u.noEvolve) return;
   const stage = CELL_FORMS.indexOf(u.form);
   if (stage === 0 && u.biomass >= 8) evolveCell(u, 1);
   else if (stage === 1 && u.biomass >= 16) evolveCell(u, 2);

@@ -83,6 +83,8 @@ function selectEntities(list, add) {
   G.sel = G.sel.filter(e => !e.dead);
   cmdSig = ''; G.cmdPage = 'main'; G.placing = null; G.targeting = null;
   if (list.length) SFX.play('select');
+  const talker = list.find(e => e && e.kind === 'unit' && e.owner === G.me && BARKS[e.key]);
+  if (talker) bark(talker, 'sel');
 }
 function boxSelect(a, b, add) {
   const x0 = Math.min(a.sx, b.sx), x1 = Math.max(a.sx, b.sx), y0 = Math.min(a.sy, b.sy), y1 = Math.max(a.sy, b.sy);
@@ -129,7 +131,9 @@ function command(wx, wy, target, queued) {
       else o = { type: 'move', x: wx + ox, y: wy + oy, amove: isCombat(u) };
     } else if (target && target.kind === 'building' && isAlly(target.owner, G.me)) {
       const d = B[target.key];
-      if (target.owner === G.me && vill && (!target.built || target.hp < maxHp(target))) o = { type: 'build', bid: target.id };
+      if (u.def.empower && target.owner === G.me && target.built) o = { type: 'empower', bid: target.id };
+      else if (u.def.trader && target.key === 'tc' && target.built) { const m = nearestOfKind(G.me, 'market', u); if (m) o = { type: 'trade', home: m.id, dest: target.id }; else { toast('Caravans need a Market to trade from.', 'warn'); o = { type: 'move', x: wx + ox, y: wy + oy }; } }
+      else if (target.owner === G.me && (vill || u.def.canBuild) && (!target.built || target.hp < maxHp(target))) o = { type: 'build', bid: target.id };
       else if (target.owner === G.me && target.built && d.farm && vill) o = { type: 'gather', rid: target.id, rtype: 'food' };
       else if (target.built && d.vault && (u.carryBall || (u.carryRelic && target.owner === G.me))) o = { type: 'deposit', bid: target.id };
       else if (target.owner === G.me && target.built && target.key === 'temple' && vill && P.faction === 'earth') o = { type: 'meditate', bid: target.id };
@@ -144,6 +148,8 @@ function command(wx, wy, target, queued) {
     } else o = { type: 'move', x: wx + ox, y: wy + oy, amove: amove && isCombat(u) };
     setOrder(u, o, queued);
   }
+  const talker = units.find(u => BARKS[u.key]);
+  if (talker) bark(talker, enemyT ? 'atk' : 'go');
 }
 // Placement (with drag-to-build walls).
 function placementCells() {
@@ -197,7 +203,7 @@ function getCommands() {
       if (ak && techAvailable(P, ak) && !b.research && !G.blds.some(x => x.owner === G.me && x.research && TECH[x.research.key].ageUp)) {
         for (const pk of FACTIONS[P.faction].minors[P.age + 1]) {
           const why = techCheck(P, b, ak);
-          out.push({ id: 'age-' + pk, icon: patronPortrait(pk, 52), age: true, name: `${TECH[ak].name}: ${PATRONS[pk].name}`, cost: TECH[ak].cost, why, desc: `<i>${PATRONS[pk].title}.</i> ${PATRONS[pk].desc}<br>Power: <b>${POW[PATRONS[pk].power].name}</b>: ${POW[PATRONS[pk].power].desc}`, run: () => { const w = startTech(P, b, ak, pk); if (w) { toast(w, 'warn'); SFX.play('error'); } else SFX.play('click'); } });
+          out.push({ id: 'age-' + pk, icon: patronPortrait(pk, 52), age: true, name: `${TECH[ak].name}: ${PATRONS[pk].name}`, cost: TECH[ak].cost, why, desc: `<i>${PATRONS[pk].title}.</i> ${PATRONS[pk].desc}<br>Power: <b>${POW[PATRONS[pk].power].name}</b>: ${POW[PATRONS[pk].power].desc}<br>Gift: <b>${patronGift(pk)} × ${U[PATRONS[pk].myth].name}</b> at your Temple.<br>Upgrades: ${Object.keys(TECH).filter(k => TECH[k].patron === pk).map(k => TECH[k].name).join(', ')}.`, run: () => { const w = startTech(P, b, ak, pk); if (w) { toast(w, 'warn'); SFX.play('error'); } else SFX.play('click'); } });
         }
       }
     }
@@ -244,6 +250,12 @@ function getCommands() {
     if (h.carryRelic) out.push({ id: 'dropr-' + h.id, icon: relicIcon((G.relics.find(r => r.id === h.carryRelic) || { key: 'powerpole' }).key, 52), hero: true, name: 'Drop relic', desc: 'Put the relic down here. Bring it to your Temple instead to get its bonus.', run: () => dropRelic(h) });
     if (h.carryBall) out.push({ id: 'drop-' + h.id, icon: cmdIcon('dropball'), hero: true, name: 'Drop Dragon Ball', desc: 'Put the Dragon Ball down here.', run: () => dropBall(h) });
   }
+  const emp = units.filter(u => u.def.empower);
+  if (emp.length) out.push({ id: 'empower', icon: cmdIcon('empower'), on: G.targeting && G.targeting.type === 'empower', name: 'Empower a building', desc: 'Click one of your buildings: it trains, researches, builds and shoots 25% faster while he stands by it, and resources dropped off there count 20% more.', run: () => { G.targeting = { type: 'empower' }; G.placing = null; } });
+  const trd = units.filter(u => u.def.trader);
+  if (trd.length) out.push({ id: 'trade', icon: cmdIcon('trade'), on: G.targeting && G.targeting.type === 'trade', name: 'Trade route', desc: 'Click a Town Center (yours or an ally’s). The caravan shuttles between it and your Market; the longer the route, the more Zeni.', run: () => { G.targeting = { type: 'trade' }; G.placing = null; } });
+  const fighters = units.filter(isCombat);
+  if (fighters.length) { const cur = fighters[0].stance || 'aggressive', nxt = STANCES[(STANCES.indexOf(cur) + 1) % STANCES.length]; out.push({ id: 'stance-' + cur, icon: cmdIcon('stance_' + cur), name: `Stance: ${STANCE_NAME[cur]}`, desc: 'Click to switch. <b>Aggressive</b>: chase enemies. <b>Defensive</b>: fight nearby, then return. <b>Stand Ground</b>: never move, hit what is in range. <b>No Attack</b>: never fight back. Next: ' + STANCE_NAME[nxt] + '.', run: () => { for (const u of fighters) u.stance = nxt; } }); }
   if (units.some(isCombat)) out.push({ id: 'amove', icon: cmdIcon('amove'), on: G.targeting && G.targeting.type === 'amove', name: 'Attack-move', desc: 'Move and fight anything on the way. Key: A', run: () => { G.targeting = { type: 'amove' }; G.placing = null; } });
   const gar = nearestGarrison(P, units[0]);
   if (gar) out.push({ id: 'garrison', icon: cmdIcon('garrison'), name: `Garrison in ${gar.name}`, desc: 'Units inside are safe, heal slowly, and add shots to Town Centers, towers and fortresses.', run: () => { for (const u of units) setOrder(u, { type: 'garrison', bid: gar.id }); } });
@@ -288,7 +300,7 @@ const tipEl = $('tooltip');
 function showTip(anchor, c) {
   if (!c || matchMedia('(hover: none)').matches) return;
   const i = cmdList.indexOf(c);
-  tipEl.innerHTML = `<b>${esc(c.name)}</b>${c.cost ? `<div class="cost">${costLine(c.cost)}</div>` : ''}<div>${c.desc || ''}</div>${c.why ? `<div class="why">${esc(c.why)}</div>` : ''}${i >= 0 && HOTKEYS[i] ? `<div class="hk">Hotkey: ${HOTKEYS[i]}</div>` : ''}`;
+  tipEl.innerHTML = `<b>${esc(c.name)}</b>${c.cost ? `<div class="cost">${costLine(c.cost)}</div>` : ''}<div class="d">${c.desc || ''}</div>${c.why ? `<div class="why">${esc(c.why)}</div>` : ''}${i >= 0 && HOTKEYS[i] ? `<div class="hk">Hotkey: ${HOTKEYS[i]}</div>` : ''}`;
   tipEl.hidden = false;
   const r = anchor.getBoundingClientRect(), tw = tipEl.offsetWidth, th = tipEl.offsetHeight;
   tipEl.style.left = clamp(r.left + r.width / 2 - tw / 2, 8, vw - tw - 8) + 'px';
@@ -373,7 +385,7 @@ function singleInfo(e) {
     if (e.carryBall) { const b = G.balls.find(q => q.id === e.carryBall); extra += `<div class="stat" style="color:var(--zeni)">Carrying the ${b ? b.star : ''}-Star Dragon Ball</div>`; }
     if (e.carryRelic) { const r = G.relics.find(q => q.id === e.carryRelic); if (r) extra += `<div class="stat" style="color:#d7b8ff">Carrying the ${esc(RELICS[r.key].name)}: ${esc(RELICS[r.key].desc)}</div>`; }
     if (e.carryAmt > .5) extra += `<div class="stat">Carrying <b>${Math.floor(e.carryAmt)}</b> ${RES_NAME[e.carry]}</div>`;
-    const cls = { ship: e.def.fisher ? 'Fishing ship' : { arrow: 'Arrow ship', hammer: 'Hammer ship', siege: 'Siege ship' }[e.def.ship] || 'Ship', villager: 'Villager', infantry: 'Infantry', ranged: 'Ranged', cavalry: 'Cavalry', siege: 'Siege', myth: 'Myth unit', hero: 'Hero', titan: 'Titan', guard: 'Guardian', huntable: 'Animal' }[e.def.cls] || '';
+    const cls = { cart: e.def.trader ? 'Caravan' : 'Supply cart', ship: e.def.fisher ? 'Fishing ship' : { arrow: 'Arrow ship', hammer: 'Hammer ship', siege: 'Siege ship' }[e.def.ship] || 'Ship', villager: 'Villager', infantry: 'Infantry', ranged: 'Ranged', cavalry: 'Cavalry', siege: 'Siege', myth: 'Myth unit', hero: 'Hero', titan: 'Titan', guard: 'Guardian', huntable: 'Animal' }[e.def.cls] || '';
     return `<div class="sub">${esc(owner)} · ${cls}</div><h3>${esc(e.nick || (e.ape ? 'Great Ape' : st.name))}</h3><div class="hpbar"><i style="width:${clamp(e.hp / mh, 0, 1) * 100}%"></i></div><div class="stats"><span class="stat"><b>${Math.ceil(e.hp)}</b>/${Math.round(mh)} HP</span><span class="stat">Armor H ${Math.round(A[0] * 100)}% P ${Math.round(A[1] * 100)}% C ${Math.round(A[2] * 100)}%</span></div>${atk.length ? `<div class="stat">${atk.join(' · ')}</div>` : ''}${extra}`;
   }
   const b = e, d = B[b.key], P = G.players[b.owner];
@@ -505,6 +517,7 @@ function clickAt(px, py, ev) {
   const w = screenToWorld(px, py);
   if (G.targeting) {
     if (G.targeting.type === 'power') { if (castPower(humanP(), G.targeting.key, w.x, w.y)) G.targeting = null; powSig = ''; return; }
+    if (G.targeting.type === 'empower' || G.targeting.type === 'trade') { const hit = pickAt(px, py); if (hit && hit.kind === 'building') command(w.x, w.y, hit, ev && ev.shiftKey); else toast(G.targeting.type === 'empower' ? 'Click one of your buildings.' : 'Click a Town Center.', 'warn'); G.targeting = null; cmdSig = ''; return; }
     if (G.targeting.type === 'amove') { command(w.x, w.y, pickAt(px, py), ev && ev.shiftKey); G.targeting = null; cmdSig = ''; return; }
   }
   const hit = pickAt(px, py, true);
@@ -587,3 +600,13 @@ for (const el of document.querySelectorAll('.res')) tipFor(el, () => {
   const d = { food: ['Rations', 'Hunt dinosaurs, pick Senzu bushes, or farm. Drop off at a Granary or Town Center.'], wood: ['Capsule Alloy', 'Cut from forests. Drop off at a Storehouse or Town Center.'], gold: ['Zeni', 'Mined from Zeni veins. Drop off at a Storehouse or Town Center.'], ki: ['Ki', { earth: "Villagers meditate at Kami's Lookout.", rr: 'Bio-Reactors generate it.', ff: 'Earned by fighting.' }[P.faction] + ' Spent on myth units, heroes and flight.'], pop: ['Population', 'Houses +10 (up to 10), Town Centers +15. Maximum 200.'] }[k];
   return { name: d[0], desc: d[1] };
 });
+
+// ---------- tribute (team games): send resources to an ally, minus the 10% courier fee ----------
+const myAllies = () => G.players.filter(P => P.id && P.id !== G.me && G.me && isAlly(P.id, G.me) && !P.defeated);
+function renderTribute() {
+  const el = $('tribute'), me = humanP(); if (!me) return;
+  el.innerHTML = `<h4>Tribute</h4><p class="note">Send 100 to an ally. The courier keeps ${Math.round(TRIBUTE_FEE * 100)}%.</p>` + myAllies().map(P => `<div class="trow"><span class="who"><span style="color:${pcol(P.color)}">■</span> ${esc(P.name)}</span>${['food', 'wood', 'gold'].map(r => `<button class="tbtn" data-to="${P.id}" data-r="${r}">+100 ${esc(RES_NAME[r])}</button>`).join('')}</div>`).join('') + '<button class="ghost tclose">Close</button>';
+  for (const b of el.querySelectorAll('button[data-to]')) b.addEventListener('click', () => { const w = tribute(me, G.players[+b.dataset.to], b.dataset.r, 100); if (w) { toast(w, 'warn'); SFX.play('error'); } else { toast(`Sent 100 ${RES_NAME[b.dataset.r]} to ${G.players[+b.dataset.to].name}.`, 'good'); SFX.play('click'); } });
+  el.querySelector('.tclose').addEventListener('click', () => { el.hidden = true; });
+}
+$('btn-trib').addEventListener('click', () => { const el = $('tribute'); el.hidden = !el.hidden; if (!el.hidden) renderTribute(); });

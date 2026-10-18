@@ -26,10 +26,16 @@ overwrite vanilla files and can sit next to other mods.
 design. It plays like Age of Mythology and runs in any modern browser, on desktop or
 phone. Open the file and pick **Campaign** or **Skirmish**.
 
-- **Campaign**: nine story missions across all four Sagas, from Raditz's landing to Kid
-  Buu. They have briefings, objectives, character dialogue and scripted boss events: Great
-  Ape Vegeta, Frieza's final form, Super Perfect Cell, Majin Vegeta, and the Universal
-  Spirit Bomb. Each win unlocks the next mission. Easy, Normal and Hard difficulty.
+- **Campaign**: thirteen story missions across all four Sagas, from a Bardock prologue
+  and Raditz's landing to Kid Buu. They include the Ginyu Force, Future Trunks against
+  Mecha Frieza and King Cold, Imperfect Cell in Gingertown, and the Gotenks fusion. Every
+  mission opens and closes with a story scene: painted backdrops, character portraits and
+  conversations, which you can skip with Esc. In-mission dialogue and scripted boss
+  events include Great Ape Vegeta, Captain Ginyu's Body Change, Frieza's final form, Super
+  Perfect Cell, Majin Vegeta and the Universal Spirit Bomb. As in Age of Mythology's
+  campaign, story heroes are never killed: a knocked-out hero gets back up when one of
+  your units stands next to them and no enemy is near. Each win unlocks the next mission.
+  Easy, Normal and Hard difficulty.
 - **Skirmish**: 2 to 4 players with teams, against computer opponents, on five maps:
   Earth, Planet Namek, Wasteland, Highlands, and the Kame Sea (a naval map).
 - **Game modes** (the Age of Mythology set):
@@ -47,17 +53,32 @@ phone. Open the file and pick **Campaign** or **Skirmish**.
   - **Frieza Force**: Ki from fighting.
 
   Each has its own villager, buildings, army, ships, heroes with transformations, and
-  myth units.
+  myth units. Like Age of Mythology's cultures, they also play differently: Frieza Force
+  workers gather 10% slower, but Supply Pods are drop-off points you can move to where
+  they work, and Saiyan soldiers can build. Red Ribbon drones gather 5% slower, but
+  Officer Black empowers a building, as a Pharaoh does: it works 25% faster, and
+  resources dropped off there count 20% more.
+- **More than 60 Dragon Ball characters**. 28 are trainable heroes, from Yamcha, Master
+  Roshi, Tien, Future Trunks and Gotenks to Tao, Androids 16 and 19, Zarbon, Dodoria,
+  Captain Ginyu, Recoome, Cooler, Bardock and Broly. The rest appear in the story.
+  Heroes speak in short speech bubbles when you select or order them, and idle heroes
+  standing together chat with each other.
 - **Age of Mythology rules**:
   - Four resources plus Ki.
   - Four Ages (Sagas). You pick a major patron at the start and a minor patron at each
-    age-up; each patron unlocks myth units, technologies and a one-use god power.
+    age-up. Each minor patron sends a gift of free myth units to your Temple, and
+    unlocks its myth unit, three upgrades and a one-use god power.
   - Each age-up needs a building first: a Temple, then an Armory, then a Fortress.
   - Up to 300 population. Town Centers only on Settlements; houses; walls and gates;
     garrisoning; market trading; armory upgrades.
   - Counter triangle: infantry beats cavalry, cavalry beats ranged, ranged beats
     infantry. Heroes beat myth units.
-  - Control groups, shift-queued orders and attack-move.
+  - Unit stances (aggressive, defensive, stand ground, no attack), control groups,
+    shift-queued orders and attack-move.
+  - Trade caravans between your Market and any allied Town Center, paying more the
+    longer the route. Tribute to allies, minus a 10% fee.
+  - Titan AI difficulty, and an end screen with the four-part score (economy, military,
+    technology, mythology) and graphs of score, population and villagers over time.
 - **Ships**: Docks, fishing boats that catch giant fish, and three warship types with
   their own counter triangle. Arrow ships beat siege ships, siege ships beat hammer ships
   and hammer ships beat arrow ships.
@@ -83,8 +104,9 @@ Ball artwork.
 The source code is in `browser/src/`. Running `python3 browser/tools/build.py` rebuilds
 the HTML file. `browser/tools/` also has automated tests: `ai-test.cjs` plays
 computer-vs-computer games in Node (pass `"$(cat modes.json)"` or `navy.json` to try every
-game mode or the naval maps). `ui-test.cjs`, `features-test.cjs` and `campaign-test.cjs`
-click through the game in Playwright.
+game mode or the naval maps). `ui-test.cjs`, `features-test.cjs`, `aom-test.cjs` and
+`campaign-test.cjs` click through the game in Playwright. `campaign-balance.cjs` plays the
+newer missions with a simple scripted player, to check they can be won.
 
 ## Install and play
 

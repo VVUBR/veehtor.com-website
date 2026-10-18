@@ -32,6 +32,7 @@ function frame(now) {
     miniT -= real; if (miniT <= 0) { miniT = .2; renderMinimap(); }
     hudT -= real; if (hudT <= 0) { hudT = .15; updateHUD(); }
     if (G.scn) tickDialogue(real);
+    tickBanter();
   } catch (err) {
     console.error(err);
     if (!G.errShown) { G.errShown = true; toast('Something went wrong: ' + err.message, 'warn'); }
@@ -49,5 +50,5 @@ window.__DBH = {
   borrowAI: (secs, diff) => { const P = G.players[G.me]; initAI(P, diff || 'normal'); for (let t = 0; t < secs && !G.over; t += STEP) tick(STEP); P.ai = null; },
   launch: spec => launch(spec),
   toScreen: (x, y) => ({ x: sx(x, y), y: sy(x, y) }),
-  dev: () => ({ placeBuilding, spawnUnit, spawnNear, centerOn, castPower, applyTech, startTech, queueUnit, runCheat, refreshLists, CAMPAIGN, kill, setForm, maxHp, ballsHeld, setOrder, DLG, depositBall, quitToMenu, canPlace }),
+  dev: () => ({ placeBuilding, spawnUnit, spawnNear, centerOn, castPower, applyTech, startTech, queueUnit, runCheat, refreshLists, CAMPAIGN, kill, setForm, maxHp, ballsHeld, setOrder, DLG, depositBall, quitToMenu, canPlace, drawFigure, FORMS, playScene, SPEAKERS }),
 };

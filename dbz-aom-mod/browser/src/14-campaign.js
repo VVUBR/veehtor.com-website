@@ -7,15 +7,28 @@ const SPEAKERS = {
   vegeta: ['Vegeta', () => FORMS.vegeta_base.look], frieza: ['Frieza', () => FORMS.frieza_base.look], friezaf: ['Frieza', () => FORMS.frieza_final.look], kami: ['Kami', () => PATRON_LOOKS.kami],
   bulma: ['Bulma', () => PATRON_LOOKS.bulma], kingkai: ['King Kai', () => PATRON_LOOKS.kingkai], guru: ['Grand Elder Guru', () => ({ r: 'human', skin: '#6fbf4a', hair: 'none', antenna: true, top: '#f4f4f4', pants: '#f4f4f4', belt: '#ffcc33', build: 'bulky', keepColors: true })],
   dende: ['Dende', () => PATRON_LOOKS.dende], gero: ['Dr. Gero', () => PATRON_LOOKS.gero], a17: ['Android 17', () => U.a17.look], a18: ['Android 18', () => U.a18.look],
-  vegetassj: ['Vegeta', () => FORMS.vegeta_ssj.look], gokussj3: ['Goku', () => FORMS.goku_ssj3.look], supremekai: ['Supreme Kai', () => PATRON_LOOKS.supremekai],
+  vegetassj: ['Vegeta', () => FORMS.vegeta_ssj.look],
+  yamcha: ['Yamcha', () => U.yamcha.look], roshi: ['Master Roshi', () => U.roshi.look], tien: ['Tien', () => U.tien.look], chiaotzu: ['Chiaotzu', () => U.chiaotzu.look],
+  trunks: ['Trunks', () => U.trunks.look], goten: ['Goten', () => U.goten.look], kidtrunks: ['Trunks', () => U.kidtrunks.look], gotenks: ['Gotenks', () => U.gotenks.look],
+  videl: ['Videl', () => U.videl.look], satan: ['Mr. Satan', () => U.satan.look], yajirobe: ['Yajirobe', () => U.yajirobe.look], nail: ['Nail', () => U.nail.look],
+  chichi: ['Chi-Chi', () => ({ r: 'human', skin: '#f6d2b0', hair: 'bob', hairC: '#151515', top: '#8a3ab0', pants: '#8a3ab0', belt: '#ffcc33', boots: '#3a2a1a', keepColors: true })],
+  popo: ['Mr. Popo', () => ({ r: 'human', skin: '#1b1b2b', hair: 'turban', hairC: '#f4f4f4', top: '#8a2a3a', pants: '#f4f4f4', belt: '#ffcc33', boots: '#7a4a22', fatBelly: true, build: 'bulky', keepColors: true })],
+  black: ['Officer Black', () => U.black.look], tao: ['Mercenary Tao', () => U.tao.look], a16: ['Android 16', () => U.a16.look], a19: ['Android 19', () => U.a19.look], gero20: ['Dr. Gero', () => PATRON_LOOKS.gero],
+  zarbonm: ['Zarbon', () => FORMS.zarbon_monster.look], zarbonh: ['Zarbon', () => FORMS.zarbon_base.look], ginyucap: ['Captain Ginyu', () => U.ginyucap.look], recoome: ['Recoome', () => U.recoome.look],
+  burter: ['Burter', () => U.burter.look], jeice: ['Jeice', () => U.jeice.look], guldo: ['Guldo', () => U.guldo.look], cooler: ['Cooler', () => U.coolerh.look],
+  kingcold: ['King Cold', () => U.kingcoldh.look], mecha: ['Mecha Frieza', () => U.mecha.look], dabura2: ['Dabura', () => U.dabura.look], fatbuu: ['Majin Buu', () => U.fatbuu.look], superbuu: ['Super Buu', () => U.superbuu.look],
+  bardock: ['Bardock', () => U.bardock.look], broly: ['Broly', () => U.broly.look], puipui: ['Pui Pui', () => U.puipui.look], yakon: ['Yakon', () => U.yakon.look],
+  kibito: ['Kibito', () => ({ r: 'human', skin: '#e88aa0', hair: 'long', hairC: '#f4f4f4', top: '#d33a3a', pants: '#2a2a6a', belt: '#e8832a', boots: '#ffcc33', build: 'tall', keepColors: true })],
+  shenron: ['Shenron', () => ({ r: 'human', skin: '#3f9a3a', hair: 'none', horns: true, top: '#3f9a3a', pants: '#3f9a3a', boots: '#3f9a3a', eyes: '#d33a3a', build: 'tall', keepColors: true })], gokussj3: ['Goku', () => FORMS.goku_ssj3.look], supremekai: ['Supreme Kai', () => PATRON_LOOKS.supremekai],
   babidi: ['Babidi', () => ({ r: 'human', skin: '#f0e2b8', hair: 'none', top: '#3a2a6a', pants: '#3a2a6a', belt: '#ffcc33', boots: '#5a3a1e', cape: '#5a2a8a', build: 'slim', keepColors: true })],
-  dabura: ['Dabura', () => U.ginyu.look], buu: ['Kid Buu', () => U.kidbuu.look],
+  dabura: ['Dabura', () => U.dabura.look], buu: ['Kid Buu', () => U.kidbuu.look],
   cell: ['Cell', () => FORMS.cell_perfect.look], dodoria: ['Dodoria', () => ({ r: 'brute' })], zarbon: ['Zarbon', () => PATRON_LOOKS.zarbon], blue: ['General Blue', () => U.blue.look],
 };
 // ---------- dialogue ----------
 const DLG = { queue: [], cur: null, t: 0 };
 function say(spk, text, o) { if (G.headless) return; DLG.queue.push({ spk, text, dur: (o && o.dur) || clamp(2.6 + text.length / 26, 3.5, 10), pause: o && o.pause }); }
 function tickDialogue(real) {
+  if (STORY.active) return;
   if (!DLG.cur && DLG.queue.length && !G.over) showLine(DLG.queue.shift());
   if (DLG.cur) { DLG.t += real; if (DLG.t >= DLG.cur.dur) nextLine(); }
 }
@@ -83,7 +96,7 @@ function makeScenario(m, diffKey) {
     bld(key, pid, tx, ty, built) { return placeBuilding(key, pid, tx, ty, built !== false); },
     bldNear(key, pid, near, rmin, rmax) { const sp = findSpot(G.players[pid], key, near, rmin || 4, rmax || 12); return sp ? placeBuilding(key, pid, sp.tx, sp.ty, true) : null; },
     units(key, pid, x, y, n, form) { const out = []; for (let k = 0; k < (n || 1); k++) { const a = k * 2.4, r = k ? .7 + k * .12 : 0; let ux = x + Math.cos(a) * r, uy = y + Math.sin(a) * r; if (!walkableAt(ux, uy, teamOf(pid))) { const f = freeTileNear(clamp(Math.floor(ux), 0, MW - 1), clamp(Math.floor(uy), 0, MH - 1), 6); if (f) { ux = f.x + .5; uy = f.y + .5; } } out.push(spawnUnit(key, pid, ux, uy, form)); } return out; },
-    hero(key, pid, x, y, form, nick) { const u = S.units(key, pid, x, y, 1, form)[0]; if (nick) u.nick = nick; return u; },
+    hero(key, pid, x, y, form, nick) { const u = S.units(key, pid, x, y, 1, form)[0]; if (nick) u.nick = nick; if (pid === 1 && u.def.cls === 'hero') u.koable = true; return u; },
     attack(list, x, y) { for (const u of list) if (u && !u.dead) setOrder(u, { type: 'move', x: x + (rnd() - .5) * 2, y: y + (rnd() - .5) * 2, amove: true }); },
     wave(pid, comp, x, y, tx, ty) { const out = []; for (const [k, n] of comp) out.push(...S.units(k, pid, x, y, Math.max(1, Math.round(n)))); S.attack(out, tx, ty); return out; },
     ai(pid, diffKey, flags) { initAI(G.players[pid], diffKey, flags); },
@@ -153,7 +166,12 @@ function startMission(idx, diffKey) {
 }
 
 // ---------- campaign menu and briefing ----------
-function progress() { return store.get('campaign', { unlocked: 1, won: {} }); }
+function progress() {
+  const pr = store.get('campaign', { unlocked: 1, won: {} });
+  let u = 1; CAMPAIGN.forEach((m, i) => { if (pr.won[m.id]) u = Math.max(u, i + 2); });
+  pr.unlocked = Math.min(CAMPAIGN.length, u);
+  return pr;
+}
 let selMission = 0, campDiff = store.get('campDiff', 'normal');
 function openCampaignMenu() {
   const pr = progress(), el = $('mission-list'); el.innerHTML = '';
@@ -424,7 +442,7 @@ const CAMPAIGN = [
       S.when(() => S.alive(S.vars.frieza) && S.vars.frieza.hp < maxHp(S.vars.frieza) * .5, () => { S.say('friezaf', 'You should feel honored. You are about to see my final form!'); setForm(S.vars.frieza, 'frieza_final', true); });
       S.when(() => !S.alive(S.vars.krillin), () => {
         if (!S.alive(S.vars.goku) || S.vars.goku.form !== 'goku_base') return;
-        S.say('goku', 'KRILLIN!!! … I am the hope of the universe. I am the answer to all living things that cry out for peace. I am… a Super Saiyan!', { pause: true });
+        S.say('goku', 'KRILLIN!!! … Frieza… every life you crushed, every planet you burned… you will answer for all of it!', { pause: true });
         G.players[1].techs.add('ssj1'); recomputeMods(G.players[1]); setForm(S.vars.goku, 'goku_ssj1', true); announce('Super Saiyan!');
       });
       S.when(() => S.vars.frieza.dead, () => { S.setObj('frieza', 'done'); S.say('friezaf', 'Impossible… beaten by a monkey…'); });
@@ -453,7 +471,7 @@ const CAMPAIGN = [
       S.vars.tc2 = S.tc(2, 48, 24); S.units('drone', 2, 46, 28, 12); S.resAround(48, 24, { hunt: 'boar' });
       for (const k of ['house', 'house', 'house', 'house', 'barracks', 'barracks', 'temple', 'reactor', 'reactor', 'reactor', 'granary', 'storehouse', 'tower', 'tower', 'tower', 'stable']) S.bldNear(k, 2, S.vars.tc2, 4, 13);
       S.hero('blue', 2, 50, 30); S.units('rifleman', 2, 46, 32, 5); S.units('shocktrooper', 2, 50, 32, 5); S.units('jacket', 2, 48, 34, 2);
-      S.vars.a19 = S.hero('eighter', 2, 48, 12, null, 'Android 19');
+      S.vars.a19 = S.hero('a19', 2, 48, 12); S.vars.a19.hpMul = 1.3; S.vars.a19.hp = maxHp(S.vars.a19);
       P2.age = 2; P2.minors = ['silver']; recomputeMods(P2); P2.res = { food: 700, wood: 700, gold: 600, ki: 40 };
       S.ai(2, S.diffKey, { maxAge: 3, noExpand: true, firstWave: { easy: 720, normal: 500, hard: 360 }[S.diffKey] });
       S.maxAge = 3; S.lock('wonder');
@@ -551,7 +569,7 @@ const CAMPAIGN = [
       S.vars.tc2 = S.tc(2, 48, 26); S.units('worker', 2, 46, 30, 12); S.resAround(48, 26, { hunt: 'boar' });
       for (const k of ['house', 'house', 'house', 'house', 'barracks', 'barracks', 'granary', 'storehouse', 'tower', 'tower', 'temple', 'stable', 'armory']) S.bldNear(k, 2, S.vars.tc2, 4, 14);
       P2.age = 3; P2.minors = ['dodoria', 'ginyu']; recomputeMods(P2); P2.res = { food: 800, wood: 800, gold: 800, ki: 60 };
-      S.vars.dabura = S.hero('ginyu', 2, 46, 14, null, 'Dabura'); S.vars.dabura.buffs.push({ until: 1e9, atk: 1.4 });
+      S.vars.dabura = S.hero('dabura', 2, 46, 14);
       S.units('saiyan', 2, 44, 34, 6); S.units('soldier', 2, 50, 34, 6); S.units('brute', 2, 47, 36, 2);
       S.ai(2, S.diffKey, { maxAge: 3, noExpand: true, noHunt: true, firstWave: { easy: 600, normal: 420, hard: 300 }[S.diffKey] });
       S.maxAge = 4; S.lock('wonder');

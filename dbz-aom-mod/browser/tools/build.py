@@ -15,7 +15,7 @@ open(os.path.join(root, 'dragon-ball-hunt.html'), 'w').write(page)
 sim = [f for f in js_files if os.path.basename(f)[:2] in ('01','02','03','04','05','06','07','08')]
 stubs = """
 function fxPush(f){ if (G.fx.length < 400) G.fx.push(f); }
-function floatText(){} function toast(){} function announce(){} function alertAttack(){} function openWish(){} function showEnd(){}
+function floatText(){} function toast(){} function announce(){} function alertAttack(){} function openWish(){} function showEnd(){} function barkDeath(){}
 """
 node = "'use strict';\n" + '\n'.join(open(f).read() for f in sim) + stubs + "\nmodule.exports = { G, startSkirmish, tick, STEP, U, B, TECH, POW, PATRONS, FACTIONS, ballsHeld, maxHp, stats, castPower, MAPS };\n"
 open(os.path.join(root, 'dist', 'sim.cjs'), 'w').write(node)

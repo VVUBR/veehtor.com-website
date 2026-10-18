@@ -166,6 +166,7 @@ function render(alpha, realDt) {
   for (const r of G.ruins) if (exploredAt(r.x, r.y)) { const sp = rubbleSprite(r.w, r.h); ctx.globalAlpha = clamp(1 - (r.t - 45) / 15, 0, 1); drawSpr(sp, isoX(r.tx, r.ty), isoY(r.tx, r.ty)); ctx.globalAlpha = 1; }
   for (const b of G.blds) if (B[b.key].walk && seenBld(b)) drawBuilding(b);
   for (const c of G.corpses) if (visibleAt(c.x, c.y)) drawCorpse(c);
+  for (const e of G.kos) if (visibleAt(e.x, e.y) || isAlly(e.owner, G.me)) drawKO(e);
   const lerpX = u => u.px + (u.x - u.px) * alpha, lerpY = u => u.py + (u.y - u.py) * alpha;
   const draws = [];
   for (const u of G.units) {
@@ -200,6 +201,7 @@ function render(alpha, realDt) {
   drawOverlays(lerpX, lerpY);
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   drawScreenFx();
+  drawBubbles();
   if (G.boxStart && G.boxEnd) { const bx = Math.min(G.boxStart.sx, G.boxEnd.sx), by = Math.min(G.boxStart.sy, G.boxEnd.sy), bw = Math.abs(G.boxEnd.sx - G.boxStart.sx), bh = Math.abs(G.boxEnd.sy - G.boxStart.sy); ctx.fillStyle = 'rgba(127,224,255,.12)'; ctx.fillRect(bx, by, bw, bh); ctx.strokeStyle = '#7fe0ff'; ctx.lineWidth = 1.5; ctx.strokeRect(bx, by, bw, bh); }
 }
 function seenBld(b) { return G.revealAll || isAlly(b.owner, G.me) || exploredAt(b.x, b.y) || exploredAt(b.tx, b.ty); }
@@ -265,6 +267,13 @@ function drawUnit(u, x, y) {
   if (u.carryBall) { const b = G.balls.find(q => q.id === u.carryBall); drawBall(ix, iy - 52 * (L.scale || 1), b ? b.star : 1, .8); }
   if (u.carryRelic) { const r = G.relics.find(q => q.id === u.carryRelic); if (r) drawRelic(r, ix, iy - 40 * (L.scale || 1), .7, true); }
 }
+// A knocked-out campaign hero: lying down, with a pulsing ring that says "come and help me up".
+function drawKO(e) {
+  drawCorpse({ x: e.x, y: e.y, key: e.key, form: e.form, owner: e.owner, dir: e.dir, t: 0, ape: e.ape });
+  const x = isoX(e.x, e.y), y = isoY(e.x, e.y), p = .5 + .5 * Math.sin(performance.now() / 280);
+  ctx.strokeStyle = `rgba(255,214,77,${.35 + p * .45})`; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.ellipse(x, y, 20 + p * 5, 10 + p * 2.5, 0, 0, Math.PI * 2); ctx.stroke();
+}
 function drawCorpse(c) {
   const L = c.ape ? APE_LOOK : (c.form ? FORMS[c.form].look : U[c.key].look) || {};
   const s = figureSprite(c.ape ? 'ape' : c.key + (c.form ? ':' + c.form : ''), L, 'dead', 0, c.owner > 0 ? G.players[c.owner].color : null);
@@ -284,6 +293,7 @@ function drawBuilding(b) {
     if (k > .02) { ctx.save(); const cut = sp.h * (1 - k * .9); ctx.beginPath(); ctx.rect(ix - sp.ax - 2, iy - sp.ay + cut, sp.w + 4, sp.h); ctx.clip(); ctx.globalAlpha = .55 + .45 * k; drawSpr(sp, ix, iy); ctx.restore(); }
     return;
   }
+  if (b.empowered && b.empowered.until > G.time) { const k = .5 + .5 * Math.sin(G.time * 5); ctx.strokeStyle = `rgba(255,211,77,${.5 + k * .4})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(isoX(b.tx, b.ty), isoY(b.tx, b.ty)); ctx.lineTo(isoX(b.tx + b.w, b.ty), isoY(b.tx + b.w, b.ty)); ctx.lineTo(isoX(b.tx + b.w, b.ty + b.h), isoY(b.tx + b.w, b.ty + b.h)); ctx.lineTo(isoX(b.tx, b.ty + b.h), isoY(b.tx, b.ty + b.h)); ctx.closePath(); ctx.stroke(); if (frnd() < .3) partBurst(b.tx + frnd() * b.w, b.ty + frnd() * b.h, 10, 1, '#ffd34d', .2, .8, false, 2); }
   drawSpr(sp, ix, iy);
   if (b.hitFlash > 0) { ctx.globalAlpha = Math.min(.5, b.hitFlash * 4); ctx.globalCompositeOperation = 'lighter'; drawSpr(sp, ix, iy); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; }
   const hpk = b.hp / maxHp(b);

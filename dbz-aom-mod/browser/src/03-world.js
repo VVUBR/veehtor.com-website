@@ -93,16 +93,17 @@ function unitStats(owner, def, form) {
     name: base.name, hp, armor: [Math.min(.9, arm[0] + armorAdd), Math.min(.9, arm[1] + armorAdd), arm[2]],
     melee: scaleAtk(base.melee, atk, 0), ranged: scaleAtk(base.ranged, atk, rangeAdd), speed: (base.speed || 0) * speed * MT, los: ((base.los || 10) + los) * MT,
     regen, special: base.special || null, look: base.look || {}, kiDrain: base.kiDrain || 0, absorb: !!base.absorb, kaioken: !!base.kaioken,
-    costMul: cost, trainMul: train, heal: base.heal ? { rate: base.heal.rate * heal, radius: base.heal.radius } : null, leap: base.leap || null,
+    aura: base.aura || null, costMul: cost, trainMul: train, heal: base.heal ? { rate: base.heal.rate * heal, radius: base.heal.radius } : null, leap: base.leap || null,
   };
   if (P) P.statCache[key] = s;
   return s;
 }
 const stats = u => unitStats(u.owner, u.def, u.form);
 function maxHp(e) {
-  if (e.kind === 'building') return bmod(G.players[e.owner], e.key, 'hp', B[e.key].hp);
+  if (e.kind === 'building') return bmod(G.players[e.owner], e.key, 'hp', B[e.key].hp) * (e.hpMul || 1);
   let hp = stats(e).hp;
   if (e.ape) hp *= 2;
+  if (e.hpMul) hp *= e.hpMul;
   return hp;
 }
 function unitCost(P, key) {

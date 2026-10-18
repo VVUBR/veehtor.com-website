@@ -8,8 +8,8 @@ function gaiaPlayer() {
 function resetState(opts) {
   Object.assign(G, {
     started: true, gameN: (G.gameN || 0) + 1, opts, time: 0, tickN: 0, ents: [], byId: new Map(), nextId: 1, projs: [], fx: [], texts: [], delayed: [], sel: [], balls: [], camps: [], settlements: [], bases: [],
-    pings: [], corpses: [], ruins: [], treeFall: [], reveals: [], over: false, winner: 0, winTeam: 0, speed: 1, paused: false, pathBudget: 999, stoneUntil: 0, shenronOwner: 0, wishPending: 0,
-    relics: [], objMarks: [], placing: null, targeting: null, fogT: 0, korin: 0, koth: null, settleHold: null, speedMul: 1, units: [], blds: [], ress: [], groups: {}, headless: !!opts.headless, revealAll: !!opts.revealAll, scn: null, me: 1, chunkDirtyAll: true,
+    pings: [], corpses: [], kos: [], ruins: [], treeFall: [], reveals: [], over: false, winner: 0, winTeam: 0, speed: 1, paused: false, pathBudget: 999, stoneUntil: 0, shenronOwner: 0, wishPending: 0,
+    relics: [], objMarks: [], bubbles: [], nextBanter: 40, history: [], histT: 0, placing: null, targeting: null, fogT: 0, korin: 0, koth: null, settleHold: null, speedMul: 1, units: [], blds: [], ress: [], groups: {}, headless: !!opts.headless, revealAll: !!opts.revealAll, scn: null, me: 1, chunkDirtyAll: true,
   });
 }
 const START_RES = { standard: { food: 300, wood: 300, gold: 150, ki: 0 }, high: { food: 1000, wood: 1000, gold: 1000, ki: 40 }, deathmatch: { food: 5000, wood: 5000, gold: 5000, ki: 100 }, nomad: { food: 300, wood: 450, gold: 400, ki: 0 } };
@@ -40,6 +40,7 @@ function startSkirmish(opts) {
     } else {
       const tc = placeBuilding('tc', i, s.tx, s.ty, true);
       for (let k = 0; k < 5; k++) spawnNear(tc, FACTIONS[P.faction].villager, i);
+      if (P.faction === 'rr') spawnNear(tc, 'black', i);
     }
     if (opts.players[i - 1].ai) initAI(P, opts.players[i - 1].ai);
   }

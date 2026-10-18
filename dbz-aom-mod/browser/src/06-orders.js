@@ -12,7 +12,10 @@ function idleOrder(u) {
   u.order = { type: 'idle' }; u.path = null; u.wantPath = false; u.meditating = false;
 }
 function nextOrder(u) { const o = u.order; if (o.then) setOrder(u, o.then); else if (u.queue.length) { const q = u.queue.shift(); u.order = q; u.path = null; u.wantPath = true; } else idleOrder(u); }
-const isCombat = u => u.def.cls !== 'villager' && u.def.cls !== 'huntable' && !u.def.fisher;
+const weaponRange = u => { const s = stats(u); return Math.max(s.melee ? s.melee.range * MT + .25 : 0, s.ranged ? s.ranged.range * MT : 0); };
+const STANCES = ['aggressive', 'defensive', 'ground', 'passive'];
+const STANCE_NAME = { aggressive: 'Aggressive', defensive: 'Defensive', ground: 'Stand Ground', passive: 'No Attack' };
+const isCombat = u => u.def.cls !== 'villager' && u.def.cls !== 'huntable' && !u.def.fisher && !u.def.civilian;
 // Can this unit ever hit that target? Land fighters cannot reach ships at sea (ranged units and fliers can);
 // ships only hunt land targets they can get close to.
 function canTarget(u, e) {
@@ -44,7 +47,7 @@ function findEnemy(u, withBuildings, range) {
   return best;
 }
 function retaliateTarget(u) {
-  if (!u.lastHitBy || G.time - u.lastHitAt > 3) return null;
+  if (u.stance === 'passive' || !u.lastHitBy || G.time - u.lastHitAt > 3) return null;
   const a = byId(u.lastHitBy);
   return a && a.kind !== 'building' && (isEnemy(u.owner, a.owner) || a.owner === 0) && Math.hypot(a.x - u.x, a.y - u.y) < stats(u).los * 1.4 && canTarget(u, a) ? a : null;
 }
@@ -52,6 +55,7 @@ function nearestDrop(u, type) {
   let best = null, bd = 1e9;
   const nav = !!u.def.naval;
   for (const b of G.blds) if (!b.dead && b.owner === u.owner && b.built && B[b.key].drop && B[b.key].drop.includes(type) && !!B[b.key].navalDrop === nav && (!nav || regionsOf(b, true).includes(regionAt(u.x, u.y, true)))) { const d = edgeDist(u, b); if (d < bd) { bd = d; best = b; } }
+  if (!nav) for (const c of G.units) if (c.owner === u.owner && c.def.mobileDrop && !c.dead && c.def.mobileDrop.includes(type)) { const d = edgeDist(u, c); if (d < bd) { bd = d; best = c; } }
   return best;
 }
 // Nearest resource of a type, avoiding crowded spots.
@@ -85,7 +89,7 @@ function updateUnit(u, dt) {
   const st = stats(u), P = G.players[u.owner];
   u.cdM -= dt; u.cdR -= dt; u.spCd -= dt; if (u.hitFlash > 0) u.hitFlash -= dt; if (u.atkT > 0) u.atkT -= dt;
   u.moving = false;
-  let regen = st.regen;
+  let regen = u.noRegen ? 0 : st.regen;
   if (u.def.cls === 'hero' && P && P.immortal) regen += 5;
   if (u.def.cls === 'guard' && u.order.type === 'idle' && Math.hypot(u.x - u.home.x, u.y - u.home.y) < 1.5) regen += 15;
   if (regen && u.hp < maxHp(u)) u.hp = Math.min(maxHp(u), u.hp + regen * dt);
@@ -95,17 +99,39 @@ function updateUnit(u, dt) {
   if (u.stun > 0) { u.stun -= dt; return; }
   if (st.absorb) { cellAbsorb(u, dt); if (u.dead) return; }
   if (st.heal) { u.healT = (u.healT || 0) - dt; if (u.healT <= 0) { u.healT = .5; let did = false; forUnitsNear(u.x, u.y, st.heal.radius * MT, a => { if (a !== u && isAlly(a.owner, u.owner) && a.hp < maxHp(a) && !a.def.tagset.has('Mech')) { a.hp = Math.min(maxHp(a), a.hp + st.heal.rate * .5); did = true; } }); if (did) { u.atkT = .4; u.anim = 'cast'; } } }
+  if (st.aura) { u.auraT = (u.auraT || 0) - dt; if (u.auraT <= 0) { u.auraT = .5; forUnitsNear(u.x, u.y, st.aura.radius * MT, a => { if (a !== u && a.owner === u.owner && whoMatches(a.def, st.aura.who)) { a.buffs = a.buffs.filter(b => !b.aura); a.buffs.push({ until: G.time + .8, atk: st.aura.atk, aura: true }); } }); } }
   const o = u.order;
   switch (o.type) {
+    case 'empower': {
+      const b = byId(o.bid);
+      if (!b || !b.built || b.owner !== u.owner) { idleOrder(u); break; }
+      if (approach(u, b, dt, .7)) { u.anim = 'cast'; faceTo(u, b.x - u.x, b.y - u.y); b.empowered = { by: u.id, until: G.time + .4, mul: u.def.empower }; }
+      break;
+    }
+    case 'trade': {
+      const a = byId(o.home), z = byId(o.dest);
+      if (!a || !z || !a.built || !z.built || !isAlly(z.owner, u.owner)) { idleOrder(u); break; }
+      const t = o.back ? a : z;
+      if (approach(u, t, dt, .5)) {
+        const g = tradeGold(a, z);
+        P.res.gold += g; P.stats.gathered += g; P.stats.trade = (P.stats.trade || 0) + g;
+        if (P.human && visibleAt(u.x, u.y)) floatText(u.x, u.y, 30, '+' + Math.round(g) + ' Zeni', '#ffd34d');
+        o.back = !o.back; u.path = null; u.wantPath = true;
+      }
+      break;
+    }
     case 'idle': {
       if (u.def.cls === 'huntable') { wander(u, dt); break; }
       if (u.def.cls === 'guard') { guardThink(u, dt); break; }
-      if (!isCombat(u)) break;
+      if (!isCombat(u) || u.stance === 'passive') break;
       u.scanT -= dt;
       if (u.scanT <= 0) {
         u.scanT = .5;
-        const e = retaliateTarget(u) || findEnemy(u, u.def.cls === 'titan' || u.def.cls === 'siege');
-        if (e) { u.order = { type: 'attack', tid: e.id, auto: true, home: { x: u.x, y: u.y } }; u.path = null; u.wantPath = true; }
+        // AoM stances: aggressive chases far, defensive stays close to its post, stand ground never moves
+        const ground = u.stance === 'ground', reach = weaponRange(u);
+        let e = retaliateTarget(u) || findEnemy(u, u.def.cls === 'titan' || u.def.cls === 'siege' || ground, ground ? reach : undefined);
+        if (e && ground && edgeDist(u, e) > reach) e = null;
+        if (e) { u.order = { type: 'attack', tid: e.id, auto: true, home: { x: u.x, y: u.y }, ground, leash: u.stance === 'defensive' ? .8 : 1.6 }; u.path = null; u.wantPath = true; }
       }
       break;
     }
@@ -128,7 +154,8 @@ function updateUnit(u, dt) {
         if (o.hunt) { const c = findRes(u.x, u.y, 'food', 3, u.owner); if (c) { setOrder(u, { type: 'gather', rid: c.id, rtype: 'food' }); break; } }
         nextOrder(u); break;
       }
-      if (o.auto && Math.hypot(u.x - o.home.x, u.y - o.home.y) > st.los * 1.6) { setOrder(u, { type: 'move', x: o.home.x, y: o.home.y }); break; }
+      if (o.auto && Math.hypot(u.x - o.home.x, u.y - o.home.y) > st.los * (o.leash || 1.6)) { setOrder(u, { type: 'move', x: o.home.x, y: o.home.y }); break; }
+      if (o.ground && edgeDist(u, t) > weaponRange(u) + .2) { nextOrder(u); break; }
       if (u.def.cls === 'guard' && Math.hypot(u.x - u.home.x, u.y - u.home.y) > 12) { setOrder(u, { type: 'move', x: u.home.x, y: u.home.y }); break; }
       if (u.def.cls === 'villager' && t.kind === 'unit' && t.def.cls !== 'huntable' && t.owner !== 0 && !o.forced) { nextOrder(u); break; }
       engage(u, t, dt);
@@ -139,7 +166,9 @@ function updateUnit(u, dt) {
       const drop = nearestDrop(u, u.carry);
       if (!drop) { idleOrder(u); break; }
       if (approach(u, drop, dt, .35)) {
-        P.res[u.carry] += u.carryAmt; P.stats.gathered += u.carryAmt; u.carryAmt = 0;
+        // an empowered drop site (Officer Black, like an AoM Pharaoh) adds 20% to every delivery
+        const amt = u.carryAmt * (drop.kind === 'building' && drop.empowered && drop.empowered.until > G.time ? 1.2 : 1);
+        P.res[u.carry] += amt; P.stats.gathered += amt; u.carryAmt = 0;
         const r = byId(o.rid);
         if (r && (r.kind === 'building' || r.amount > 0)) setOrder(u, { type: 'gather', rid: r.id, rtype: o.rtype });
         else { const n = findRes(u.x, u.y, o.rtype, 14, u.owner, 0, u); if (n) setOrder(u, { type: 'gather', rid: n.id, rtype: o.rtype }); else idleOrder(u); }
@@ -153,14 +182,14 @@ function updateUnit(u, dt) {
         if (u.queue.length) { nextOrder(u); break; }
         const next = G.blds.find(x => !x.dead && !x.built && x.owner === u.owner && Math.hypot(x.x - u.x, x.y - u.y) < 10);
         if (next) { setOrder(u, { type: 'build', bid: next.id }); break; }
-        if (b && b.built && B[b.key].drop) { const type = B[b.key].drop.length === 1 ? 'food' : null; const r = findRes(b.x, b.y, type || (rnd() < .5 ? 'wood' : 'gold'), 10, u.owner); if (r) { setOrder(u, { type: 'gather', rid: r.id, rtype: resType(r) }); break; } }
+        if (b && b.built && B[b.key].drop && u.def.cls === 'villager') { const type = B[b.key].drop.length === 1 ? 'food' : null; const r = findRes(b.x, b.y, type || (rnd() < .5 ? 'wood' : 'gold'), 10, u.owner); if (r) { setOrder(u, { type: 'gather', rid: r.id, rtype: resType(r) }); break; } }
         idleOrder(u); break;
       }
       if (approach(u, b, dt, .35)) {
         u.anim = 'build'; u.face = Math.atan2(b.y - u.y, b.x - u.x); faceTo(u, b.x - u.x, b.y - u.y);
         const d = B[b.key];
         if (!b.built) {
-          const dp = dt / d.time * (u.def.build || 1) * P.mods.build;
+          const dp = dt / d.time * (u.def.build || 1) * P.mods.build * (b.empowered && b.empowered.until > G.time ? b.empowered.mul : 1);
           b.progress += dp; b.hp = Math.min(maxHp(b), b.hp + maxHp(b) * .92 * dp);
           if (b.progress >= 1) completeBuilding(b);
         } else b.hp = Math.min(maxHp(b), b.hp + maxHp(b) * dt / (d.time * 3) * (u.def.build || 1));
@@ -242,7 +271,8 @@ function gatherThink(u, o, dt, P) {
   if (u.carry !== type) { u.carry = type; u.carryAmt = 0; }
   const aiMult = P.ai ? P.ai.diff.gather : 1, g = P.mods.gather;
   const base = { hunt: .95, berry: .65, farm: .55, fish: .8, wood: .6, gold: .6 }[sub] || .6;
-  const rate = base * (g[sub] || 1) * (sub === 'hunt' || sub === 'berry' || sub === 'farm' || sub === 'fish' ? g.food : 1) * (u.def.fisher ? 1 : g.all) * aiMult;
+  // like AoM's cultures, workers differ: Frieza Force workers (Norse-like) and Red Ribbon drones (Egyptian-like) gather a bit slower
+  const rate = base * (g[sub] || 1) * (sub === 'hunt' || sub === 'berry' || sub === 'farm' || sub === 'fish' ? g.food : 1) * (u.def.fisher ? 1 : g.all * (FACTIONS[P.faction].gather || 1)) * aiMult;
   let amt = Math.min(rate * dt, cap - u.carryAmt);
   if (r.kind === 'res') { amt = Math.min(amt, r.amount); r.amount -= amt; if (r.amount <= 0) removeRes(r); }
   u.carryAmt += amt; u.anim = 'work';
@@ -303,12 +333,15 @@ function completeBuilding(b) {
   if (b.key === 'wonder') { P.wonderSince = G.time; toast(`${P.human ? 'Your' : P.name + "'s"} Wonder stands! ${modeHas('wonder') ? 'Defend it for 10 minutes to win.' : ''}`, P.human ? 'gold' : 'warn'); }
   if (G.scn && G.scn.onBuilt) G.scn.onBuilt(b);
 }
+function nearestOfKind(owner, key, from) { let best = null, bd = 1e9; for (const b of G.blds) if (!b.dead && b.owner === owner && b.key === key && b.built) { const d = Math.hypot(b.x - from.x, b.y - from.y); if (d < bd) { bd = d; best = b; } } return best; }
+const tradeGold = (a, z) => { const d = Math.hypot(a.x - z.x, a.y - z.y); return Math.min(120, 2 + d * d * TRADE_RATE); };
 function updateBuilding(b, dt) {
   if (b.hitFlash > 0) b.hitFlash -= dt;
   if (!b.built) return;
   const d = B[b.key], P = G.players[b.owner];
+  const em = b.empowered && b.empowered.until > G.time ? b.empowered.mul : 1;
   if (d.attack) {
-    b.cdA -= dt;
+    b.cdA -= dt * em;
     if (b.cdA <= 0) {
       const range = bmod(P, b.key, 'range', d.attack.range) * MT;
       const targets = [];
@@ -321,14 +354,14 @@ function updateBuilding(b, dt) {
       } else b.cdA = .3;
     }
   }
-  if (d.ki && P) addKi(P, bmod(P, b.key, 'ki', d.ki) * dt * (P.ai ? P.ai.diff.gather : 1));
+  if (d.ki && P) addKi(P, bmod(P, b.key, 'ki', d.ki) * dt * em * (P.ai ? P.ai.diff.gather : 1));
   if (b.garrisoned.length) for (const id of b.garrisoned) { const u = G.byId.get(id); if (u && !u.dead && u.hp < maxHp(u)) u.hp = Math.min(maxHp(u), u.hp + 2 * dt); }
   if (b.queue.length) {
     const q = b.queue[0], def = U[q.key];
     if (q.progress === 0 && P.pop + (def.pop || 0) > P.popCap && (def.pop || 0) > 0) q.blocked = true;
     else {
       q.blocked = false;
-      q.progress += dt / def.time * unitStats(P.id, def, null).trainMul;
+      q.progress += dt / def.time * unitStats(P.id, def, null).trainMul * em;
       if (q.progress >= 1) {
         b.queue.shift();
         P.pop += def.pop || 0;
@@ -344,7 +377,7 @@ function updateBuilding(b, dt) {
   }
   if (b.research) {
     const T = TECH[b.research.key];
-    b.research.progress += dt / T.time;
+    b.research.progress += dt / T.time * em;
     if (b.research.progress >= 1) { const r = b.research; b.research = null; applyTech(P, r.key, b, r.patron); }
   }
 }
@@ -353,6 +386,7 @@ function issueRally(u, rally) {
   if (t && !t.dead && (t.kind === 'res' || (t.kind === 'building' && t.key === 'farm')) && ((u.def.cls === 'villager' && !(t.kind === 'res' && RES_DEF[t.key].naval)) || (u.def.fisher && t.kind === 'res' && RES_DEF[t.key].naval))) setOrder(u, { type: 'gather', rid: t.id, rtype: resType(t) });
   else if (u.def.fisher) { const r = findRes(rally.x, rally.y, 'food', 20, u.owner, 0, u); if (r) setOrder(u, { type: 'gather', rid: r.id, rtype: 'food' }); else setOrder(u, { type: 'move', x: rally.x, y: rally.y }); }
   else if (t && !t.dead && t.kind === 'building' && t.key === 'temple' && u.def.cls === 'villager' && G.players[u.owner].faction === 'earth') setOrder(u, { type: 'meditate', bid: t.id });
+  else if (u.def.trader && t && !t.dead && t.kind === 'building' && t.key === 'tc' && isAlly(t.owner, u.owner)) { const m = nearestOfKind(u.owner, 'market', u); if (m) setOrder(u, { type: 'trade', home: m.id, dest: t.id }); }
   else setOrder(u, { type: 'move', x: rally.x + (rnd() - .5) * .8, y: rally.y + (rnd() - .5) * .8, amove: isCombat(u) });
 }
 function applyTech(P, key, b, patron) {
@@ -360,7 +394,12 @@ function applyTech(P, key, b, patron) {
   P.techs.add(key);
   if (T.ageUp) {
     P.age = T.ageUp;
-    if (patron) { P.minors.push(patron); P.powers[PATRONS[patron].power] = { state: 'ready' }; }
+    if (patron) {
+      P.minors.push(patron); P.powers[PATRONS[patron].power] = { state: 'ready' };
+      // as in Age of Mythology, the new patron sends a gift of its myth units to your Temple
+      const mk = PATRONS[patron].myth, home = G.blds.find(x => x.owner === P.id && x.key === 'temple' && x.built) || b;
+      if (mk && home) for (let i = 0; i < patronGift(patron); i++) spawnNear(home, mk, P.id);
+    }
     if (P.human) { announce(AGES[P.age]); SFX.play('age'); toast(`${PATRONS[patron].name} now watches over you: ${PATRONS[patron].desc}`, 'gold'); }
     else if (G.me && isEnemy(G.me, P.id)) toast(`${P.name} entered the ${AGES[P.age]}.`, 'warn');
   }
@@ -376,6 +415,7 @@ function applyTech(P, key, b, patron) {
   if (G.scn && G.scn.onTech) G.scn.onTech(P, key);
 }
 
+const patronGift = pk => { const d = U[PATRONS[pk].myth]; return d ? (d.pop >= 4 ? 1 : 2) : 0; };
 // ---------- training and research rules (shared by the HUD and the AI) ----------
 const canAfford = (P, c) => { for (const k in c) if ((P.res[k] || 0) < c[k]) return false; return true; };
 const pay = (P, c) => { for (const k in c) P.res[k] -= c[k]; };
@@ -492,6 +532,33 @@ function economy(dt) {
   for (const u of G.units) if (u.buffs.length) u.buffs = u.buffs.filter(b => b.until > G.time);
 }
 
+// ---------- score (AoM-style post-game timeline) ----------
+// The score has Age of Mythology's four parts: economy, military, technology and mythology.
+function scoreParts(P) {
+  const st = P.stats, used = Object.keys(P.powers || {}).filter(k => P.powers[k].state === 'used').length;
+  return {
+    economy: Math.round(st.gathered / 10 + (st.trade || 0) / 10),
+    military: Math.round(st.kills * 4 + st.killedB * 15),
+    technology: Math.round(P.techs.size * 12 + (P.age - 1) * 80),
+    mythology: Math.round(relicsOf(P.id).length * 25 + st.balls * 20 + (st.wishes || 0) * 40 + used * 10),
+  };
+}
+function scoreOf(P) { const s = scoreParts(P); return s.economy + s.military + s.technology + s.mythology; }
+function recordHistory() {
+  G.history = G.history || [];
+  const vills = G.players.map(() => 0); for (const u of G.units) if (u.def.cls === 'villager' && vills[u.owner] !== undefined) vills[u.owner]++;
+  G.history.push({ t: G.time, s: G.players.map(P => P.id ? scoreOf(P) : 0), p: G.players.map(P => P.id ? P.pop || 0 : 0), v: vills });
+}
+// Tribute to an ally. As in Age of Mythology, the courier takes a 10% cut.
+const TRIBUTE_FEE = .1;
+function tribute(from, to, res, amt) {
+  const fee = Math.ceil(amt * TRIBUTE_FEE);
+  if (!isAlly(from.id, to.id) || from.id === to.id) return 'You can only send tribute to allies';
+  if ((from.res[res] || 0) < amt + fee) return `Not enough ${RES_NAME[res]}`;
+  from.res[res] -= amt + fee; to.res[res] += amt;
+  from.stats.tribute = (from.stats.tribute || 0) + amt;
+  return null;
+}
 // ---------- victory ----------
 const PRODUCTION = new Set(['tc', 'barracks', 'stable', 'temple', 'fortress']);
 function checkVictory() {
@@ -598,6 +665,7 @@ function tick(dt) {
   for (let i = G.delayed.length - 1; i >= 0; i--) if (G.time >= G.delayed[i].at) { const d = G.delayed.splice(i, 1)[0]; d.fn(); }
   updateBalls(dt);
   updateRelics();
+  if (G.kos.length) updateKOs(dt);
   if (G.koth) updateKoth(dt);
   for (const P of G.players) if (P.ai && !P.defeated) aiThink(P, dt);
   if (G.scn && G.scn.tick) G.scn.tick(dt);
@@ -608,6 +676,7 @@ function tick(dt) {
   for (let i = G.ruins.length - 1; i >= 0; i--) { G.ruins[i].t += dt; if (G.ruins[i].t > 60) G.ruins.splice(i, 1); }
   for (let i = G.treeFall.length - 1; i >= 0; i--) { G.treeFall[i].t += dt; if (G.treeFall[i].t > 20) G.treeFall.splice(i, 1); }
   if (G.ents.length > G.units.length + G.blds.length + G.ress.length + 50 || (G.tickN++ % 40) === 0) { G.ents = G.ents.filter(e => { if (e.dead) { G.byId.delete(e.id); return false; } return true; }); }
+  if (G.time >= (G.histT || 0)) { G.histT = G.time + 20; recordHistory(); }
   checkVictory();
 }
 function separate(dt) {

@@ -299,7 +299,7 @@ function sealedBallSprite(open) {
 }
 
 // ---------- icons and portraits (for the HUD) ----------
-const CLASS_BG = { ship: ['#1a4a5a', '#0c222a'], villager: ['#2f4a2a', '#1b2a18'], infantry: ['#5a2a1a', '#2a140c'], ranged: ['#1a3a5a', '#0c1a2a'], cavalry: ['#4a3a1a', '#24180a'], siege: ['#3a3a3a', '#1a1a1a'], myth: ['#3a1a5a', '#1a0c2a'], hero: ['#6a4a0a', '#2a1a04'], titan: ['#5a1a3a', '#2a0c1a'], guard: ['#3a3a1a', '#1a1a0c'], huntable: ['#3a3a1a', '#1a1a0c'] };
+const CLASS_BG = { cart: ['#4a4a2a', '#22220c'], ship: ['#1a4a5a', '#0c222a'], villager: ['#2f4a2a', '#1b2a18'], infantry: ['#5a2a1a', '#2a140c'], ranged: ['#1a3a5a', '#0c1a2a'], cavalry: ['#4a3a1a', '#24180a'], siege: ['#3a3a3a', '#1a1a1a'], myth: ['#3a1a5a', '#1a0c2a'], hero: ['#6a4a0a', '#2a1a04'], titan: ['#5a1a3a', '#2a0c1a'], guard: ['#3a3a1a', '#1a1a0c'], huntable: ['#3a3a1a', '#1a1a0c'] };
 function iconCanvas(key, size, draw) {
   return sprite('I|' + key + '|' + size, size, size, 0, 0, draw);
 }
@@ -424,6 +424,12 @@ function powerIcon(key, size) {
   });
 }
 const CMD_GLYPH = {
+  empower: c => { for (let i = 0; i < 8; i++) { const a = i / 8 * 6.283; limb(c, 26 + Math.cos(a) * 8, 26 + Math.sin(a) * 8, 26 + Math.cos(a) * 16, 26 + Math.sin(a) * 16, 2.4, '#ffd34d'); } blob(c, 26, 26, 7, 7, '#fff2b0'); },
+  trade: c => { limb(c, 10, 30, 42, 30, 3, '#dfe7f2'); poly(c, [[42, 24], [48, 30], [42, 36]], '#dfe7f2'); poly(c, [[10, 16], [4, 22], [10, 28]], '#ffd34d'); limb(c, 10, 22, 40, 22, 3, '#ffd34d'); },
+  stance_aggressive: c => { limb(c, 12, 40, 34, 14, 3.4, '#dfe7f2'); limb(c, 40, 40, 18, 14, 3.4, '#dfe7f2'); blob(c, 26, 26, 4, 4, '#ff5a5f'); },
+  stance_defensive: c => { poly(c, [[26, 8], [42, 14], [40, 30], [26, 44], [12, 30], [10, 14]], '#5b8fd8'); poly(c, [[26, 14], [36, 18], [34, 29], [26, 38]], '#9fc4ff', true); },
+  stance_ground: c => { limb(c, 26, 10, 26, 36, 3.4, '#dfe7f2'); limb(c, 18, 18, 34, 18, 3, '#a07a2a'); c.fillStyle = '#8a6a42'; c.fillRect(10, 38, 32, 5); },
+  stance_passive: c => { blob(c, 26, 26, 14, 14, 'rgba(0,0,0,0)'); c.strokeStyle = '#ffd34d'; c.lineWidth = 3; c.beginPath(); c.arc(26, 26, 13, 0, 7); c.stroke(); limb(c, 16, 16, 36, 36, 3, '#ff5a5f'); },
   stop: c => { c.fillStyle = '#ff5a5f'; c.fillRect(16, 16, 20, 20); },
   amove: c => { limb(c, 12, 40, 36, 16, 3, '#dfe7f2'); poly(c, [[36, 12], [42, 10], [40, 18]], '#ff5a5f'); },
   garrison: c => { poly(c, [[10, 26], [26, 12], [42, 26], [42, 42], [10, 42]], '#9aa0aa'); c.fillStyle = '#2a2d33'; c.fillRect(22, 30, 8, 12); },

@@ -32,13 +32,20 @@ function aiThink(P, dt) {
   const A = P.ai; A.t -= dt; if (A.t > 0) return; A.t = A.diff.think;
   A.powerCd -= A.diff.think; A.tradeCd -= A.diff.think;
   const F = A.flags, now = G.time, D = A.diff;
+  // allies help each other, as AoM's computer players do: a rich AI sends tribute to a poor human ally
+  const me = G.me && G.players[G.me];
+  if (!G.scn && me && me.id !== P.id && !me.defeated && isAlly(P.id, me.id) && now > (A.nextTribute || 300)) {
+    A.nextTribute = now + 150;
+    for (const r of ['food', 'wood', 'gold']) if (P.res[r] > 1400 && me.res[r] < 150 && !tribute(P, me, r, 200)) { toast(`${P.name} sent you 200 ${RES_NAME[r]} as tribute.`, 'good'); break; }
+  }
   const units = G.units.filter(u => u.owner === P.id), blds = G.blds.filter(b => b.owner === P.id);
   const tcs = blds.filter(b => b.key === 'tc');
   const tc = tcs.find(b => b.built) || tcs[0];
   const vills = units.filter(u => u.def.cls === 'villager' && !u.garrison);
-  const army = units.filter(u => u.def.cls !== 'villager' && u.def.cls !== 'hero' && !u.garrison && !u.def.naval);
-  const heroes = units.filter(u => u.def.cls === 'hero');
-  const hero = heroes.find(h => h.key === FACTIONS[P.faction].mainHero) || heroes[0];
+  const army = units.filter(u => u.def.cls !== 'villager' && u.def.cls !== 'hero' && !u.garrison && !u.def.naval && !u.def.civilian);
+  const heroes = units.filter(u => u.def.cls === 'hero' && !u.def.pharaoh);
+  // the faction's main hero (Goku, General Blue, Vegeta) comes first; side heroes never stand in for it
+  const main = heroes.find(h => h.key === FACTIONS[P.faction].mainHero), hero = main || heroes[0];
   const count = k => blds.filter(b => b.key === k).length;
   const pending = k => blds.some(b => b.key === k && !b.built);
   const temple = blds.find(b => b.key === 'temple' && b.built);
@@ -106,7 +113,7 @@ function aiThink(P, dt) {
   const want = c => { for (const k in c) reserve[k] = (reserve[k] || 0) + c[k]; };
   if (saving && !threat) want(TECH[ageKey].cost);
   const heroKey = FACTIONS[P.faction].mainHero;
-  if (!hero && (vills.length >= 12 || P.age >= 2) && !threat) want(unitCost(P, heroKey));
+  if (!main && (vills.length >= 12 || P.age >= 2) && !threat) want(unitCost(P, heroKey));
   const spare = c => { for (const k in c) if ((P.res[k] || 0) - (reserve[k] || 0) < c[k]) return false; return true; };
   const tryTech = (b, k) => { if (b && !b.research && !techCheck(P, b, k) && spare(TECH[k].cost)) { startTech(P, b, k); return true; } return false; };
   if (tc && vills.length >= 10) { const g = built('granary')[0], s = built('storehouse')[0]; for (const k of ['hunting', 'plow', 'hydro']) if (tryTech(g, k)) break; for (const k of ['saws', 'drills', 'lasersaws', 'deepcore', 'hovercarts']) if (tryTech(s, k)) break; }
@@ -122,9 +129,24 @@ function aiThink(P, dt) {
   for (const t of built('tower')) tryTech(t, 'towerup');
 
   // ---- heroes
-  if (!hero && (vills.length >= 12 || P.age >= 2)) { const hb = tc && tc.built ? tc : null; if (hb) queueUnit(P, hb, heroKey); }
-  const extra = { earth: [['krillin', 'tc'], ['piccolo', 'temple'], ['gohan', 'temple']], rr: [['a18', 'fortress'], ['a17', 'fortress'], ['cell', 'temple']], ff: [['raditz', 'tc'], ['nappa', 'fortress'], ['frieza', 'temple']] }[P.faction];
-  for (const [k, at] of extra) { const b = built(at)[0]; if (b && !trainCheck(P, b, k) && spare(unitCost(P, k)) && P.pop < P.popCap - 4) { queueUnit(P, b, k); break; } }
+  if (!main && (vills.length >= 12 || P.age >= 2)) { const hb = tc && tc.built ? tc : null; if (hb) queueUnit(P, hb, heroKey); }
+  const extra = { earth: [['krillin', 'tc'], ['yamcha', 'tc'], ['roshi', 'temple'], ['piccolo', 'temple'], ['tien', 'tc'], ['gohan', 'temple'], ['trunks', 'fortress'], ['gotenks', 'temple']], rr: [['black', 'tc'], ['tao', 'tc'], ['a19', 'temple'], ['a16', 'fortress'], ['a18', 'fortress'], ['a17', 'fortress'], ['cell', 'temple']], ff: [['raditz', 'tc'], ['bardock', 'tc'], ['zarbon', 'tc'], ['dodoriah', 'tc'], ['recoome', 'fortress'], ['ginyucap', 'temple'], ['coolerh', 'temple'], ['nappa', 'fortress'], ['broly', 'fortress'], ['frieza', 'temple']] }[P.faction];
+  if (main && heroes.length < 2 + P.age) for (const [k, at] of extra) { const b = built(at)[0]; if (b && !trainCheck(P, b, k) && spare(unitCost(P, k)) && P.pop < P.popCap - 4) { queueUnit(P, b, k); break; } }
+  // ---- culture specials: Officer Black empowers, Frieza Force supply pods, trade caravans
+  const ph = units.find(u => u.def.empower && !u.garrison);
+  if (ph && !threat) { const busy = blds.filter(b => b.built && (b.queue.length || b.research) && b.key !== 'house').sort((a, b) => (b.key === 'tc' ? 0 : 1) - (a.key === 'tc' ? 0 : 1))[0] || tc; if (busy && !(ph.order.type === 'empower' && ph.order.bid === busy.id)) setOrder(ph, { type: 'empower', bid: busy.id }); }
+  if (P.faction === 'ff' && tc && tc.built) {
+    const pods = units.filter(u => u.def.mobileDrop), spot = remoteSpot(P, vills);
+    if (spot && pods.length < 3 && !tc.queue.some(q => q.key === 'supplypod') && P.res.wood > 150) queueUnit(P, tc, 'supplypod');
+    for (const p of pods) if (p.order.type === 'idle' && spot && !pods.some(q => q !== p && dist(q.x, q.y, spot.x, spot.y) < 4)) setOrder(p, { type: 'move', x: spot.x + 1.5, y: spot.y + 1.5 });
+  }
+  const mkt = built('market')[0];
+  if (mkt) {
+    const kind = Object.keys(U).find(k => U[k].trader && U[k].faction === P.faction), cars = units.filter(u => u.def.trader);
+    let far = null, fd = 24; for (const b of G.blds) if (b.key === 'tc' && b.built && isAlly(b.owner, P.id)) { const d = dist(b.x, b.y, mkt.x, mkt.y); if (d > fd) { fd = d; far = b; } }
+    if (far && cars.length + mkt.queue.length < (A.diffKey === 'easy' ? 3 : 6) && mkt.queue.length < 2 && spare(unitCost(P, kind)) && P.pop < P.popCap - 2) queueUnit(P, mkt, kind);
+    if (far) for (const c of cars) if (c.order.type === 'idle') setOrder(c, { type: 'trade', home: mkt.id, dest: far.id });
+  }
 
   // ---- army composition by counters
   const foe = { infantry: 0, ranged: 0, cavalry: 0, myth: 0, siege: 0 };
@@ -207,7 +229,10 @@ function aiVillagers(P, A, vills, anchor, temple) {
   const jobs = { food: 0, wood: 0, gold: 0 };
   let meditating = 0;
   for (const v of vills) { if (v.order.type === 'gather' || v.order.type === 'return') jobs[v.order.rtype] = (jobs[v.order.rtype] || 0) + 1; if (v.order.type === 'meditate') meditating++; }
-  const wantMed = P.faction === 'earth' && temple ? (P.age >= 2 ? 6 : 3) + (P.age >= 3 ? 2 : 0) : 0;
+  // like an AoM player managing favor: pray while Ki is short, send the monks back to work when it is full
+  const kiFull = P.res.ki >= P.kiCap - 5;
+  const wantMed = P.faction === 'earth' && temple ? (kiFull ? 1 : (P.age >= 2 ? 6 : 3) + (P.age >= 3 ? 2 : 0)) : 0;
+  if (meditating > wantMed + 1) { let extra = meditating - wantMed; for (const v of vills) if (extra > 0 && v.order.type === 'meditate') { idleOrder(v); extra--; meditating--; } }
   const weights = P.age === 1 ? { food: .55, wood: .3, gold: .15 } : P.age === 2 ? { food: .42, wood: .25, gold: .33 } : { food: .38, wood: .22, gold: .4 };
   for (const k in weights) if (P.res[k] > 1500) weights[k] *= .12; else if (P.res[k] > 800) weights[k] *= .4;
   if (P.res.gold < 150 && P.age >= 2) weights.gold *= 1.5;

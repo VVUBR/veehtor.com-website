@@ -60,7 +60,7 @@ function poseParams(pose, f) {
 // ---------- humanoid ----------
 function drawHuman(c, L, pose, f, pc) {
   const P = poseParams(pose, f);
-  const bulk = L.build === 'bulky' ? 1.35 : L.build === 'slim' ? .85 : 1, tall = L.build === 'tall' ? 1.12 : 1;
+  const bulk = L.build === 'bulky' ? 1.35 : L.build === 'heavy' ? 1.5 : L.build === 'fat' ? 1.7 : L.build === 'slim' ? .85 : L.build === 'kid' ? .9 : 1, tall = L.build === 'tall' || L.build === 'heavy' ? 1.12 : L.build === 'kid' ? .82 : 1;
   const skin = L.skin || '#f2c9a0', top = L.top || '#888', pants = L.pants || top, boots = L.boots || '#333';
   const team = pc != null ? pcol(pc) : (L.belt || '#333');
   const belt = L.keepColors ? (L.belt || team) : team, band = L.keepColors ? (L.band || L.belt || team) : team;
@@ -68,6 +68,7 @@ function drawHuman(c, L, pose, f, pc) {
   const lean = P.lean;
   if (L.ghost) c.globalAlpha = .82;
   // cape and tail behind
+  if (L.shell) { blob(c, -6 + lean * .3, -22 * tall - P.bob, 7, 9, '#3f8f3a'); c.strokeStyle = '#2b5f28'; c.lineWidth = 1; c.beginPath(); c.moveTo(-11 + lean * .3, -22 * tall - P.bob); c.lineTo(-1 + lean * .3, -22 * tall - P.bob); c.stroke(); }
   if (L.cape) poly(c, [[-3 + lean * .5, shY + 1], [3 + lean * .5, shY + 1], [-3 + lean * .2, -2], [-10, -1]], L.cape);
   if (L.tail) { c.strokeStyle = OUTLINE; c.lineWidth = 4; c.beginPath(); c.moveTo(-3, hipY + 2); c.quadraticCurveTo(-12, hipY + 4, -10, hipY - 6); c.stroke(); c.strokeStyle = '#7a4a22'; c.lineWidth = 2.4; c.stroke(); }
   // back arm and back leg
@@ -87,6 +88,8 @@ function drawHuman(c, L, pose, f, pc) {
     blob(c, -tw / 2 + lean * .5, shY + 1.4, 3.2, 2.6, pc != null && !L.keepColors ? team : L.armor.pad);
     blob(c, tw / 2 + lean * .5, shY + 1.4, 3.2, 2.6, pc != null && !L.keepColors ? team : L.armor.pad);
   }
+  if (L.emblem) { blob(c, -tw / 2 + lean * .5 + 3.4, shY + 3.6, 2.2, 2.2, '#f4f4f4'); c.fillStyle = L.emblemC || '#d33a3a'; c.font = '700 3.4px sans-serif'; c.textAlign = 'center'; c.fillText(L.emblem, -tw / 2 + lean * .5 + 3.4, shY + 4.8); }
+  if (L.fatBelly) blob(c, lean * .5 + 2, hipY - 4, tw * .42, 4.5, shade(top, .06));
   c.fillStyle = belt; c.fillRect(-tw / 2 + lean * .5, hipY - 1.5, tw, 2.6);
   if (L.scarf) poly(c, [[lean * .5 - 3, shY - 1], [lean * .5 + 4, shY - 1], [lean * .5 + 1, shY + 3]], L.scarf);
   // front leg
@@ -107,7 +110,13 @@ function drawHuman(c, L, pose, f, pc) {
   if (L.beard) { c.fillStyle = L.beard; c.beginPath(); c.moveTo(hx - 2, hy + 2); c.quadraticCurveTo(hx + 2, hy + 12, hx + 6, hy + 2); c.fill(); }
   if (L.dots) { c.fillStyle = '#7a4a22'; for (let i = 0; i < 6; i++) c.fillRect(hx - 2 + (i % 3) * 2, hy - 5.2 - Math.floor(i / 3) * 1.5, .9, .9); }
   if (L.shades) { c.fillStyle = '#111'; c.fillRect(hx + 1, hy - 1.4, 6, 2.6); }
+  if (L.thirdEye) { c.fillStyle = '#fff'; c.beginPath(); c.ellipse(hx + 3, hy - 4.3, 1.4, .9, 0, 0, 7); c.fill(); c.fillStyle = '#151020'; c.beginPath(); c.arc(hx + 3.3, hy - 4.3, .55, 0, 7); c.fill(); }
+  if (L.cheeks) { c.fillStyle = 'rgba(255,90,120,.55)'; c.beginPath(); c.arc(hx + 4.5, hy + 2, 1.2, 0, 7); c.fill(); }
+  if (L.mark) { c.fillStyle = L.mark; c.font = '700 4px sans-serif'; c.textAlign = 'center'; c.fillText('M', hx + 2.6, hy - 3.2); }
+  if (L.scar) { c.strokeStyle = shade(skin, -.55); c.lineWidth = .8; c.beginPath(); c.moveTo(hx + 3.9, hy + .9); c.lineTo(hx + 6.3, hy + 2.7); c.stroke(); }
   drawHair(c, L, hx, hy, hr);
+  if (L.headband) { c.fillStyle = L.headband; c.fillRect(hx - hr + .4, hy - 3.9, hr * 2 - .8, 1.9); poly(c, [[hx - hr + .5, hy - 3.6], [hx - hr - 4.5, hy - 1.2], [hx - hr - 3.8, hy + 1.2], [hx - hr + .8, hy - 2]], L.headband); }
+  if (L.crown) { c.fillStyle = '#ffcc33'; c.fillRect(hx - hr + .6, hy - 4.4, hr * 2 - 1.2, 1.5); c.fillStyle = '#d33a3a'; c.fillRect(hx + 1.8, hy - 4.3, 1.4, 1.3); }
   if (L.scouter) { c.fillStyle = 'rgba(80,255,120,.75)'; c.beginPath(); c.ellipse(hx + 4.6, hy - .4, 2.5, 2, 0, 0, 7); c.fill(); c.strokeStyle = OUTLINE; c.lineWidth = 1; c.stroke(); c.fillStyle = '#ddd'; c.fillRect(hx - 1, hy - 1, 2.5, 4); }
   if (L.halo) { c.strokeStyle = '#ffe066'; c.lineWidth = 1.6; c.beginPath(); c.ellipse(hx, hy - hr - 3.5, 4.5, 1.5, 0, 0, 7); c.stroke(); }
   // front arm and held items
@@ -124,6 +133,8 @@ function drawHuman(c, L, pose, f, pc) {
   else if (L.gun === 'pistol') { limb(c, hand[0], hand[1] - .5, hand[0] + 5, hand[1] - 1, 2, '#2b2b2b'); }
   if (L.baton) limb(c, hand[0], hand[1], hand[0] + 4, hand[1] - 8, 1.8, '#3b3b3b');
   if (L.sword) { limb(c, hand[0], hand[1], hand[0] + 6, hand[1] - 15, 2.4, '#dfe7f2'); limb(c, hand[0] - 2, hand[1] + 1, hand[0] + 3, hand[1] - 1, 2, '#a07a2a'); }
+  if (L.backSword && !L.sword) { limb(c, -6 + lean * .3, shY + 9, 3 + lean * .3, shY - 8, 2, '#6a5a3a'); }
+  if (L.cane) limb(c, hand[0] + 1, hand[1] - 2, hand[0] + 3, -1.5, 1.6, '#8a6a42');
   if (L.tool && (pose === 'work' || pose === 'build')) { limb(c, hand[0], hand[1], hand[0] + Math.cos(-1.2 + P.tool - .9) * 7, hand[1] + Math.sin(-1.2 + P.tool - .9) * 7, 1.8, '#6b6b70'); blob(c, hand[0] + Math.cos(-1.2 + P.tool - .9) * 7, hand[1] + Math.sin(-1.2 + P.tool - .9) * 7, 2, 1.5, '#9aa0aa'); }
   if (P.glow) { const g = c.createRadialGradient(hand[0] + 2, hand[1], 0, hand[0] + 2, hand[1], 6 * P.glow); g.addColorStop(0, 'rgba(255,255,255,.95)'); g.addColorStop(.4, rgba(L.kiC || '#7fe0ff', .8)); g.addColorStop(1, rgba(L.kiC || '#7fe0ff', 0)); c.fillStyle = g; c.beginPath(); c.arc(hand[0] + 2, hand[1], 6 * P.glow, 0, 7); c.fill(); }
   c.globalAlpha = 1;
@@ -165,6 +176,15 @@ function drawHair(c, L, hx, hy, hr) {
     case 'cap': hairCap(c, hx, hy, hr + .3, col); c.fillStyle = col; c.fillRect(hx + 2, hy - 3.2, 6, 1.6); break;
     case 'turban': c.fillStyle = col; c.beginPath(); c.arc(hx, hy - 1.5, hr + 1.4, Math.PI * .95, Math.PI * 2.05); c.closePath(); c.fill(); c.strokeStyle = OUTLINE; c.lineWidth = 1.1; c.stroke(); c.fillStyle = '#6a3aa0'; c.fillRect(hx - hr, hy - 3.5, hr * 2, 1.6); break;
     case 'white': hairCap(c, hx, hy, hr, '#f2f2f2'); break;
+    case 'trunks': hairCap(c, hx, hy, hr + .3, col); poly(c, [[hx - hr - .3, hy - 2], [hx - hr, hy + 5], [hx - 3, hy + 4], [hx - 2, hy - 3]], col); poly(c, [[hx + 1, hy - 6], [hx + 6.5, hy - 1], [hx + 3, hy - 5]], col); break;
+    case 'afro': c.fillStyle = col; c.strokeStyle = OUTLINE; c.lineWidth = 1.1; c.beginPath(); for (let a = 0; a < 9; a++) { const t = Math.PI * (.95 + a * .13); c.moveTo(hx + Math.cos(t) * 7 + 3, hy - 2 + Math.sin(t) * 7); c.arc(hx + Math.cos(t) * 7, hy - 2 + Math.sin(t) * 7, 3.4, 0, 7); } c.fill(); c.stroke(); hairCap(c, hx, hy, hr + .6, col); break;
+    case 'pigtails': hairCap(c, hx, hy, hr, col); poly(c, [[hx - 5, hy + 1], [hx - 9, hy + 7], [hx - 6, hy + 8], [hx - 3, hy + 2]], col); poly(c, [[hx + 1, hy - 6], [hx + 6.5, hy - 2], [hx + 4, hy - 5.6]], col); break;
+    case 'braid': hairCap(c, hx, hy, hr, col, true); limb(c, hx - 5, hy, hx - 9, hy + 14, 2.4, col); blob(c, hx - 9, hy + 15, 1.6, 1.6, '#ffcc33'); break;
+    case 'flat': c.fillStyle = col; c.fillRect(hx - hr, hy - hr - 3, hr * 2, 5); c.strokeStyle = OUTLINE; c.lineWidth = 1; c.strokeRect(hx - hr, hy - hr - 3, hr * 2, 5); hairCap(c, hx, hy, hr, col); break;
+    case 'flame': spikes(c, hx - 1, hy - 1, [[U2 - .5, 13, 3], [U2, 15, 3], [U2 + .45, 12, 2.6]], col); hairCap(c, hx, hy, hr, col); break;
+    case 'mullet': hairCap(c, hx, hy, hr, col); poly(c, [[hx - 5, hy - 3], [hx - 9, hy + 9], [hx - 3, hy + 7], [hx - 1, hy - 2]], col); break;
+    case 'twotone': spikes(c, hx - 1, hy - 1, [[U2 - .9, 12, 3], [U2 - .3, 13, 3], [U2 + .3, 12, 2.6], [Math.PI * .9, 9, 2.6]], L.hair2C || col); hairCap(c, hx, hy, hr, col); break;
+    case 'beanie': c.fillStyle = col; c.beginPath(); c.arc(hx, hy - 1, hr + .8, Math.PI, 0); c.closePath(); c.fill(); c.strokeStyle = OUTLINE; c.lineWidth = 1.1; c.stroke(); c.fillStyle = L.hair2C || '#f4f4f4'; c.fillRect(hx - hr - .8, hy - 2.4, hr * 2 + 1.6, 1.8); break;
     default: break;
   }
 }
@@ -211,6 +231,19 @@ function drawVehicle(c, L, pose, f, pc) {
     poly(c, [[-15, -6 - bob], [14, -6 - bob], [16, -12 - bob], [8, -18 - bob], [-10, -18 - bob], [-15, -12 - bob]], body);
     c.fillStyle = trim; c.fillRect(-14, -11 - bob, 28, 2.4);
     rrect(c, -2, -24 - bob, 9, 7, 2, '#5b6b52'); limb(c, 6, -21 - bob, 14 + (pose === 'atk' ? f * 2 : 0), -21 - bob, 2.2, '#2a2a2a');
+    return;
+  }
+  if (k === 'truck') {
+    for (const x of [-9, 9]) { blob(c, x, -3.5, 3.6, 3.6, '#222'); blob(c, x, -3.5, 1.4, 1.4, '#888'); }
+    rrect(c, -15, -18 - bob, 20, 13, 2, body); c.fillStyle = trim; c.fillRect(-15, -12 - bob, 20, 2.2);
+    rrect(c, 5, -14 - bob, 10, 9, 2, shade(body, -.1)); c.fillStyle = 'rgba(160,220,255,.8)'; c.fillRect(9, -12.5 - bob, 5, 3.5);
+    c.fillStyle = '#ffd34d'; c.font = '700 6px sans-serif'; c.textAlign = 'center'; c.fillText('Z', -5, -10 - bob);
+    return;
+  }
+  if (k === 'pod') {
+    c.fillStyle = 'rgba(120,220,255,.35)'; c.beginPath(); c.ellipse(0, -1, 10, 2.6, 0, 0, 7); c.fill();
+    blob(c, 0, -10 - bob, 10, 7, body); c.fillStyle = trim; c.fillRect(-9, -10 - bob, 18, 2);
+    for (const [x, col] of [[-5, '#86e07c'], [0, '#d9b27a'], [5, '#ffd34d']]) blob(c, x, -16 - bob, 2.6, 2, col);
     return;
   }
   if (k === 'tank') {
@@ -323,7 +356,8 @@ function drawCell(c, L, pose, f, pc) {
 }
 function drawFrieza(c, L, pose, f, pc) {
   const form = L.form, P = poseParams(pose, f);
-  const purple = form === 'arcosian' ? '#7aa0d8' : '#a24ad0', white = '#f4f4f4';
+  const purple = form === 'arcosian' ? '#7aa0d8' : form === 'cooler' ? '#5a3aa0' : form === 'cold' ? '#6a4aa0' : form === 'mecha' ? '#8a8fa0' : '#a24ad0', white = form === 'mecha' ? '#d8dce4' : '#f4f4f4';
+  if (form === 'cold') poly(c, [[-4, -25], [4, -25], [0, -6], [-12, -4]], '#6a2a3a');
   c.strokeStyle = OUTLINE; c.lineWidth = 5; c.beginPath(); c.moveTo(-2, -12); c.quadraticCurveTo(-18, -8, -14, -1); c.stroke(); c.strokeStyle = form === 'final' ? white : '#d8c8e8'; c.lineWidth = 3; c.stroke();
   limb(c, -2, -13, -2 + P.legB, -2.5, 4, shade(white, -.15)); blob(c, -1 + P.legB, -1.4, 2.6, 1.6, purple);
   rrect(c, -5 + P.lean * .5, -25, 10, 13, 3.5, white);
@@ -333,15 +367,45 @@ function drawFrieza(c, L, pose, f, pc) {
   limb(c, 2, -13, 2 + P.legA, -2.5, 4.2, white); blob(c, 3 + P.legA, -1.4, 2.6, 1.6, purple);
   const hx = P.lean * .9 + .5, hy = -31;
   blob(c, hx, hy, 6, 6.4, white);
-  if (form === 'base' || form === 'arcosian') { poly(c, [[hx - 4, hy - 4], [hx - 7, hy - 11], [hx - 2, hy - 6]], '#ddd'); poly(c, [[hx + 2, hy - 6], [hx + 5, hy - 12], [hx + 5, hy - 4]], '#ddd'); }
+  if (form === 'cooler') { c.fillStyle = purple; c.beginPath(); c.arc(hx, hy - 1, 6.4, Math.PI * 1.02, Math.PI * 1.98); c.closePath(); c.fill(); c.fillStyle = 'rgba(40,20,80,.6)'; c.fillRect(hx + 1, hy + 1.5, 6, 2.4); }
+  if (form === 'mecha') { c.strokeStyle = '#5a5f6a'; c.lineWidth = 1; c.beginPath(); c.moveTo(hx + 1, hy - 5); c.lineTo(hx + 1, hy + 5); c.stroke(); c.fillStyle = '#ff3b3b'; c.fillRect(hx + 4, hy - .6, 2, 1.2); }
+  if (form === 'base' || form === 'arcosian' || form === 'cold') { poly(c, [[hx - 4, hy - 4], [hx - 7, hy - 11], [hx - 2, hy - 6]], '#ddd'); poly(c, [[hx + 2, hy - 6], [hx + 5, hy - 12], [hx + 5, hy - 4]], '#ddd'); }
   c.fillStyle = purple; c.beginPath(); c.arc(hx, hy - 1.5, 5.6, Math.PI * 1.08, Math.PI * 1.92); c.closePath(); c.fill();
   c.fillStyle = '#c0104a'; c.beginPath(); c.ellipse(hx + 2.8, hy + .5, 1, 1.4, 0, 0, 7); c.ellipse(hx + 5, hy + .5, .8, 1.3, 0, 0, 7); c.fill();
   const hand = P.reach ? [4 + P.reach, -21.5] : P.raise ? [9, -32] : [4 + P.armA, -14];
   limb(c, 3, -23, hand[0], hand[1], 3.4, white); blob(c, hand[0], hand[1], 2, 2, white);
   if (P.glow) { c.fillStyle = 'rgba(255,120,220,.9)'; c.beginPath(); c.arc(hand[0] + 3, hand[1] - 1, 2.6, 0, 7); c.fill(); }
 }
-function drawBuu(c, pose, f) {
-  const P = poseParams(pose, f), pink = '#ff9ecf';
+function drawBuu(c, pose, f, L) {
+  const P = poseParams(pose, f), pink = '#ff9ecf', form = L && L.form;
+  if (form === 'fat') {
+    limb(c, -4, -10, -4 + P.legB, -3, 6, '#f4f4f4'); blob(c, -3 + P.legB, -2, 3.8, 2.2, '#f4c430');
+    c.fillStyle = '#5a2a8a'; poly(c, [[-6, -26], [6, -26], [-1, -6], [-13, -4]], '#5a2a8a');
+    blob(c, P.lean * .5, -16, 11, 10, pink);
+    c.fillStyle = '#1b1b2b'; c.fillRect(-10 + P.lean * .5, -10, 20, 3); blob(c, P.lean * .5 + 1, -9, 2.4, 2, '#ffcc33');
+    c.fillStyle = '#1b1b2b'; c.font = '700 6px sans-serif'; c.textAlign = 'center'; c.fillText('M', P.lean * .5 + 1, -8);
+    limb(c, 4, -10, 4 + P.legA, -3, 6, '#f4f4f4'); blob(c, 5 + P.legA, -2, 3.8, 2.2, '#f4c430');
+    const hx = P.lean * .9, hy = -30;
+    c.strokeStyle = OUTLINE; c.lineWidth = 5; c.beginPath(); c.moveTo(hx, hy - 5); c.quadraticCurveTo(hx - 4, hy - 12, hx + 2, hy - 14); c.stroke(); c.strokeStyle = pink; c.lineWidth = 3; c.stroke();
+    blob(c, hx, hy, 6.4, 6, pink); c.fillStyle = '#111'; c.fillRect(hx + 2, hy - .5, 2.4, 1); c.fillRect(hx + 5, hy - .5, 1.6, 1);
+    c.fillStyle = '#7a1a3a'; c.beginPath(); c.ellipse(hx + 4, hy + 2.6, 1.8, 1, 0, 0, 7); c.fill();
+    const hand = P.reach ? [7 + P.reach, -17] : [8 + P.armA * .5, -12];
+    limb(c, 6, -20, hand[0], hand[1], 4.4, pink); blob(c, hand[0], hand[1], 3, 3, '#f4f4f4');
+    return;
+  }
+  if (form === 'super') {
+    limb(c, -2.5, -13, -2.5 + P.legB, -3, 4.6, '#f4f4f4'); blob(c, -1.5 + P.legB, -2, 3, 1.8, '#1b1b2b');
+    rrect(c, -5.5 + P.lean * .5, -27, 11, 15, 4, pink); c.fillStyle = '#1b1b2b'; rrect(c, -5.5 + P.lean * .5, -27, 11, 8, 3, '#1b1b2b'); c.fillStyle = '#ffcc33'; c.fillRect(-5.5 + P.lean * .5, -13.5, 11, 2.4);
+    limb(c, 2.5, -13, 2.5 + P.legA, -3, 4.6, '#f4f4f4'); blob(c, 3.5 + P.legA, -2, 3, 1.8, '#1b1b2b');
+    const hx = P.lean * .9 + .5, hy = -33;
+    c.strokeStyle = OUTLINE; c.lineWidth = 5; c.beginPath(); c.moveTo(hx - 1, hy - 4); c.quadraticCurveTo(hx - 12, hy - 4, hx - 13, hy + 10); c.stroke(); c.strokeStyle = pink; c.lineWidth = 3; c.stroke();
+    blob(c, hx, hy, 5.8, 6, pink); c.fillStyle = '#111'; c.fillRect(hx + 2, hy - .8, 2.4, 1.1); c.fillRect(hx + 4.8, hy - .8, 1.6, 1.1);
+    c.strokeStyle = '#111'; c.lineWidth = .8; c.beginPath(); c.moveTo(hx + 3, hy + 3); c.lineTo(hx + 5.5, hy + 2.4); c.stroke();
+    const hand = P.reach ? [5 + P.reach, -22] : P.raise ? [8, -34] : [4 + P.armA, -15];
+    limb(c, 3, -24, hand[0], hand[1], 3.4, pink); blob(c, hand[0], hand[1], 2.2, 2.2, pink);
+    if (P.glow) { c.fillStyle = 'rgba(255,140,210,.9)'; c.beginPath(); c.arc(hand[0] + 3, hand[1], 2.8, 0, 7); c.fill(); }
+    return;
+  }
   limb(c, -3, -12, -3 + P.legB, -3, 5, shade(pink, -.1)); blob(c, -2 + P.legB, -2, 3.4, 2, '#f4c430');
   rrect(c, -7 + P.lean * .5, -24, 14, 13, 5, pink);
   c.fillStyle = '#1b1b2b'; c.fillRect(-7 + P.lean * .5, -14, 14, 3);
@@ -431,7 +495,7 @@ function drawFigure(c, L, pose, f, pc) {
     case 'ape': drawApe(c, p, f, pc); break;
     case 'cell': drawCell(c, L, p, f, pc); break;
     case 'frieza': drawFrieza(c, L, p, f, pc); break;
-    case 'buu': drawBuu(c, p, f); break;
+    case 'buu': drawBuu(c, p, f, L); break;
     default: drawHuman(c, L, p, f, pc);
   }
   if (pose === 'dead') c.restore();
