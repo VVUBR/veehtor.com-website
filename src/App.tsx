@@ -18,6 +18,7 @@ import Cervejarias from "./pages/Cervejarias";
 import CaseStudies from "./pages/CaseStudies";
 import CaseStudyDetail from "./pages/CaseStudyDetail";
 import RaioX from "./pages/RaioX";
+import Observer from "./pages/Observer";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/cervejarias" element={<Cervejarias />} />
             <Route path="/case-studies" element={<CaseStudies />} />
             <Route path="/raio-x" element={<RaioX />} />
+            <Route path="/observer" element={<Observer />} />
             <Route path="/case-studies/:slug" element={<CaseStudyDetail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
