@@ -114,7 +114,7 @@ export default function Observer() {
                 <s.icon className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="font-semibold mb-1">{i + 1}. {s.t}</h2>
+                <h2 className="font-sans font-semibold mb-1">{i + 1}. {s.t}</h2>
                 <p className="text-muted-foreground leading-relaxed">{s.d}</p>
               </div>
             </li>
@@ -124,7 +124,7 @@ export default function Observer() {
         <section className="flex gap-4 rounded-xl border border-border bg-card p-5 mb-12">
           <ShieldCheck className="h-6 w-6 shrink-0 text-primary" />
           <div>
-            <h2 className="font-semibold mb-1">Privacidade</h2>
+            <h2 className="font-sans font-semibold mb-1">Privacidade</h2>
             <p className="text-muted-foreground leading-relaxed">
               Seus dados ficam cifrados no seu Mac. A Veehtor só vê se o robô está coletando, nunca o que você faz. Os relatórios com IA usam a sua própria conta.
             </p>
