@@ -145,8 +145,8 @@ export default function Observer() {
     setLoading(true);
     setError("");
     const r = await chamar(sistema);
-    if (r.ok) setData(r.data);
-    else setError(r.msg);
+    if (r.ok === true) setData(r.data);
+    else if ("msg" in r) setError(r.msg);
     setLoading(false);
   }
 
@@ -157,10 +157,10 @@ export default function Observer() {
     setDlErr("");
     setDlMsg("");
     const r = await chamar(outro);
-    if (r.ok) {
+    if (r.ok === true) {
       setSistema(outro);
       setData(r.data);
-    } else setDlErr(r.msg);
+    } else if ("msg" in r) setDlErr(r.msg);
     setLoading(false);
   }
 
