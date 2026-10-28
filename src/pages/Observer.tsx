@@ -33,14 +33,15 @@ const MSGS: Record<string, string> = {
 
 function normalize(v: string) {
   const raw = v.toUpperCase().replace(/[^A-Z0-9]/g, "");
-  return raw.length === 12 ? raw.match(/.{4}/g)!.join("-") : v.trim().toUpperCase();
+  const groups = raw.match(/.{4}/g);
+  return raw.length === 12 && groups ? groups.join("-") : v.trim().toUpperCase();
 }
 
 function detect(): { sistema: Sistema; certo: boolean } {
   const nav = navigator as Navigator & { userAgentData?: { platform?: string } };
   const s = `${nav.userAgentData?.platform || ""} ${nav.userAgent || ""}`;
   if (/Windows/i.test(s)) return { sistema: "windows", certo: true };
-  if (/Macintosh|Mac OS|macOS/i.test(s) && !/iPhone|iPad|Mobile/i.test(s)) return { sistema: "mac", certo: true };
+  if (/Macintosh|Mac OS|macOS|\bMac\b/i.test(s) && !/iPhone|iPad|Mobile/i.test(s)) return { sistema: "mac", certo: true };
   return { sistema: "mac", certo: false };
 }
 
@@ -117,8 +118,11 @@ export default function Observer() {
           method: "POST",
           headers: { apikey: API_KEY, "Content-Type": "application/json" },
           body: "{}",
-        }).then((r) => r.json());
-        if (!s?.access_token) return { ok: false, msg: MSG_PREPARO };
+        }).then(async (r) => {
+          if (!r.ok) throw new Error("signup failed");
+          return r.json();
+        });
+        if (typeof s?.access_token !== "string" || !s.access_token) return { ok: false, msg: MSG_PREPARO };
         tokenRef.current = s.access_token;
       } catch {
         return { ok: false, msg: MSG_PREPARO };
@@ -174,9 +178,9 @@ export default function Observer() {
   }
 
   async function baixarWindows() {
-    if (!data?.partes || !tokenRef.current || progress !== null) return;
+    if (!data?.partes || !tokenRef.current || progress !== null || loading) return;
     const token = tokenRef.current;
-    const total = data.partes.reduce((a, p) => a + Number(p.tamanho), 0) || Number(data.tamanho) || 1;
+    const total = Number(data.tamanho) || 1;
     let recebidos = 0;
     setDlErr("");
     setDlMsg("");
@@ -267,7 +271,7 @@ export default function Observer() {
                   Baixar para Mac
                 </a>
               ) : (
-                <button type="button" onClick={baixarWindows} disabled={progress !== null} className={bigBtn}>
+                <button type="button" onClick={baixarWindows} disabled={progress !== null || loading} className={bigBtn}>
                   <Download className="h-5 w-5" />
                   {progress !== null ? `Baixando… ${progress}%` : "Baixar para Windows"}
                 </button>
