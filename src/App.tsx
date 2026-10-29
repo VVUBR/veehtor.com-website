@@ -13,7 +13,6 @@ import NotFound from "./pages/NotFound";
 import Complo from "./pages/Complo";
 import ScoreDeCredito from "./pages/ScoreDeCredito";
 import PodunkAnnies from "./pages/PodunkAnnies";
-import FamilyRealty from "./pages/family-realty";
 import Cervejarias from "./pages/Cervejarias";
 import CaseStudies from "./pages/CaseStudies";
 import CaseStudyDetail from "./pages/CaseStudyDetail";
@@ -37,8 +36,6 @@ const App = () => (
             <Route path="/complo" element={<Complo />} />
             <Route path="/Score.de.credito.DCarvalho" element={<ScoreDeCredito />} />
             <Route path="/PodunkAnnies" element={<PodunkAnnies />} />
-
-            <Route path="/family-realty/*" element={<FamilyRealty />} />
             <Route path="/cervejarias" element={<Cervejarias />} />
             <Route path="/case-studies" element={<CaseStudies />} />
             <Route path="/raio-x" element={<RaioX />} />
